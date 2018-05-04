@@ -1,7 +1,19 @@
-## AWS Cfn Lint Visual Studio Code
+# vscode-cfn-lint
 
-Provides IDE specific integration to cfn-lint. https://github.com/awslabs/cfn-python-lint
+VS Code CloudFormation Linter uses cfn-lint to lint your CloudFormation templates.
 
-## License
+## Features
 
-This library is licensed under the Apache 2.0 License. 
+Uses cfn-lint to parse and show issues with CloudFormation templates
+
+For example if there is an image subfolder under your extension project workspace:
+
+![features](images/features.png)
+
+## Requirements
+
+Requires cfn-lint to be installed
+
+## Extension Settings
+
+* `cfnLinter.path`: path to the cfn-lint command
