@@ -16,4 +16,4 @@ Requires cfn-lint to be installed
 
 ## Extension Settings
 
-* `cfnLinter.path`: path to the cfn-lint command
+* `cfnLint.path`: path to the cfn-lint command
