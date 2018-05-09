@@ -8,7 +8,7 @@ Uses cfn-lint to parse and show issues with CloudFormation templates
 
 For example if there is an image subfolder under your extension project workspace:
 
-![features](images/features.png)
+![features](/images/features.png)
 
 ## Requirements
 
