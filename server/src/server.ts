@@ -16,11 +16,10 @@ permissions and limitations under the License.
 
 import {
 	Files, IPCMessageReader, IPCMessageWriter, createConnection, IConnection, TextDocuments, TextDocument,
-	Diagnostic, DiagnosticSeverity, InitializeResult, TextDocumentPositionParams, CompletionItem,
-	CompletionItemKind
+	Diagnostic, DiagnosticSeverity, InitializeResult
 } from 'vscode-languageserver';
 
-import { exec, spawn } from "child_process";
+import { spawn } from "child_process";
 
 // Create a connection for the server. The connection uses Node's IPC as a transport
 let connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
@@ -34,9 +33,7 @@ documents.listen(connection);
 
 // After the server has started the client sends an initialize request. The server receives
 // in the passed params the rootPath of the workspace plus the client capabilities. 
-let workspaceRoot: string;
-connection.onInitialize((params): InitializeResult => {
-	workspaceRoot = params.rootPath;
+connection.onInitialize((): InitializeResult => {
 	return {
 		capabilities: {
 			// Tell the client that the server works in FULL text document sync mode
@@ -62,12 +59,12 @@ documents.onDidOpen((event) => {
 
 // The settings interface describe the server relevant settings part
 interface Settings {
-	cfnLinter: CloudFormationLinterSettings;
+	cfnLint: CloudFormationLintSettings;
 }
 
 // These are the example settings we defined in the client's package.json
 // file
-interface CloudFormationLinterSettings {
+interface CloudFormationLintSettings {
 	path: string;
 }
 
@@ -78,7 +75,7 @@ connection.onDidChangeConfiguration((change) => {
 	console.log('Settings have been updated...');
 	let settings = <Settings>change.settings;
 	console.log('Settings: ' + settings);
-	Path = settings.cfnLinter.path || 'cfn-lint';
+	Path = settings.cfnLint.path || 'cfn-lint';
 	// Revalidate any open text documents
 	console.log('Path set to: ' + Path);
 	documents.all().forEach(validateCloudFormationFile);

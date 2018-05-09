@@ -15,19 +15,38 @@
 	"bugs": {
 		"url": "https://github.com/awslabs/aws-cfn-lint-visual-studio-code/issues"
 	},
+	"main": "./client/out/extension",
+	"activationEvents": [
+		"onLanguage:yaml",
+		"onLanguage:json"
+	],
 	"homepage": "https://github.com/awslabs/aws-cfn-lint-visual-studio-code/blob/master/README.md",
 	"scripts": {
 		"postinstall": "cd server && npm install && cd ../client && npm install && cd ..",
-		"compile": "cd client && npm run compile && cd ../server && npm run compile && cd ..",
-		"compile:client": "tsc -p client/tsconfig.json",
-		"watch:client": "tsc -w -p client/tsconfig.json",
-		"compile:server": "cd server && npm run installServer && cd .. && tsc -p server/tsconfig.json",
-		"watch:server": "cd server && npm run installServer && cd .. && tsc -w -p server/tsconfig.json",
+		"vscode:prepublish": "cd client && npm run update-vscode && cd .. && npm run compile",
+		"compile": "npm run compile:client && npm run compile:server",
+		"compile:client": "tsc -p ./client/tsconfig.json",
+		"watch:client": "tsc -w -p ./client/tsconfig.json",
+		"compile:server": "tsc -p ./server/tsconfig.json",
+		"watch:server": "tsc -w -p ./server/tsconfig.json",
 		"lint": "tslint --project server/tsconfig.json && tslint --project client/tsconfig.json"
 	},
 	"devDependencies": {
 		"@types/mocha": "^2.2.42",
 		"@types/node": "^6.0.88",
 		"typescript": "^2.5.2"
+	},
+	"contributes": {
+		"configuration": {
+			"type": "object",
+			"title": "CloudFormation Linter configuration",
+			"properties": {
+				"cfnLint.path": {
+					"type": "string",
+					"default": "cfn-lint",
+					"description": "Path to cfn-lint"
+				}
+			}
+		}
 	}
 }
