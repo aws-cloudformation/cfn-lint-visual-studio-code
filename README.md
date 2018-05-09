@@ -12,7 +12,7 @@ For example if there is an image subfolder under your extension project workspac
 
 ## Requirements
 
-Requires cfn-lint to be installed
+Requires cfn-lint to be installed.  `pip install cfn-lint`
 
 ## Extension Settings
 
