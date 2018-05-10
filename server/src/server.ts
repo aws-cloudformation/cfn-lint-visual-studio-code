@@ -32,7 +32,7 @@ let documents: TextDocuments = new TextDocuments();
 documents.listen(connection);
 
 // After the server has started the client sends an initialize request. The server receives
-// in the passed params the rootPath of the workspace plus the client capabilities. 
+// in the passed params the rootPath of the workspace plus the client capabilities.
 connection.onInitialize((): InitializeResult => {
 	return {
 		capabilities: {
@@ -47,7 +47,7 @@ connection.onInitialize((): InitializeResult => {
 });
 
 // The content of a CloudFormation document has saved. This event is emitted
-// when the document get saved 
+// when the document get saved
 documents.onDidSave((event) => {
 	console.log('Running cfn-lint...');
 	validateCloudFormationFile(event.document);
@@ -107,9 +107,6 @@ function validateCloudFormationFile(document: TextDocument): void {
 	isValidating[uri] = true;
 
 	let file_to_lint = Files.uriToFilePath(uri);
-	if(file_to_lint.search(/\/tasks\//i) !== -1){
-		file_to_lint = file_to_lint.substr(0,(file_to_lint.search(/\/tasks\//i)));
-	}
 
 	let is_cfn_regex = new RegExp('"?AWSTemplateFormatVersion"?\s*');
 	let is_cfn = false;
@@ -121,21 +118,20 @@ function validateCloudFormationFile(document: TextDocument): void {
 	}
 
 	connection.console.log("Is CFN: " + is_cfn);
-
-	let args = `--format json --template ${file_to_lint}`;
+	let args = ['--format', 'json', '--template', file_to_lint];
 
 	connection.console.log(`running............. ${Path} ${args}`);
 
 	let child = spawn(
-		Path, 
-		args.split(" ")
+		Path,
+		args
 	);
 
 	let diagnostics: Diagnostic[] = [];
 	let filename = uri.toString();
 	let start = 0;
 	let end = Number.MAX_VALUE;
-	
+
 	child.stderr.on("data", (data: Buffer) => {
 		let err = data.toString();
 		connection.console.log(err);
