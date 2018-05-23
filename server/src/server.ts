@@ -118,69 +118,71 @@ function validateCloudFormationFile(document: TextDocument): void {
 	}
 
 	connection.console.log("Is CFN: " + is_cfn);
-	let args = ['--format', 'json', '--template', file_to_lint];
 
-	connection.console.log(`running............. ${Path} ${args}`);
+	if (is_cfn) {
+		let args = ['--format', 'json', '--template', file_to_lint];
 
-	let child = spawn(
-		Path,
-		args
-	);
+		connection.console.log(`running............. ${Path} ${args}`);
 
-	let diagnostics: Diagnostic[] = [];
-	let filename = uri.toString();
-	let start = 0;
-	let end = Number.MAX_VALUE;
+		let child = spawn(
+			Path,
+			args
+		);
 
-	child.stderr.on("data", (data: Buffer) => {
-		let err = data.toString();
-		connection.console.log(err);
-		let lineNumber = 0;
-		let diagnostic: Diagnostic = {
-			range: {
-				start: { line: lineNumber, character: start },
-				end: { line: lineNumber, character: end }
-			},
-			severity: DiagnosticSeverity.Warning,
-			message: err
-		};
-		diagnostics.push(diagnostic);
-	});
+		let diagnostics: Diagnostic[] = [];
+		let filename = uri.toString();
+		let start = 0;
+		let end = Number.MAX_VALUE;
 
-	let stdout = "";
-	child.stdout.on("data", (data: Buffer) => {
-		stdout = stdout.concat(data.toString());
-	});
-
-	child.on('exit', function (code, signal) {
-		console.log('child process exited with ' +
-					`code ${code} and signal ${signal}`);
-		let tmp = stdout.toString();
-		let obj = JSON.parse(tmp);
-		for(let element of obj) {
-			let lineNumber = (Number.parseInt(element.Location.Start.LineNumber) - 1);
-			let columnNumber = (Number.parseInt(element.Location.Start.ColumnNumber) - 1);
-			let lineNumberEnd = (Number.parseInt(element.Location.End.LineNumber) - 1);
-			let columnNumberEnd = (Number.parseInt(element.Location.End.ColumnNumber) - 1);
+		child.stderr.on("data", (data: Buffer) => {
+			let err = data.toString();
+			connection.console.log(err);
+			let lineNumber = 0;
 			let diagnostic: Diagnostic = {
 				range: {
-					start: { line: lineNumber, character: columnNumber },
-					end: { line: lineNumberEnd, character: columnNumberEnd }
+					start: { line: lineNumber, character: start },
+					end: { line: lineNumber, character: end }
 				},
-				severity: convertSeverity(element.Level),
-				message: element.Message
+				severity: DiagnosticSeverity.Warning,
+				message: err
 			};
-			if (is_cfn) {
+			diagnostics.push(diagnostic);
+		});
+
+		let stdout = "";
+		child.stdout.on("data", (data: Buffer) => {
+			stdout = stdout.concat(data.toString());
+		});
+
+		child.on('exit', function (code, signal) {
+			console.log('child process exited with ' +
+						`code ${code} and signal ${signal}`);
+			let tmp = stdout.toString();
+			let obj = JSON.parse(tmp);
+			for(let element of obj) {
+				let lineNumber = (Number.parseInt(element.Location.Start.LineNumber) - 1);
+				let columnNumber = (Number.parseInt(element.Location.Start.ColumnNumber) - 1);
+				let lineNumberEnd = (Number.parseInt(element.Location.End.LineNumber) - 1);
+				let columnNumberEnd = (Number.parseInt(element.Location.End.ColumnNumber) - 1);
+				let diagnostic: Diagnostic = {
+					range: {
+						start: { line: lineNumber, character: columnNumber },
+						end: { line: lineNumberEnd, character: columnNumberEnd }
+					},
+					severity: convertSeverity(element.Level),
+					message: element.Message
+				};
+
 				diagnostics.push(diagnostic);
 			}
-		}
-	});
+		});
 
-	child.on("close", () => {
-		//connection.console.log(`Validation finished for(code:${code}): ${Files.uriToFilePath(uri)}`);
-		connection.sendDiagnostics({ uri: filename, diagnostics });
-		isValidating[uri] = false;
-	});
+		child.on("close", () => {
+			//connection.console.log(`Validation finished for(code:${code}): ${Files.uriToFilePath(uri)}`);
+			connection.sendDiagnostics({ uri: filename, diagnostics });
+			isValidating[uri] = false;
+		});
+	}
 }
 
 // Listen on the connection
