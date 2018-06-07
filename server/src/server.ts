@@ -66,18 +66,29 @@ interface Settings {
 // file
 interface CloudFormationLintSettings {
 	path: string;
+	appendRules: Array<string>;
+	ignoreRules: Array<string>;
+	overrideSpecPath: string;
 }
 
-// hold the Path setting
+// hold the Settings
 let Path: string;
+let AppendRules: Array<string>;
+let IgnoreRules: Array<string>;
+let OverrideSpecPath: string;
+
 // The settings have changed. Is send on server activation as well.
 connection.onDidChangeConfiguration((change) => {
 	console.log('Settings have been updated...');
 	let settings = <Settings>change.settings;
-	console.log('Settings: ' + settings);
+	console.log('Settings: ' + JSON.stringify(settings));
+
 	Path = settings.cfnLint.path || 'cfn-lint';
+	IgnoreRules = settings.cfnLint.ignoreRules;
+	OverrideSpecPath = settings.cfnLint.overrideSpecPath;
+	AppendRules = settings.cfnLint.appendRules;
+
 	// Revalidate any open text documents
-	console.log('Path set to: ' + Path);
 	documents.all().forEach(validateCloudFormationFile);
 });
 
@@ -121,6 +132,26 @@ function validateCloudFormationFile(document: TextDocument): void {
 
 	if (is_cfn) {
 		let args = ['--format', 'json', '--template', file_to_lint];
+
+		if (IgnoreRules.length > 0) {
+			args.push('--ignore-checks')
+
+			for (var ignoreRule of IgnoreRules) {
+				args.push(ignoreRule)
+			}
+		}
+
+		if (AppendRules.length > 0) {
+			args.push('--append-rules')
+
+			for (var appendRule of AppendRules) {
+				args.push(appendRule)
+			}
+		}
+
+		if (OverrideSpecPath !== "") {
+			args.push('--override-spec', OverrideSpecPath)
+		}
 
 		connection.console.log(`running............. ${Path} ${args}`);
 
