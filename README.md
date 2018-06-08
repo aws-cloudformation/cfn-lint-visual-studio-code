@@ -17,3 +17,6 @@ Requires cfn-lint to be installed.  `pip install cfn-lint`
 ## Extension Settings
 
 * `cfnLint.path`: path to the cfn-lint command
+* `cfnLint.appendRules`: Array of paths containing additional Rules
+* `cfnLint.ignoreRules`: Array of Rule Ids to be ignored
+* `cfnLint.overrideSpecPath`: Path to an Specification overrule file
