@@ -165,6 +165,21 @@ function validateCloudFormationFile(document: TextDocument): void {
 		let start = 0;
 		let end = Number.MAX_VALUE;
 
+		child.on('error', function(err) {
+			let errorMessage = `Unable to start cfn-lint (${err}). Is cfn-lint installed correctly?`;
+			connection.console.log(errorMessage);
+			let lineNumber = 0;
+			let diagnostic: Diagnostic = {
+				range: {
+					start: { line: lineNumber, character: start },
+					end: { line: lineNumber, character: end }
+				},
+				severity: DiagnosticSeverity.Error,
+				message: errorMessage
+			};
+			diagnostics.push(diagnostic);
+		});
+
 		child.stderr.on("data", (data: Buffer) => {
 			let err = data.toString();
 			connection.console.log(err);
