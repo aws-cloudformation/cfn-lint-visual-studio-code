@@ -14,7 +14,7 @@ For example if there is an image subfolder under your extension project workspac
 
 Requires cfn-lint to be installed: `pip install cfn-lint`
 
-For more information about cfn-lint can be found [here](https://github.com/awslabs/cfn-python-lint)
+More information about cfn-lint can be found [here](https://github.com/awslabs/cfn-python-lint)
 
 ## Extension Settings
 
