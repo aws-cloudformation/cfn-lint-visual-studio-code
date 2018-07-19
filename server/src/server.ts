@@ -130,17 +130,15 @@ function validateCloudFormationFile(document: TextDocument): void {
 		let args = ['--format', 'json', '--template', file_to_lint];
 
 		if (IgnoreRules.length > 0) {
-			args.push('--ignore-checks')
-
 			for (var ignoreRule of IgnoreRules) {
+				args.push('--ignore-checks')
 				args.push(ignoreRule)
 			}
 		}
 
 		if (AppendRules.length > 0) {
-			args.push('--append-rules')
-
 			for (var appendRule of AppendRules) {
+				args.push('--append-rules')
 				args.push(appendRule)
 			}
 		}

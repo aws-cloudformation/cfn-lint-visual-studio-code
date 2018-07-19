@@ -4,7 +4,7 @@ VS Code CloudFormation Linter uses cfn-lint to lint your CloudFormation template
 
 ## Features
 
-Uses cfn-lint to parse and show issues with CloudFormation templates
+Uses [cfn-lint](https://github.com/awslabs/cfn-python-lint) to parse and show issues with CloudFormation templates
 
 For example if there is an image subfolder under your extension project workspace:
 
@@ -22,3 +22,7 @@ More information about cfn-lint can be found [here](https://github.com/awslabs/c
 * `cfnLint.appendRules`: Array of paths containing additional Rules
 * `cfnLint.ignoreRules`: Array of Rule Ids to be ignored
 * `cfnLint.overrideSpecPath`: Path to an Specification overrule file
+
+## Contribute
+
+The code for this plugin can be found on GitHub at [awslabs/aws-cfn-lint-visual-studio-code](https://github.com/awslabs/aws-cfn-lint-visual-studio-code)
