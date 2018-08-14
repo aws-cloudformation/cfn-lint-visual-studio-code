@@ -108,10 +108,9 @@ function validateCloudFormationFile(document: TextDocument): void {
 	let uri = document.uri;
 
 	if (isValidating[uri]) {
+		connection.console.log("Already validating template: " + uri.toString());
 		return;
 	}
-
-	isValidating[uri] = true;
 
 	let file_to_lint = Files.uriToFilePath(uri);
 
@@ -124,31 +123,32 @@ function validateCloudFormationFile(document: TextDocument): void {
 		}
 	}
 
-	connection.console.log("Is CFN: " + is_cfn);
+	connection.console.log("File '" + uri.toString() + " is a CFN? " + is_cfn);
 
 	if (is_cfn) {
 		let args = ['--format', 'json', '--template', file_to_lint];
 
 		if (IgnoreRules.length > 0) {
 			for (var ignoreRule of IgnoreRules) {
-				args.push('--ignore-checks')
-				args.push(ignoreRule)
+				args.push('--ignore-checks');
+				args.push(ignoreRule);
 			}
 		}
 
 		if (AppendRules.length > 0) {
 			for (var appendRule of AppendRules) {
-				args.push('--append-rules')
-				args.push(appendRule)
+				args.push('--append-rules');
+				args.push(appendRule);
 			}
 		}
 
 		if (OverrideSpecPath !== "") {
-			args.push('--override-spec', OverrideSpecPath)
+			args.push('--override-spec', OverrideSpecPath);
 		}
 
 		connection.console.log(`running............. ${Path} ${args}`);
 
+		isValidating[uri] = true;
 		let child = spawn(
 			Path,
 			args
