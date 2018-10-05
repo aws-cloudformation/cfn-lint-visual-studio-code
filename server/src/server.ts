@@ -104,6 +104,23 @@ function convertSeverity(mistakeType: string): DiagnosticSeverity {
 	return DiagnosticSeverity.Error;
 }
 
+function isCloudFormation(template: string, filename: string): Boolean {
+
+	if (/"?AWSTemplateFormatVersion"?\s*/.exec(template)) {
+		connection.console.log("Determined this file is a CloudFormation Template. " + filename +
+			". Found the string AWSTemplateFormatVersion");
+		return true;
+	}
+	if (/"?Resources"?\s*:/.exec(template)) {
+		if (/"?Type"?\s*:\s*"?'?(AWS|Custom)::/.exec(template)) {
+			connection.console.log("Determined this file is a CloudFormation Template. " + filename +
+			". Found 'Resources' and 'Type: (AWS|Custom)::'");
+			return true;
+		}
+	}
+	return false;
+}
+
 function validateCloudFormationFile(document: TextDocument): void {
 	let uri = document.uri;
 
@@ -114,16 +131,7 @@ function validateCloudFormationFile(document: TextDocument): void {
 
 	let file_to_lint = Files.uriToFilePath(uri);
 
-	let is_cfn_regex = new RegExp('"?AWSTemplateFormatVersion"?\s*');
-	let is_cfn = false;
-	let text = document.getText().split("\n");
-	for (var index in text) {
-		if (is_cfn_regex.exec(text[index])) {
-			is_cfn = true;
-		}
-	}
-
-	connection.console.log("File '" + uri.toString() + " is a CFN? " + is_cfn);
+	let is_cfn = isCloudFormation(document.getText(), uri.toString());
 
 	if (is_cfn) {
 		let args = ['--format', 'json', '--template', file_to_lint];
@@ -222,6 +230,10 @@ function validateCloudFormationFile(document: TextDocument): void {
 			connection.sendDiagnostics({ uri: filename, diagnostics });
 			isValidating[uri] = false;
 		});
+	} else {
+		connection.console.log("Don't believe this is a CloudFormation template. " + uri.toString() +
+			". If it is please add AWSTemplateFormatVersion: '2010-09-09' (YAML) or " +
+			" \"AWSTemplateFormatVersion\": \"2010-09-09\" (JSON) into the root level of the document.");
 	}
 }
 
