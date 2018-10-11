@@ -113,9 +113,12 @@ function isCloudFormation(template: string, filename: string): Boolean {
 	}
 	if (/"?Resources"?\s*:/.exec(template)) {
 		if (/"?Type"?\s*:\s*"?'?(AWS|Custom)::/.exec(template)) {
-			connection.console.log("Determined this file is a CloudFormation Template. " + filename +
-			". Found 'Resources' and 'Type: (AWS|Custom)::'");
-			return true;
+			// filter out serverless.io templates
+			if (!(/\nresources:/.exec(template) && /\nprovider:/.exec(template))) {
+				connection.console.log("Determined this file is a CloudFormation Template. " + filename +
+				". Found 'Resources' and 'Type: (AWS|Custom)::'");
+				return true;
+			}
 		}
 	}
 	return false;
