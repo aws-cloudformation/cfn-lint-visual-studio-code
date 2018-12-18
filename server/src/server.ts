@@ -180,7 +180,7 @@ function validateCloudFormationFile(document: TextDocument): void {
 					end: { line: lineNumber, character: end }
 				},
 				severity: DiagnosticSeverity.Error,
-				message: errorMessage
+				message: '[cfn-lint] ' + errorMessage
 			};
 			diagnostics.push(diagnostic);
 		});
@@ -195,7 +195,7 @@ function validateCloudFormationFile(document: TextDocument): void {
 					end: { line: lineNumber, character: end }
 				},
 				severity: DiagnosticSeverity.Warning,
-				message: err
+				message: '[cfn-lint] ' + err
 			};
 			diagnostics.push(diagnostic);
 		});
@@ -221,7 +221,7 @@ function validateCloudFormationFile(document: TextDocument): void {
 						end: { line: lineNumberEnd, character: columnNumberEnd }
 					},
 					severity: convertSeverity(element.Level),
-					message: element.Message
+					message: '[cfn-lint] ' + element.Rule.Id + ':' + element.Message
 				};
 
 				diagnostics.push(diagnostic);
