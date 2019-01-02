@@ -96,7 +96,7 @@ function convertSeverity(mistakeType: string): DiagnosticSeverity {
 	switch (mistakeType) {
 		case "Warning":
 			return DiagnosticSeverity.Warning;
-		case "Information":
+		case "Informational":
 			return DiagnosticSeverity.Information;
 		case "Hint":
 			return DiagnosticSeverity.Hint;
