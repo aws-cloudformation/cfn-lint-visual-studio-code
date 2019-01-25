@@ -33,7 +33,9 @@ documents.listen(connection);
 
 // After the server has started the client sends an initialize request. The server receives
 // in the passed params the rootPath of the workspace plus the client capabilities.
-connection.onInitialize((): InitializeResult => {
+let workspaceRoot: string;
+connection.onInitialize((params): InitializeResult => {
+	workspaceRoot = params.rootPath;
 	return {
 		capabilities: {
 			// Tell the client that the server works in FULL text document sync mode
@@ -137,7 +139,7 @@ function validateCloudFormationFile(document: TextDocument): void {
 	let is_cfn = isCloudFormation(document.getText(), uri.toString());
 
 	if (is_cfn) {
-		let args = ['--format', 'json', '--template', file_to_lint];
+		let args = ['--format', 'json'];
 
 		if (IgnoreRules.length > 0) {
 			for (var ignoreRule of IgnoreRules) {
@@ -157,12 +159,17 @@ function validateCloudFormationFile(document: TextDocument): void {
 			args.push('--override-spec', OverrideSpecPath);
 		}
 
+		args.push('--', file_to_lint);
+
 		connection.console.log(`running............. ${Path} ${args}`);
 
 		isValidating[uri] = true;
 		let child = spawn(
 			Path,
-			args
+			args,
+			{
+				cwd: workspaceRoot
+			}
 		);
 
 		let diagnostics: Diagnostic[] = [];
