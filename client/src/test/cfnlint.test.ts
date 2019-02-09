@@ -94,6 +94,20 @@ describe('Should not have failures a non CloudFormation Template', () => {
 	});
 });
 
+describe('Should have failuers even though AWSTemplateFormatVersion isn\'t in the file', () => {
+	const docUri = getDocUri('still_a_template.yaml');
+
+	it('Diagnoses a bad template without AWSTemplateFormatVersion', async () => {
+		await testDiagnostics(docUri, [
+			{
+				severity: vscode.DiagnosticSeverity.Error,
+				message: '[cfn-lint] E3002:Invalid Property Resources/RootRole/Properties/BadKey',
+				range: toRange(5, 6, 5, 12)
+			}
+		]);
+	});
+});
+
 function toRange(sLine: number, sChar: number, eLine: number, eChar: number) {
 	const start = new vscode.Position(sLine, sChar);
 	const end = new vscode.Position(eLine, eChar);
