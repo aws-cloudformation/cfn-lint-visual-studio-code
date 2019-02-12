@@ -81,10 +81,12 @@ connection.onDidChangeConfiguration((change) => {
 	let settings = <Settings>change.settings;
 	console.log('Settings: ' + JSON.stringify(settings));
 
-	Path = settings.cfnLint.path || 'cfn-lint';
+	Path = (settings.cfnLint.path || 'cfn-lint').replace(/\${workspaceFolder}/g, workspaceRoot);
 	IgnoreRules = settings.cfnLint.ignoreRules;
-	OverrideSpecPath = settings.cfnLint.overrideSpecPath;
-	AppendRules = settings.cfnLint.appendRules;
+	OverrideSpecPath = settings.cfnLint.overrideSpecPath.replace(/\${workspaceFolder}/g, workspaceRoot);
+	AppendRules = settings.cfnLint.appendRules.map(function(val) {
+		return val.replace(/\${workspaceFolder}/g, workspaceRoot);
+	});
 
 	// Revalidate any open text documents
 	documents.all().forEach(validateCloudFormationFile);
