@@ -44,7 +44,7 @@ describe('Should have failuers with a bad template', () => {
 			}, {
 				severity: vscode.DiagnosticSeverity.Error,
 				message: '[cfn-lint] E3003:Property PolicyDocument missing at Resources/RootRole/Properties/Policies/0',
-				range: toRange(49, 6, 49, 14)
+				range: toRange(51, 10, 59, 2)
 			}, {
 				severity: vscode.DiagnosticSeverity.Error,
 				message: '[cfn-lint] E3002:Invalid Property Resources/RootRole/Properties/Policies/0/PolicyDocument1',
@@ -60,7 +60,7 @@ describe('Should have failuers with a bad template', () => {
 			}, {
 				severity: vscode.DiagnosticSeverity.Error,
 				message: '[cfn-lint] E1012:Ref WebServerPort not found as a resource or parameter',
-				range: toRange(97, 10, 97, 18)
+				range: toRange(100, 14, 101, 12)
 			}, {
 				severity: vscode.DiagnosticSeverity.Error,
 				message: '[cfn-lint] E3012:Property Resources/ElasticLoadBalancer/Properties/HealthCheck/UnhealthyThreshold should be of type String',
