@@ -4,7 +4,7 @@
 )](https://marketplace.visualstudio.com/items?itemName=kddejong.vscode-cfn-lint)
 
 VS Code CloudFormation Linter uses cfn-lint to lint your CloudFormation templates.
-<img alt="[cfn-lint logo]" src="logo.png?raw=true" width="150" align="right">
+<img alt="[cfn-lint logo]" src="https://raw.githubusercontent.com/awslabs/aws-cfn-lint-visual-studio-code/master/logo.png" width="150" align="right">
 
 ## Features
 
