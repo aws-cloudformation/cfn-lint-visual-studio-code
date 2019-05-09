@@ -15,9 +15,11 @@ permissions and limitations under the License.
 'use strict';
 
 import {
-	Files, IPCMessageReader, IPCMessageWriter, createConnection, IConnection, TextDocuments, TextDocument,
+	IPCMessageReader, IPCMessageWriter, createConnection, IConnection, TextDocuments, TextDocument,
 	Diagnostic, DiagnosticSeverity, InitializeResult
 } from 'vscode-languageserver';
+
+import { URI } from 'vscode-uri';
 
 import { spawn } from "child_process";
 
@@ -134,7 +136,7 @@ function validateCloudFormationFile(document: TextDocument): void {
 		return;
 	}
 
-	let file_to_lint = Files.uriToFilePath(uri);
+	let file_to_lint = URI.parse(uri).fsPath;
 
 	let is_cfn = isCloudFormation(document.getText(), uri.toString());
 
@@ -159,7 +161,7 @@ function validateCloudFormationFile(document: TextDocument): void {
 			args.push('--override-spec', OverrideSpecPath);
 		}
 
-		args.push('--', file_to_lint);
+		args.push('--', `"${file_to_lint}"`);
 
 		connection.console.log(`running............. ${Path} ${args}`);
 
@@ -168,7 +170,8 @@ function validateCloudFormationFile(document: TextDocument): void {
 			Path,
 			args,
 			{
-				cwd: workspaceRoot
+				cwd: workspaceRoot,
+				shell: true
 			}
 		);
 
