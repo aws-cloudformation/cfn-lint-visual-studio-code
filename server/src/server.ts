@@ -113,7 +113,7 @@ function isCloudFormation(template: string, filename: string): Boolean {
 			". Found the string AWSTemplateFormatVersion");
 		return true;
 	}
-	if (/"?Resources"?\s*:/.exec(template)) {
+	if (/\n"?Resources"?\s*:/.exec(template)) {
 		if (/"?Type"?\s*:\s*"?'?(AWS|Custom)::/.exec(template)) {
 			// filter out serverless.io templates
 			if (!(/\nresources:/.exec(template) && /\nprovider:/.exec(template))) {
