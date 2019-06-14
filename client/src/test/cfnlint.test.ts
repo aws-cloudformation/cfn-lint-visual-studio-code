@@ -108,6 +108,20 @@ describe('Should have failuers even though AWSTemplateFormatVersion isn\'t in th
 	});
 });
 
+describe('Should have failuers even with a space in the filename', () => {
+	const docUri = getDocUri('a template.yaml');
+
+	it('Diagnoses a bad template with spaces in the name', async () => {
+		await testDiagnostics(docUri, [
+			{
+				severity: vscode.DiagnosticSeverity.Error,
+				message: '[cfn-lint] E3002:Invalid Property Resources/RootRole/Properties/BadKey',
+				range: toRange(5, 6, 5, 12)
+			}
+		]);
+	});
+});
+
 function toRange(sLine: number, sChar: number, eLine: number, eChar: number) {
 	const start = new vscode.Position(sLine, sChar);
 	const end = new vscode.Position(eLine, eChar);
