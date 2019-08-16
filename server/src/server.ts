@@ -49,7 +49,7 @@ connection.onInitialize((params): InitializeResult => {
 // The content of a CloudFormation document has saved. This event is emitted
 // when the document get saved
 documents.onDidSave((event) => {
-	console.log('Running cfn-lint...');
+	connection.console.log('Running cfn-lint...');
 	validateCloudFormationFile(event.document);
 });
 
@@ -79,9 +79,9 @@ let OverrideSpecPath: string;
 
 // The settings have changed. Is send on server activation as well.
 connection.onDidChangeConfiguration((change) => {
-	console.log('Settings have been updated...');
+	connection.console.log('Settings have been updated...');
 	let settings = <Settings>change.settings;
-	console.log('Settings: ' + JSON.stringify(settings));
+	connection.console.log('Settings: ' + JSON.stringify(settings));
 
 	Path = settings.cfnLint.path || 'cfn-lint';
 	IgnoreRules = settings.cfnLint.ignoreRules;
@@ -216,7 +216,7 @@ function validateCloudFormationFile(document: TextDocument): void {
 		});
 
 		child.on('exit', function (code, signal) {
-			console.log('child process exited with ' +
+			connection.console.log('child process exited with ' +
 						`code ${code} and signal ${signal}`);
 			let tmp = stdout.toString();
 			let obj = JSON.parse(tmp);
