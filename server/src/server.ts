@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /*
 Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
@@ -14,6 +15,8 @@ permissions and limitations under the License.
 */
 'use strict';
 
+import { Command } from 'commander';
+
 import {
 	IPCMessageReader, IPCMessageWriter, createConnection, IConnection, TextDocuments, TextDocument,
 	Diagnostic, DiagnosticSeverity, InitializeResult
@@ -23,8 +26,19 @@ import { URI } from 'vscode-uri';
 
 import { spawn } from "child_process";
 
-// Create a connection for the server. The connection uses Node's IPC as a transport
-let connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
+const program = new Command('cfn-lsp')
+	.allowUnknownOption()
+	.version(require('../../package.json').version)
+	.option('--stdio', 'use stdio')
+	.option('--node-ipc', 'use node-ipc')
+	.parse(process.argv);
+
+var connection: IConnection;
+if (program.stdio) {
+	connection = createConnection(process.stdin, process.stdout);
+} else {
+	connection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
+}
 
 // Create a simple text document manager. The text document manager
 // supports full document sync only
