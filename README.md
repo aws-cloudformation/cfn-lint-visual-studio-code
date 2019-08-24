@@ -16,6 +16,8 @@ For example if there is an image subfolder under your extension project workspac
 
 ## Requirements
 
+Templates must include [AWSTemplateFormatVersion](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/format-version-structure.html)
+
 Requires cfn-lint to be installed: `pip install cfn-lint`
 
 More information about cfn-lint can be found [here](https://github.com/aws-cloudformation/cfn-python-lint)
