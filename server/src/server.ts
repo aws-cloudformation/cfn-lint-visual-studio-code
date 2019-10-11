@@ -245,7 +245,7 @@ function validateCloudFormationFile(document: TextDocument): void {
 						end: { line: lineNumberEnd, character: columnNumberEnd }
 					},
 					severity: convertSeverity(element.Level),
-					message: '[cfn-lint] ' + element.Rule.Id + ':' + element.Message
+					message: '[cfn-lint] ' + element.Rule.Id + ': ' + element.Message
 				};
 
 				diagnostics.push(diagnostic);
