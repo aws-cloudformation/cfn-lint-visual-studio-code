@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import * as assert from 'assert';
 import { getDocUri, activate } from './helper';
 
-describe('Should have failuers with a bad template', () => {
+describe('Should have failures with a bad template', () => {
 	const docUri = getDocUri('bad.yaml');
 
 	it('Diagnoses bad template', async () => {
@@ -94,7 +94,7 @@ describe('Should not have failures a non CloudFormation Template', () => {
 	});
 });
 
-describe('Should have failuers even though AWSTemplateFormatVersion isn\'t in the file', () => {
+describe('Should have failures even though AWSTemplateFormatVersion isn\'t in the file', () => {
 	const docUri = getDocUri('still_a_template.yaml');
 
 	it('Diagnoses a bad template without AWSTemplateFormatVersion', async () => {
@@ -108,7 +108,7 @@ describe('Should have failuers even though AWSTemplateFormatVersion isn\'t in th
 	});
 });
 
-describe('Should have failuers even with a space in the filename', () => {
+describe('Should have failures even with a space in the filename', () => {
 	const docUri = getDocUri('a template.yaml');
 
 	it('Diagnoses a bad template with spaces in the name', async () => {
