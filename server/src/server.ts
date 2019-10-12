@@ -129,12 +129,12 @@ function isCloudFormation(template: string, filename: string): Boolean {
 			". Found the string AWSTemplateFormatVersion");
 		return true;
 	}
-	if (/\n"?Resources"?\s*:/.exec(template)) {
+	if (/\n?"?Resources"?\s*:/.exec(template)) {
 		if (/"?Type"?\s*:\s*"?'?(AWS|Custom)::/.exec(template)) {
 			// filter out serverless.io templates
 			if (!(/\nresources:/.exec(template) && /\nprovider:/.exec(template))) {
 				connection.console.log("Determined this file is a CloudFormation Template. " + filename +
-				". Found 'Resources' and 'Type: (AWS|Custom)::'");
+					". Found 'Resources' and 'Type: (AWS|Custom)::'");
 				return true;
 			}
 		}
@@ -194,7 +194,7 @@ function validateCloudFormationFile(document: TextDocument): void {
 		let start = 0;
 		let end = Number.MAX_VALUE;
 
-		child.on('error', function(err) {
+		child.on('error', function (err) {
 			let errorMessage = `Unable to start cfn-lint (${err}). Is cfn-lint installed correctly?`;
 			connection.console.log(errorMessage);
 			let lineNumber = 0;
@@ -231,10 +231,10 @@ function validateCloudFormationFile(document: TextDocument): void {
 
 		child.on('exit', function (code, signal) {
 			connection.console.log('child process exited with ' +
-						`code ${code} and signal ${signal}`);
+				`code ${code} and signal ${signal}`);
 			let tmp = stdout.toString();
 			let obj = JSON.parse(tmp);
-			for(let element of obj) {
+			for (let element of obj) {
 				let lineNumber = (Number.parseInt(element.Location.Start.LineNumber) - 1);
 				let columnNumber = (Number.parseInt(element.Location.Start.ColumnNumber) - 1);
 				let lineNumberEnd = (Number.parseInt(element.Location.End.LineNumber) - 1);

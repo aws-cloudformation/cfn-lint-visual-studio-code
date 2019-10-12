@@ -3,10 +3,10 @@ import * as vscode from 'vscode';
 import * as assert from 'assert';
 import { getDocUri, activate } from './helper';
 
-describe('Should have failures with a bad template', () => {
+suite('Should have failures with a bad template', () => {
 	const docUri = getDocUri('bad.yaml');
 
-	it('Diagnoses bad template', async () => {
+	test('Diagnoses bad template', async () => {
 		await testDiagnostics(docUri, [
 			{
 				severity: vscode.DiagnosticSeverity.Error,
@@ -78,26 +78,26 @@ describe('Should have failures with a bad template', () => {
 	});
 });
 
-describe('Should not have failures on a goodtemplate', () => {
+suite('Should not have failures on a goodtemplate', () => {
 	const docUri = getDocUri('good.yaml');
 
-	it('Diagnose good template', async () => {
+	test('Diagnose good template', async () => {
 		await testDiagnostics(docUri, []);
 	});
 });
 
-describe('Should not have failures a non CloudFormation Template', () => {
+suite('Should not have failures a non CloudFormation Template', () => {
 	const docUri = getDocUri('not_template.yaml');
 
-	it('Diagnose good template', async () => {
+	test('Diagnose good template', async () => {
 		await testDiagnostics(docUri, []);
 	});
 });
 
-describe('Should have failures even though AWSTemplateFormatVersion isn\'t in the file', () => {
+suite('Should have failures even though AWSTemplateFormatVersion isn\'t in the file', () => {
 	const docUri = getDocUri('still_a_template.yaml');
 
-	it('Diagnoses a bad template without AWSTemplateFormatVersion', async () => {
+	test('Diagnoses a bad template without AWSTemplateFormatVersion', async () => {
 		await testDiagnostics(docUri, [
 			{
 				severity: vscode.DiagnosticSeverity.Error,
@@ -108,10 +108,24 @@ describe('Should have failures even though AWSTemplateFormatVersion isn\'t in th
 	});
 });
 
-describe('Should have failures even with a space in the filename', () => {
+suite('Should have failures even though AWSTemplateFormatVersion isn\'t in the file', () => {
+	const docUri = getDocUri('still_a_template_2.yaml');
+
+	test('Diagnoses a bad template without AWSTemplateFormatVersion', async () => {
+		await testDiagnostics(docUri, [
+			{
+				severity: vscode.DiagnosticSeverity.Error,
+				message: '[cfn-lint] E3002: Invalid Property Resources/RootRole/Properties/BadKey',
+				range: toRange(4, 6, 4, 12)
+			}
+		]);
+	});
+});
+
+suite('Should have failures even with a space in the filename', () => {
 	const docUri = getDocUri('a template.yaml');
 
-	it('Diagnoses a bad template with spaces in the name', async () => {
+	test('Diagnoses a bad template with spaces in the name', async () => {
 		await testDiagnostics(docUri, [
 			{
 				severity: vscode.DiagnosticSeverity.Error,
