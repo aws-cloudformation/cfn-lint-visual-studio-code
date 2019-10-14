@@ -16,7 +16,7 @@ permissions and limitations under the License.
 
 import * as path from 'path';
 
-import { workspace, ExtensionContext } from 'vscode';
+import { workspace, ExtensionContext, ConfigurationTarget } from 'vscode';
 import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from 'vscode-languageclient';
 
 export function activate(context: ExtensionContext) {
@@ -29,7 +29,7 @@ export function activate(context: ExtensionContext) {
 	// If the extension is launched in debug mode then the debug server options are used
 	// Otherwise the run options are used
 	let serverOptions: ServerOptions = {
-		run : { module: serverModule, transport: TransportKind.ipc },
+		run: { module: serverModule, transport: TransportKind.ipc },
 		debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions }
 	};
 
@@ -37,8 +37,8 @@ export function activate(context: ExtensionContext) {
 	let clientOptions: LanguageClientOptions = {
 		// Register the server for plain text documents
 		documentSelector: [
-			{scheme: 'file', language: 'yaml'},
-			{scheme: 'file', language: 'json'}
+			{ scheme: 'file', language: 'yaml' },
+			{ scheme: 'file', language: 'json' }
 		],
 		synchronize: {
 			// Synchronize the setting section 'languageServerExample' to the server
@@ -48,6 +48,48 @@ export function activate(context: ExtensionContext) {
 		}
 	};
 
+	workspace.getConfiguration().update('yaml.format.enable', true, ConfigurationTarget.Global);
+	workspace.getConfiguration().update('yaml.trace.server', 'verbose', ConfigurationTarget.Global);
+	workspace.getConfiguration().update('yaml.validate', false, ConfigurationTarget.Global);
+	workspace.getConfiguration().update('yaml.customTags', [
+		'!And',
+		'!If',
+		'!Not',
+		'!Equals',
+		'!Or',
+		'!FindInMap',
+		'!Base64',
+		'!Cidr',
+		'!Ref',
+		'!Sub',
+		'!GetAtt',
+		'!GetAZs',
+		'!ImportValue',
+		'!Select',
+		'!Split',
+		'!Join'
+	], ConfigurationTarget.Global);
+	workspace.getConfiguration().update('[yaml]', {
+		"editor.insertSpaces": true,
+		"editor.tabSize": 2,
+		"editor.quickSuggestions": {
+			"other": true,
+			"comments": false,
+			"strings": true
+		},
+		"editor.autoIndent": true
+	}, ConfigurationTarget.Global);
+	workspace.getConfiguration().update('yaml.schemas', {
+		"https://s3.amazonaws.com/cfn-resource-specifications-us-east-1-prod/schemas/2.15.0/all-spec.json": "*.yaml"
+	}, ConfigurationTarget.Global);
+	workspace.getConfiguration().update('json.schemas', [
+		{
+			'fileMatch': [
+				'*-template.json'
+			],
+			'url': 'https://s3.amazonaws.com/cfn-resource-specifications-us-east-1-prod/schemas/2.15.0/all-spec.json'
+		}
+	], ConfigurationTarget.Global)
 	// Create the language client and start the client.
 	let disposable = new LanguageClient('cfnLint', 'CloudFormation linter Language Server', serverOptions, clientOptions).start();
 
