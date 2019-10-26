@@ -18,6 +18,7 @@ import * as path from 'path';
 
 import { workspace, ExtensionContext, ConfigurationTarget } from 'vscode';
 import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from 'vscode-languageclient';
+import { registerYamlSchemaSupport } from './yaml-support/yaml-schema';
 
 export function activate(context: ExtensionContext) {
 
@@ -48,10 +49,8 @@ export function activate(context: ExtensionContext) {
 		}
 	};
 
-	workspace.getConfiguration().update('yaml.format.enable', true, ConfigurationTarget.Global);
-	workspace.getConfiguration().update('yaml.trace.server', 'verbose', ConfigurationTarget.Global);
-	workspace.getConfiguration().update('yaml.validate', false, ConfigurationTarget.Global);
-	workspace.getConfiguration().update('yaml.customTags', [
+	let currentTags: Array<string> = workspace.getConfiguration().get('yaml.customTags')
+	let cloudFormationTags = [
 		'!And',
 		'!If',
 		'!Not',
@@ -68,32 +67,17 @@ export function activate(context: ExtensionContext) {
 		'!Select',
 		'!Split',
 		'!Join'
-	], ConfigurationTarget.Global);
-	workspace.getConfiguration().update('[yaml]', {
-		"editor.insertSpaces": true,
-		"editor.tabSize": 2,
-		"editor.quickSuggestions": {
-			"other": true,
-			"comments": false,
-			"strings": true
-		},
-		"editor.autoIndent": true
-	}, ConfigurationTarget.Global);
-	workspace.getConfiguration().update('yaml.schemas', {
-		"https://s3.amazonaws.com/cfn-resource-specifications-us-east-1-prod/schemas/2.15.0/all-spec.json": "*.yaml"
-	}, ConfigurationTarget.Global);
-	workspace.getConfiguration().update('json.schemas', [
-		{
-			'fileMatch': [
-				'*-template.json'
-			],
-			'url': 'https://s3.amazonaws.com/cfn-resource-specifications-us-east-1-prod/schemas/2.15.0/all-spec.json'
-		}
-	], ConfigurationTarget.Global)
+	]
+	let updateTags = currentTags.concat(cloudFormationTags.filter((item) => currentTags.indexOf(item) < 0))
+
+	workspace.getConfiguration().update('yaml.customTags', updateTags, ConfigurationTarget.Global);
+
 	// Create the language client and start the client.
 	let disposable = new LanguageClient('cfnLint', 'CloudFormation linter Language Server', serverOptions, clientOptions).start();
 
 	// Push the disposable to the context's subscriptions so that the
 	// client can be deactivated on extension deactivation
 	context.subscriptions.push(disposable);
+
+	registerYamlSchemaSupport();
 }
