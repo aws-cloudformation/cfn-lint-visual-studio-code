@@ -21,8 +21,7 @@ Resources:
       KeyName: 1
       FakeKey: MadeYouLook
       BlockDeviceMappings:
-        -
-          DeviceName: /dev/sdm
+        - DeviceName: /dev/sdm
           Ebs:
             VolumeType: io1
             Iops: !Ref pIops
@@ -39,8 +38,7 @@ Resources:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
-          -
-            Effect: "Allow"
+          - Effect: "Allow"
             Principal:
               Service:
                 - "ec2.amazonaws.com"
@@ -48,13 +46,11 @@ Resources:
               - "sts:AssumeRole"
       Path: "/"
       Policies:
-        -
-          PolicyName: "root"
+        - PolicyName: "root"
           PolicyDocument1:
             Version: "2012-10-17"
             Statement:
-              -
-                Effect: "Allow"
+              - Effect: "Allow"
                 Action: "*"
                 Resource: "*"
   RolePolicies:
@@ -64,48 +60,45 @@ Resources:
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
-          -
-            Effect: "Allow"
+          - Effect: "Allow"
             Action: "*"
             Resource: "*"
       Roles:
-        -
-          Ref: "RootRole"
+        - Ref: "RootRole"
   RootInstanceProfile:
     Type: "AWS::IAM::InstanceProfile"
     Properties:
       Path: "/"
       Roles:
-        -
-          Ref: "RootRole"
+        - Ref: "RootRole"
 
   # Bad Key under HealthCheck
   ElasticLoadBalancer:
     Type: AWS::ElasticLoadBalancing::LoadBalancer
     Properties:
       AvailabilityZones:
-        Fn::GetAZs: ''
+        Fn::GetAZs: ""
       Instances:
-      - Ref: MyEC2Instance
+        - Ref: MyEC2Instance
       Listeners:
-      - LoadBalancerPort: '80'
-        InstancePort:
-          Ref: WebServerPort
-        Protocol: HTTP
+        - LoadBalancerPort: "80"
+          InstancePort:
+            Ref: WebServerPort
+          Protocol: HTTP
       HealthCheck:
         FakeKey: Another fake key
         Target:
           Fn::Join:
-          - ''
-          - - 'HTTP:'
-            - Ref: WebServerPort
-            - "/"
-        HealthyThreshold: '3'
+            - ""
+            - - "HTTP:"
+              - Ref: WebServerPort
+              - "/"
+        HealthyThreshold: "3"
         # Int which should be string. (No Error)
         UnhealthyThreshold: 5
         # Should be boolean (Error)
         Interval: True
-        Timeout: '5'
+        Timeout: "5"
 Outputs:
   myOutput:
     Value: !GetAtt ElasticLoadBalancer.CanonicalHostedZoneName

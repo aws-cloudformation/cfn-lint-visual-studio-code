@@ -21,6 +21,7 @@ export async function activate(docUri: vscode.Uri) {
 	try {
 		doc = await vscode.workspace.openTextDocument(docUri);
 		editor = await vscode.window.showTextDocument(doc);
+		vscode.workspace.getConfiguration().update('yaml.validate', false, vscode.ConfigurationTarget.Global);
 		await sleep(4000); // Wait for server activation
 	} catch (e) {
 		console.error(e);

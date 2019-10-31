@@ -16,8 +16,9 @@ permissions and limitations under the License.
 
 import * as path from 'path';
 
-import { workspace, ExtensionContext } from 'vscode';
+import { workspace, ExtensionContext, ConfigurationTarget } from 'vscode';
 import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from 'vscode-languageclient';
+import { registerYamlSchemaSupport } from './yaml-support/yaml-schema';
 
 export function activate(context: ExtensionContext) {
 
@@ -29,7 +30,7 @@ export function activate(context: ExtensionContext) {
 	// If the extension is launched in debug mode then the debug server options are used
 	// Otherwise the run options are used
 	let serverOptions: ServerOptions = {
-		run : { module: serverModule, transport: TransportKind.ipc },
+		run: { module: serverModule, transport: TransportKind.ipc },
 		debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions }
 	};
 
@@ -37,8 +38,8 @@ export function activate(context: ExtensionContext) {
 	let clientOptions: LanguageClientOptions = {
 		// Register the server for plain text documents
 		documentSelector: [
-			{scheme: 'file', language: 'yaml'},
-			{scheme: 'file', language: 'json'}
+			{ scheme: 'file', language: 'yaml' },
+			{ scheme: 'file', language: 'json' }
 		],
 		synchronize: {
 			// Synchronize the setting section 'languageServerExample' to the server
@@ -48,10 +49,35 @@ export function activate(context: ExtensionContext) {
 		}
 	};
 
+	let currentTags: Array<string> = workspace.getConfiguration().get('yaml.customTags')
+	let cloudFormationTags = [
+		'!And',
+		'!If',
+		'!Not',
+		'!Equals',
+		'!Or',
+		'!FindInMap',
+		'!Base64',
+		'!Cidr',
+		'!Ref',
+		'!Sub',
+		'!GetAtt',
+		'!GetAZs',
+		'!ImportValue',
+		'!Select',
+		'!Split',
+		'!Join'
+	]
+	let updateTags = currentTags.concat(cloudFormationTags.filter((item) => currentTags.indexOf(item) < 0))
+
+	workspace.getConfiguration().update('yaml.customTags', updateTags, ConfigurationTarget.Global);
+
 	// Create the language client and start the client.
 	let disposable = new LanguageClient('cfnLint', 'CloudFormation linter Language Server', serverOptions, clientOptions).start();
 
 	// Push the disposable to the context's subscriptions so that the
 	// client can be deactivated on extension deactivation
 	context.subscriptions.push(disposable);
+
+	registerYamlSchemaSupport();
 }
