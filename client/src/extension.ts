@@ -72,6 +72,12 @@ export function activate(context: ExtensionContext) {
 
 	workspace.getConfiguration().update('yaml.customTags', updateTags, ConfigurationTarget.Global);
 
+	let validateYaml: boolean = workspace.getConfiguration().get('yaml.validate')
+	let cfnValidateYaml: boolean = workspace.getConfiguration().get('cfnLint.validateUsingJsonSchema')
+	if (validateYaml) {
+		workspace.getConfiguration().update('yaml.validate', cfnValidateYaml, ConfigurationTarget.Global);
+	}
+
 	// Create the language client and start the client.
 	let disposable = new LanguageClient('cfnLint', 'CloudFormation linter Language Server', serverOptions, clientOptions).start();
 
