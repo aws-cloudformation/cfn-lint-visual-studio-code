@@ -16,7 +16,7 @@ permissions and limitations under the License.
 
 import * as path from 'path';
 
-import { workspace, ExtensionContext, ConfigurationTarget } from 'vscode';
+import { workspace, ExtensionContext, ConfigurationTarget, window } from 'vscode';
 import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from 'vscode-languageclient';
 import { registerYamlSchemaSupport } from './yaml-support/yaml-schema';
 
@@ -49,33 +49,45 @@ export function activate(context: ExtensionContext) {
 		}
 	};
 
-	let currentTags: Array<string> = workspace.getConfiguration().get('yaml.customTags')
-	let cloudFormationTags = [
-		'!And',
-		'!If',
-		'!Not',
-		'!Equals',
-		'!Or',
-		'!FindInMap',
-		'!Base64',
-		'!Cidr',
-		'!Ref',
-		'!Sub',
-		'!GetAtt',
-		'!GetAZs',
-		'!ImportValue',
-		'!Select',
-		'!Split',
-		'!Join'
-	]
-	let updateTags = currentTags.concat(cloudFormationTags.filter((item) => currentTags.indexOf(item) < 0))
+	let enableAutocomplete: boolean = workspace.getConfiguration().get('cfnLint.enableAutocomplete');
+	if (enableAutocomplete) {
+		let currentTags: Array<string> = workspace.getConfiguration().get('yaml.customTags');
+		let cloudFormationTags = [
+			"!And",
+			"!And sequence",
+			"!If",
+			"!If sequence",
+			"!Not",
+			"!Not sequence",
+			"!Equals",
+			"!Equals sequence",
+			"!Or",
+			"!Or sequence",
+			"!FindInMap",
+			"!FindInMap sequence",
+			"!Base64",
+			"!Join",
+			"!Join sequence",
+			"!Cidr",
+			"!Ref",
+			"!Sub",
+			"!Sub sequence",
+			"!GetAtt",
+			"!GetAZs",
+			"!ImportValue",
+			"!ImportValue sequence",
+			"!Select",
+			"!Select sequence",
+			"!Split",
+			"!Split sequence"
+		];
+		let updateTags = currentTags.concat(cloudFormationTags.filter((item) => currentTags.indexOf(item) < 0));
 
-	workspace.getConfiguration().update('yaml.customTags', updateTags, ConfigurationTarget.Global);
+		workspace.getConfiguration().update('yaml.customTags', updateTags, ConfigurationTarget.Global);
 
-	let validateYaml: boolean = workspace.getConfiguration().get('yaml.validate')
-	let cfnValidateYaml: boolean = workspace.getConfiguration().get('cfnLint.validateUsingJsonSchema')
-	if (validateYaml) {
-		workspace.getConfiguration().update('yaml.validate', cfnValidateYaml, ConfigurationTarget.Global);
+		yamlLangaugeServerValidation();
+
+		registerYamlSchemaSupport();
 	}
 
 	// Create the language client and start the client.
@@ -85,5 +97,28 @@ export function activate(context: ExtensionContext) {
 	// client can be deactivated on extension deactivation
 	context.subscriptions.push(disposable);
 
-	registerYamlSchemaSupport();
+}
+
+export async function yamlLangaugeServerValidation(): Promise<void> {
+	let validateYaml: boolean = workspace.getConfiguration().get('yaml.validate');
+	let cfnValidateYamlInspect = workspace.getConfiguration().inspect('cfnLint.validateUsingJsonSchema');
+	let cfnValidateYaml: boolean = workspace.getConfiguration().get('cfnLint.validateUsingJsonSchema');
+
+	if (validateYaml) {
+		if (cfnValidateYamlInspect.globalValue == null || cfnValidateYamlInspect.workspaceFolderValue == null || cfnValidateYamlInspect.workspaceValue == null) {
+			let selection: string = await window
+				.showInformationMessage('The installed Red Hat YAML extension is also configured to validate YAML templates. This may result in duplicate lint errors with cfn-lint. Disabling the YAML extensions validation will disable it completely.  Would you like to only use cfn-lint to lint CloudFormation templates?',
+					...['yes', 'no']);
+			if (selection == 'yes') {
+				workspace.getConfiguration().update('cfnLint.validateUsingJsonSchema', false, ConfigurationTarget.Global);
+			} else if (selection == 'no') {
+				workspace.getConfiguration().update('cfnLint.validateUsingJsonSchema', true, ConfigurationTarget.Global);
+				cfnValidateYaml = true
+			}
+
+		}
+		if (cfnValidateYaml == false) {
+			workspace.getConfiguration().update('yaml.validate', false, ConfigurationTarget.Global);
+		}
+	}
 }
