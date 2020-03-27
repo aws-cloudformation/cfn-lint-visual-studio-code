@@ -105,19 +105,19 @@ export async function yamlLangaugeServerValidation(): Promise<void> {
 	let cfnValidateYaml: boolean = workspace.getConfiguration().get('cfnLint.validateUsingJsonSchema');
 
 	if (validateYaml) {
-		if (cfnValidateYamlInspect.globalValue == null || cfnValidateYamlInspect.workspaceFolderValue == null || cfnValidateYamlInspect.workspaceValue == null) {
+		if (cfnValidateYamlInspect.globalValue === null || cfnValidateYamlInspect.workspaceFolderValue === null || cfnValidateYamlInspect.workspaceValue === null) {
 			let selection: string = await window
 				.showInformationMessage('The installed Red Hat YAML extension is also configured to validate YAML templates. This may result in duplicate lint errors with cfn-lint. Disabling the YAML extensions validation will disable it completely.  Would you like to only use cfn-lint to lint CloudFormation templates?',
 					...['yes', 'no']);
-			if (selection == 'yes') {
+			if (selection === 'yes') {
 				workspace.getConfiguration().update('cfnLint.validateUsingJsonSchema', false, ConfigurationTarget.Global);
-			} else if (selection == 'no') {
+			} else if (selection === 'no') {
 				workspace.getConfiguration().update('cfnLint.validateUsingJsonSchema', true, ConfigurationTarget.Global);
-				cfnValidateYaml = true
+				cfnValidateYaml = true;
 			}
 
 		}
-		if (cfnValidateYaml == false) {
+		if (cfnValidateYaml === false) {
 			workspace.getConfiguration().update('yaml.validate', false, ConfigurationTarget.Global);
 		}
 	}

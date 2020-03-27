@@ -50,7 +50,7 @@ function requestYamlSchemaUriCallback(resource: string): string | undefined {
 			}
 		});
 		if (found) {
-			return CLOUDFORMATION_SCHEMA_PREFIX + 'cloudformation'
+			return CLOUDFORMATION_SCHEMA_PREFIX + 'cloudformation';
 		}
 	}
 	return undefined;
