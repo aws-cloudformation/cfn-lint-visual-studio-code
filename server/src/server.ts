@@ -71,6 +71,10 @@ documents.onDidOpen((event) => {
 	validateCloudFormationFile(event.document);
 });
 
+documents.onDidClose((event) => {
+	connection.sendNotification('cfn/fileclosed', event.document.uri);
+})
+
 // The settings interface describe the server relevant settings part
 interface Settings {
 	cfnLint: CloudFormationLintSettings;
@@ -155,7 +159,8 @@ function validateCloudFormationFile(document: TextDocument): void {
 	let is_cfn = isCloudFormation(document.getText(), uri.toString());
 
 	if (is_cfn) {
-		let args = ['--format', 'json'];
+		//FIXME add a path parameter to "-g"
+		let args = ['-g', '--format', 'json'];
 
 		if (IgnoreRules.length > 0) {
 			for (var ignoreRule of IgnoreRules) {
@@ -254,6 +259,7 @@ function validateCloudFormationFile(document: TextDocument): void {
 
 		child.on("close", () => {
 			//connection.console.log(`Validation finished for(code:${code}): ${Files.uriToFilePath(uri)}`);
+			connection.sendNotification('cfn/previewisavailable', uri);
 			connection.sendDiagnostics({ uri: filename, diagnostics });
 			isValidating[uri] = false;
 		});
