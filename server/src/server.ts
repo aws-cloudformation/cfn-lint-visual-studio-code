@@ -159,7 +159,6 @@ function validateCloudFormationFile(document: TextDocument): void {
 	let is_cfn = isCloudFormation(document.getText(), uri.toString());
 
 	if (is_cfn) {
-		//FIXME add a path parameter to "-g"
 		let args = ['-g', '--format', 'json'];
 
 		if (IgnoreRules.length > 0) {

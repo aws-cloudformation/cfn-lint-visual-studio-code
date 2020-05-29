@@ -150,6 +150,7 @@ function loadSidePreview() {
 		previews[previewKey].onDidDispose(() => {
 			// if the user closed the preview
 			delete previews[previewKey];
+			//TODO remove the dot file?
 		});
 	}
 
