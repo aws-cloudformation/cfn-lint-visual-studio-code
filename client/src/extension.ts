@@ -127,7 +127,7 @@ function loadSidePreview() {
 	if (!window.activeTextEditor.document)
 		return;
 	let uri = window.activeTextEditor.document.uri;
-	//FIXME security concern - we should read this file from the extension's workspace
+	const previewKey = uri.toString();
 	let dotFile = uri.fsPath + ".dot";
 
 	if (!fs.existsSync(dotFile)) {
@@ -135,8 +135,7 @@ function loadSidePreview() {
 		window.showInformationMessage("Your version of cfn-lint doesn't support previews. Please run: `pip3 install cfn-lint pydot --upgrade`")
 		return;
 	}
-	const onDiskPath = vscode.Uri.file(dotFile);
-	const previewKey = uri.toString();
+	let content = fs.readFileSync(dotFile, 'utf8');
 
 	if (!previews[previewKey]) {
 		previews[previewKey] = vscode.window.createWebviewPanel(
@@ -154,13 +153,12 @@ function loadSidePreview() {
 	}
 
 	const panel = previews[previewKey];
-	const dotUri = panel.webview.asWebviewUri(onDiskPath);
-	panel.webview.html = getPreviewContent(dotUri);
+	panel.webview.html = getPreviewContent(content);
 }
 
-function getPreviewContent(dotUri: vscode.Uri) : string {
-	//FIXME reload properly. If the URL didn't change, the webview won't change
+function getPreviewContent(content: String) : string {
 
+	let escapedContent = "`" + content + "`";
 	// FIXME is there a better way of converting from dot to svg that is not using cdn urls?
 	return `
 	<!DOCTYPE html>
@@ -170,14 +168,9 @@ function getPreviewContent(dotUri: vscode.Uri) : string {
 		<script src="https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.min.js"></script>
 		<div id="graph" style="text-align: center;"></div>
 		<script>
-			fetch("${dotUri}")
-			.then(function(response) {
-				response.text().then(function(text) {
-					d3.select("#graph")
-					.graphviz()
-					.renderDot(text);
-				});
-			});
+			d3.select("#graph")
+			.graphviz()
+			.renderDot(${escapedContent});
 		</script>
 	</body>
 `;
