@@ -259,7 +259,7 @@ function validateCloudFormationFile(document: TextDocument): void {
 
 		child.on("close", () => {
 			//connection.console.log(`Validation finished for(code:${code}): ${Files.uriToFilePath(uri)}`);
-			connection.sendNotification('cfn/previewisavailable', uri);
+			connection.sendNotification('cfn/previewIsAvailable', uri);
 			connection.sendDiagnostics({ uri: filename, diagnostics });
 			isValidating[uri] = false;
 		});

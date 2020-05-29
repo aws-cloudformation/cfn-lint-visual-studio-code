@@ -98,7 +98,7 @@ export function activate(context: ExtensionContext) {
 	let disposable = languageClient.start();
 
 	languageClient.onReady().then(() => {
-		languageClient.onNotification('cfn/previewisavailable', (uri) => {
+		languageClient.onNotification('cfn/previewIsAvailable', (uri) => {
 			// This enables the "show preview" button in the top right corner
 			vscode.commands.executeCommand('setContext', 'isCfnPreviewAvailable', true);
 
@@ -132,7 +132,7 @@ function loadSidePreview() {
 
 	if (!fs.existsSync(dotFile)) {
 		//FIXME test!
-		window.showInformationMessage("Your version of cfn-python-lint doesn't support previews. Please update to the latest version.")
+		window.showInformationMessage("Your version of cfn-lint doesn't support previews. Please run: `pip3 install cfn-lint pydot --upgrade`")
 		return;
 	}
 	const onDiskPath = vscode.Uri.file(dotFile);
@@ -141,7 +141,7 @@ function loadSidePreview() {
 	if (!previews[previewKey]) {
 		previews[previewKey] = vscode.window.createWebviewPanel(
 			'cfnLintPreview', // Identifies the type of the webview. Used internally
-			'Template: ' + dotFile, // Title of the panel displayed to the user
+			'Template: ' + dotFile.slice(0,-4), // Title of the panel displayed to the user
 			vscode.ViewColumn.Two, // Editor column to show the new webview panel in.
 			{
 				enableScripts: true,
