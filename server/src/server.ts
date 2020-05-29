@@ -73,7 +73,7 @@ documents.onDidOpen((event) => {
 
 documents.onDidClose((event) => {
 	connection.sendNotification('cfn/fileclosed', event.document.uri);
-})
+});
 
 // The settings interface describe the server relevant settings part
 interface Settings {

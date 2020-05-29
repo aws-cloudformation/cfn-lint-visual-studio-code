@@ -106,12 +106,12 @@ export function activate(context: ExtensionContext) {
 			if (previews[uri]) {
 				vscode.commands.executeCommand('extension.sidePreview');
 			}
-		})
+		});
 		languageClient.onNotification('cfn/fileclosed', (uri) => {
 			// if the user closed the template itself
 			previews[uri].dispose();
-		})
-	})
+		});
+	});
 
 	// Push the disposable to the context's subscriptions so that the
 	// client can be deactivated on extension deactivation
@@ -124,15 +124,16 @@ export function activate(context: ExtensionContext) {
 }
 
 function loadSidePreview() {
-	if (!window.activeTextEditor.document)
+	if (!window.activeTextEditor.document) {
 		return;
+	}
 	let uri = window.activeTextEditor.document.uri;
 	const previewKey = uri.toString();
 	let dotFile = uri.fsPath + ".dot";
 
 	if (!fs.existsSync(dotFile)) {
 		//FIXME test!
-		window.showInformationMessage("Your version of cfn-lint doesn't support previews. Please run: `pip3 install cfn-lint pydot --upgrade`")
+		window.showInformationMessage("Your version of cfn-lint doesn't support previews. Please run: `pip3 install cfn-lint pydot --upgrade`");
 		return;
 	}
 	let content = fs.readFileSync(dotFile, 'utf8');
@@ -145,11 +146,11 @@ function loadSidePreview() {
 			{
 				enableScripts: true,
 			}
-		)
+		);
 		previews[previewKey].onDidDispose(() => {
 			// if the user closed the preview
 			delete previews[previewKey];
-		})
+		});
 	}
 
 	const panel = previews[previewKey];
