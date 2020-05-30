@@ -115,7 +115,7 @@ connection.onDidChangeConfiguration((change) => {
 	AppendRules = settings.cfnLint.appendRules;
 
 	// Revalidate any open text documents
-	documents.all().forEach(d => runLinter(d));
+	documents.all().forEach(runLinter);
 });
 
 let isValidating: { [index: string]: boolean } = {};
@@ -250,7 +250,6 @@ function runLinter(document: TextDocument): void {
 		child.on('exit', function (code, signal) {
 			connection.console.log('child process exited with ' +
 				`code ${code} and signal ${signal}`);
-
 			let tmp = stdout.toString();
 			let obj = JSON.parse(tmp);
 			for (let element of obj) {

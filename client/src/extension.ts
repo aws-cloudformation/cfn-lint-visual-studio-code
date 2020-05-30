@@ -16,8 +16,7 @@ permissions and limitations under the License.
 
 import * as path from 'path';
 import * as fs from 'fs';
-import { workspace, ExtensionContext, ConfigurationTarget, window, WebviewPanel, Uri } from 'vscode';
-import * as vscode from 'vscode';
+import { workspace, ExtensionContext, ConfigurationTarget, window, WebviewPanel, Uri, commands, ViewColumn, window as VsCodeWindow } from 'vscode';
 import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from 'vscode-languageclient';
 import { registerYamlSchemaSupport } from './yaml-support/yaml-schema';
 
@@ -102,14 +101,14 @@ export function activate(context: ExtensionContext) {
 			reloadSidePreview(uri, languageClient);
 		});
 		languageClient.onNotification('cfn/isPreviewable', (value) => {
-			vscode.commands.executeCommand('setContext', 'isPreviewable', value);
+			commands.executeCommand('setContext', 'isPreviewable', value);
 		});
 		languageClient.onNotification('cfn/fileclosed', (uri) => {
 			// if the user closed the template itself, we close the preview
 			previews[uri].dispose();
 		});
 
-		let previewDisposable = vscode.commands.registerCommand('extension.sidePreview', () => {
+		let previewDisposable = commands.registerCommand('extension.sidePreview', () => {
 			let uri = Uri.file(window.activeTextEditor.document.fileName).toString();
 
 			languageClient.sendNotification('cfn/requestPreview', uri);
@@ -135,10 +134,10 @@ function reloadSidePreview(file:string, languageClient:LanguageClient) {
 	let content = fs.readFileSync(dotFile, 'utf8');
 
 	if (!previews[previewKey]) {
-		previews[previewKey] = vscode.window.createWebviewPanel(
+		previews[previewKey] = VsCodeWindow.createWebviewPanel(
 			'cfnLintPreview', // Identifies the type of the webview. Used internally
 			'Template: ' + dotFile.slice(0,-4), // Title of the panel displayed to the user
-			vscode.ViewColumn.Two, // Editor column to show the new webview panel in.
+			ViewColumn.Two, // Editor column to show the new webview panel in.
 			{
 				enableScripts: true,
 			}
