@@ -169,6 +169,8 @@ function getPreviewContent(content: String) : string {
 		<script>
 			d3.select("#graph")
 			.graphviz()
+			.width(screen.width)
+			.height(screen.height)
 			.renderDot(${multilineString});
 		</script>
 	</body>
