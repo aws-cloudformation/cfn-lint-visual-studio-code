@@ -21,7 +21,7 @@ export function run(): Promise<void> {
 			files.forEach(f => mocha.addFile(path.resolve(testsRoot, f)));
 
 			try {
-				mocha.timeout(20 * 1000);
+				mocha.timeout(10 * 1000);
 				// Run the mocha test
 				mocha.run(failures => {
 					if (failures > 0) {

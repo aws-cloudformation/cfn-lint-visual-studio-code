@@ -33,7 +33,7 @@ export async function activateAndPreview(docUri: vscode.Uri) {
 
 	await vscode.commands.executeCommand('extension.sidePreview');
 
-	await sleep(8000); // Wait for preview to become available
+	await sleep(4000); // Wait for preview to become available
 }
 
 async function sleep(ms: number) {
