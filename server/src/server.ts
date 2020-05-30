@@ -167,6 +167,8 @@ function runLinter(document: TextDocument): void {
 
 	let is_cfn = isCloudFormation(document.getText(), uri.toString());
 
+	connection.sendNotification('cfn/isPreviewable', is_cfn);
+
 	if (is_cfn) {
 		let args = ['--format', 'json'];
 		if (isPreviewing[uri]) {
@@ -248,10 +250,7 @@ function runLinter(document: TextDocument): void {
 		child.on('exit', function (code, signal) {
 			connection.console.log('child process exited with ' +
 				`code ${code} and signal ${signal}`);
-			if (isPreviewing[uri]) {
-				connection.console.log('preview file is available');
-				connection.sendNotification('cfn/previewIsAvailable', uri);
-			}
+
 			let tmp = stdout.toString();
 			let obj = JSON.parse(tmp);
 			for (let element of obj) {
@@ -276,6 +275,10 @@ function runLinter(document: TextDocument): void {
 			//connection.console.log(`Validation finished for(code:${code}): ${Files.uriToFilePath(uri)}`);
 			connection.sendDiagnostics({ uri: filename, diagnostics });
 			isValidating[uri] = false;
+			if (isPreviewing[uri]) {
+				connection.console.log('preview file is available');
+				connection.sendNotification('cfn/previewIsAvailable', uri);
+			}
 		});
 	} else {
 		connection.console.log("Don't believe this is a CloudFormation template. " + uri.toString() +

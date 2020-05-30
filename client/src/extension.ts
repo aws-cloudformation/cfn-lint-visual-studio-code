@@ -101,6 +101,9 @@ export function activate(context: ExtensionContext) {
 		languageClient.onNotification('cfn/previewIsAvailable', (uri) => {
 			reloadSidePreview(uri, languageClient);
 		});
+		languageClient.onNotification('cfn/isPreviewable', (value) => {
+			vscode.commands.executeCommand('setContext', 'isPreviewable', value);
+		});
 		languageClient.onNotification('cfn/fileclosed', (uri) => {
 			// if the user closed the template itself, we close the preview
 			previews[uri].dispose();
