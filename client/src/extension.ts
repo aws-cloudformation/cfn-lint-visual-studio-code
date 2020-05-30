@@ -154,7 +154,7 @@ function reloadSidePreview(file:string, languageClient:LanguageClient) {
 
 function getPreviewContent(content: String) : string {
 
-	let escapedContent = "`" + content + "`";
+	let multilineString = "`" + content + "`";
 	// FIXME is there a better way of converting from dot to svg that is not using cdn urls?
 	return `
 	<!DOCTYPE html>
@@ -166,7 +166,7 @@ function getPreviewContent(content: String) : string {
 		<script>
 			d3.select("#graph")
 			.graphviz()
-			.renderDot(${escapedContent});
+			.renderDot(${multilineString});
 		</script>
 	</body>
 `;

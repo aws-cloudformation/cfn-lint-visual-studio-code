@@ -1,8 +1,8 @@
 
 import * as vscode from 'vscode';
 import * as assert from 'assert';
-import { getDocUri, activate, activateAndPreview, getDocPath } from './helper';
 import * as fs from 'fs';
+import { getDocUri, activate, activateAndPreview, getDocPath } from './helper';
 
 suite('Should have failures with a bad template', () => {
 	const docUri = getDocUri('bad.yaml');
@@ -156,8 +156,6 @@ suite('Previews should work', () => {
 		fs.unlinkSync(getDocPath(dotUri));
 	});
 });
-
-
 
 function toRange(sLine: number, sChar: number, eLine: number, eChar: number) {
 	const start = new vscode.Position(sLine, sChar);
