@@ -126,7 +126,7 @@ function reloadSidePreview(file:string, languageClient:LanguageClient) {
 	let dotFile = uri.fsPath + ".dot";
 
 	if (!fs.existsSync(dotFile)) {
-		window.showInformationMessage("Your version of cfn-lint doesn't support previews. Please run: `pip3 install cfn-lint pydot --upgrade`");
+		window.showErrorMessage("Error previewing graph. Please run `pip3 install cfn-lint pydot --upgrade`");
 		return;
 	}
 	let content = fs.readFileSync(dotFile, 'utf8');
