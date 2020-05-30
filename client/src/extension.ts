@@ -16,7 +16,7 @@ permissions and limitations under the License.
 
 import * as path from 'path';
 import * as fs from 'fs';
-import { workspace, ExtensionContext, ConfigurationTarget, window, WebviewPanel } from 'vscode';
+import { workspace, ExtensionContext, ConfigurationTarget, window, WebviewPanel, Uri } from 'vscode';
 import * as vscode from 'vscode';
 import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from 'vscode-languageclient';
 import { registerYamlSchemaSupport } from './yaml-support/yaml-schema';
@@ -95,44 +95,37 @@ export function activate(context: ExtensionContext) {
 
 	// Create the language client and start the client.
 	let languageClient = new LanguageClient('cfnLint', 'CloudFormation linter Language Server', serverOptions, clientOptions);
-	let disposable = languageClient.start();
+	let clientDisposable = languageClient.start();
 
 	languageClient.onReady().then(() => {
 		languageClient.onNotification('cfn/previewIsAvailable', (uri) => {
-			// This enables the "show preview" button in the top right corner
-			vscode.commands.executeCommand('setContext', 'isCfnPreviewAvailable', true);
-
-			// We don't want to show the preview if the user didn't request it. But, if the preview is visible, reload it
-			if (previews[uri]) {
-				vscode.commands.executeCommand('extension.sidePreview');
-			}
+			reloadSidePreview(uri, languageClient);
 		});
 		languageClient.onNotification('cfn/fileclosed', (uri) => {
-			// if the user closed the template itself
+			// if the user closed the template itself, we close the preview
 			previews[uri].dispose();
 		});
+
+		let previewDisposable = vscode.commands.registerCommand('extension.sidePreview', () => {
+			let uri = Uri.file(window.activeTextEditor.document.fileName).toString();
+
+			languageClient.sendNotification('cfn/requestPreview', uri);
+		});
+
+		context.subscriptions.push(previewDisposable);
 	});
 
 	// Push the disposable to the context's subscriptions so that the
 	// client can be deactivated on extension deactivation
-	context.subscriptions.push(disposable);
-
-	context.subscriptions.push(
-		vscode.commands.registerCommand('extension.sidePreview', loadSidePreview)
-	  );
-
+	context.subscriptions.push(clientDisposable);
 }
 
-function loadSidePreview() {
-	if (!window.activeTextEditor.document) {
-		return;
-	}
-	let uri = window.activeTextEditor.document.uri;
-	const previewKey = uri.toString();
+function reloadSidePreview(file:string, languageClient:LanguageClient) {
+	let uri = Uri.parse(file);
+	let previewKey = uri.toString();
 	let dotFile = uri.fsPath + ".dot";
 
 	if (!fs.existsSync(dotFile)) {
-		//FIXME test!
 		window.showInformationMessage("Your version of cfn-lint doesn't support previews. Please run: `pip3 install cfn-lint pydot --upgrade`");
 		return;
 	}
@@ -150,7 +143,8 @@ function loadSidePreview() {
 		previews[previewKey].onDidDispose(() => {
 			// if the user closed the preview
 			delete previews[previewKey];
-			//TODO remove the dot file?
+			fs.unlinkSync(dotFile);
+			languageClient.sendNotification('cfn/previewClosed', uri);
 		});
 	}
 
@@ -165,7 +159,7 @@ function getPreviewContent(content: String) : string {
 	return `
 	<!DOCTYPE html>
 	<body>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js"></script>
+		<script src="https://unpkg.com/d3@5.16.0/dist/d3.min.js"></script>
 		<script src="https://unpkg.com/@hpcc-js/wasm@0.3.11/dist/index.min.js"></script>
 		<script src="https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.min.js"></script>
 		<div id="graph" style="text-align: center;"></div>

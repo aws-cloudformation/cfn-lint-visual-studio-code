@@ -63,16 +63,24 @@ connection.onInitialize((params): InitializeResult => {
 // The content of a CloudFormation document has saved. This event is emitted
 // when the document get saved
 documents.onDidSave((event) => {
-	connection.console.log('Running cfn-lint...');
-	validateCloudFormationFile(event.document);
+	runLinter(event.document);
 });
 
 documents.onDidOpen((event) => {
-	validateCloudFormationFile(event.document);
+	runLinter(event.document);
 });
 
 documents.onDidClose((event) => {
 	connection.sendNotification('cfn/fileclosed', event.document.uri);
+});
+
+connection.onNotification('cfn/requestPreview', (uri: string) => {
+	isPreviewing[uri] = true;
+	runLinter(documents.get(uri));
+});
+
+connection.onNotification('cfn/previewClosed', (uri: string) => {
+	isPreviewing[uri] = false;
 });
 
 // The settings interface describe the server relevant settings part
@@ -107,10 +115,11 @@ connection.onDidChangeConfiguration((change) => {
 	AppendRules = settings.cfnLint.appendRules;
 
 	// Revalidate any open text documents
-	documents.all().forEach(validateCloudFormationFile);
+	documents.all().forEach(d => runLinter(d));
 });
 
 let isValidating: { [index: string]: boolean } = {};
+let isPreviewing: { [index: string]: boolean } = {};
 
 
 function convertSeverity(mistakeType: string): DiagnosticSeverity {
@@ -146,7 +155,7 @@ function isCloudFormation(template: string, filename: string): Boolean {
 	return false;
 }
 
-function validateCloudFormationFile(document: TextDocument): void {
+function runLinter(document: TextDocument): void {
 	let uri = document.uri;
 
 	if (isValidating[uri]) {
@@ -159,7 +168,10 @@ function validateCloudFormationFile(document: TextDocument): void {
 	let is_cfn = isCloudFormation(document.getText(), uri.toString());
 
 	if (is_cfn) {
-		let args = ['-g', '--format', 'json'];
+		let args = ['--format', 'json'];
+		if (isPreviewing[uri]) {
+			args.push('--build-graph');
+		}
 
 		if (IgnoreRules.length > 0) {
 			for (var ignoreRule of IgnoreRules) {
@@ -181,7 +193,7 @@ function validateCloudFormationFile(document: TextDocument): void {
 
 		args.push('--', `"${file_to_lint}"`);
 
-		connection.console.log(`running............. ${Path} ${args}`);
+		connection.console.log(`Running... ${Path} ${args}`);
 
 		isValidating[uri] = true;
 		let child = spawn(
@@ -236,6 +248,10 @@ function validateCloudFormationFile(document: TextDocument): void {
 		child.on('exit', function (code, signal) {
 			connection.console.log('child process exited with ' +
 				`code ${code} and signal ${signal}`);
+			if (isPreviewing[uri]) {
+				connection.console.log('preview file is available');
+				connection.sendNotification('cfn/previewIsAvailable', uri);
+			}
 			let tmp = stdout.toString();
 			let obj = JSON.parse(tmp);
 			for (let element of obj) {
@@ -258,7 +274,6 @@ function validateCloudFormationFile(document: TextDocument): void {
 
 		child.on("close", () => {
 			//connection.console.log(`Validation finished for(code:${code}): ${Files.uriToFilePath(uri)}`);
-			connection.sendNotification('cfn/previewIsAvailable', uri);
 			connection.sendDiagnostics({ uri: filename, diagnostics });
 			isValidating[uri] = false;
 		});
