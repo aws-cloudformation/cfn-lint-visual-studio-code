@@ -167,7 +167,7 @@ function runLinter(document: TextDocument): void {
 
 	let is_cfn = isCloudFormation(document.getText(), uri.toString());
 
-	connection.sendNotification('cfn/isPreviewable', is_cfn);
+
 
 	if (is_cfn) {
 		let args = ['--format', 'json'];
@@ -274,6 +274,7 @@ function runLinter(document: TextDocument): void {
 			//connection.console.log(`Validation finished for(code:${code}): ${Files.uriToFilePath(uri)}`);
 			connection.sendDiagnostics({ uri: filename, diagnostics });
 			isValidating[uri] = false;
+			connection.sendNotification('cfn/isPreviewable', is_cfn);
 			if (isPreviewing[uri]) {
 				connection.console.log('preview file is available');
 				connection.sendNotification('cfn/previewIsAvailable', uri);
