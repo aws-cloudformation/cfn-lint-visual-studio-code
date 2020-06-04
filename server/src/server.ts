@@ -167,8 +167,6 @@ function runLinter(document: TextDocument): void {
 
 	let is_cfn = isCloudFormation(document.getText(), uri.toString());
 
-
-
 	if (is_cfn) {
 		let args = ['--format', 'json'];
 		if (isPreviewing[uri]) {
