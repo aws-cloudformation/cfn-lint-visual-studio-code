@@ -124,7 +124,7 @@ export function activate(context: ExtensionContext) {
 
 function reloadSidePreview(file:string, languageClient:LanguageClient) {
 	let uri = Uri.parse(file);
-	let previewKey = uri.toString();
+	let stringifiedUri = uri.toString();
 	let dotFile = uri.fsPath + ".dot";
 
 	if (!fs.existsSync(dotFile)) {
@@ -133,8 +133,8 @@ function reloadSidePreview(file:string, languageClient:LanguageClient) {
 	}
 	let content = fs.readFileSync(dotFile, 'utf8');
 
-	if (!previews[previewKey]) {
-		previews[previewKey] = VsCodeWindow.createWebviewPanel(
+	if (!previews[stringifiedUri]) {
+		previews[stringifiedUri] = VsCodeWindow.createWebviewPanel(
 			'cfnLintPreview', // Identifies the type of the webview. Used internally
 			'Template: ' + dotFile.slice(0,-4), // Title of the panel displayed to the user
 			ViewColumn.Two, // Editor column to show the new webview panel in.
@@ -142,15 +142,15 @@ function reloadSidePreview(file:string, languageClient:LanguageClient) {
 				enableScripts: true,
 			}
 		);
-		previews[previewKey].onDidDispose(() => {
+		previews[stringifiedUri].onDidDispose(() => {
 			// if the user closed the preview
-			delete previews[previewKey];
+			delete previews[stringifiedUri];
 			fs.unlinkSync(dotFile);
-			languageClient.sendNotification('cfn/previewClosed', uri);
+			languageClient.sendNotification('cfn/previewClosed', stringifiedUri);
 		});
 	}
 
-	const panel = previews[previewKey];
+	const panel = previews[stringifiedUri];
 	panel.webview.html = getPreviewContent(content);
 }
 

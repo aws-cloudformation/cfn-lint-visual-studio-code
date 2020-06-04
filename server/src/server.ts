@@ -75,11 +75,13 @@ documents.onDidClose((event) => {
 });
 
 connection.onNotification('cfn/requestPreview', (uri: string) => {
+	connection.console.log('preview requested: ' + uri);
 	isPreviewing[uri] = true;
 	runLinter(documents.get(uri));
 });
 
 connection.onNotification('cfn/previewClosed', (uri: string) => {
+	connection.console.log('preview closed: ' + uri);
 	isPreviewing[uri] = false;
 });
 
@@ -118,7 +120,7 @@ connection.onDidChangeConfiguration((change) => {
 	documents.all().forEach(runLinter);
 });
 
-let isValidating: { [index: string]: boolean } = {};
+let isRunningLinterOn: { [index: string]: boolean } = {};
 let isPreviewing: { [index: string]: boolean } = {};
 
 
@@ -158,8 +160,8 @@ function isCloudFormation(template: string, filename: string): Boolean {
 function runLinter(document: TextDocument): void {
 	let uri = document.uri;
 
-	if (isValidating[uri]) {
-		connection.console.log("Already validating template: " + uri.toString());
+	if (isRunningLinterOn[uri]) {
+		connection.console.log("Already linting template: " + uri.toString());
 		return;
 	}
 
@@ -195,7 +197,7 @@ function runLinter(document: TextDocument): void {
 
 		connection.console.log(`Running... ${Path} ${args}`);
 
-		isValidating[uri] = true;
+		isRunningLinterOn[uri] = true;
 		let child = spawn(
 			Path,
 			args,
@@ -271,7 +273,7 @@ function runLinter(document: TextDocument): void {
 		child.on("close", () => {
 			//connection.console.log(`Validation finished for(code:${code}): ${Files.uriToFilePath(uri)}`);
 			connection.sendDiagnostics({ uri: filename, diagnostics });
-			isValidating[uri] = false;
+			isRunningLinterOn[uri] = false;
 			connection.sendNotification('cfn/isPreviewable', is_cfn);
 			if (isPreviewing[uri]) {
 				connection.console.log('preview file is available');
