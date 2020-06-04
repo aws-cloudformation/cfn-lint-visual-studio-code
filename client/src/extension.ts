@@ -111,9 +111,13 @@ export function activate(context: ExtensionContext) {
 		});
 
 		let previewDisposable = commands.registerCommand('extension.sidePreview', () => {
-			let uri = Uri.file(window.activeTextEditor.document.fileName).toString();
 
-			languageClient.sendNotification('cfn/requestPreview', uri);
+			if (window.activeTextEditor.document) {
+				let uri = Uri.file(window.activeTextEditor.document.fileName).toString();
+
+				languageClient.sendNotification('cfn/requestPreview', uri);
+			}
+
 		});
 
 		context.subscriptions.push(previewDisposable);
