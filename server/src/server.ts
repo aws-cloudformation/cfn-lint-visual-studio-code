@@ -169,9 +169,13 @@ function runLinter(document: TextDocument): void {
 
 	let is_cfn = isCloudFormation(document.getText(), uri.toString());
 
+	connection.sendNotification('cfn/isPreviewable', is_cfn);
+
+	let build_graph = isPreviewing[uri];
+
 	if (is_cfn) {
 		let args = ['--format', 'json'];
-		if (isPreviewing[uri]) {
+		if (build_graph) {
 			args.push('--build-graph');
 		}
 
@@ -274,8 +278,8 @@ function runLinter(document: TextDocument): void {
 			//connection.console.log(`Validation finished for(code:${code}): ${Files.uriToFilePath(uri)}`);
 			connection.sendDiagnostics({ uri: filename, diagnostics });
 			isRunningLinterOn[uri] = false;
-			connection.sendNotification('cfn/isPreviewable', is_cfn);
-			if (isPreviewing[uri]) {
+
+			if (build_graph) {
 				connection.console.log('preview file is available');
 				connection.sendNotification('cfn/previewIsAvailable', uri);
 			}
