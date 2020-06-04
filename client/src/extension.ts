@@ -97,6 +97,9 @@ export function activate(context: ExtensionContext) {
 	let clientDisposable = languageClient.start();
 
 	languageClient.onReady().then(() => {
+		languageClient.onNotification('cfn/busy', () => {
+			window.showInformationMessage("Linter is already running. Please try again.");
+		});
 		languageClient.onNotification('cfn/previewIsAvailable', (uri) => {
 			reloadSidePreview(uri, languageClient);
 		});

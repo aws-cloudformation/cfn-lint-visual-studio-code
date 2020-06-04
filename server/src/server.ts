@@ -161,7 +161,7 @@ function runLinter(document: TextDocument): void {
 	let uri = document.uri;
 
 	if (isRunningLinterOn[uri]) {
-		connection.console.log("Already linting template: " + uri.toString());
+		connection.sendNotification('cfn/busy');
 		return;
 	}
 
