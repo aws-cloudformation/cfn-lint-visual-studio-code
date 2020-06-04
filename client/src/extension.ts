@@ -105,7 +105,9 @@ export function activate(context: ExtensionContext) {
 		});
 		languageClient.onNotification('cfn/fileclosed', (uri) => {
 			// if the user closed the template itself, we close the preview
-			previews[uri].dispose();
+			if (previews[uri]) {
+				previews[uri].dispose();
+			}
 		});
 
 		let previewDisposable = commands.registerCommand('extension.sidePreview', () => {
