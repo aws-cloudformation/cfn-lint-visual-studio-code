@@ -10,7 +10,7 @@ suite('Should have failures with a bad template', () => {
 		await testDiagnostics(docUri, [
 			{
 				severity: vscode.DiagnosticSeverity.Error,
-				message: '[cfn-lint] E1001: Top level item Errors isn\'t valid',
+				message: '[cfn-lint] E1001: Top level template section Errors is not valid',
 				range: toRange(2, 0, 2, 6)
 			},
 			{
