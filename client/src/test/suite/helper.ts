@@ -28,6 +28,14 @@ export async function activate(docUri: vscode.Uri) {
 	}
 }
 
+export async function activateAndPreview(docUri: vscode.Uri) {
+	await activate(docUri);
+
+	await vscode.commands.executeCommand('extension.sidePreview');
+
+	await sleep(4000); // Wait for preview to become available
+}
+
 async function sleep(ms: number) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
