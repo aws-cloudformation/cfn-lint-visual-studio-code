@@ -10,7 +10,7 @@ VS Code CloudFormation Linter uses cfn-lint to lint your CloudFormation template
 
 - Uses [cfn-lint](https://github.com/aws-cloudformation/cfn-python-lint) to parse the template and show problems with it.
 
-- Uses [pydot]((https://pypi.org/project/pydot/)) to preview the template as a graph of resources.
+- Uses [pydot](https://pypi.org/project/pydot/) to preview the template as a graph of resources.
 
 ![features](/images/features.png)
 
