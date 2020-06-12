@@ -1,7 +1,8 @@
 
 import * as vscode from 'vscode';
 import * as assert from 'assert';
-import { getDocUri, activate } from './helper';
+import * as fs from 'fs';
+import { getDocUri, activate, activateAndPreview, getDocPath } from './helper';
 
 suite('Should have failures with a bad template', () => {
 	const docUri = getDocUri('bad.yaml');
@@ -78,7 +79,7 @@ suite('Should have failures with a bad template', () => {
 	});
 });
 
-suite('Should not have failures on a goodtemplate', () => {
+suite('Should not have failures on a good template', () => {
 	const docUri = getDocUri('good.yaml');
 
 	test('Diagnose good template', async () => {
@@ -133,6 +134,26 @@ suite('Should have failures even with a space in the filename', () => {
 				range: toRange(5, 6, 5, 12)
 			}
 		]);
+	});
+});
+
+suite('Previews should work', () => {
+	const docUri = 'preview.yaml';
+	const dotUri = 'preview.yaml.dot';
+
+	test('Does NOT create .dot file if a preview was not requested', async () => {
+		await activate(getDocUri(docUri));
+
+		assert.ok(! fs.existsSync(getDocPath(dotUri)));
+	});
+
+	test('Does create .dot file if a preview was requested', async () => {
+		await activateAndPreview(getDocUri(docUri));
+
+		assert.ok(fs.existsSync(getDocPath(dotUri)));
+
+		// cleanup
+		fs.unlinkSync(getDocPath(dotUri));
 	});
 });
 

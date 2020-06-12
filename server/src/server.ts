@@ -63,12 +63,26 @@ connection.onInitialize((params): InitializeResult => {
 // The content of a CloudFormation document has saved. This event is emitted
 // when the document get saved
 documents.onDidSave((event) => {
-	connection.console.log('Running cfn-lint...');
-	validateCloudFormationFile(event.document);
+	runLinter(event.document);
 });
 
 documents.onDidOpen((event) => {
-	validateCloudFormationFile(event.document);
+	runLinter(event.document);
+});
+
+documents.onDidClose((event) => {
+	connection.sendNotification('cfn/fileclosed', event.document.uri);
+});
+
+connection.onNotification('cfn/requestPreview', (uri: string) => {
+	connection.console.log('preview requested: ' + uri);
+	isPreviewing[uri] = true;
+	runLinter(documents.get(uri));
+});
+
+connection.onNotification('cfn/previewClosed', (uri: string) => {
+	connection.console.log('preview closed: ' + uri);
+	isPreviewing[uri] = false;
 });
 
 // The settings interface describe the server relevant settings part
@@ -103,10 +117,11 @@ connection.onDidChangeConfiguration((change) => {
 	AppendRules = settings.cfnLint.appendRules;
 
 	// Revalidate any open text documents
-	documents.all().forEach(validateCloudFormationFile);
+	documents.all().forEach(runLinter);
 });
 
-let isValidating: { [index: string]: boolean } = {};
+let isRunningLinterOn: { [index: string]: boolean } = {};
+let isPreviewing: { [index: string]: boolean } = {};
 
 
 function convertSeverity(mistakeType: string): DiagnosticSeverity {
@@ -142,11 +157,11 @@ function isCloudFormation(template: string, filename: string): Boolean {
 	return false;
 }
 
-function validateCloudFormationFile(document: TextDocument): void {
+function runLinter(document: TextDocument): void {
 	let uri = document.uri;
 
-	if (isValidating[uri]) {
-		connection.console.log("Already validating template: " + uri.toString());
+	if (isRunningLinterOn[uri]) {
+		connection.sendNotification('cfn/busy');
 		return;
 	}
 
@@ -154,8 +169,15 @@ function validateCloudFormationFile(document: TextDocument): void {
 
 	let is_cfn = isCloudFormation(document.getText(), uri.toString());
 
+	connection.sendNotification('cfn/isPreviewable', is_cfn);
+
+	let build_graph = isPreviewing[uri];
+
 	if (is_cfn) {
 		let args = ['--format', 'json'];
+		if (build_graph) {
+			args.push('--build-graph');
+		}
 
 		if (IgnoreRules.length > 0) {
 			for (var ignoreRule of IgnoreRules) {
@@ -177,9 +199,9 @@ function validateCloudFormationFile(document: TextDocument): void {
 
 		args.push('--', `"${file_to_lint}"`);
 
-		connection.console.log(`running............. ${Path} ${args}`);
+		connection.console.log(`Running... ${Path} ${args}`);
 
-		isValidating[uri] = true;
+		isRunningLinterOn[uri] = true;
 		let child = spawn(
 			Path,
 			args,
@@ -255,7 +277,12 @@ function validateCloudFormationFile(document: TextDocument): void {
 		child.on("close", () => {
 			//connection.console.log(`Validation finished for(code:${code}): ${Files.uriToFilePath(uri)}`);
 			connection.sendDiagnostics({ uri: filename, diagnostics });
-			isValidating[uri] = false;
+			isRunningLinterOn[uri] = false;
+
+			if (build_graph) {
+				connection.console.log('preview file is available');
+				connection.sendNotification('cfn/previewIsAvailable', uri);
+			}
 		});
 	} else {
 		connection.console.log("Don't believe this is a CloudFormation template. " + uri.toString() +
