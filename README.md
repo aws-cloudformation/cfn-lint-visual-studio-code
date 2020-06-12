@@ -8,24 +8,24 @@ VS Code CloudFormation Linter uses cfn-lint to lint your CloudFormation template
 
 ## Features
 
-Uses [cfn-lint](https://github.com/aws-cloudformation/cfn-python-lint) to parse and show issues with CloudFormation templates
+- Uses [cfn-lint](https://github.com/aws-cloudformation/cfn-python-lint) to parse the template and show problems with it.
 
-For example if there is an image subfolder under your extension project workspace:
+- Uses [pydot]((https://pypi.org/project/pydot/)) to preview the template as a graph of resources.
 
 ![features](/images/features.png)
 
 ## Requirements
 
-Requires cfn-lint to be installed: `pip install cfn-lint`
+Requires `cfn-lint` to be installed: `pip install cfn-lint`.
 
-More information about cfn-lint can be found [here](https://github.com/aws-cloudformation/cfn-python-lint)
+If you want to be able to preview templates as graphs, you also need to install `pydot`: `pip install pydot`.
 
 ## Extension Settings
 
-* `cfnLint.path`: path to the cfn-lint command
+* `cfnLint.path`: path to the `cfn-lint` command
 * `cfnLint.appendRules`: Array of paths containing additional Rules
 * `cfnLint.ignoreRules`: Array of Rule Ids to be ignored
-* `cfnLint.overrideSpecPath`: Path to an Specification overrule file
+* `cfnLint.overrideSpecPath`: Path to a specification override file
 
 ## Contribute
 
