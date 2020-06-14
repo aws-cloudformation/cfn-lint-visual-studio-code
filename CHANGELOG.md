@@ -54,7 +54,6 @@ Features:
 ## 0.10.10 - Feb 29, 2020
 
 Features:
-- Visual Studio Code extension manifest fields ([#80](https://github.com/aws-cloudformation/aws-cfn-lint-visual-studio-code/pull/80))
 - CloudFormation Template Schema 11.2.0 ([#81](https://github.com/aws-cloudformation/aws-cfn-lint-visual-studio-code/pull/81))
 
 ## 0.10.8 - Feb 22, 2020
