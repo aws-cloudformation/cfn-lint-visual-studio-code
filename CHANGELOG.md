@@ -9,7 +9,6 @@ Features:
 
 Features:
 - CloudFormation Template Schema 15.0.0 ([#107](https://github.com/aws-cloudformation/aws-cfn-lint-visual-studio-code/pull/107))
-- E1001 error message re-wording ([#105](https://github.com/aws-cloudformation/aws-cfn-lint-visual-studio-code/pull/105))
 
 ## 0.11.2 - Apr 27, 2020
 
