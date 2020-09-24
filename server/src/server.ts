@@ -229,6 +229,7 @@ function runLinter(document: TextDocument): void {
 				message: '[cfn-lint] ' + errorMessage
 			};
 			diagnostics.push(diagnostic);
+			return;
 		});
 
 		child.stderr.on("data", (data: Buffer) => {
@@ -241,9 +242,10 @@ function runLinter(document: TextDocument): void {
 					end: { line: lineNumber, character: end }
 				},
 				severity: DiagnosticSeverity.Warning,
-				message: '[cfn-lint] ' + err
+				message: '[cfn-lint] ' + err + '\nGo to https://github.com/aws-cloudformation/cfn-python-lint/#install for more help'
 			};
 			diagnostics.push(diagnostic);
+			return;
 		});
 
 		let stdout = "";
@@ -255,7 +257,22 @@ function runLinter(document: TextDocument): void {
 			connection.console.log('child process exited with ' +
 				`code ${code} and signal ${signal}`);
 			let tmp = stdout.toString();
-			let obj = JSON.parse(tmp);
+			let obj;
+			try {
+				obj = JSON.parse(tmp);
+			} catch (err) {
+				let lineNumber = 0;
+				let diagnostic: Diagnostic = {
+					range: {
+						start: { line: lineNumber, character: start },
+						end: { line: lineNumber, character: end }
+					},
+					severity: DiagnosticSeverity.Warning,
+					message: '[cfn-lint] ' + err + '\nGo to https://github.com/aws-cloudformation/cfn-python-lint/#install for more help'
+				};
+				diagnostics.push(diagnostic);
+				return;
+			}
 			for (let element of obj) {
 				let lineNumber = (Number.parseInt(element.Location.Start.LineNumber) - 1);
 				let columnNumber = (Number.parseInt(element.Location.Start.ColumnNumber) - 1);
@@ -271,7 +288,7 @@ function runLinter(document: TextDocument): void {
 				};
 
 				diagnostics.push(diagnostic);
-			}
+			};
 		});
 
 		child.on("close", () => {
