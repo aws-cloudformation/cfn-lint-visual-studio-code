@@ -22,10 +22,9 @@ If you want to be able to preview templates as graphs, you also need to install 
 
 ## Extension Settings
 
-* `cfnLint.path`: path to the `cfn-lint` command
-* `cfnLint.appendRules`: Array of paths containing additional Rules
-* `cfnLint.ignoreRules`: Array of Rule Ids to be ignored
-* `cfnLint.overrideSpecPath`: Path to a specification override file
+* `cfnLint.path`: path to the `cfn-lint` command, optionally including [parameters](https://github.com/aws-cloudformation/cfn-python-lint/#parameters) as well:
+
+`cfn-lint --include-checks I --ignore-checks E3012`
 
 ## Contribute
 
