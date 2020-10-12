@@ -1,7 +1,6 @@
 # vscode-cfn-lint
 [![Version](https://img.shields.io/visual-studio-marketplace/v/kddejong.vscode-cfn-lint.svg?style=flat)](https://marketplace.visualstudio.com/items?itemName=kddejong.vscode-cfn-lint)
-[![Version](https://img.shields.io/visual-studio-marketplace/d/kddejong.vscode-cfn-lint.svg?style=flat
-)](https://marketplace.visualstudio.com/items?itemName=kddejong.vscode-cfn-lint)
+[![Version](https://img.shields.io/visual-studio-marketplace/d/kddejong.vscode-cfn-lint.svg?style=flat)](https://marketplace.visualstudio.com/items?itemName=kddejong.vscode-cfn-lint)
 
 VS Code CloudFormation Linter uses cfn-lint to lint your CloudFormation templates.
 <img alt="[cfn-lint logo]" src="https://raw.githubusercontent.com/awslabs/aws-cfn-lint-visual-studio-code/master/logo.png" width="150" align="right">
@@ -22,10 +21,9 @@ If you want to be able to preview templates as graphs, you also need to install 
 
 ## Extension Settings
 
-* `cfnLint.path`: path to the `cfn-lint` command
-* `cfnLint.appendRules`: Array of paths containing additional Rules
-* `cfnLint.ignoreRules`: Array of Rule Ids to be ignored
-* `cfnLint.overrideSpecPath`: Path to a specification override file
+* `cfnLint.path`: path to the `cfn-lint` command, optionally including [parameters](https://github.com/aws-cloudformation/cfn-python-lint/#parameters) as well:
+
+![](/images/settings.png)
 
 ## Contribute
 
