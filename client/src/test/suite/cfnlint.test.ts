@@ -22,58 +22,6 @@ suite('Should have failures with a bad template', () => {
 				severity: vscode.DiagnosticSeverity.Error,
 				message: '[cfn-lint] E3001: Invalid or unsupported Type AWS::EC2::Instance1 for resource MyEC2Instance1 in us-east-1',
 				range: toRange(12, 4, 12, 8)
-			}, {
-				severity: vscode.DiagnosticSeverity.Error,
-				message: '[cfn-lint] E3012: Property Resources/MyEC2Instance/Properties/KeyName should be of type String',
-				range: toRange(20, 6, 20, 13)
-			}, {
-				severity: vscode.DiagnosticSeverity.Error,
-				message: '[cfn-lint] E3002: Invalid Property Resources/MyEC2Instance/Properties/FakeKey',
-				range: toRange(21, 6, 21, 13)
-			}, {
-				severity: vscode.DiagnosticSeverity.Error,
-				message: '[cfn-lint] E1012: Ref pIops not found as a resource or parameter',
-				range: toRange(26, 12, 26, 16)
-			}, {
-				severity: vscode.DiagnosticSeverity.Error,
-				message: '[cfn-lint] E3002: Invalid Property Resources/MyEC2Instance/Properties/BlockDeviceMappings/0/Ebs/BadSubX2Key',
-				range: toRange(29, 12, 29, 23)
-			}, {
-				severity: vscode.DiagnosticSeverity.Error,
-				message: '[cfn-lint] E3002: Invalid Property Resources/MyEC2Instance/Properties/NetworkInterfaces/0/BadKey',
-				range: toRange(32, 10, 32, 16)
-			}, {
-				severity: vscode.DiagnosticSeverity.Error,
-				message: '[cfn-lint] E3003: Property PolicyDocument missing at Resources/RootRole/Properties/Policies/0',
-				range: toRange(48, 10, 55, 2)
-			}, {
-				severity: vscode.DiagnosticSeverity.Error,
-				message: '[cfn-lint] E3002: Invalid Property Resources/RootRole/Properties/Policies/0/PolicyDocument1',
-				range: toRange(49, 10, 49, 25)
-			}, {
-				severity: vscode.DiagnosticSeverity.Error,
-				message: '[cfn-lint] E1012: Ref WebServerPort not found as a resource or parameter',
-				range: toRange(84, 10, 84, 22)
-			}, {
-				severity: vscode.DiagnosticSeverity.Error,
-				message: '[cfn-lint] E3002: Invalid Property Resources/ElasticLoadBalancer/Properties/HealthCheck/FakeKey',
-				range: toRange(88, 8, 88, 15)
-			}, {
-				severity: vscode.DiagnosticSeverity.Error,
-				message: '[cfn-lint] E1012: Ref WebServerPort not found as a resource or parameter',
-				range: toRange(93, 16, 94, 14)
-			}, {
-				severity: vscode.DiagnosticSeverity.Error,
-				message: '[cfn-lint] E3012: Property Resources/ElasticLoadBalancer/Properties/HealthCheck/UnhealthyThreshold should be of type String',
-				range: toRange(97, 8, 97, 26)
-			}, {
-				severity: vscode.DiagnosticSeverity.Error,
-				message: '[cfn-lint] E3012: Property Resources/ElasticLoadBalancer/Properties/HealthCheck/Interval should be of type String',
-				range: toRange(99, 8, 99, 16)
-			}, {
-				severity: vscode.DiagnosticSeverity.Error,
-				message: '[cfn-lint] E1010: Invalid GetAtt ElasticLoadBalancer.DNE for resource myErrorOutput',
-				range: toRange(105, 4, 105, 9)
 			}
 		]);
 	});
