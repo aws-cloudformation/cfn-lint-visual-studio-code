@@ -1,10 +1,38 @@
 on:
- schedule: 
-  - cron: '*/5 * * * *'
+  schedule:
+    - cron: '*/5 * * * *'
 jobs:
   job:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: touch hello-world.txt
+      - uses: actions/checkout@v2
+        with:
+          repository: aws-cloudformation/aws-cloudformation-template-schema
+          path: aws-cloudformation-template-schema
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 8
+      - run: |
+          cd aws-cloudformation-template-schema
+          mvn package
+          echo 'settings:
+            regions: [us-east-1]
+            output: out' > cfg.yml
+          java -jar target/aws-cloudformation-template-schema-1.0-SNAPSHOT-jar-with-dependencies.jar --config-file cfg.yml
+          mv out/us-east-1/all-spec.json ../schema/all-spec.json
+          cd ..
+          rm -rf aws-cloudformation-template-schema
       - uses: peter-evans/create-pull-request@v3
+        with:
+          commit-message: |
+            CloudFormation Template Schema upgrade
+            https://github.com/aws-cloudformation/aws-cloudformation-template-schema/issues/32
+            https://github.com/aws-cloudformation/aws-cloudformation-template-schema/blob/master/docs/tool/instructions.md
+            as described in https://github.com/aws-cloudformation/aws-cfn-lint-visual-studio-code/pull/76
+          delete-branch: true
+          title: CloudFormation Template Schema upgrade
+          body: |
+            https://github.com/aws-cloudformation/aws-cloudformation-template-schema/issues/32
+            https://github.com/aws-cloudformation/aws-cloudformation-template-schema/blob/master/docs/tool/instructions.md
+            as described in https://github.com/aws-cloudformation/aws-cfn-lint-visual-studio-code/pull/76
