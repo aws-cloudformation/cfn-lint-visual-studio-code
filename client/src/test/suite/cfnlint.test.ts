@@ -92,13 +92,13 @@ suite('Previews should work', () => {
 	test('Does NOT create .dot file if a preview was not requested', async () => {
 		await activate(getDocUri(docUri));
 
-		assert.ok(! fs.existsSync(getDocPath(dotUri)));
+		assert.strictEqual(! fs.existsSync(getDocPath(dotUri)), true);
 	});
 
 	test('Does create .dot file if a preview was requested', async () => {
 		await activateAndPreview(getDocUri(docUri));
 
-		assert.ok(fs.existsSync(getDocPath(dotUri)));
+		assert.strictEqual(fs.existsSync(getDocPath(dotUri)), true);
 
 		// cleanup
 		fs.unlinkSync(getDocPath(dotUri));
