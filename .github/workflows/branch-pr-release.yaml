@@ -1,0 +1,45 @@
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  release:
+    types:
+    - created
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Setup Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 10.x
+    - name: Set up Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: "3.x"
+    - name: Setup NPM
+      run: |
+        npm install
+        npm run compile
+    - name: Setup cfn-lint
+      run: |
+        pip install cfn-lint
+        pip install pydot
+    - run: npm run lint
+      if: runner.os != 'Linux'
+    - run: xvfb-run -a npm run test
+      if: runner.os == 'Linux'
+    - name: Publish
+      if: success() && startsWith( github.ref, 'refs/tags/releases/') && matrix.os == 'ubuntu-latest'
+      run: vsce publish
+      env:
+        VSCE_PAT: ${{ secrets.VSCE_PAT }}
+
