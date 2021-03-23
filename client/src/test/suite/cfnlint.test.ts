@@ -18,7 +18,8 @@ suite('Should have failures with a bad template', () => {
 				severity: vscode.DiagnosticSeverity.Warning,
 				message: '[cfn-lint] W2001: Parameter myParam not used.',
 				range: toRange(5, 2, 5, 9)
-			}, {
+			},
+			{
 				severity: vscode.DiagnosticSeverity.Error,
 				message: '[cfn-lint] E3001: Invalid or unsupported Type AWS::EC2::Instance1 for resource MyEC2Instance1 in us-east-1',
 				range: toRange(12, 4, 12, 8)
