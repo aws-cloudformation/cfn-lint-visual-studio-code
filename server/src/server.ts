@@ -97,6 +97,7 @@ interface CloudFormationLintSettings {
 	appendRules: Array<string>;
 	ignoreRules: Array<string>;
 	overrideSpecPath: string;
+	validateRegistryTypes: Array<string>;
 }
 
 // hold the Settings
@@ -104,6 +105,7 @@ let Path: string;
 let AppendRules: Array<string>;
 let IgnoreRules: Array<string>;
 let OverrideSpecPath: string;
+let ValidateRegistryTypes: Array<string>;
 
 // The settings have changed. Is send on server activation as well.
 connection.onDidChangeConfiguration((change) => {
@@ -115,6 +117,7 @@ connection.onDidChangeConfiguration((change) => {
 	IgnoreRules = settings.cfnLint.ignoreRules;
 	OverrideSpecPath = settings.cfnLint.overrideSpecPath;
 	AppendRules = settings.cfnLint.appendRules;
+	ValidateRegistryTypes = settings.cfnLint.validateRegistryTypes;
 
 	// Revalidate any open text documents
 	documents.all().forEach(runLinter);
@@ -195,6 +198,13 @@ function runLinter(document: TextDocument): void {
 
 		if (OverrideSpecPath !== "") {
 			args.push('--override-spec', OverrideSpecPath);
+		}
+
+		if (ValidateRegistryTypes.length > 0) {
+			args.push('--validate-registry-types')
+			for (var registryType of ValidateRegistryTypes) {
+				args.push(registryType)
+			}
 		}
 
 		args.push('--', `"${file_to_lint}"`);
