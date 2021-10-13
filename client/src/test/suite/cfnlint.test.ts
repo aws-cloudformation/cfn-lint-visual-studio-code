@@ -7,7 +7,7 @@ import { getDocUri, activate, activateAndPreview, getDocPath } from './helper';
 suite('Should have failures with a bad template', () => {
 	const docUri = getDocUri('bad.yaml');
 
-	test('Diagnoses bad template', async () => {
+	test('Diagnose bad template', async () => {
 		await testDiagnostics(docUri, [
 			{
 				severity: vscode.DiagnosticSeverity.Error,
