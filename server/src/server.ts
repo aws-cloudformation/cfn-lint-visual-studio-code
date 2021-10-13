@@ -187,7 +187,13 @@ function runLinter(document: TextDocument): void {
 	let build_graph = isPreviewing[uri];
 
 	if (is_cfn) {
-		patchTemplateSchema(__dirname + '/../../schema/schemas/');
+		if (Path.includes(' --registry-schemas ') || Path.includes(' -s ')) {
+			for (const segment of Path.split('-')) {
+				if (segment.startsWith('schemas ') || segment.startsWith('s ')) {
+					patchTemplateSchema(segment.split(' ')[1] + "/");
+				}
+			}
+		}
 
 		let args = ['--format', 'json'];
 		if (build_graph) {
