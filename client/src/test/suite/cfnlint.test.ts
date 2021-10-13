@@ -4,6 +4,17 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import { getDocUri, activate, activateAndPreview, getDocPath } from './helper';
 
+suite('A test to create some better spacing for activation', () => {
+	const docUri = getDocUri('good.yaml');
+
+	test('A more elaborate sleep', async () => {
+		await activate(docUri);
+
+		const actualDiagnostics = vscode.languages.getDiagnostics(docUri);
+		console.log(actualDiagnostics);
+	});
+});
+
 suite('Should have failures with a bad template', () => {
 	const docUri = getDocUri('bad.yaml');
 
@@ -125,3 +136,4 @@ async function testDiagnostics(docUri: vscode.Uri, expectedDiagnostics: vscode.D
 		assert.equal(actualDiagnostic.severity, expectedDiagnostic.severity);
 	});
 }
+
