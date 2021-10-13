@@ -145,11 +145,11 @@ function isCloudFormation(template: string, filename: string): Boolean {
 		return true;
 	}
 	if (/\n?"?Resources"?\s*:/.exec(template)) {
-		if (/"?Type"?\s*:\s*"?'?(AWS|Alexa|Custom)::/.exec(template)) {
+		if (/"?Type"?\s*:\s*"?'?[a-zA-Z0-9]{2,64}::[a-zA-Z0-9]{2,64}/.exec(template)) {
 			// filter out serverless.io templates
 			if (!(/\nresources:/.exec(template) && /\nprovider:/.exec(template))) {
 				connection.console.log("Determined this file is a CloudFormation Template. " + filename +
-					". Found 'Resources' and 'Type: (AWS|Alexa|Custom)::'");
+					". Found 'Resources' and 'Type: [a-zA-Z0-9]{2,64}::[a-zA-Z0-9]{2,64}'");
 				return true;
 			}
 		}
