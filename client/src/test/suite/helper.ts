@@ -12,19 +12,19 @@ export let documentEol: string;
 export let platformEol: string;
 
 /**
- * Activates the vscode.lsp-sample extension
+ * Activates the kddejong.vscode-cfn-lint extension
  */
 export async function activate(docUri: vscode.Uri) {
-	// The extensionId is `publisher.name` from package.json
 	const ext = vscode.extensions.getExtension('kddejong.vscode-cfn-lint')!;
 	await ext.activate();
+	await vscode.workspace.getConfiguration().update('yaml.validate', false, vscode.ConfigurationTarget.Global);
 	try {
 		doc = await vscode.workspace.openTextDocument(docUri);
 		editor = await vscode.window.showTextDocument(doc);
-		vscode.workspace.getConfiguration().update('yaml.validate', false, vscode.ConfigurationTarget.Global);
 		await sleep(4000); // Wait for server activation
 	} catch (e) {
 		console.error(e);
+		throw(e);
 	}
 }
 
