@@ -25,7 +25,7 @@ import {
 import { URI } from 'vscode-uri';
 
 import { spawn } from "child_process";
-import { readdirSync, readFileSync } from 'fs';
+import { readdirSync, readFileSync, writeFileSync } from 'fs';
 import { applyPatch } from 'fast-json-patch';
 
 const program = new Command('cfn-lsp')
@@ -167,7 +167,7 @@ function patchTemplateSchema(registrySchemaDirectory: string) {
 		const patch = JSON.parse(stub.replace(/RESOURCE_TYPE/g, JSON.parse(registrySchema)['typeName']).replace(/"RESOURCE_SCHEMA"/g, registrySchema));
 		templateSchema = applyPatch(templateSchema, patch).newDocument;
 	}
-	console.warn(JSON.stringify(templateSchema));
+	writeFileSync(__dirname + '/../../schema/all-spec.json', JSON.stringify(templateSchema));
 }
 
 function runLinter(document: TextDocument): void {
