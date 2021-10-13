@@ -13,7 +13,7 @@ async function main() {
 
 		const cp = require('child_process');
 		const { downloadAndUnzipVSCode, resolveCliPathFromVSCodeExecutablePath } = require('vscode-test');
-		const vscodeExecutablePath = await downloadAndUnzipVSCode('1.52.0');
+		const vscodeExecutablePath = await downloadAndUnzipVSCode('1.61.0');
 		const cliPath = resolveCliPathFromVSCodeExecutablePath(vscodeExecutablePath);
 
 		// Use cp.spawn / cp.exec for custom setup
