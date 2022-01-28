@@ -15,6 +15,8 @@ export let platformEol: string;
  * Activates the kddejong.vscode-cfn-lint extension
  */
 export async function activate(docUri: vscode.Uri) {
+	const yamlext = vscode.extensions.getExtension('redhat.vscode-yaml')!;
+	await yamlext.activate();
 	const ext = vscode.extensions.getExtension('kddejong.vscode-cfn-lint')!;
 	await ext.activate();
 	await vscode.workspace.getConfiguration().update('yaml.validate', false, vscode.ConfigurationTarget.Global);
