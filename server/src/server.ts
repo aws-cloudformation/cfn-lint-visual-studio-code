@@ -196,7 +196,7 @@ function runLinter(document: TextDocument): void {
 		}
 
 		let args = ['--format', 'json'];
-		if !(Path.includes(' --include-checks ') || Path.includes(' -c ')) {
+		if (!(Path.includes(' --include-checks ') || Path.includes(' -c '))) {
 			args.push('--include-checks');
 			args.push('I'); // informational
 		}
