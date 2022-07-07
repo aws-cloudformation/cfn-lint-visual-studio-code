@@ -196,6 +196,11 @@ function runLinter(document: TextDocument): void {
 		}
 
 		let args = ['--format', 'json'];
+		if (!(Path.includes(' --include-checks ') || Path.includes(' -c '))) {
+			args.push('--include-checks');
+			args.push('I'); // informational
+		}
+		
 		if (build_graph) {
 			args.push('--build-graph');
 		}
