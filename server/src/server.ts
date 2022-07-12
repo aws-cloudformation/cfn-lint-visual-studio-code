@@ -25,6 +25,8 @@ import {
 import { URI } from 'vscode-uri';
 
 import { spawn } from "child_process";
+import { readdirSync, readFileSync, writeFileSync } from 'fs';
+import { applyPatch } from 'fast-json-patch';
 
 const program = new Command('cfn-lsp')
 	.allowUnknownOption()
@@ -157,6 +159,17 @@ function isCloudFormation(template: string, filename: string): Boolean {
 	return false;
 }
 
+function patchTemplateSchema(registrySchemaDirectory: string) {
+	const stub = readFileSync(__dirname + '/../../schema/resource-patch-stub.json', 'utf8');
+	let templateSchema = JSON.parse(readFileSync(__dirname + '/../../schema/all-spec.json', 'utf8'));
+	for (const schemaFile of readdirSync(registrySchemaDirectory)) {
+		const registrySchema = readFileSync(registrySchemaDirectory + schemaFile, 'utf8');
+		const patch = JSON.parse(stub.replace(/RESOURCE_TYPE/g, JSON.parse(registrySchema)['typeName']).replace(/"RESOURCE_SCHEMA"/g, registrySchema));
+		templateSchema = applyPatch(templateSchema, patch).newDocument;
+	}
+	writeFileSync(__dirname + '/../../schema/all-spec.json', JSON.stringify(templateSchema));
+}
+
 function runLinter(document: TextDocument): void {
 	let uri = document.uri;
 
@@ -174,7 +187,20 @@ function runLinter(document: TextDocument): void {
 	let build_graph = isPreviewing[uri];
 
 	if (is_cfn) {
+		if (Path.includes(' --registry-schemas ') || Path.includes(' -s ')) {
+			for (const segment of Path.split('-')) {
+				if (segment.startsWith('schemas ') || segment.startsWith('s ')) {
+					patchTemplateSchema(segment.split(' ')[1] + "/");
+				}
+			}
+		}
+
 		let args = ['--format', 'json'];
+		if (!(Path.includes(' --include-checks ') || Path.includes(' -c '))) {
+			args.push('--include-checks');
+			args.push('I'); // informational
+		}
+		
 		if (build_graph) {
 			args.push('--build-graph');
 		}
