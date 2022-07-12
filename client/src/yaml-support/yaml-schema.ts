@@ -1,5 +1,5 @@
 import * as semver from 'semver';
-import Uri from 'vscode-uri';
+import { URI } from 'vscode-uri';
 import * as vscode from 'vscode';
 import { yamlLocator, YamlMap } from "./yaml-locator";
 import { VSCODE_YAML_EXTENSION_ID, CLOUDFORMATION_SCHEMA } from "./yaml-constant";
@@ -58,7 +58,7 @@ function requestYamlSchemaUriCallback(resource: string): string | undefined {
 
 // see docs from YamlSchemaContributor
 function requestYamlSchemaContentCallback(uri: string): string | undefined {
-	const parsedUri = Uri.parse(uri);
+	const parsedUri = URI.parse(uri);
 	if (parsedUri.scheme !== CLOUDFORMATION_SCHEMA) {
 		return undefined;
 	}

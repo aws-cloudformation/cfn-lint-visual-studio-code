@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License").
 You may not use this file except in compliance with the License.
 A copy of the License is located at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 or in the "license" file accompanying this file. This file is distributed
 on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
@@ -17,12 +17,13 @@ permissions and limitations under the License.
 import * as path from 'path';
 import * as fs from 'fs';
 import { workspace, ExtensionContext, ConfigurationTarget, window, WebviewPanel, Uri, commands, ViewColumn, window as VsCodeWindow } from 'vscode';
-import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from 'vscode-languageclient';
+import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from 'vscode-languageclient/node';
 import { registerYamlSchemaSupport } from './yaml-support/yaml-schema';
 
 let previews: { [index: string]: WebviewPanel } = {};
+let languageClient: LanguageClient;
 
-export function activate(context: ExtensionContext) {
+export async function activate(context: ExtensionContext) {
 
 	// The server is implemented in node
 	let serverModule = context.asAbsolutePath(path.join('server', 'out', 'server.js'));
@@ -93,45 +94,40 @@ export function activate(context: ExtensionContext) {
 	}
 
 	// Create the language client and start the client.
-	let languageClient = new LanguageClient('cfnLint', 'CloudFormation linter Language Server', serverOptions, clientOptions);
-	let clientDisposable = languageClient.start();
+	languageClient = new LanguageClient('cfnLint', 'CloudFormation linter Language Server', serverOptions, clientOptions);
+	await languageClient.start();
 
-	languageClient.onReady().then(() => {
-		languageClient.onNotification('cfn/busy', () => {
-			window.showInformationMessage("Linter is already running. Please try again.");
-		});
-		languageClient.onNotification('cfn/previewIsAvailable', (uri) => {
-			reloadSidePreview(uri, languageClient);
-		});
-		languageClient.onNotification('cfn/isPreviewable', (value) => {
-			commands.executeCommand('setContext', 'isPreviewable', value);
-		});
-		languageClient.onNotification('cfn/fileclosed', (uri) => {
-			// if the user closed the template itself, we close the preview
-			if (previews[uri]) {
-				previews[uri].dispose();
-			}
-		});
-
-		let previewDisposable = commands.registerCommand('extension.sidePreview', () => {
-
-			if (window.activeTextEditor.document) {
-				let uri = Uri.file(window.activeTextEditor.document.fileName).toString();
-
-				languageClient.sendNotification('cfn/requestPreview', uri);
-			}
-
-		});
-
-		context.subscriptions.push(previewDisposable);
+	languageClient.onNotification('cfn/busy', () => {
+		window.showInformationMessage("Linter is already running. Please try again.");
+	});
+	languageClient.onNotification('cfn/previewIsAvailable', (uri) => {
+		reloadSidePreview(uri, languageClient);
+	});
+	languageClient.onNotification('cfn/isPreviewable', (value) => {
+		commands.executeCommand('setContext', 'isPreviewable', value);
+	});
+	languageClient.onNotification('cfn/fileclosed', (uri) => {
+		// if the user closed the template itself, we close the preview
+		if (previews[uri]) {
+			previews[uri].dispose();
+		}
 	});
 
-	// Push the disposable to the context's subscriptions so that the
-	// client can be deactivated on extension deactivation
-	context.subscriptions.push(clientDisposable);
+	let previewDisposable = commands.registerCommand('extension.sidePreview', () => {
+
+		if (window.activeTextEditor.document) {
+			let uri = Uri.file(window.activeTextEditor.document.fileName).toString();
+
+			languageClient.sendNotification('cfn/requestPreview', uri);
+		}
+
+	});
+
+	context.subscriptions.push(previewDisposable);
+
 }
 
-function reloadSidePreview(file:string, languageClient:LanguageClient) {
+function reloadSidePreview(file: string, languageClient: LanguageClient) {
 	let uri = Uri.parse(file);
 	let stringifiedUri = uri.toString();
 	let dotFile = uri.fsPath + ".dot";
@@ -145,7 +141,7 @@ function reloadSidePreview(file:string, languageClient:LanguageClient) {
 	if (!previews[stringifiedUri]) {
 		previews[stringifiedUri] = VsCodeWindow.createWebviewPanel(
 			'cfnLintPreview', // Identifies the type of the webview. Used internally
-			'Template: ' + dotFile.slice(0,-4), // Title of the panel displayed to the user
+			'Template: ' + dotFile.slice(0, -4), // Title of the panel displayed to the user
 			ViewColumn.Two, // Editor column to show the new webview panel in.
 			{
 				enableScripts: true,
@@ -163,7 +159,7 @@ function reloadSidePreview(file:string, languageClient:LanguageClient) {
 	panel.webview.html = getPreviewContent(content);
 }
 
-function getPreviewContent(content: String) : string {
+function getPreviewContent(content: String): string {
 
 	let multilineString = "`" + content + "`";
 	// FIXME is there a better way of converting from dot to svg that is not using cdn urls?
@@ -207,4 +203,11 @@ export async function yamlLangaugeServerValidation(): Promise<void> {
 			workspace.getConfiguration().update('yaml.validate', false, ConfigurationTarget.Global);
 		}
 	}
+}
+
+export function deactivate(): Thenable<void> | undefined {
+	if (!languageClient) {
+		return undefined;
+	}
+	return languageClient.stop();
 }
