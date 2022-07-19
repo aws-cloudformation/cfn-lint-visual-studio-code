@@ -4,8 +4,8 @@ import * as _ from 'lodash';
 import { YamlMap, YamlNode } from './yaml-locator';
 
 export enum StringComparison {
-	Ordinal,
-	OrdinalIgnoreCase
+	ordinal,
+	ordinalIgnoreCase
 }
 
 // test whether two strings are equal ignore case
@@ -20,13 +20,13 @@ export function equalIgnoreCase(a: string, b: string): boolean {
 //      key2: value2
 //
 export function getYamlMappingValue(mapRootNode: YamlMap, key: string,
-	ignoreCase: StringComparison = StringComparison.Ordinal): string | undefined {
+	ignoreCase: StringComparison = StringComparison.ordinal): string | undefined {
 	// TODO, unwrap quotes
 	if (!key) {
 		return undefined;
 	}
 	const keyValueItem = mapRootNode.mappings.find((mapping) => mapping.key &&
-		(ignoreCase === StringComparison.OrdinalIgnoreCase ? key === mapping.key.raw : equalIgnoreCase(key, mapping.key.raw)));
+		(ignoreCase === StringComparison.ordinalIgnoreCase ? key === mapping.key.raw : equalIgnoreCase(key, mapping.key.raw)));
 	return keyValueItem ? keyValueItem.value.raw : undefined;
 }
 
@@ -37,13 +37,13 @@ export function getYamlMappingValue(mapRootNode: YamlMap, key: string,
 //      key2: value2
 //
 export function getYamlMappingNode(mapRootNode: YamlMap, key: string,
-	ignoreCase: StringComparison = StringComparison.Ordinal): YamlNode | undefined {
+	ignoreCase: StringComparison = StringComparison.ordinal): YamlNode | undefined {
 	// TODO, unwrap quotes
 	if (!key) {
 		return undefined;
 	}
 	const keyValueItem = mapRootNode.mappings.find((mapping) => mapping.key &&
-		(ignoreCase === StringComparison.OrdinalIgnoreCase ? key === mapping.key.raw : equalIgnoreCase(key, mapping.key.raw)));
+		(ignoreCase === StringComparison.ordinalIgnoreCase ? key === mapping.key.raw : equalIgnoreCase(key, mapping.key.raw)));
 	return keyValueItem ? keyValueItem.value : undefined;
 }
 

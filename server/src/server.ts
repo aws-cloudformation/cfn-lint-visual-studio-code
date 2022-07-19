@@ -6,7 +6,7 @@ Licensed under the Apache License, Version 2.0 (the "License").
 You may not use this file except in compliance with the License.
 A copy of the License is located at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 or in the "license" file accompanying this file. This file is distributed
 on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
@@ -15,12 +15,14 @@ permissions and limitations under the License.
 */
 'use strict';
 
-import { Command } from 'commander';
+import {
+	createConnection, Connection, TextDocuments,
+	Diagnostic, DiagnosticSeverity, InitializeResult, TextDocumentSyncKind, ProposedFeatures
+} from 'vscode-languageserver/node';
 
 import {
-	IPCMessageReader, IPCMessageWriter, createConnection, IConnection, TextDocuments, TextDocument,
-	Diagnostic, DiagnosticSeverity, InitializeResult
-} from 'vscode-languageserver';
+	TextDocument
+} from 'vscode-languageserver-textdocument';
 
 import { URI } from 'vscode-uri';
 
@@ -28,36 +30,26 @@ import { spawn } from "child_process";
 import { readdirSync, readFileSync, writeFileSync } from 'fs';
 import { applyPatch } from 'fast-json-patch';
 
-const program = new Command('cfn-lsp')
-	.allowUnknownOption()
-	.version(require('../../package.json').version)
-	.option('--stdio', 'use stdio')
-	.option('--node-ipc', 'use node-ipc')
-	.parse(process.argv);
+var connection: Connection;
 
-var connection: IConnection;
-if (program.stdio) {
-	connection = createConnection(process.stdin, process.stdout);
-} else {
-	connection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
-}
+connection = createConnection(ProposedFeatures.all);
 
 // Create a simple text document manager. The text document manager
 // supports full document sync only
-let documents: TextDocuments = new TextDocuments();
+const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
 // Make the text document manager listen on the connection
 // for open, change and close text document events
 documents.listen(connection);
 
+let hasConfigurationCapability: boolean = false;
+
 // After the server has started the client sends an initialize request. The server receives
 // in the passed params the rootPath of the workspace plus the client capabilities.
-let workspaceRoot: string;
-connection.onInitialize((params): InitializeResult => {
-	workspaceRoot = params.rootPath;
+connection.onInitialize((_): InitializeResult => {
 	return {
 		capabilities: {
 			// Tell the client that the server works in FULL text document sync mode
-			textDocumentSync: documents.syncKind
+			textDocumentSync: TextDocumentSyncKind.Full,
 		}
 	};
 });
@@ -101,24 +93,24 @@ interface CloudFormationLintSettings {
 	overrideSpecPath: string;
 }
 
-// hold the Settings
-let Path: string;
-let AppendRules: Array<string>;
-let IgnoreRules: Array<string>;
-let OverrideSpecPath: string;
+const defaultSettings: Settings = { cfnLint: { path: 'cfn-lint', appendRules: [], ignoreRules: [], overrideSpecPath: "" } };
+let globalSettings: Settings = defaultSettings;
+
+// Cache the settings of all open documents
+let documentSettings: Map<string, Thenable<Settings>> = new Map();
 
 // The settings have changed. Is send on server activation as well.
-connection.onDidChangeConfiguration((change) => {
-	connection.console.log('Settings have been updated...');
-	let settings = <Settings>change.settings;
-	connection.console.log('Settings: ' + JSON.stringify(settings));
+connection.onDidChangeConfiguration(change => {
+	if (hasConfigurationCapability) {
+		// Reset all cached document settings
+		documentSettings.clear();
+	} else {
+		globalSettings = <Settings>(
+			(change.settings || defaultSettings)
+		);
+	}
 
-	Path = settings.cfnLint.path || 'cfn-lint';
-	IgnoreRules = settings.cfnLint.ignoreRules;
-	OverrideSpecPath = settings.cfnLint.overrideSpecPath;
-	AppendRules = settings.cfnLint.appendRules;
-
-	// Revalidate any open text documents
+	// Revalidate all open text documents
 	documents.all().forEach(runLinter);
 });
 
@@ -170,25 +162,41 @@ function patchTemplateSchema(registrySchemaDirectory: string) {
 	writeFileSync(__dirname + '/../../schema/all-spec.json', JSON.stringify(templateSchema));
 }
 
-function runLinter(document: TextDocument): void {
+function getDocumentSettings(resource: string): Thenable<Settings> {
+	if (!hasConfigurationCapability) {
+		return Promise.resolve(globalSettings);
+	}
+	let result = documentSettings.get(resource);
+	if (!result) {
+		result = connection.workspace.getConfiguration({
+			scopeUri: resource,
+			section: 'languageServerExample'
+		});
+		documentSettings.set(resource, result);
+	}
+	return result;
+}
+
+async function runLinter(document: TextDocument): Promise<void> {
 	let uri = document.uri;
+	let settings = await getDocumentSettings(uri);
 
 	if (isRunningLinterOn[uri]) {
 		connection.sendNotification('cfn/busy');
 		return;
 	}
 
-	let file_to_lint = URI.parse(uri).fsPath;
+	let fileToLint = URI.parse(uri).fsPath;
 
-	let is_cfn = isCloudFormation(document.getText(), uri.toString());
+	let isCfn = isCloudFormation(document.getText(), uri.toString());
 
-	connection.sendNotification('cfn/isPreviewable', is_cfn);
+	connection.sendNotification('cfn/isPreviewable', isCfn);
 
-	let build_graph = isPreviewing[uri];
+	let buildGraph = isPreviewing[uri];
 
-	if (is_cfn) {
-		if (Path.includes(' --registry-schemas ') || Path.includes(' -s ')) {
-			for (const segment of Path.split('-')) {
+	if (isCfn) {
+		if (settings.cfnLint.path.includes(' --registry-schemas ') || settings.cfnLint.path.includes(' -s ')) {
+			for (const segment of settings.cfnLint.path.split('-')) {
 				if (segment.startsWith('schemas ') || segment.startsWith('s ')) {
 					patchTemplateSchema(segment.split(' ')[1] + "/");
 				}
@@ -196,43 +204,42 @@ function runLinter(document: TextDocument): void {
 		}
 
 		let args = ['--format', 'json'];
-		if (!(Path.includes(' --include-checks ') || Path.includes(' -c '))) {
+		if (!(settings.cfnLint.path.includes(' --include-checks ') || settings.cfnLint.path.includes(' -c '))) {
 			args.push('--include-checks');
 			args.push('I'); // informational
 		}
-		
-		if (build_graph) {
+
+		if (buildGraph) {
 			args.push('--build-graph');
 		}
 
-		if (IgnoreRules.length > 0) {
-			for (var ignoreRule of IgnoreRules) {
+		if (settings.cfnLint.ignoreRules.length > 0) {
+			for (var ignoreRule of settings.cfnLint.ignoreRules) {
 				args.push('--ignore-checks');
 				args.push(ignoreRule);
 			}
 		}
 
-		if (AppendRules.length > 0) {
-			for (var appendRule of AppendRules) {
+		if (settings.cfnLint.appendRules.length > 0) {
+			for (var appendRule of settings.cfnLint.appendRules) {
 				args.push('--append-rules');
 				args.push(appendRule);
 			}
 		}
 
-		if (OverrideSpecPath !== "") {
-			args.push('--override-spec', OverrideSpecPath);
+		if (settings.cfnLint.overrideSpecPath !== "") {
+			args.push('--override-spec', settings.cfnLint.overrideSpecPath);
 		}
 
-		args.push('--', `"${file_to_lint}"`);
+		args.push('--', `"${fileToLint}"`);
 
-		connection.console.log(`Running... ${Path} ${args}`);
+		connection.console.log(`Running... ${settings.cfnLint.path} ${args}`);
 
 		isRunningLinterOn[uri] = true;
 		let child = spawn(
-			Path,
+			settings.cfnLint.path,
 			args,
 			{
-				cwd: workspaceRoot,
 				shell: true
 			}
 		);
@@ -322,7 +329,7 @@ function runLinter(document: TextDocument): void {
 			connection.sendDiagnostics({ uri: filename, diagnostics });
 			isRunningLinterOn[uri] = false;
 
-			if (build_graph) {
+			if (buildGraph) {
 				connection.console.log('preview file is available');
 				connection.sendNotification('cfn/previewIsAvailable', uri);
 			}

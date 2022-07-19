@@ -7,7 +7,6 @@ export function run(): Promise<void> {
 	const mocha = new Mocha({
 		ui: 'tdd'
 	});
-	mocha.useColors(true);
 
 	const testsRoot = path.resolve(__dirname, '..');
 
@@ -21,7 +20,7 @@ export function run(): Promise<void> {
 			files.forEach(f => mocha.addFile(path.resolve(testsRoot, f)));
 
 			try {
-				mocha.timeout(10 * 1000);
+				mocha.timeout(50000);
 				// Run the mocha test
 				mocha.run(failures => {
 					if (failures > 0) {

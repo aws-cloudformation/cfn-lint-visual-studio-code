@@ -13,7 +13,7 @@ module.exports = {
     },
     "ignorePatterns": ["server/node_modules/", "client/node_modules/"],
     "rules": {
-        "@typescript-eslint/class-name-casing": "warn",
+        "@typescript-eslint/naming-convention": "warn",
         "@typescript-eslint/member-delimiter-style": [
             "warn",
             {

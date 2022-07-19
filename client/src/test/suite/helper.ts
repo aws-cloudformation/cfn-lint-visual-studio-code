@@ -4,6 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as vscode from 'vscode';
+import * as assert from 'assert';
 import * as path from 'path';
 
 export let doc: vscode.TextDocument;
@@ -14,18 +15,27 @@ export let platformEol: string;
 /**
  * Activates the kddejong.vscode-cfn-lint extension
  */
-export async function activate(docUri: vscode.Uri) {
-	const ext = vscode.extensions.getExtension('kddejong.vscode-cfn-lint')!;
-	await ext.activate();
-	await vscode.workspace.getConfiguration().update('yaml.validate', false, vscode.ConfigurationTarget.Global);
+export async function activate(docUri: vscode.Uri): Promise<any> {
+	const extension = vscode.extensions.getExtension("kddejong.vscode-cfn-lint");
+	const activation = await extension?.activate();
+
 	try {
 		doc = await vscode.workspace.openTextDocument(docUri);
-		editor = await vscode.window.showTextDocument(doc);
-		await sleep(4000); // Wait for server activation
+		editor = await vscode.window.showTextDocument(doc, {
+			preview: true,
+			preserveFocus: false,
+		});
+
+		await reinitializeExtension();
+		return activation;
 	} catch (e) {
-		console.error(e);
-		throw(e);
+		console.error("Error from activation -> ", e);
 	}
+}
+
+async function reinitializeExtension(): Promise<void> {
+	await vscode.languages.setTextDocumentLanguage(doc, 'yaml');
+	await sleep(20000); // Wait for server activation
 }
 
 export async function activateAndPreview(docUri: vscode.Uri) {
@@ -36,13 +46,14 @@ export async function activateAndPreview(docUri: vscode.Uri) {
 	await sleep(4000); // Wait for preview to become available
 }
 
-async function sleep(ms: number) {
+export async function sleep(ms: number) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 export const getDocPath = (p: string) => {
 	return path.resolve(__dirname, '../../../src/test/suite/fixtures', p);
 };
+
 export const getDocUri = (p: string) => {
 	return vscode.Uri.file(getDocPath(p));
 };
@@ -54,3 +65,19 @@ export async function setTestContent(content: string): Promise<boolean> {
 	);
 	return editor.edit(eb => eb.replace(all, content));
 }
+
+export async function testDiagnostics(docUri: vscode.Uri, expectedDiagnostics: vscode.Diagnostic[]) {
+	await activate(docUri);
+
+	const actualDiagnostics = vscode.languages.getDiagnostics(docUri);
+
+	assert.equal(actualDiagnostics.length, expectedDiagnostics.length);
+
+	expectedDiagnostics.forEach((expectedDiagnostic, i) => {
+		const actualDiagnostic = actualDiagnostics[i];
+		assert.equal(actualDiagnostic.message, expectedDiagnostic.message);
+		assert.deepEqual(actualDiagnostic.range, expectedDiagnostic.range);
+		assert.equal(actualDiagnostic.severity, expectedDiagnostic.severity);
+	});
+}
+
