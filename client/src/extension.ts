@@ -16,9 +16,8 @@ permissions and limitations under the License.
 
 import * as path from 'path';
 import * as fs from 'fs';
-import { workspace, ExtensionContext, ConfigurationTarget, window, WebviewPanel, Uri, commands, ViewColumn, window as VsCodeWindow } from 'vscode';
+import { workspace, ExtensionContext, window, WebviewPanel, Uri, commands, ViewColumn, window as VsCodeWindow } from 'vscode';
 import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from 'vscode-languageclient/node';
-import { registerYamlSchemaSupport } from './yaml-support/yaml-schema';
 
 let previews: { [index: string]: WebviewPanel } = {};
 let languageClient: LanguageClient;
@@ -41,57 +40,19 @@ export async function activate(context: ExtensionContext) {
 	let clientOptions: LanguageClientOptions = {
 		// Register the server for plain text documents
 		documentSelector: [
-			{ scheme: 'file', language: 'yaml' },
-			{ scheme: 'file', language: 'json' }
+			{ scheme: 'file', language: 'yaml'},
+			{ scheme: 'file', language: 'json'},
 		],
 		synchronize: {
 			// Synchronize the setting section 'languageServerExample' to the server
 			configurationSection: 'cfnLint',
 			// Notify the server about file changes to '.clientrc files contain in the workspace
-			fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
+			fileEvents: [
+				workspace.createFileSystemWatcher('**/.clientrc'),
+				workspace.createFileSystemWatcher('**/*.?(e)y?(a)ml'),
+			]
 		}
 	};
-
-	let enableAutocomplete: boolean = workspace.getConfiguration().get('cfnLint.enableAutocomplete');
-	if (enableAutocomplete) {
-		let currentTags: Array<string> = workspace.getConfiguration().get('yaml.customTags');
-		let cloudFormationTags = [
-			"!And",
-			"!And sequence",
-			"!If",
-			"!If sequence",
-			"!Not",
-			"!Not sequence",
-			"!Equals",
-			"!Equals sequence",
-			"!Or",
-			"!Or sequence",
-			"!FindInMap",
-			"!FindInMap sequence",
-			"!Base64",
-			"!Join",
-			"!Join sequence",
-			"!Cidr",
-			"!Ref",
-			"!Sub",
-			"!Sub sequence",
-			"!GetAtt",
-			"!GetAZs",
-			"!ImportValue",
-			"!ImportValue sequence",
-			"!Select",
-			"!Select sequence",
-			"!Split",
-			"!Split sequence"
-		];
-		let updateTags = currentTags.concat(cloudFormationTags.filter((item) => currentTags.indexOf(item) < 0));
-
-		workspace.getConfiguration().update('yaml.customTags', updateTags, ConfigurationTarget.Global);
-
-		yamlLangaugeServerValidation();
-
-		registerYamlSchemaSupport();
-	}
 
 	// Create the language client and start the client.
 	languageClient = new LanguageClient('cfnLint', 'CloudFormation linter Language Server', serverOptions, clientOptions);
@@ -179,30 +140,6 @@ function getPreviewContent(content: String): string {
 		</script>
 	</body>
 `;
-}
-
-export async function yamlLangaugeServerValidation(): Promise<void> {
-	let validateYaml: boolean = workspace.getConfiguration().get('yaml.validate');
-	let cfnValidateYamlInspect = workspace.getConfiguration().inspect('cfnLint.validateUsingJsonSchema');
-	let cfnValidateYaml: boolean = workspace.getConfiguration().get('cfnLint.validateUsingJsonSchema');
-
-	if (validateYaml) {
-		if (cfnValidateYamlInspect.globalValue === null || cfnValidateYamlInspect.workspaceFolderValue === null || cfnValidateYamlInspect.workspaceValue === null) {
-			let selection: string = await window
-				.showInformationMessage('The installed Red Hat YAML extension is also configured to validate YAML templates. This may result in duplicate lint errors with cfn-lint. Disabling the YAML extensions validation will disable it completely.  Would you like to only use cfn-lint to lint CloudFormation templates?',
-					...['yes', 'no']);
-			if (selection === 'yes') {
-				workspace.getConfiguration().update('cfnLint.validateUsingJsonSchema', false, ConfigurationTarget.Global);
-			} else if (selection === 'no') {
-				workspace.getConfiguration().update('cfnLint.validateUsingJsonSchema', true, ConfigurationTarget.Global);
-				cfnValidateYaml = true;
-			}
-
-		}
-		if (cfnValidateYaml === false) {
-			workspace.getConfiguration().update('yaml.validate', false, ConfigurationTarget.Global);
-		}
-	}
 }
 
 export function deactivate(): Thenable<void> | undefined {
