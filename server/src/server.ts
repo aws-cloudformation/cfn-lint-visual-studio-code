@@ -16,330 +16,52 @@ permissions and limitations under the License.
 'use strict';
 
 import {
-	createConnection, Connection, TextDocuments,
-	Diagnostic, DiagnosticSeverity, InitializeResult, TextDocumentSyncKind, ProposedFeatures
+	createConnection, Connection, ProposedFeatures
 } from 'vscode-languageserver/node';
+import { SettingsState } from './cfnSettings';
+import { CfnServerInit } from './cfnServerInit';
+import { workspaceContext, schemaRequestHandler } from "yaml-language-server/out/server/src/languageservice/services/schemaRequestHandler";
+import { Telemetry } from 'yaml-language-server/out/server/src/languageserver/telemetry';
+import { promises as fs } from 'fs';
 
-import {
-	TextDocument
-} from 'vscode-languageserver-textdocument';
+// Create a connection for the server.
+let connection: Connection = null;
 
-import { URI } from 'vscode-uri';
-
-import { spawn } from "child_process";
-import { readdirSync, readFileSync, writeFileSync } from 'fs';
-import { applyPatch } from 'fast-json-patch';
-
-var connection: Connection;
-
-connection = createConnection(ProposedFeatures.all);
-
-// Create a simple text document manager. The text document manager
-// supports full document sync only
-const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
-// Make the text document manager listen on the connection
-// for open, change and close text document events
-documents.listen(connection);
-
-let hasConfigurationCapability: boolean = false;
-
-// After the server has started the client sends an initialize request. The server receives
-// in the passed params the rootPath of the workspace plus the client capabilities.
-connection.onInitialize((_): InitializeResult => {
-	return {
-		capabilities: {
-			// Tell the client that the server works in FULL text document sync mode
-			textDocumentSync: TextDocumentSyncKind.Full,
-		}
-	};
-});
-
-// The content of a CloudFormation document has saved. This event is emitted
-// when the document get saved
-documents.onDidSave((event) => {
-	runLinter(event.document);
-});
-
-documents.onDidOpen((event) => {
-	runLinter(event.document);
-});
-
-documents.onDidClose((event) => {
-	connection.sendNotification('cfn/fileclosed', event.document.uri);
-});
-
-connection.onNotification('cfn/requestPreview', (uri: string) => {
-	connection.console.log('preview requested: ' + uri);
-	isPreviewing[uri] = true;
-	runLinter(documents.get(uri));
-});
-
-connection.onNotification('cfn/previewClosed', (uri: string) => {
-	connection.console.log('preview closed: ' + uri);
-	isPreviewing[uri] = false;
-});
-
-// The settings interface describe the server relevant settings part
-interface Settings {
-	cfnLint: CloudFormationLintSettings;
+if (process.argv.indexOf('--stdio') === -1) {
+	connection = createConnection(ProposedFeatures.all);
+} else {
+	connection = createConnection();
 }
 
-// These are the example settings we defined in the client's package.json
-// file
-interface CloudFormationLintSettings {
-	path: string;
-	appendRules: Array<string>;
-	ignoreRules: Array<string>;
-	overrideSpecPath: string;
-}
-
-const defaultSettings: Settings = { cfnLint: { path: 'cfn-lint', appendRules: [], ignoreRules: [], overrideSpecPath: "" } };
-let globalSettings: Settings = defaultSettings;
-
-// Cache the settings of all open documents
-let documentSettings: Map<string, Thenable<Settings>> = new Map();
-
-// The settings have changed. Is send on server activation as well.
-connection.onDidChangeConfiguration(change => {
-	if (hasConfigurationCapability) {
-		// Reset all cached document settings
-		documentSettings.clear();
-	} else {
-		globalSettings = <Settings>(
-			(change.settings || defaultSettings)
-		);
-	}
-
-	// Revalidate all open text documents
-	documents.all().forEach(runLinter);
+process.on('uncaughtException', (err: Error) => {
+	// send all uncaught exception to telemetry with stack traces
+	connection.console.error(err.message);
 });
 
-let isRunningLinterOn: { [index: string]: boolean } = {};
-let isPreviewing: { [index: string]: boolean } = {};
+const fileSystem = {
+	readFile: (fsPath: string, encoding?: null) => {
+		return fs.readFile(fsPath, encoding).then((b) => b.toString());
+	},
+};
 
+/**
+ * Handles schema content requests given the schema URI
+ * @param uri can be a local file, vscode request, http(s) request or a custom request
+ */
+const schemaRequestHandlerWrapper = (connection: Connection, uri: string): Promise<string> => {
+	return schemaRequestHandler(
+		connection,
+		uri,
+		cfnSettings.workspaceFolders,
+		cfnSettings.workspaceRoot,
+		cfnSettings.useVSCodeContentRequest,
+		fileSystem
+	);
+};
 
-function convertSeverity(mistakeType: string): DiagnosticSeverity {
+const schemaRequestService = schemaRequestHandlerWrapper.bind(this, connection);
 
-	switch (mistakeType) {
-		case "Warning":
-			return DiagnosticSeverity.Warning;
-		case "Informational":
-			return DiagnosticSeverity.Information;
-		case "Hint":
-			return DiagnosticSeverity.Hint;
-	}
-	return DiagnosticSeverity.Error;
-}
+const cfnSettings = new SettingsState();
+const telemetry = new Telemetry(connection);
 
-function isCloudFormation(template: string, filename: string): Boolean {
-
-	if (/"?AWSTemplateFormatVersion"?\s*/.exec(template)) {
-		connection.console.log("Determined this file is a CloudFormation Template. " + filename +
-			". Found the string AWSTemplateFormatVersion");
-		return true;
-	}
-	if (/\n?"?Resources"?\s*:/.exec(template)) {
-		if (/"?Type"?\s*:\s*"?'?[a-zA-Z0-9]{2,64}::[a-zA-Z0-9]{2,64}/.exec(template)) {
-			// filter out serverless.io templates
-			if (!(/\nresources:/.exec(template) && /\nprovider:/.exec(template))) {
-				connection.console.log("Determined this file is a CloudFormation Template. " + filename +
-					". Found 'Resources' and 'Type: [a-zA-Z0-9]{2,64}::[a-zA-Z0-9]{2,64}'");
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
-function patchTemplateSchema(registrySchemaDirectory: string) {
-	const stub = readFileSync(__dirname + '/../../schema/resource-patch-stub.json', 'utf8');
-	let templateSchema = JSON.parse(readFileSync(__dirname + '/../../schema/all-spec.json', 'utf8'));
-	for (const schemaFile of readdirSync(registrySchemaDirectory)) {
-		const registrySchema = readFileSync(registrySchemaDirectory + schemaFile, 'utf8');
-		const patch = JSON.parse(stub.replace(/RESOURCE_TYPE/g, JSON.parse(registrySchema)['typeName']).replace(/"RESOURCE_SCHEMA"/g, registrySchema));
-		templateSchema = applyPatch(templateSchema, patch).newDocument;
-	}
-	writeFileSync(__dirname + '/../../schema/all-spec.json', JSON.stringify(templateSchema));
-}
-
-function getDocumentSettings(resource: string): Thenable<Settings> {
-	if (!hasConfigurationCapability) {
-		return Promise.resolve(globalSettings);
-	}
-	let result = documentSettings.get(resource);
-	if (!result) {
-		result = connection.workspace.getConfiguration({
-			scopeUri: resource,
-			section: 'languageServerExample'
-		});
-		documentSettings.set(resource, result);
-	}
-	return result;
-}
-
-async function runLinter(document: TextDocument): Promise<void> {
-	let uri = document.uri;
-	let settings = await getDocumentSettings(uri);
-
-	if (isRunningLinterOn[uri]) {
-		connection.sendNotification('cfn/busy');
-		return;
-	}
-
-	let fileToLint = URI.parse(uri).fsPath;
-
-	let isCfn = isCloudFormation(document.getText(), uri.toString());
-
-	connection.sendNotification('cfn/isPreviewable', isCfn);
-
-	let buildGraph = isPreviewing[uri];
-
-	if (isCfn) {
-		if (settings.cfnLint.path.includes(' --registry-schemas ') || settings.cfnLint.path.includes(' -s ')) {
-			for (const segment of settings.cfnLint.path.split('-')) {
-				if (segment.startsWith('schemas ') || segment.startsWith('s ')) {
-					patchTemplateSchema(segment.split(' ')[1] + "/");
-				}
-			}
-		}
-
-		let args = ['--format', 'json'];
-		if (!(settings.cfnLint.path.includes(' --include-checks ') || settings.cfnLint.path.includes(' -c '))) {
-			args.push('--include-checks');
-			args.push('I'); // informational
-		}
-
-		if (buildGraph) {
-			args.push('--build-graph');
-		}
-
-		if (settings.cfnLint.ignoreRules.length > 0) {
-			for (var ignoreRule of settings.cfnLint.ignoreRules) {
-				args.push('--ignore-checks');
-				args.push(ignoreRule);
-			}
-		}
-
-		if (settings.cfnLint.appendRules.length > 0) {
-			for (var appendRule of settings.cfnLint.appendRules) {
-				args.push('--append-rules');
-				args.push(appendRule);
-			}
-		}
-
-		if (settings.cfnLint.overrideSpecPath !== "") {
-			args.push('--override-spec', settings.cfnLint.overrideSpecPath);
-		}
-
-		args.push('--', `"${fileToLint}"`);
-
-		connection.console.log(`Running... ${settings.cfnLint.path} ${args}`);
-
-		isRunningLinterOn[uri] = true;
-		let child = spawn(
-			settings.cfnLint.path,
-			args,
-			{
-				shell: true
-			}
-		);
-
-		let diagnostics: Diagnostic[] = [];
-		let filename = uri.toString();
-		let start = 0;
-		let end = Number.MAX_VALUE;
-
-		child.on('error', function (err) {
-			let errorMessage = `Unable to start cfn-lint (${err}). Is cfn-lint installed correctly?`;
-			connection.console.log(errorMessage);
-			let lineNumber = 0;
-			let diagnostic: Diagnostic = {
-				range: {
-					start: { line: lineNumber, character: start },
-					end: { line: lineNumber, character: end }
-				},
-				severity: DiagnosticSeverity.Error,
-				message: '[cfn-lint] ' + errorMessage
-			};
-			diagnostics.push(diagnostic);
-			return;
-		});
-
-		child.stderr.on("data", (data: Buffer) => {
-			let err = data.toString();
-			connection.console.log(err);
-			let lineNumber = 0;
-			let diagnostic: Diagnostic = {
-				range: {
-					start: { line: lineNumber, character: start },
-					end: { line: lineNumber, character: end }
-				},
-				severity: DiagnosticSeverity.Warning,
-				message: '[cfn-lint] ' + err + '\nGo to https://github.com/aws-cloudformation/cfn-python-lint/#install for more help'
-			};
-			diagnostics.push(diagnostic);
-			return;
-		});
-
-		let stdout = "";
-		child.stdout.on("data", (data: Buffer) => {
-			stdout = stdout.concat(data.toString());
-		});
-
-		child.on('exit', function (code, signal) {
-			connection.console.log('child process exited with ' +
-				`code ${code} and signal ${signal}`);
-			let tmp = stdout.toString();
-			let obj;
-			try {
-				obj = JSON.parse(tmp);
-			} catch (err) {
-				let lineNumber = 0;
-				let diagnostic: Diagnostic = {
-					range: {
-						start: { line: lineNumber, character: start },
-						end: { line: lineNumber, character: end }
-					},
-					severity: DiagnosticSeverity.Warning,
-					message: '[cfn-lint] ' + err + '\nGo to https://github.com/aws-cloudformation/cfn-python-lint/#install for more help'
-				};
-				diagnostics.push(diagnostic);
-				return;
-			}
-			for (let element of obj) {
-				let lineNumber = (Number.parseInt(element.Location.Start.LineNumber) - 1);
-				let columnNumber = (Number.parseInt(element.Location.Start.ColumnNumber) - 1);
-				let lineNumberEnd = (Number.parseInt(element.Location.End.LineNumber) - 1);
-				let columnNumberEnd = (Number.parseInt(element.Location.End.ColumnNumber) - 1);
-				let diagnostic: Diagnostic = {
-					range: {
-						start: { line: lineNumber, character: columnNumber },
-						end: { line: lineNumberEnd, character: columnNumberEnd }
-					},
-					severity: convertSeverity(element.Level),
-					message: '[cfn-lint] ' + element.Rule.Id + ': ' + element.Message
-				};
-
-				diagnostics.push(diagnostic);
-			};
-		});
-
-		child.on("close", () => {
-			//connection.console.log(`Validation finished for(code:${code}): ${Files.uriToFilePath(uri)}`);
-			connection.sendDiagnostics({ uri: filename, diagnostics });
-			isRunningLinterOn[uri] = false;
-
-			if (buildGraph) {
-				connection.console.log('preview file is available');
-				connection.sendNotification('cfn/previewIsAvailable', uri);
-			}
-		});
-	} else {
-		connection.console.log("Don't believe this is a CloudFormation template. " + uri.toString() +
-			". If it is please add AWSTemplateFormatVersion: '2010-09-09' (YAML) or " +
-			" \"AWSTemplateFormatVersion\": \"2010-09-09\" (JSON) into the root level of the document.");
-	}
-}
-
-// Listen on the connection
-connection.listen();
+new CfnServerInit(connection, cfnSettings, workspaceContext, schemaRequestService, telemetry).start();

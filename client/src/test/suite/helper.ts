@@ -26,16 +26,11 @@ export async function activate(docUri: vscode.Uri): Promise<any> {
 			preserveFocus: false,
 		});
 
-		await reinitializeExtension();
+		await sleep(3000);
 		return activation;
 	} catch (e) {
 		console.error("Error from activation -> ", e);
 	}
-}
-
-async function reinitializeExtension(): Promise<void> {
-	await vscode.languages.setTextDocumentLanguage(doc, 'yaml');
-	await sleep(20000); // Wait for server activation
 }
 
 export async function activateAndPreview(docUri: vscode.Uri) {
@@ -50,12 +45,12 @@ export async function sleep(ms: number) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export const getDocPath = (p: string) => {
-	return path.resolve(__dirname, '../../../src/test/suite/fixtures', p);
+export const getDocPath = (d: string, p: string) => {
+	return path.resolve(__dirname, '../../../src/test/suite/fixtures', d, p);
 };
 
-export const getDocUri = (p: string) => {
-	return vscode.Uri.file(getDocPath(p));
+export const getDocUri = (d: string, p: string) => {
+	return vscode.Uri.file(getDocPath(d, p));
 };
 
 export async function setTestContent(content: string): Promise<boolean> {
