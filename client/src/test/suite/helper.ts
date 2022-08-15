@@ -26,7 +26,7 @@ export async function activate(docUri: vscode.Uri): Promise<any> {
 			preserveFocus: false,
 		});
 
-		await sleep(3000);
+		await sleep(5000);
 		return activation;
 	} catch (e) {
 		console.error("Error from activation -> ", e);
