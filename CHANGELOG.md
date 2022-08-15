@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to the "vscode-cfn-lint" extension will be documented in this file.
 
+## 0.23.0
+- Removed dependency on plugin `vscode-yaml` (pull #[228](https://github.com/aws-cloudformation/aws-cfn-lint-visual-studio-code/pull/228))
+- Include `yaml-language-server` as a library in server package (pull #[228](https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/228))
+
 ## 0.22.0
 - Updated CloudFormation Specs (pull #[212](https://github.com/aws-cloudformation/aws-cfn-lint-visual-studio-code/pull/212))
 - Include Information checks by default (pull #[223](https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/223))
