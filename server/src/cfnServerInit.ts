@@ -20,7 +20,7 @@ import { SettingsState } from './cfnSettings';
 import { ValidationHandler } from './handlers/validationHandler';
 import { SettingsHandler } from './handlers/settingsHandler';
 import { NotificationHandler } from './handlers/notificationHandler';
-import { LanguageHandlers } from 'yaml-language-server/out/server/src/languageserver/handlers/languageHandlers';
+import { LanguageHandlers } from './handlers/languageHandlers';
 import { Telemetry } from 'yaml-language-server/out/server/src/languageserver/telemetry';
 import { readFile } from 'fs';
 import { JSONSchema } from 'yaml-language-server/out/server/src/languageservice/jsonSchema';

@@ -23,7 +23,7 @@ import { CfnLint } from '../services/cfnlint';
 import { Diagnostic } from 'vscode-languageserver-types';
 import { LanguageService } from 'yaml-language-server';
 import { ValidationHandler as YamlValidationHandler } from 'yaml-language-server/out/server/src/languageserver/handlers/validationHandlers';
-
+import { isCloudFormation } from './helpers';
 
 // code adopted from https://github.com/redhat-developer/yaml-language-server/blob/main/src/languageserver/handlers/validationHandlers.ts
 export class ValidationHandler extends YamlValidationHandler {
@@ -41,26 +41,6 @@ export class ValidationHandler extends YamlValidationHandler {
     this.cfnSettings.documents.onDidOpen((event) => {
       this.validate(event.document);
     });
-  }
-
-  private isCloudFormation(template: string, filename: string): Boolean {
-
-    if (/"?AWSTemplateFormatVersion"?\s*/.exec(template)) {
-      this.cfnConnection.console.log("Determined this file is a CloudFormation Template. " + filename +
-        ". Found the string AWSTemplateFormatVersion");
-      return true;
-    }
-    if (/\n?"?Resources"?\s*:/.exec(template)) {
-      if (/"?Type"?\s*:\s*"?'?[a-zA-Z0-9]{2,64}::[a-zA-Z0-9]{2,64}/.exec(template)) {
-        // filter out serverless.io templates
-        if (!(/\nresources:/.exec(template) && /\nprovider:/.exec(template))) {
-          this.cfnConnection.console.log("Determined this file is a CloudFormation Template. " + filename +
-            ". Found 'Resources' and 'Type: [a-zA-Z0-9]{2,64}::[a-zA-Z0-9]{2,64}'");
-          return true;
-        }
-      }
-    }
-    return false;
   }
 
   private patchTemplateSchema(registrySchemaDirectory: string) {
@@ -85,7 +65,7 @@ export class ValidationHandler extends YamlValidationHandler {
 
     let fileToLint = URI.parse(uri).fsPath;
 
-    let isCfn = this.isCloudFormation(document.getText(), uri.toString());
+    let isCfn = isCloudFormation(document.getText(), uri.toString(), this.cfnConnection);
 
     this.cfnConnection.sendNotification('cfn/isPreviewable', isCfn);
 
