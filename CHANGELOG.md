@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to the "vscode-cfn-lint" extension will be documented in this file.
 
+## 0.23.1
+- Update the formatter handler to only handle yaml files (pull #[231](https://github.com/aws-cloudformation/aws-cfn-lint-visual-studio-code/pull/231))
+
 ## 0.23.0
 - Removed dependency on plugin `vscode-yaml` (pull #[228](https://github.com/aws-cloudformation/aws-cfn-lint-visual-studio-code/pull/228))
 - Include `yaml-language-server` as a library in server package (pull #[228](https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/228))
