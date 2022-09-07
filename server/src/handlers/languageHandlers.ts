@@ -16,14 +16,17 @@ permissions and limitations under the License.
 import { Connection } from 'vscode-languageserver';
 import {
   TextDocumentPositionParams,
+  DocumentFormattingParams,
 } from 'vscode-languageserver-protocol';
 import {
   CompletionList,
+  TextEdit,
 } from 'vscode-languageserver-types';
 import { LanguageService } from 'yaml-language-server';
 import { SettingsState } from '../cfnSettings';
 import { ValidationHandler } from './validationHandler';
 import { LanguageHandlers as YamlLanguageHandlers } from 'yaml-language-server/out/server/src/languageserver/handlers/languageHandlers';
+import { isYaml } from './helpers';
 
 // code adopted from https://github.com/redhat-developer/yaml-language-server/blob/main/src/languageserver/handlers/languageHandlers.ts
 export class LanguageHandlers extends YamlLanguageHandlers{
@@ -65,4 +68,33 @@ export class LanguageHandlers extends YamlLanguageHandlers{
       false,
     );
   }
+
+  /**
+   * Called when the formatter is invoked
+   * Returns the formatted document content using prettier
+   */
+   formatterHandler(formatParams: DocumentFormattingParams): TextEdit[] {
+    const uri = formatParams.textDocument.uri;
+    const document = this.cfnSettings.documents.get(uri);
+
+    if (!document) {
+      // @ts-ignore
+      return;
+    }
+
+    let fileIsYaml = isYaml(uri.toString());
+
+    if (!fileIsYaml) {
+      // @ts-ignore
+      return;
+    }
+
+    const customFormatterSettings = {
+      tabWidth: formatParams.options.tabSize,
+      ...this.cfnSettings.yamlFormatterSettings,
+    };
+
+    return this.cfnLanguageService.doFormat(document, customFormatterSettings);
+  }
+
 }
