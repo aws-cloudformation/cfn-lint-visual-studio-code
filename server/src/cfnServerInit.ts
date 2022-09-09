@@ -100,11 +100,11 @@ export class CfnServerInit {
 				completionProvider: {},
 				hoverProvider: true,
 				documentSymbolProvider: true,
-				documentFormattingProvider: true,
+				documentFormattingProvider: false,
 				documentOnTypeFormattingProvider: {
 					firstTriggerCharacter: '\n',
 				},
-				documentRangeFormattingProvider: true,
+				documentRangeFormattingProvider: false,
 				definitionProvider: true,
 				documentLinkProvider: {},
 				foldingRangeProvider: true,
