@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to the "vscode-cfn-lint" extension will be documented in this file.
 
+## 0.23.3
+- Fix preview command not showing graph (pull #[243](https://github.com/aws-cloudformation/aws-cfn-lint-visual-studio-code/pull/243))
+
 ## 0.23.2
 - Disable `documentRangeFormattingProvider` and `documentFormattingProvider` in server capabilities (pull #[234](https://github.com/aws-cloudformation/aws-cfn-lint-visual-studio-code/pull/234))
 
