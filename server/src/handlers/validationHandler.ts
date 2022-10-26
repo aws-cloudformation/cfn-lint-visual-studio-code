@@ -117,6 +117,10 @@ export class ValidationHandler extends YamlValidationHandler {
         const cfnLintExec = cfnLint.exec();
         cfnLintExec.then(value => {
           this.cfnConnection.sendDiagnostics({ uri: uri.toString(), diagnostics: value });
+          if (this.cfnSettings.isPreviewing[uri]) {
+            this.cfnConnection.console.log('preview file is available');
+            this.cfnConnection.sendNotification('cfn/previewIsAvailable', uri);
+          }
           resolve(value);
         });
         cfnLintExec.catch(value => {
