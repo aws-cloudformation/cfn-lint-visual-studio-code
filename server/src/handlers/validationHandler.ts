@@ -36,12 +36,37 @@ export class ValidationHandler extends YamlValidationHandler {
     this.cfnConnection = connection;
 
     this.cfnSettings.documents.onDidSave((event) => {
-      this.validate(event.document);
+      this.validateCfn(event.document);
     });
     this.cfnSettings.documents.onDidOpen((event) => {
-      this.validate(event.document);
+      this.validateCfn(event.document);
+    });
+    this.cfnSettings.documents.onDidClose((event) => {
+      this.cleanPendingValidationCfn(event.document);
+      this.cfnConnection.sendDiagnostics({ uri: event.document.uri, diagnostics: [] });
     });
   }
+
+  // override the base version of this function
+  // to prevent the onDidChange function
+  validate(_: TextDocument): void {}
+
+  validateCfn(textDocument: TextDocument): void {
+    this.cfnSettings.pendingValidationRequests[textDocument.uri] = setTimeout(() => {
+      delete this.cfnSettings.pendingValidationRequests[textDocument.uri];
+      this.validateTextDocument(textDocument);
+    }, this.cfnSettings.validationDelayMs);
+  }
+
+  private cleanPendingValidationCfn(textDocument: TextDocument): void {
+    const request = this.cfnSettings.pendingValidationRequests[textDocument.uri];
+
+    if (request) {
+      clearTimeout(request);
+      delete this.cfnSettings.pendingValidationRequests[textDocument.uri];
+    }
+  }
+
 
   private patchTemplateSchema(registrySchemaDirectory: string) {
     const stub = readFileSync(__dirname + '/../../schema/resource-patch-stub.json', 'utf8');
