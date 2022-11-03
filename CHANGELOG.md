@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to the "vscode-cfn-lint" extension will be documented in this file.
 
+## 0.23.4
+- Fix an issue where validation is run on file change (pull #[245](https://github.com/aws-cloudformation/aws-cfn-lint-visual-studio-code/pull/245))
+
 ## 0.23.3
 - Fix preview command not showing graph (pull #[243](https://github.com/aws-cloudformation/aws-cfn-lint-visual-studio-code/pull/243))
 
