@@ -18,12 +18,23 @@ import {
   TextDocumentPositionParams,
   DocumentFormattingParams,
 } from "vscode-languageserver-protocol";
-import { CompletionList, TextEdit } from "vscode-languageserver-types";
+import { CompletionList, TextEdit, Hover } from "vscode-languageserver-types";
 import { LanguageService } from "yaml-language-server";
 import { SettingsState } from "../cfnSettings";
 import { ValidationHandler } from "./validationHandler";
 import { LanguageHandlers as YamlLanguageHandlers } from "yaml-language-server/out/server/src/languageserver/handlers/languageHandlers";
 import { isYaml } from "./helpers";
+import { yamlDocumentsCache } from "yaml-language-server/out/server/src/languageservice/parser/yaml-documents";
+import { matchOffsetToDocument } from "yaml-language-server/out/server/src/languageservice/utils/arrUtils";
+import { isNode, isPair, isScalar, isMap } from "yaml";
+import { TextDocument } from "vscode-languageserver-textdocument";
+import { ASTNode } from "yaml-language-server/out/server/src/languageservice/jsonASTTypes";
+import { MarkdownString } from "../utils/markdownString";
+
+interface CfnTypes {
+  parameters: Map<string, string>;
+  resources: Map<string, string>;
+}
 
 // code adopted from https://github.com/redhat-developer/yaml-language-server/blob/main/src/languageserver/handlers/languageHandlers.ts
 export class LanguageHandlers extends YamlLanguageHandlers {
@@ -52,7 +63,7 @@ export class LanguageHandlers extends YamlLanguageHandlers {
    * Called when auto-complete is triggered in an editor
    * Returns a list of valid completion items
    */
-  completionHandler(
+  async completionHandler(
     textDocumentPosition: TextDocumentPositionParams
   ): Promise<CompletionList> {
     const textDocument = this.cfnSettings.documents.get(
@@ -68,11 +79,46 @@ export class LanguageHandlers extends YamlLanguageHandlers {
       return Promise.resolve(result);
     }
 
-    return this.cfnLanguageService.doComplete(
+    const results = await this.cfnLanguageService.doComplete(
       textDocument,
       textDocumentPosition.position,
       false
     );
+
+    let [node, template] = this.getNode(textDocument, textDocumentPosition);
+
+    if (isNode(node.internalNode)) {
+      if (node.internalNode.tag !== undefined) {
+        if (node.internalNode.tag === "!Ref") {
+          results.items = results.items.filter(
+            (item) => item.insertText !== "!Ref "
+          );
+          template.resources.forEach((value: string, key: string) => {
+            const markedDownString = new MarkdownString();
+            markedDownString.appendCodeblock("", `(Resource): ${value}`);
+            results.items.push({
+              kind: 12,
+              insertTextFormat: 2,
+              insertText: key,
+              label: key,
+              documentation: markedDownString.toMarkupContent(),
+            });
+          });
+          template.parameters.forEach((value: string, key: string) => {
+            const markedDownString = new MarkdownString();
+            markedDownString.appendCodeblock("", `(Parameter): ${value}`);
+            results.items.push({
+              kind: 12,
+              insertTextFormat: 2,
+              insertText: key,
+              label: key,
+              documentation: markedDownString.toMarkupContent(),
+            });
+          });
+        }
+      }
+    }
+    return results;
   }
 
   /**
@@ -101,5 +147,116 @@ export class LanguageHandlers extends YamlLanguageHandlers {
     };
 
     return this.cfnLanguageService.doFormat(document, customFormatterSettings);
+  }
+
+  /**
+   * Called when the user hovers with their mouse over a keyword
+   * Returns an informational tooltip
+   */
+  async hoverHandler(
+    textDocumentPositionParams: TextDocumentPositionParams
+  ): Promise<Hover> {
+    const document = this.cfnSettings.documents.get(
+      textDocumentPositionParams.textDocument.uri
+    );
+
+    if (!document) {
+      return Promise.resolve(undefined);
+    }
+
+    const results = await this.cfnLanguageService.doHover(
+      document,
+      textDocumentPositionParams.position
+    );
+
+    let [node, template] = this.getNode(document, textDocumentPositionParams);
+
+    const markedDownString = new MarkdownString();
+
+    if (isNode(node.internalNode)) {
+      if (node.internalNode.tag !== undefined) {
+        if (node.internalNode.tag === "!Ref") {
+          template.resources.forEach((value: string, key: string) => {
+            if (key === node.value) {
+              markedDownString.appendCodeblock(
+                "",
+                `(Resource) ${key}: ${value}`
+              );
+              results.contents = markedDownString.toMarkupContent();
+            }
+            console.log(value);
+          });
+          template.parameters.forEach((value: string, key: string) => {
+            if (key === node.value) {
+              markedDownString.appendCodeblock(
+                "",
+                `(Parameter) ${key}: ${value}`
+              );
+              results.contents = markedDownString.toMarkupContent();
+            }
+            console.log(value);
+          });
+        }
+      }
+    }
+
+    return results;
+  }
+
+  private getNode(
+    document: TextDocument,
+    position: TextDocumentPositionParams
+  ): [ASTNode, CfnTypes] {
+    const doc = yamlDocumentsCache.getYamlDocument(document);
+    const offset = document.offsetAt(position.position);
+    const currentDoc = matchOffsetToDocument(offset, doc);
+    const currentDocIndex = doc.documents.indexOf(currentDoc);
+    currentDoc.currentDocIndex = currentDocIndex;
+
+    let cfnTypes: CfnTypes = {
+      parameters: new Map<string, string>(),
+      resources: new Map<string, string>(),
+    };
+    // Build resource types
+    try {
+      Object.entries(doc.documents[0].root.children).forEach(([_, value]) => {
+        if (isPair(value.internalNode)) {
+          if (isScalar(value.internalNode.key)) {
+            if (value.internalNode.key.value === "Resources") {
+              if (isMap(value.internalNode.value)) {
+                for (let idx in value.internalNode.value.items) {
+                  const resource = value.internalNode.value.items[idx];
+                  if (isPair(resource)) {
+                    if (isMap(resource.value)) {
+                      const type = resource.value.items.filter(
+                        (item) => item.key == "Type"
+                      );
+                      if (type.length === 1) {
+                        if (isScalar(resource.key) && isPair(type[0])) {
+                          if (typeof resource.key.value === "string") {
+                            if (isScalar(type[0].value)) {
+                              if (typeof type[0].value.value === "string") {
+                                cfnTypes.resources.set(
+                                  resource.key.value,
+                                  type[0].value.value
+                                );
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      });
+    } catch (error) {
+      console.debug(error);
+    }
+
+    return [currentDoc.getNodeFromOffset(offset), cfnTypes];
   }
 }
