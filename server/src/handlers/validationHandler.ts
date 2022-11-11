@@ -84,7 +84,7 @@ export class ValidationHandler extends YamlValidationHandler {
       "utf8"
     );
     let templateSchema = JSON.parse(
-      readFileSync(__dirname + "/../../schema/all-spec.json", "utf8")
+      readFileSync(__dirname + "/../../schema/template.schema.json", "utf8")
     );
     for (const schemaFile of readdirSync(registrySchemaDirectory)) {
       const registrySchema = readFileSync(
@@ -99,7 +99,7 @@ export class ValidationHandler extends YamlValidationHandler {
       templateSchema = applyPatch(templateSchema, patch).newDocument;
     }
     writeFileSync(
-      __dirname + "/../../schema/all-spec.json",
+      __dirname + "/../../schema/template.schema.json",
       JSON.stringify(templateSchema)
     );
   }

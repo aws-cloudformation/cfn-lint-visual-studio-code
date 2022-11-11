@@ -79,7 +79,7 @@ export class SettingsHandler {
   private async setConfiguration(settings: Settings): Promise<void> {
     this.cfnSettings.schemaConfigurationSettings = [];
     const yamlSchemas: { [name: string]: Array<string> } = {};
-    const filename = path.join(__dirname, "../../../schema/all-spec.json");
+    const filename = path.join(__dirname, "../../../schema/template.schema.json");
     yamlSchemas[filename] = ["*.yaml", "*.yml"];
 
     for (const uri in yamlSchemas) {
