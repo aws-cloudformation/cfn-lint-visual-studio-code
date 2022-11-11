@@ -87,37 +87,40 @@ export class LanguageHandlers extends YamlLanguageHandlers {
 
     let [node, template] = this.getNode(textDocument, textDocumentPosition);
 
-    if (isNode(node.internalNode)) {
-      if (node.internalNode.tag !== undefined) {
-        if (node.internalNode.tag === "!Ref") {
-          results.items = results.items.filter(
-            (item) => item.insertText !== "!Ref "
-          );
-          template.resources.forEach((value: string, key: string) => {
-            const markedDownString = new MarkdownString();
-            markedDownString.appendCodeblock("", `(Resource): ${value}`);
-            results.items.push({
-              kind: 12,
-              insertTextFormat: 2,
-              insertText: key,
-              label: key,
-              documentation: markedDownString.toMarkupContent(),
+    if (node != null && template != null) {
+      if (isNode(node.internalNode)) {
+        if (node.internalNode.tag !== undefined) {
+          if (node.internalNode.tag === "!Ref") {
+            results.items = results.items.filter(
+              (item) => item.insertText !== "!Ref "
+            );
+            template.resources.forEach((value: string, key: string) => {
+              const markedDownString = new MarkdownString();
+              markedDownString.appendCodeblock("", `(Resource): ${value}`);
+              results.items.push({
+                kind: 12,
+                insertTextFormat: 2,
+                insertText: key,
+                label: key,
+                documentation: markedDownString.toMarkupContent(),
+              });
             });
-          });
-          template.parameters.forEach((value: string, key: string) => {
-            const markedDownString = new MarkdownString();
-            markedDownString.appendCodeblock("", `(Parameter): ${value}`);
-            results.items.push({
-              kind: 12,
-              insertTextFormat: 2,
-              insertText: key,
-              label: key,
-              documentation: markedDownString.toMarkupContent(),
+            template.parameters.forEach((value: string, key: string) => {
+              const markedDownString = new MarkdownString();
+              markedDownString.appendCodeblock("", `(Parameter): ${value}`);
+              results.items.push({
+                kind: 12,
+                insertTextFormat: 2,
+                insertText: key,
+                label: key,
+                documentation: markedDownString.toMarkupContent(),
+              });
             });
-          });
+          }
         }
       }
     }
+
     return results;
   }
 
@@ -173,29 +176,31 @@ export class LanguageHandlers extends YamlLanguageHandlers {
 
     const markedDownString = new MarkdownString();
 
-    if (isNode(node.internalNode)) {
-      if (node.internalNode.tag !== undefined) {
-        if (node.internalNode.tag === "!Ref") {
-          template.resources.forEach((value: string, key: string) => {
-            if (key === node.value) {
-              markedDownString.appendCodeblock(
-                "",
-                `(Resource) ${key}: ${value}`
-              );
-              results.contents = markedDownString.toMarkupContent();
-            }
-            console.log(value);
-          });
-          template.parameters.forEach((value: string, key: string) => {
-            if (key === node.value) {
-              markedDownString.appendCodeblock(
-                "",
-                `(Parameter) ${key}: ${value}`
-              );
-              results.contents = markedDownString.toMarkupContent();
-            }
-            console.log(value);
-          });
+    if (node != null && template != null) {
+      if (isNode(node.internalNode)) {
+        if (node.internalNode.tag !== undefined) {
+          if (node.internalNode.tag === "!Ref") {
+            template.resources.forEach((value: string, key: string) => {
+              if (key === node.value) {
+                markedDownString.appendCodeblock(
+                  "",
+                  `(Resource) ${key}: ${value}`
+                );
+                results.contents = markedDownString.toMarkupContent();
+              }
+              console.log(value);
+            });
+            template.parameters.forEach((value: string, key: string) => {
+              if (key === node.value) {
+                markedDownString.appendCodeblock(
+                  "",
+                  `(Parameter) ${key}: ${value}`
+                );
+                results.contents = markedDownString.toMarkupContent();
+              }
+              console.log(value);
+            });
+          }
         }
       }
     }
@@ -206,19 +211,21 @@ export class LanguageHandlers extends YamlLanguageHandlers {
   private getNode(
     document: TextDocument,
     position: TextDocumentPositionParams
-  ): [ASTNode, CfnTypes] {
-    const doc = yamlDocumentsCache.getYamlDocument(document);
-    const offset = document.offsetAt(position.position);
-    const currentDoc = matchOffsetToDocument(offset, doc);
-    const currentDocIndex = doc.documents.indexOf(currentDoc);
-    currentDoc.currentDocIndex = currentDocIndex;
-
+  ): [ASTNode, CfnTypes] | null {
     let cfnTypes: CfnTypes = {
       parameters: new Map<string, string>(),
       resources: new Map<string, string>(),
     };
+
+    const doc = yamlDocumentsCache.getYamlDocument(document);
+
     // Build resource types
     try {
+      const offset = document.offsetAt(position.position);
+      const currentDoc = matchOffsetToDocument(offset, doc);
+      const currentDocIndex = doc.documents.indexOf(currentDoc);
+      currentDoc.currentDocIndex = currentDocIndex;
+
       Object.entries(doc.documents[0].root.children).forEach(([_, value]) => {
         if (isPair(value.internalNode)) {
           if (isScalar(value.internalNode.key)) {
@@ -253,10 +260,12 @@ export class LanguageHandlers extends YamlLanguageHandlers {
           }
         }
       });
+
+      return [currentDoc.getNodeFromOffset(offset), cfnTypes];
     } catch (error) {
       console.debug(error);
     }
 
-    return [currentDoc.getNodeFromOffset(offset), cfnTypes];
+    return [null, null];
   }
 }
