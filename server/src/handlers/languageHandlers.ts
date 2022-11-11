@@ -87,7 +87,7 @@ export class LanguageHandlers extends YamlLanguageHandlers {
 
     let [node, template] = this.getNode(textDocument, textDocumentPosition);
 
-    if (node != null && template != null) {
+    if (node !== null && template !== null) {
       if (isNode(node.internalNode)) {
         if (node.internalNode.tag !== undefined) {
           if (node.internalNode.tag === "!Ref") {
@@ -176,7 +176,7 @@ export class LanguageHandlers extends YamlLanguageHandlers {
 
     const markedDownString = new MarkdownString();
 
-    if (node != null && template != null) {
+    if (node !== null && template !== null) {
       if (isNode(node.internalNode)) {
         if (node.internalNode.tag !== undefined) {
           if (node.internalNode.tag === "!Ref") {
@@ -236,7 +236,7 @@ export class LanguageHandlers extends YamlLanguageHandlers {
                   if (isPair(resource)) {
                     if (isMap(resource.value)) {
                       const type = resource.value.items.filter(
-                        (item) => item.key == "Type"
+                        (item) => item.key === "Type"
                       );
                       if (type.length === 1) {
                         if (isScalar(resource.key) && isPair(type[0])) {
