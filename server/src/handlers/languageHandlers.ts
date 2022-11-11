@@ -13,27 +13,29 @@ on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
 express or implied. See the License for the specific language governing
 permissions and limitations under the License.
 */
-import { Connection } from 'vscode-languageserver';
+import { Connection } from "vscode-languageserver";
 import {
   TextDocumentPositionParams,
   DocumentFormattingParams,
-} from 'vscode-languageserver-protocol';
-import {
-  CompletionList,
-  TextEdit,
-} from 'vscode-languageserver-types';
-import { LanguageService } from 'yaml-language-server';
-import { SettingsState } from '../cfnSettings';
-import { ValidationHandler } from './validationHandler';
-import { LanguageHandlers as YamlLanguageHandlers } from 'yaml-language-server/out/server/src/languageserver/handlers/languageHandlers';
-import { isYaml } from './helpers';
+} from "vscode-languageserver-protocol";
+import { CompletionList, TextEdit } from "vscode-languageserver-types";
+import { LanguageService } from "yaml-language-server";
+import { SettingsState } from "../cfnSettings";
+import { ValidationHandler } from "./validationHandler";
+import { LanguageHandlers as YamlLanguageHandlers } from "yaml-language-server/out/server/src/languageserver/handlers/languageHandlers";
+import { isYaml } from "./helpers";
 
 // code adopted from https://github.com/redhat-developer/yaml-language-server/blob/main/src/languageserver/handlers/languageHandlers.ts
-export class LanguageHandlers extends YamlLanguageHandlers{
+export class LanguageHandlers extends YamlLanguageHandlers {
   private cfnLanguageService: LanguageService;
   private cfnSettings: SettingsState;
 
-  pendingLimitExceededWarnings: { [uri: string]: { features: { [name: string]: string }; timeout?: NodeJS.Timeout } };
+  pendingLimitExceededWarnings: {
+    [uri: string]: {
+      features: { [name: string]: string };
+      timeout?: NodeJS.Timeout;
+    };
+  };
 
   constructor(
     connection: Connection,
@@ -50,8 +52,12 @@ export class LanguageHandlers extends YamlLanguageHandlers{
    * Called when auto-complete is triggered in an editor
    * Returns a list of valid completion items
    */
-  completionHandler(textDocumentPosition: TextDocumentPositionParams): Promise<CompletionList> {
-    const textDocument = this.cfnSettings.documents.get(textDocumentPosition.textDocument.uri);
+  completionHandler(
+    textDocumentPosition: TextDocumentPositionParams
+  ): Promise<CompletionList> {
+    const textDocument = this.cfnSettings.documents.get(
+      textDocumentPosition.textDocument.uri
+    );
 
     const result: CompletionList = {
       items: [],
@@ -65,7 +71,7 @@ export class LanguageHandlers extends YamlLanguageHandlers{
     return this.cfnLanguageService.doComplete(
       textDocument,
       textDocumentPosition.position,
-      false,
+      false
     );
   }
 
@@ -73,7 +79,7 @@ export class LanguageHandlers extends YamlLanguageHandlers{
    * Called when the formatter is invoked
    * Returns the formatted document content using prettier
    */
-   formatterHandler(formatParams: DocumentFormattingParams): TextEdit[] {
+  formatterHandler(formatParams: DocumentFormattingParams): TextEdit[] {
     const uri = formatParams.textDocument.uri;
     const document = this.cfnSettings.documents.get(uri);
 
@@ -96,5 +102,4 @@ export class LanguageHandlers extends YamlLanguageHandlers{
 
     return this.cfnLanguageService.doFormat(document, customFormatterSettings);
   }
-
 }

@@ -1,28 +1,36 @@
-declare module 'node-yaml-parser' {
-	export function parse(text: string): { readonly documents: YamlDocument[]; readonly lineLengths: number[] };
-	export function findNodeAtPosition(documents: YamlDocument[], lineLengths: number[], line: number, char: number): YamlMatchedElement;
+declare module "node-yaml-parser" {
+  export function parse(text: string): {
+    readonly documents: YamlDocument[];
+    readonly lineLengths: number[];
+  };
+  export function findNodeAtPosition(
+    documents: YamlDocument[],
+    lineLengths: number[],
+    line: number,
+    char: number
+  ): YamlMatchedElement;
 
-	export interface YamlNode {
-		readonly kind: string;
-		readonly raw: string;
-		readonly startPosition: number;
-		readonly endPosition: number;
-		readonly parent?: YamlNode;
-	}
+  export interface YamlNode {
+    readonly kind: string;
+    readonly raw: string;
+    readonly startPosition: number;
+    readonly endPosition: number;
+    readonly parent?: YamlNode;
+  }
 
-	export interface YamlDocument {
-		readonly nodes: YamlNode[];
-		readonly errors: string[];
-	}
+  export interface YamlDocument {
+    readonly nodes: YamlNode[];
+    readonly errors: string[];
+  }
 
-	export interface YamlMatchedElement {
-		readonly matchedNode: YamlNode;
-		readonly matchedDocument: YamlDocument;
-	}
+  export interface YamlMatchedElement {
+    readonly matchedNode: YamlNode;
+    readonly matchedDocument: YamlDocument;
+  }
 
-	export interface Util {
-		isKey(node: YamlNode): boolean;
-	}
+  export interface Util {
+    isKey(node: YamlNode): boolean;
+  }
 
-	export const util: Util;
+  export const util: Util;
 }

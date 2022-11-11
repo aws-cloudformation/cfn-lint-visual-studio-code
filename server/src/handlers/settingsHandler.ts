@@ -13,16 +13,25 @@ on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
 express or implied. See the License for the specific language governing
 permissions and limitations under the License.
 */
-import { Connection, DidChangeConfigurationNotification } from 'vscode-languageserver';
-import { Settings, SettingsState } from '../cfnSettings';
-import { ValidationHandler } from './validationHandler';
-import { LanguageSettings, LanguageService, SchemaPriority } from 'yaml-language-server';
-import { SchemaSelectionRequests } from 'yaml-language-server/out/server/src/requestTypes';
-import { Telemetry } from 'yaml-language-server/out/server/src/languageserver/telemetry';
-import { checkSchemaURI } from 'yaml-language-server/out/server/src/languageservice/utils/schemaUrls';
-import { isRelativePath, relativeToAbsolutePath } from 'yaml-language-server/out/server/src/languageservice/utils/paths';
-import * as path from 'path';
-
+import {
+  Connection,
+  DidChangeConfigurationNotification,
+} from "vscode-languageserver";
+import { Settings, SettingsState } from "../cfnSettings";
+import { ValidationHandler } from "./validationHandler";
+import {
+  LanguageSettings,
+  LanguageService,
+  SchemaPriority,
+} from "yaml-language-server";
+import { SchemaSelectionRequests } from "yaml-language-server/out/server/src/requestTypes";
+import { Telemetry } from "yaml-language-server/out/server/src/languageserver/telemetry";
+import { checkSchemaURI } from "yaml-language-server/out/server/src/languageservice/utils/schemaUrls";
+import {
+  isRelativePath,
+  relativeToAbsolutePath,
+} from "yaml-language-server/out/server/src/languageservice/utils/paths";
+import * as path from "path";
 
 // code adopted from https://github.com/redhat-developer/yaml-language-server/blob/main/src/languageserver/handlers/settingsHandlers.ts
 export class SettingsHandler {
@@ -31,16 +40,20 @@ export class SettingsHandler {
     private readonly languageService: LanguageService,
     private readonly cfnSettings: SettingsState,
     private readonly validationHandler: ValidationHandler,
-    private readonly telemetry: Telemetry,
-  ) {
-  }
+    private readonly telemetry: Telemetry
+  ) {}
 
   async registerHandlers(): Promise<void> {
-    if (this.cfnSettings.hasConfigurationCapability && this.cfnSettings.clientDynamicRegisterSupport) {
+    if (
+      this.cfnSettings.hasConfigurationCapability &&
+      this.cfnSettings.clientDynamicRegisterSupport
+    ) {
       try {
         // Register for all configuration changes.
-        await this.connection.client.register(DidChangeConfigurationNotification.type);
-      } catch (err) { }
+        await this.connection.client.register(
+          DidChangeConfigurationNotification.type
+        );
+      } catch (err) {}
     }
     this.connection.onDidChangeConfiguration(() => this.pullConfiguration());
   }
@@ -50,9 +63,9 @@ export class SettingsHandler {
    */
   async pullConfiguration(): Promise<void> {
     const config = await this.connection.workspace.getConfiguration([
-      { section: 'cfnLint' },
-      { section: 'editor' },
-      { section: 'files' },
+      { section: "cfnLint" },
+      { section: "editor" },
+      { section: "files" },
     ]);
 
     const settings: Settings = {
@@ -64,7 +77,6 @@ export class SettingsHandler {
   }
 
   private async setConfiguration(settings: Settings): Promise<void> {
-
     this.cfnSettings.schemaConfigurationSettings = [];
     const yamlSchemas: { [name: string]: Array<string> } = {};
     const filename = path.join(__dirname, "../../../schema/all-spec.json");
@@ -75,44 +87,62 @@ export class SettingsHandler {
 
       const schemaObj = {
         fileMatch: Array.isArray(globPattern) ? globPattern : [globPattern],
-        uri: checkSchemaURI(this.cfnSettings.workspaceFolders, this.cfnSettings.workspaceRoot, uri, this.telemetry),
+        uri: checkSchemaURI(
+          this.cfnSettings.workspaceFolders,
+          this.cfnSettings.workspaceRoot,
+          uri,
+          this.telemetry
+        ),
       };
       this.cfnSettings.schemaConfigurationSettings.push(schemaObj);
     }
 
     if (settings.cfnLint.format) {
       this.cfnSettings.yamlFormatterSettings = {
-        proseWrap: settings.cfnLint.format.proseWrap || 'preserve',
+        proseWrap: settings.cfnLint.format.proseWrap || "preserve",
         printWidth: settings.cfnLint.format.printWidth || 80,
       };
 
       if (settings.cfnLint.format.singleQuote !== undefined) {
-        this.cfnSettings.yamlFormatterSettings.singleQuote = settings.cfnLint.format.singleQuote;
+        this.cfnSettings.yamlFormatterSettings.singleQuote =
+          settings.cfnLint.format.singleQuote;
       }
 
       if (settings.cfnLint.format.bracketSpacing !== undefined) {
-        this.cfnSettings.yamlFormatterSettings.bracketSpacing = settings.cfnLint.format.bracketSpacing;
+        this.cfnSettings.yamlFormatterSettings.bracketSpacing =
+          settings.cfnLint.format.bracketSpacing;
       }
 
       if (settings.cfnLint.format.enable !== undefined) {
-        this.cfnSettings.yamlFormatterSettings.enable = settings.cfnLint.format.enable;
+        this.cfnSettings.yamlFormatterSettings.enable =
+          settings.cfnLint.format.enable;
       }
     }
 
-
     if (settings.cfnLint) {
-      this.cfnSettings.cfnLintPath = settings.cfnLint.path ? settings.cfnLint.path : "cfn-lint";
-      this.cfnSettings.cfnLintAppendRules = settings.cfnLint.appendRules ? settings.cfnLint.appendRules : [];
-      this.cfnSettings.cfnLintIgnoreRules = settings.cfnLint.ignoreRules ? settings.cfnLint.ignoreRules : [];
-      this.cfnSettings.cfnLintOverrideSpecPath = settings.cfnLint.overrideSpecPath ? settings.cfnLint.overrideSpecPath : "";
+      this.cfnSettings.cfnLintPath = settings.cfnLint.path
+        ? settings.cfnLint.path
+        : "cfn-lint";
+      this.cfnSettings.cfnLintAppendRules = settings.cfnLint.appendRules
+        ? settings.cfnLint.appendRules
+        : [];
+      this.cfnSettings.cfnLintIgnoreRules = settings.cfnLint.ignoreRules
+        ? settings.cfnLint.ignoreRules
+        : [];
+      this.cfnSettings.cfnLintOverrideSpecPath = settings.cfnLint
+        .overrideSpecPath
+        ? settings.cfnLint.overrideSpecPath
+        : "";
     }
 
     this.updateConfiguration();
     if (this.cfnSettings.useSchemaSelectionRequests) {
-      this.connection.sendNotification(SchemaSelectionRequests.schemaStoreInitialized, {});
+      this.connection.sendNotification(
+        SchemaSelectionRequests.schemaStoreInitialized,
+        {}
+      );
     }
   }
-
 
   /**
    * Called when server settings or schema associations are changed
@@ -129,7 +159,8 @@ export class SettingsHandler {
       indentation: this.cfnSettings.indentation,
       disableAdditionalProperties: this.cfnSettings.disableAdditionalProperties,
       disableDefaultProperties: this.cfnSettings.disableDefaultProperties,
-      parentSkeletonSelectedFirst: this.cfnSettings.suggest.parentSkeletonSelectedFirst,
+      parentSkeletonSelectedFirst:
+        this.cfnSettings.suggest.parentSkeletonSelectedFirst,
       yamlVersion: this.cfnSettings.yamlVersion,
     };
 
@@ -140,12 +171,18 @@ export class SettingsHandler {
           uri = schema.schema.id;
         }
         if (!uri && schema.fileMatch) {
-          uri = 'vscode://schemas/custom/' + encodeURIComponent(schema.fileMatch.join('&'));
+          uri =
+            "vscode://schemas/custom/" +
+            encodeURIComponent(schema.fileMatch.join("&"));
         }
         if (uri) {
           if (isRelativePath(uri)) {
-            console.log('Is relative');
-            uri = relativeToAbsolutePath(this.cfnSettings.workspaceFolders, this.cfnSettings.workspaceRoot, uri);
+            console.log("Is relative");
+            uri = relativeToAbsolutePath(
+              this.cfnSettings.workspaceFolders,
+              this.cfnSettings.workspaceRoot,
+              uri
+            );
           }
 
           languageSettings = this.configureSchemas(
@@ -163,7 +200,9 @@ export class SettingsHandler {
     this.languageService.configure(languageSettings);
 
     // Revalidate any open text documents
-    this.cfnSettings.documents.all().forEach((document) => this.validationHandler.validate(document));
+    this.cfnSettings.documents
+      .all()
+      .forEach((document) => this.validationHandler.validate(document));
   }
 
   /**
@@ -181,15 +220,28 @@ export class SettingsHandler {
     languageSettings: LanguageSettings,
     priorityLevel: number
   ): LanguageSettings {
-    uri = checkSchemaURI(this.cfnSettings.workspaceFolders, this.cfnSettings.workspaceRoot, uri, this.telemetry);
+    uri = checkSchemaURI(
+      this.cfnSettings.workspaceFolders,
+      this.cfnSettings.workspaceRoot,
+      uri,
+      this.telemetry
+    );
 
     if (schema === null) {
-      languageSettings.schemas.push({ uri, fileMatch: fileMatch, priority: priorityLevel });
+      languageSettings.schemas.push({
+        uri,
+        fileMatch: fileMatch,
+        priority: priorityLevel,
+      });
     } else {
-      languageSettings.schemas.push({ uri, fileMatch: fileMatch, schema: schema, priority: priorityLevel });
+      languageSettings.schemas.push({
+        uri,
+        fileMatch: fileMatch,
+        schema: schema,
+        priority: priorityLevel,
+      });
     }
 
     return languageSettings;
   }
-
 }
