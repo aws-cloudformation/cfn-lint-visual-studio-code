@@ -116,6 +116,32 @@ export class LanguageHandlers extends YamlLanguageHandlers {
                 documentation: markedDownString.toMarkupContent(),
               });
             });
+          } else if ("!Ref".startsWith(node.internalNode.tag)) {
+            results.items = results.items.filter(
+              (item) => item.insertText !== "!Ref "
+            );
+            template.resources.forEach((value: string, key: string) => {
+              const markedDownString = new MarkdownString();
+              markedDownString.appendCodeblock("", `(Resource): ${value}`);
+              results.items.push({
+                kind: 12,
+                insertTextFormat: 2,
+                insertText: `!Ref ${key}`,
+                label: `!Ref ${key}`,
+                documentation: markedDownString.toMarkupContent(),
+              });
+            });
+            template.parameters.forEach((value: string, key: string) => {
+              const markedDownString = new MarkdownString();
+              markedDownString.appendCodeblock("", `(Parameter): ${value}`);
+              results.items.push({
+                kind: 12,
+                insertTextFormat: 2,
+                insertText: `!Ref ${key}`,
+                label: `!Ref ${key}`,
+                documentation: markedDownString.toMarkupContent(),
+              });
+            });
           }
         }
       }
@@ -229,24 +255,31 @@ export class LanguageHandlers extends YamlLanguageHandlers {
       Object.entries(doc.documents[0].root.children).forEach(([_, value]) => {
         if (isPair(value.internalNode)) {
           if (isScalar(value.internalNode.key)) {
-            if (value.internalNode.key.value === "Resources") {
-              if (isMap(value.internalNode.value)) {
-                for (let idx in value.internalNode.value.items) {
-                  const resource = value.internalNode.value.items[idx];
-                  if (isPair(resource)) {
-                    if (isMap(resource.value)) {
-                      const type = resource.value.items.filter(
-                        (item) => item.key === "Type"
-                      );
-                      if (type.length === 1) {
-                        if (isScalar(resource.key) && isPair(type[0])) {
-                          if (typeof resource.key.value === "string") {
-                            if (isScalar(type[0].value)) {
-                              if (typeof type[0].value.value === "string") {
-                                cfnTypes.resources.set(
-                                  resource.key.value,
-                                  type[0].value.value
-                                );
+            switch(value.internalNode.key.value) {
+              case "Resources": {
+                if (isMap(value.internalNode.value)) {
+                  for (let idx in value.internalNode.value.items) {
+                    const resource = value.internalNode.value.items[idx];
+                    if (isPair(resource)) {
+                      if (isMap(resource.value)) {
+                        const type = resource.value.items.filter(
+                          (item) => {
+                            if (isScalar(item.key)) {
+                              return item.key.value === "Type"
+                            }
+                            return false;
+                          }
+                        );
+                        if (type.length === 1) {
+                          if (isScalar(resource.key) && isPair(type[0])) {
+                            if (typeof resource.key.value === "string") {
+                              if (isScalar(type[0].value)) {
+                                if (typeof type[0].value.value === "string") {
+                                  cfnTypes.resources.set(
+                                    resource.key.value,
+                                    type[0].value.value
+                                  );
+                                }
                               }
                             }
                           }
@@ -255,6 +288,41 @@ export class LanguageHandlers extends YamlLanguageHandlers {
                     }
                   }
                 }
+                break;
+              }
+              case "Parameters": {
+                if (isMap(value.internalNode.value)) {
+                  for (let idx in value.internalNode.value.items) {
+                    const parameter = value.internalNode.value.items[idx];
+                    if (isPair(parameter)) {
+                      if (isMap(parameter.value)) {
+                        const type = parameter.value.items.filter(
+                          (item) => {
+                            if (isScalar(item.key)) {
+                              return item.key.value === "Type"
+                            }
+                            return false;
+                          }
+                        );
+                        if (type.length === 1) {
+                          if (isScalar(parameter.key) && isPair(type[0])) {
+                            if (typeof parameter.key.value === "string") {
+                              if (isScalar(type[0].value)) {
+                                if (typeof type[0].value.value === "string") {
+                                  cfnTypes.parameters.set(
+                                    parameter.key.value,
+                                    type[0].value.value
+                                  );
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                break;
               }
             }
           }
