@@ -13,24 +13,28 @@ on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
 express or implied. See the License for the specific language governing
 permissions and limitations under the License.
 */
-import { Connection } from 'vscode-languageserver';
-import { SettingsState } from '../cfnSettings';
-import { TextDocument } from 'vscode-languageserver-textdocument';
-import { URI } from 'vscode-uri';
-import { readdirSync, readFileSync, writeFileSync } from 'fs';
-import { applyPatch } from 'fast-json-patch';
-import { CfnLint } from '../services/cfnlint';
-import { Diagnostic } from 'vscode-languageserver-types';
-import { LanguageService } from 'yaml-language-server';
-import { ValidationHandler as YamlValidationHandler } from 'yaml-language-server/out/server/src/languageserver/handlers/validationHandlers';
-import { isCloudFormation } from './helpers';
+import { Connection } from "vscode-languageserver";
+import { SettingsState } from "../cfnSettings";
+import { TextDocument } from "vscode-languageserver-textdocument";
+import { URI } from "vscode-uri";
+import { readdirSync, readFileSync, writeFileSync } from "fs";
+import { applyPatch } from "fast-json-patch";
+import { CfnLint } from "../services/cfnlint";
+import { Diagnostic } from "vscode-languageserver-types";
+import { LanguageService } from "yaml-language-server";
+import { ValidationHandler as YamlValidationHandler } from "yaml-language-server/out/server/src/languageserver/handlers/validationHandlers";
+import { isCloudFormation } from "./helpers";
 
 // code adopted from https://github.com/redhat-developer/yaml-language-server/blob/main/src/languageserver/handlers/validationHandlers.ts
 export class ValidationHandler extends YamlValidationHandler {
   cfnSettings: SettingsState;
   cfnConnection: Connection;
 
-  constructor(connection: Connection, languageService: LanguageService, cfnSettings: SettingsState) {
+  constructor(
+    connection: Connection,
+    languageService: LanguageService,
+    cfnSettings: SettingsState
+  ) {
     super(connection, languageService, cfnSettings);
     this.cfnSettings = cfnSettings;
     this.cfnConnection = connection;
@@ -43,7 +47,10 @@ export class ValidationHandler extends YamlValidationHandler {
     });
     this.cfnSettings.documents.onDidClose((event) => {
       this.cleanPendingValidationCfn(event.document);
-      this.cfnConnection.sendDiagnostics({ uri: event.document.uri, diagnostics: [] });
+      this.cfnConnection.sendDiagnostics({
+        uri: event.document.uri,
+        diagnostics: [],
+      });
     });
   }
 
@@ -52,14 +59,18 @@ export class ValidationHandler extends YamlValidationHandler {
   validate(_: TextDocument): void {}
 
   validateCfn(textDocument: TextDocument): void {
-    this.cfnSettings.pendingValidationRequests[textDocument.uri] = setTimeout(() => {
-      delete this.cfnSettings.pendingValidationRequests[textDocument.uri];
-      this.validateTextDocument(textDocument);
-    }, this.cfnSettings.validationDelayMs);
+    this.cfnSettings.pendingValidationRequests[textDocument.uri] = setTimeout(
+      () => {
+        delete this.cfnSettings.pendingValidationRequests[textDocument.uri];
+        this.validateTextDocument(textDocument);
+      },
+      this.cfnSettings.validationDelayMs
+    );
   }
 
   private cleanPendingValidationCfn(textDocument: TextDocument): void {
-    const request = this.cfnSettings.pendingValidationRequests[textDocument.uri];
+    const request =
+      this.cfnSettings.pendingValidationRequests[textDocument.uri];
 
     if (request) {
       clearTimeout(request);
@@ -67,16 +78,30 @@ export class ValidationHandler extends YamlValidationHandler {
     }
   }
 
-
   private patchTemplateSchema(registrySchemaDirectory: string) {
-    const stub = readFileSync(__dirname + '/../../schema/resource-patch-stub.json', 'utf8');
-    let templateSchema = JSON.parse(readFileSync(__dirname + '/../../schema/all-spec.json', 'utf8'));
+    const stub = readFileSync(
+      __dirname + "/../../schema/resource-patch-stub.json",
+      "utf8"
+    );
+    let templateSchema = JSON.parse(
+      readFileSync(__dirname + "/../../schema/all-spec.json", "utf8")
+    );
     for (const schemaFile of readdirSync(registrySchemaDirectory)) {
-      const registrySchema = readFileSync(registrySchemaDirectory + schemaFile, 'utf8');
-      const patch = JSON.parse(stub.replace(/RESOURCE_TYPE/g, JSON.parse(registrySchema)['typeName']).replace(/"RESOURCE_SCHEMA"/g, registrySchema));
+      const registrySchema = readFileSync(
+        registrySchemaDirectory + schemaFile,
+        "utf8"
+      );
+      const patch = JSON.parse(
+        stub
+          .replace(/RESOURCE_TYPE/g, JSON.parse(registrySchema)["typeName"])
+          .replace(/"RESOURCE_SCHEMA"/g, registrySchema)
+      );
       templateSchema = applyPatch(templateSchema, patch).newDocument;
     }
-    writeFileSync(__dirname + '/../../schema/all-spec.json', JSON.stringify(templateSchema));
+    writeFileSync(
+      __dirname + "/../../schema/all-spec.json",
+      JSON.stringify(templateSchema)
+    );
   }
 
   validateTextDocument(document: TextDocument): Promise<Diagnostic[]> {
@@ -90,75 +115,96 @@ export class ValidationHandler extends YamlValidationHandler {
 
     let fileToLint = URI.parse(uri).fsPath;
 
-    let isCfn = isCloudFormation(document.getText(), uri.toString(), this.cfnConnection);
+    let isCfn = isCloudFormation(
+      document.getText(),
+      uri.toString(),
+      this.cfnConnection
+    );
 
-    this.cfnConnection.sendNotification('cfn/isPreviewable', isCfn);
+    this.cfnConnection.sendNotification("cfn/isPreviewable", isCfn);
 
     let buildGraph = this.cfnSettings.isPreviewing[uri];
 
     return new Promise<Diagnostic[]>((resolve, reject) => {
       if (isCfn) {
-        if (this.cfnSettings.cfnLintPath.includes(' --registry-schemas ') || this.cfnSettings.cfnLintPath.includes(' -s ')) {
-          for (const segment of this.cfnSettings.cfnLintPath.split('-')) {
-            if (segment.startsWith('schemas ') || segment.startsWith('s ')) {
-              this.patchTemplateSchema(segment.split(' ')[1] + "/");
+        if (
+          this.cfnSettings.cfnLintPath.includes(" --registry-schemas ") ||
+          this.cfnSettings.cfnLintPath.includes(" -s ")
+        ) {
+          for (const segment of this.cfnSettings.cfnLintPath.split("-")) {
+            if (segment.startsWith("schemas ") || segment.startsWith("s ")) {
+              this.patchTemplateSchema(segment.split(" ")[1] + "/");
             }
           }
         }
 
-        let args = ['--format', 'json'];
-        if (!(this.cfnSettings.cfnLintPath.includes(' --include-checks ') || this.cfnSettings.cfnLintPath.includes(' -c '))) {
-          args.push('--include-checks');
-          args.push('I'); // informational
+        let args = ["--format", "json"];
+        if (
+          !(
+            this.cfnSettings.cfnLintPath.includes(" --include-checks ") ||
+            this.cfnSettings.cfnLintPath.includes(" -c ")
+          )
+        ) {
+          args.push("--include-checks");
+          args.push("I"); // informational
         }
 
         if (buildGraph) {
-          args.push('--build-graph');
+          args.push("--build-graph");
         }
 
         if (this.cfnSettings.cfnLintIgnoreRules.length > 0) {
           for (var ignoreRule of this.cfnSettings.cfnLintIgnoreRules) {
-            args.push('--ignore-checks');
+            args.push("--ignore-checks");
             args.push(ignoreRule);
           }
         }
 
         if (this.cfnSettings.cfnLintAppendRules.length > 0) {
           for (var appendRule of this.cfnSettings.cfnLintAppendRules) {
-            args.push('--append-rules');
+            args.push("--append-rules");
             args.push(appendRule);
           }
         }
 
         if (this.cfnSettings.cfnLintOverrideSpecPath !== "") {
-          args.push('--override-spec', this.cfnSettings.cfnLintOverrideSpecPath);
+          args.push(
+            "--override-spec",
+            this.cfnSettings.cfnLintOverrideSpecPath
+          );
         }
 
-        args.push('--', `"${fileToLint}"`);
+        args.push("--", `"${fileToLint}"`);
 
-        this.cfnConnection.console.log(`Running... ${this.cfnSettings.cfnLintPath} ${args}`);
+        this.cfnConnection.console.log(
+          `Running... ${this.cfnSettings.cfnLintPath} ${args}`
+        );
 
         const cfnLint = new CfnLint(this.cfnSettings.cfnLintPath, args);
         const cfnLintExec = cfnLint.exec();
-        cfnLintExec.then(value => {
-          this.cfnConnection.sendDiagnostics({ uri: uri.toString(), diagnostics: value });
+        cfnLintExec.then((value) => {
+          this.cfnConnection.sendDiagnostics({
+            uri: uri.toString(),
+            diagnostics: value,
+          });
           if (this.cfnSettings.isPreviewing[uri]) {
-            this.cfnConnection.console.log('preview file is available');
-            this.cfnConnection.sendNotification('cfn/previewIsAvailable', uri);
+            this.cfnConnection.console.log("preview file is available");
+            this.cfnConnection.sendNotification("cfn/previewIsAvailable", uri);
           }
           resolve(value);
         });
-        cfnLintExec.catch(value => {
-          this.cfnConnection.sendDiagnostics({ uri: uri.toString(), diagnostics: value });
+        cfnLintExec.catch((value) => {
+          this.cfnConnection.sendDiagnostics({
+            uri: uri.toString(),
+            diagnostics: value,
+          });
           if (this.cfnSettings.isPreviewing[uri]) {
-            this.cfnConnection.console.log('preview file is available');
-            this.cfnConnection.sendNotification('cfn/previewIsAvailable', uri);
+            this.cfnConnection.console.log("preview file is available");
+            this.cfnConnection.sendNotification("cfn/previewIsAvailable", uri);
           }
           resolve(value);
         });
-
-      }
-      else {
+      } else {
         const message = `Don't believe this is a CloudFormation template. ${uri.toString()}. If it is please add AWSTemplateFormatVersion: '2010-09-09' (YAML) or "AWSTemplateFormatVersion": "2010-09-09" (JSON) into the root level of the document.`;
         this.cfnConnection.console.log(message);
         reject(message);

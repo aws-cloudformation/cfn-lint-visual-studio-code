@@ -14,13 +14,16 @@ express or implied. See the License for the specific language governing
 permissions and limitations under the License.
 */
 
-import { NotificationType } from 'vscode-languageserver';
+import { NotificationType } from "vscode-languageserver";
 
 export namespace RequestPreview {
-	export const type: NotificationType<{}> = new NotificationType('cfn/requestPreview');
+  export const type: NotificationType<{}> = new NotificationType(
+    "cfn/requestPreview"
+  );
 }
 
 export namespace PreviewClosed {
-	export const type: NotificationType<{}> = new NotificationType('cfn/previewClosed');
+  export const type: NotificationType<{}> = new NotificationType(
+    "cfn/previewClosed"
+  );
 }
-

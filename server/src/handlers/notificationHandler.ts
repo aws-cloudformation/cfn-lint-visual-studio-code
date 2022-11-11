@@ -13,13 +13,10 @@ on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
 express or implied. See the License for the specific language governing
 permissions and limitations under the License.
 */
-import { Connection } from 'vscode-languageserver';
-import {
-  RequestPreview, PreviewClosed
-} from '../requestTypes';
-import { SettingsState } from '../cfnSettings';
-import { ValidationHandler } from './validationHandler';
-
+import { Connection } from "vscode-languageserver";
+import { RequestPreview, PreviewClosed } from "../requestTypes";
+import { SettingsState } from "../cfnSettings";
+import { ValidationHandler } from "./validationHandler";
 
 // code adopted from https://github.com/redhat-developer/yaml-language-server/blob/main/src/languageserver/handlers/notificationHandlers.ts
 export class NotificationHandler {
@@ -36,18 +33,24 @@ export class NotificationHandler {
   }
 
   public registerHandlers(): void {
-	this.connection.onNotification(RequestPreview.type, (uri: string) => this.requestPreview(uri));
-	this.connection.onNotification(PreviewClosed.type, (uri: string) => this.previewClosed(uri));
+    this.connection.onNotification(RequestPreview.type, (uri: string) =>
+      this.requestPreview(uri)
+    );
+    this.connection.onNotification(PreviewClosed.type, (uri: string) =>
+      this.previewClosed(uri)
+    );
   }
 
   private requestPreview(uri: string): void {
-	this.connection.console.log('preview requested: ' + uri);
-	this.cfnSettings.isPreviewing[uri] = true;
-	this.validationHandler.validateTextDocument(this.cfnSettings.documents.get(uri));
+    this.connection.console.log("preview requested: " + uri);
+    this.cfnSettings.isPreviewing[uri] = true;
+    this.validationHandler.validateTextDocument(
+      this.cfnSettings.documents.get(uri)
+    );
   }
 
   private previewClosed(uri: string): void {
-	this.connection.console.log('preview closed: ' + uri);
-	this.cfnSettings.isPreviewing[uri] = false;
+    this.connection.console.log("preview closed: " + uri);
+    this.cfnSettings.isPreviewing[uri] = false;
   }
 }
