@@ -87,61 +87,60 @@ export class LanguageHandlers extends YamlLanguageHandlers {
 
     let [node, template] = this.getNode(textDocument, textDocumentPosition);
 
+    function addResources(prefix: string) {
+      template.resources.forEach((value: string, key: string) => {
+        const markedDownString = new MarkdownString();
+        markedDownString.appendCodeblock("", `(Resource): ${value}`);
+        results.items.push({
+          kind: 12,
+          insertTextFormat: 2,
+          insertText: `${prefix}${key}`,
+          label: `${prefix}${key}`,
+          documentation: markedDownString.toMarkupContent(),
+        });
+      });
+    }
+
+    function addParameters(prefix: string) {
+      template.parameters.forEach((value: string, key: string) => {
+        const markedDownString = new MarkdownString();
+        markedDownString.appendCodeblock("", `(Parameter): ${value}`);
+        results.items.push({
+          kind: 12,
+          insertTextFormat: 2,
+          insertText: `${prefix}${key}`,
+          label: `${prefix}${key}`,
+          documentation: markedDownString.toMarkupContent(),
+        });
+      });
+    }
+
     if (node !== null && template !== null) {
       if (isNode(node.internalNode)) {
-        if (node.internalNode.tag !== undefined) {
+        if (node.internalNode.tag === undefined) {
+          if (node.parent !== undefined) {
+            if (isPair(node.parent.internalNode)) {
+              if (isScalar(node.parent.internalNode.key)) {
+                if (node.parent.internalNode.key.value === "Ref") {
+                  addResources("");
+                  addParameters("");
+                }
+              }
+            }
+          }
+        } else if (node.internalNode.tag !== undefined) {
           if (node.internalNode.tag === "!Ref") {
             results.items = results.items.filter(
               (item) => item.insertText !== "!Ref "
             );
-            template.resources.forEach((value: string, key: string) => {
-              const markedDownString = new MarkdownString();
-              markedDownString.appendCodeblock("", `(Resource): ${value}`);
-              results.items.push({
-                kind: 12,
-                insertTextFormat: 2,
-                insertText: key,
-                label: key,
-                documentation: markedDownString.toMarkupContent(),
-              });
-            });
-            template.parameters.forEach((value: string, key: string) => {
-              const markedDownString = new MarkdownString();
-              markedDownString.appendCodeblock("", `(Parameter): ${value}`);
-              results.items.push({
-                kind: 12,
-                insertTextFormat: 2,
-                insertText: key,
-                label: key,
-                documentation: markedDownString.toMarkupContent(),
-              });
-            });
+            addResources("");
+            addParameters("");
           } else if ("!Ref".startsWith(node.internalNode.tag)) {
             results.items = results.items.filter(
               (item) => item.insertText !== "!Ref "
             );
-            template.resources.forEach((value: string, key: string) => {
-              const markedDownString = new MarkdownString();
-              markedDownString.appendCodeblock("", `(Resource): ${value}`);
-              results.items.push({
-                kind: 12,
-                insertTextFormat: 2,
-                insertText: `!Ref ${key}`,
-                label: `!Ref ${key}`,
-                documentation: markedDownString.toMarkupContent(),
-              });
-            });
-            template.parameters.forEach((value: string, key: string) => {
-              const markedDownString = new MarkdownString();
-              markedDownString.appendCodeblock("", `(Parameter): ${value}`);
-              results.items.push({
-                kind: 12,
-                insertTextFormat: 2,
-                insertText: `!Ref ${key}`,
-                label: `!Ref ${key}`,
-                documentation: markedDownString.toMarkupContent(),
-              });
-            });
+            addResources("!Ref ");
+            addParameters("!Ref ");
           }
         }
       }
@@ -202,30 +201,36 @@ export class LanguageHandlers extends YamlLanguageHandlers {
 
     const markedDownString = new MarkdownString();
 
+    function updateHover(
+      map: Map<string, string>,
+      type: string,
+      nodeValue: string | number | boolean
+    ) {
+      map.forEach((value: string, key: string) => {
+        if (key === nodeValue) {
+          markedDownString.appendCodeblock("", `(${type}) ${key}: ${value}`);
+          results.contents = markedDownString.toMarkupContent();
+        }
+      });
+    }
+
     if (node !== null && template !== null) {
       if (isNode(node.internalNode)) {
-        if (node.internalNode.tag !== undefined) {
+        if (node.internalNode.tag === undefined) {
+          if (node.parent !== undefined) {
+            if (isPair(node.parent.internalNode)) {
+              if (isScalar(node.parent.internalNode.key)) {
+                if (node.parent.internalNode.key.value === "Ref") {
+                  updateHover(template.resources, "Resource", node.value);
+                  updateHover(template.parameters, "Parameter", node.value);
+                }
+              }
+            }
+          }
+        } else if (node.internalNode.tag !== undefined) {
           if (node.internalNode.tag === "!Ref") {
-            template.resources.forEach((value: string, key: string) => {
-              if (key === node.value) {
-                markedDownString.appendCodeblock(
-                  "",
-                  `(Resource) ${key}: ${value}`
-                );
-                results.contents = markedDownString.toMarkupContent();
-              }
-              console.log(value);
-            });
-            template.parameters.forEach((value: string, key: string) => {
-              if (key === node.value) {
-                markedDownString.appendCodeblock(
-                  "",
-                  `(Parameter) ${key}: ${value}`
-                );
-                results.contents = markedDownString.toMarkupContent();
-              }
-              console.log(value);
-            });
+            updateHover(template.resources, "Resource", node.value);
+            updateHover(template.parameters, "Parameter", node.value);
           }
         }
       }
@@ -255,21 +260,19 @@ export class LanguageHandlers extends YamlLanguageHandlers {
       Object.entries(doc.documents[0].root.children).forEach(([_, value]) => {
         if (isPair(value.internalNode)) {
           if (isScalar(value.internalNode.key)) {
-            switch(value.internalNode.key.value) {
+            switch (value.internalNode.key.value) {
               case "Resources": {
                 if (isMap(value.internalNode.value)) {
                   for (let idx in value.internalNode.value.items) {
                     const resource = value.internalNode.value.items[idx];
                     if (isPair(resource)) {
                       if (isMap(resource.value)) {
-                        const type = resource.value.items.filter(
-                          (item) => {
-                            if (isScalar(item.key)) {
-                              return item.key.value === "Type"
-                            }
-                            return false;
+                        const type = resource.value.items.filter((item) => {
+                          if (isScalar(item.key)) {
+                            return item.key.value === "Type";
                           }
-                        );
+                          return false;
+                        });
                         if (type.length === 1) {
                           if (isScalar(resource.key) && isPair(type[0])) {
                             if (typeof resource.key.value === "string") {
@@ -296,14 +299,12 @@ export class LanguageHandlers extends YamlLanguageHandlers {
                     const parameter = value.internalNode.value.items[idx];
                     if (isPair(parameter)) {
                       if (isMap(parameter.value)) {
-                        const type = parameter.value.items.filter(
-                          (item) => {
-                            if (isScalar(item.key)) {
-                              return item.key.value === "Type"
-                            }
-                            return false;
+                        const type = parameter.value.items.filter((item) => {
+                          if (isScalar(item.key)) {
+                            return item.key.value === "Type";
                           }
-                        );
+                          return false;
+                        });
                         if (type.length === 1) {
                           if (isScalar(parameter.key) && isPair(type[0])) {
                             if (typeof parameter.key.value === "string") {

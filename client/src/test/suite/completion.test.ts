@@ -133,9 +133,11 @@ suite("Should code complete", () => {
     const docUri = getDocUri("completion", "completion2.yaml");
     await activate(docUri);
 
-    const completion_intrinsics = intrinsics.filter((intrinsic) => intrinsic.label !== "!Ref")
+    const completion_intrinsics = intrinsics.filter(
+      (intrinsic) => intrinsic.label !== "!Ref"
+    );
 
-    await testCompletion(docUri, new vscode.Position(16, 19), {
+    await testCompletion(docUri, new vscode.Position(17, 19), {
       items: [
         ...completion_intrinsics,
         {
@@ -166,9 +168,11 @@ suite("Should code complete", () => {
     const docUri = getDocUri("completion", "completion2.yaml");
     await activate(docUri);
 
-    const completion_intrinsics = intrinsics.filter((intrinsic) => intrinsic.label !== "!Ref")
+    const completion_intrinsics = intrinsics.filter(
+      (intrinsic) => intrinsic.label !== "!Ref"
+    );
 
-    await testCompletion(docUri, new vscode.Position(20, 22), {
+    await testCompletion(docUri, new vscode.Position(21, 22), {
       items: [
         ...completion_intrinsics,
         {
