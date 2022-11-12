@@ -24,17 +24,12 @@ import { SettingsState } from "../cfnSettings";
 import { ValidationHandler } from "./validationHandler";
 import { LanguageHandlers as YamlLanguageHandlers } from "yaml-language-server/out/server/src/languageserver/handlers/languageHandlers";
 import { isYaml } from "./helpers";
-import { yamlDocumentsCache } from "yaml-language-server/out/server/src/languageservice/parser/yaml-documents";
-import { matchOffsetToDocument } from "yaml-language-server/out/server/src/languageservice/utils/arrUtils";
-import { isNode, isPair, isScalar, isMap } from "yaml";
-import { TextDocument } from "vscode-languageserver-textdocument";
-import { ASTNode } from "yaml-language-server/out/server/src/languageservice/jsonASTTypes";
-import { MarkdownString } from "../utils/markdownString";
-
-interface CfnTypes {
-  parameters: Map<string, string>;
-  resources: Map<string, string>;
-}
+import { isNode, isPair, isScalar } from "yaml";
+import { CfnType, getNode, TypeInfoImpl } from "../utils/cfnParser";
+import {
+  PropertyASTNodeImpl,
+  StringASTNodeImpl,
+} from "yaml-language-server/out/server/src/languageservice/parser/jsonParser07";
 
 // code adopted from https://github.com/redhat-developer/yaml-language-server/blob/main/src/languageserver/handlers/languageHandlers.ts
 export class LanguageHandlers extends YamlLanguageHandlers {
@@ -85,65 +80,65 @@ export class LanguageHandlers extends YamlLanguageHandlers {
       false
     );
 
-    let [node, template] = this.getNode(textDocument, textDocumentPosition);
+    let [node, template] = getNode(textDocument, textDocumentPosition);
 
     function addResources(prefix: string) {
-      template.resources.forEach((value: string, key: string) => {
-        const markedDownString = new MarkdownString();
-        markedDownString.appendCodeblock("", `(Resource): ${value}`);
+      template.resources.forEach((value: TypeInfoImpl, key: string) => {
         results.items.push({
           kind: 12,
           insertTextFormat: 2,
           insertText: `${prefix}${key}`,
           label: `${prefix}${key}`,
-          documentation: markedDownString.toMarkupContent(),
+          documentation: value.toMarkupContent("Resource", "key"),
         });
       });
     }
 
     function addParameters(prefix: string) {
-      template.parameters.forEach((value: string, key: string) => {
-        const markedDownString = new MarkdownString();
-        markedDownString.appendCodeblock("", `(Parameter): ${value}`);
+      template.parameters.forEach((value: TypeInfoImpl, key: string) => {
         results.items.push({
           kind: 12,
           insertTextFormat: 2,
           insertText: `${prefix}${key}`,
           label: `${prefix}${key}`,
-          documentation: markedDownString.toMarkupContent(),
+          documentation: value.toMarkupContent("Parameter", "key"),
         });
       });
     }
 
-    if (node !== null && template !== null) {
-      if (isNode(node.internalNode)) {
-        if (node.internalNode.tag === undefined) {
-          if (node.parent !== undefined) {
-            if (isPair(node.parent.internalNode)) {
-              if (isScalar(node.parent.internalNode.key)) {
-                if (node.parent.internalNode.key.value === "Ref") {
-                  addResources("");
-                  addParameters("");
+    try {
+      if (node !== null && template !== null) {
+        if (isNode(node.internalNode)) {
+          if (node.internalNode.tag === undefined) {
+            if (node.parent !== undefined) {
+              if (isPair(node.parent.internalNode)) {
+                if (isScalar(node.parent.internalNode.key)) {
+                  if (node.parent.internalNode.key.value === "Ref") {
+                    addResources("");
+                    addParameters("");
+                  }
                 }
               }
             }
-          }
-        } else if (node.internalNode.tag !== undefined) {
-          if (node.internalNode.tag === "!Ref") {
-            results.items = results.items.filter(
-              (item) => item.insertText !== "!Ref "
-            );
-            addResources("");
-            addParameters("");
-          } else if ("!Ref".startsWith(node.internalNode.tag)) {
-            results.items = results.items.filter(
-              (item) => item.insertText !== "!Ref "
-            );
-            addResources("!Ref ");
-            addParameters("!Ref ");
+          } else if (node.internalNode.tag !== undefined) {
+            if (node.internalNode.tag === "!Ref") {
+              results.items = results.items.filter(
+                (item) => item.insertText !== "!Ref "
+              );
+              addResources("");
+              addParameters("");
+            } else if ("!Ref".startsWith(node.internalNode.tag)) {
+              results.items = results.items.filter(
+                (item) => item.insertText !== "!Ref "
+              );
+              addResources("!Ref ");
+              addParameters("!Ref ");
+            }
           }
         }
       }
+    } catch (error) {
+      console.debug(error);
     }
 
     return results;
@@ -197,144 +192,38 @@ export class LanguageHandlers extends YamlLanguageHandlers {
       textDocumentPositionParams.position
     );
 
-    let [node, template] = this.getNode(document, textDocumentPositionParams);
+    let [node, template] = getNode(document, textDocumentPositionParams);
 
-    const markedDownString = new MarkdownString();
-
-    function updateHover(
-      map: Map<string, string>,
-      type: string,
-      nodeValue: string | number | boolean
-    ) {
-      map.forEach((value: string, key: string) => {
-        if (key === nodeValue) {
-          markedDownString.appendCodeblock("", `(${type}) ${key}: ${value}`);
-          results.contents = markedDownString.toMarkupContent();
-        }
-      });
-    }
-
-    if (node !== null && template !== null) {
-      if (isNode(node.internalNode)) {
-        if (node.internalNode.tag === undefined) {
-          if (node.parent !== undefined) {
-            if (isPair(node.parent.internalNode)) {
-              if (isScalar(node.parent.internalNode.key)) {
-                if (node.parent.internalNode.key.value === "Ref") {
-                  updateHover(template.resources, "Resource", node.value);
-                  updateHover(template.parameters, "Parameter", node.value);
-                }
-              }
-            }
-          }
-        } else if (node.internalNode.tag !== undefined) {
-          if (node.internalNode.tag === "!Ref") {
-            updateHover(template.resources, "Resource", node.value);
-            updateHover(template.parameters, "Parameter", node.value);
-          }
-        }
+    function updateHover(map: CfnType, nodeValue: string) {
+      if (map.has(nodeValue)) {
+        results.contents = map.getKeyMarkupContent(nodeValue);
       }
     }
 
-    return results;
-  }
-
-  private getNode(
-    document: TextDocument,
-    position: TextDocumentPositionParams
-  ): [ASTNode, CfnTypes] | null {
-    let cfnTypes: CfnTypes = {
-      parameters: new Map<string, string>(),
-      resources: new Map<string, string>(),
-    };
-
-    const doc = yamlDocumentsCache.getYamlDocument(document);
-
-    // Build resource types
     try {
-      const offset = document.offsetAt(position.position);
-      const currentDoc = matchOffsetToDocument(offset, doc);
-      const currentDocIndex = doc.documents.indexOf(currentDoc);
-      currentDoc.currentDocIndex = currentDocIndex;
-
-      Object.entries(doc.documents[0].root.children).forEach(([_, value]) => {
-        if (isPair(value.internalNode)) {
-          if (isScalar(value.internalNode.key)) {
-            switch (value.internalNode.key.value) {
-              case "Resources": {
-                if (isMap(value.internalNode.value)) {
-                  for (let idx in value.internalNode.value.items) {
-                    const resource = value.internalNode.value.items[idx];
-                    if (isPair(resource)) {
-                      if (isMap(resource.value)) {
-                        const type = resource.value.items.filter((item) => {
-                          if (isScalar(item.key)) {
-                            return item.key.value === "Type";
-                          }
-                          return false;
-                        });
-                        if (type.length === 1) {
-                          if (isScalar(resource.key) && isPair(type[0])) {
-                            if (typeof resource.key.value === "string") {
-                              if (isScalar(type[0].value)) {
-                                if (typeof type[0].value.value === "string") {
-                                  cfnTypes.resources.set(
-                                    resource.key.value,
-                                    type[0].value.value
-                                  );
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-                break;
-              }
-              case "Parameters": {
-                if (isMap(value.internalNode.value)) {
-                  for (let idx in value.internalNode.value.items) {
-                    const parameter = value.internalNode.value.items[idx];
-                    if (isPair(parameter)) {
-                      if (isMap(parameter.value)) {
-                        const type = parameter.value.items.filter((item) => {
-                          if (isScalar(item.key)) {
-                            return item.key.value === "Type";
-                          }
-                          return false;
-                        });
-                        if (type.length === 1) {
-                          if (isScalar(parameter.key) && isPair(type[0])) {
-                            if (typeof parameter.key.value === "string") {
-                              if (isScalar(type[0].value)) {
-                                if (typeof type[0].value.value === "string") {
-                                  cfnTypes.parameters.set(
-                                    parameter.key.value,
-                                    type[0].value.value
-                                  );
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-                break;
+      if (node !== null && template !== null) {
+        if (node instanceof StringASTNodeImpl) {
+          const parent = node.parent;
+          if (parent instanceof PropertyASTNodeImpl) {
+            if (parent.keyNode.value === "Ref") {
+              updateHover(template.resources, node.value);
+              updateHover(template.parameters, node.value);
+            }
+          }
+          if (isNode(node.internalNode)) {
+            if (node.internalNode.tag !== undefined) {
+              if (node.internalNode.tag === "!Ref") {
+                updateHover(template.resources, node.value);
+                updateHover(template.parameters, node.value);
               }
             }
           }
         }
-      });
-
-      return [currentDoc.getNodeFromOffset(offset), cfnTypes];
+      }
     } catch (error) {
       console.debug(error);
     }
 
-    return [null, null];
+    return results;
   }
 }
