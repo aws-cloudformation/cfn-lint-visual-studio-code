@@ -18,12 +18,18 @@ import {
   TextDocumentPositionParams,
   DocumentFormattingParams,
 } from "vscode-languageserver-protocol";
-import { CompletionList, TextEdit } from "vscode-languageserver-types";
+import { CompletionList, TextEdit, Hover } from "vscode-languageserver-types";
 import { LanguageService } from "yaml-language-server";
 import { SettingsState } from "../cfnSettings";
 import { ValidationHandler } from "./validationHandler";
 import { LanguageHandlers as YamlLanguageHandlers } from "yaml-language-server/out/server/src/languageserver/handlers/languageHandlers";
 import { isYaml } from "./helpers";
+import { isNode, isPair, isScalar } from "yaml";
+import { CfnType, getNode, TypeInfoImpl } from "../utils/cfnParser";
+import {
+  PropertyASTNodeImpl,
+  StringASTNodeImpl,
+} from "yaml-language-server/out/server/src/languageservice/parser/jsonParser07";
 
 // code adopted from https://github.com/redhat-developer/yaml-language-server/blob/main/src/languageserver/handlers/languageHandlers.ts
 export class LanguageHandlers extends YamlLanguageHandlers {
@@ -52,7 +58,7 @@ export class LanguageHandlers extends YamlLanguageHandlers {
    * Called when auto-complete is triggered in an editor
    * Returns a list of valid completion items
    */
-  completionHandler(
+  async completionHandler(
     textDocumentPosition: TextDocumentPositionParams
   ): Promise<CompletionList> {
     const textDocument = this.cfnSettings.documents.get(
@@ -68,11 +74,74 @@ export class LanguageHandlers extends YamlLanguageHandlers {
       return Promise.resolve(result);
     }
 
-    return this.cfnLanguageService.doComplete(
+    const results = await this.cfnLanguageService.doComplete(
       textDocument,
       textDocumentPosition.position,
       false
     );
+
+    let [node, template] = getNode(textDocument, textDocumentPosition);
+
+    function addResources(prefix: string) {
+      template.resources.forEach((value: TypeInfoImpl, key: string) => {
+        results.items.push({
+          kind: 12,
+          insertTextFormat: 2,
+          insertText: `${prefix}${key}`,
+          label: `${prefix}${key}`,
+          documentation: value.toMarkupContent("Resource", "key"),
+        });
+      });
+    }
+
+    function addParameters(prefix: string) {
+      template.parameters.forEach((value: TypeInfoImpl, key: string) => {
+        results.items.push({
+          kind: 12,
+          insertTextFormat: 2,
+          insertText: `${prefix}${key}`,
+          label: `${prefix}${key}`,
+          documentation: value.toMarkupContent("Parameter", "key"),
+        });
+      });
+    }
+
+    try {
+      if (node !== null && template !== null) {
+        if (isNode(node.internalNode)) {
+          if (node.internalNode.tag === undefined) {
+            if (node.parent !== undefined) {
+              if (isPair(node.parent.internalNode)) {
+                if (isScalar(node.parent.internalNode.key)) {
+                  if (node.parent.internalNode.key.value === "Ref") {
+                    addResources("");
+                    addParameters("");
+                  }
+                }
+              }
+            }
+          } else if (node.internalNode.tag !== undefined) {
+            if (node.internalNode.tag === "!Ref") {
+              results.items = results.items.filter(
+                (item) => item.insertText !== "!Ref "
+              );
+              addResources("");
+              addParameters("");
+            } else if ("!Ref".startsWith(node.internalNode.tag)) {
+              results.items = results.items.filter(
+                (item) => item.insertText !== "!Ref "
+              );
+              addResources("!Ref ");
+              addParameters("!Ref ");
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.debug(error);
+    }
+
+    return results;
   }
 
   /**
@@ -101,5 +170,60 @@ export class LanguageHandlers extends YamlLanguageHandlers {
     };
 
     return this.cfnLanguageService.doFormat(document, customFormatterSettings);
+  }
+
+  /**
+   * Called when the user hovers with their mouse over a keyword
+   * Returns an informational tooltip
+   */
+  async hoverHandler(
+    textDocumentPositionParams: TextDocumentPositionParams
+  ): Promise<Hover> {
+    const document = this.cfnSettings.documents.get(
+      textDocumentPositionParams.textDocument.uri
+    );
+
+    if (!document) {
+      return Promise.resolve(undefined);
+    }
+
+    const results = await this.cfnLanguageService.doHover(
+      document,
+      textDocumentPositionParams.position
+    );
+
+    let [node, template] = getNode(document, textDocumentPositionParams);
+
+    function updateHover(map: CfnType, nodeValue: string) {
+      if (map.has(nodeValue)) {
+        results.contents = map.getKeyMarkupContent(nodeValue);
+      }
+    }
+
+    try {
+      if (node !== null && template !== null) {
+        if (node instanceof StringASTNodeImpl) {
+          const parent = node.parent;
+          if (parent instanceof PropertyASTNodeImpl) {
+            if (parent.keyNode.value === "Ref") {
+              updateHover(template.resources, node.value);
+              updateHover(template.parameters, node.value);
+            }
+          }
+          if (isNode(node.internalNode)) {
+            if (node.internalNode.tag !== undefined) {
+              if (node.internalNode.tag === "!Ref") {
+                updateHover(template.resources, node.value);
+                updateHover(template.parameters, node.value);
+              }
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.debug(error);
+    }
+
+    return results;
   }
 }
