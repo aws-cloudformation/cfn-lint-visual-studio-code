@@ -32,15 +32,15 @@ class refExp {
   }
   identify?: (value: unknown) => boolean;
   resolve(value: string | YAMLMap | YAMLSeq): string | YAMLMap | YAMLSeq {
-	const map = new YAMLMap()
-	map.add({key: "Ref", value: value})
-	return map
+    const map = new YAMLMap();
+    map.add({ key: "Ref", value: value });
+    return map;
   }
 }
 
 declare module "yaml-language-server/out/server/src/languageservice/parser/yamlParser07" {}
 
-module.exports.parse = function(
+module.exports.parse = function (
   text: string,
   parserOptions: ParserOptions = defaultOptions,
   document?: TextDocument
@@ -73,7 +73,7 @@ module.exports.parse = function(
 
   // Consolidate the SingleYAMLDocs
   return new YAMLDocument(yamlDocs, tokensArr);
-}
+};
 
 function parsedDocToSingleYAMLDocument(
   parsedDoc: Document,

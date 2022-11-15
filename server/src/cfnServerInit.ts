@@ -98,7 +98,10 @@ export class CfnServerInit {
         }
         let schema: JSONSchema;
         schema = data as JSONSchema;
-        this.languageService.addSchema("https://aws.amazon.com/cloudformation/template/base", schema);
+        this.languageService.addSchema(
+          "https://aws.amazon.com/cloudformation/template/base",
+          schema
+        );
       }
     );
 
@@ -111,7 +114,10 @@ export class CfnServerInit {
         }
         let schema: JSONSchema;
         schema = data as JSONSchema;
-        this.languageService.addSchema("https://aws.amazon.com/cloudformation/template/mappings", schema);
+        this.languageService.addSchema(
+          "https://aws.amazon.com/cloudformation/template/mappings",
+          schema
+        );
       }
     );
 
@@ -124,7 +130,10 @@ export class CfnServerInit {
         }
         let schema: JSONSchema;
         schema = data as JSONSchema;
-        this.languageService.addSchema("https://aws.amazon.com/cloudformation/template/resource.attributes", schema);
+        this.languageService.addSchema(
+          "https://aws.amazon.com/cloudformation/template/resource.attributes",
+          schema
+        );
       }
     );
 
