@@ -189,7 +189,7 @@ export class LanguageHandlers extends YamlLanguageHandlers {
     }
 
     let hover: Hover = {
-      contents: (new MarkdownString()).toMarkupContent()
+      contents: new MarkdownString().toMarkupContent(),
     };
 
     let results = await this.cfnLanguageService.doHover(

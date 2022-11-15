@@ -83,7 +83,9 @@ export function getNode(
           if (visit.valueNode instanceof ObjectASTNodeImpl) {
             filteredSections.set(visit.keyNode.value, visit.valueNode);
           }
-        } else if (["AWSTemplateFormatVersion"].indexOf(visit.keyNode.value) > -1) {
+        } else if (
+          ["AWSTemplateFormatVersion"].indexOf(visit.keyNode.value) > -1
+        ) {
           if (visit.valueNode instanceof StringASTNodeImpl) {
             cfnTypes.formatVersion = visit.valueNode.value;
           }

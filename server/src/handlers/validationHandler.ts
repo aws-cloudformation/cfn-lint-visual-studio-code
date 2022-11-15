@@ -115,11 +115,18 @@ export class ValidationHandler extends YamlValidationHandler {
 
     let fileToLint = URI.parse(uri).fsPath;
 
-    let [_, template] = getNode(document, {textDocument: document, position: {
-      line: 0, character: 0,
-    }});
+    let [_, template] = getNode(document, {
+      textDocument: document,
+      position: {
+        line: 0,
+        character: 0,
+      },
+    });
 
-    this.cfnConnection.sendNotification("cfn/isPreviewable", template.isValidTemplate);
+    this.cfnConnection.sendNotification(
+      "cfn/isPreviewable",
+      template.isValidTemplate
+    );
 
     let buildGraph = this.cfnSettings.isPreviewing[uri];
 
