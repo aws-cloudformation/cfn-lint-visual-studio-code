@@ -37,6 +37,8 @@ export class CfnType extends Map<string, TypeInfo> {
 }
 
 export interface CfnTypes {
+  isValidTemplate: boolean; // stores if this a CFN template
+  formatVersion: string | undefined;
   parameters: CfnType;
   resources: CfnType;
 }
@@ -58,6 +60,8 @@ export function getNode(
   position: TextDocumentPositionParams
 ): [ASTNode, CfnTypes] | null {
   let cfnTypes: CfnTypes = {
+    isValidTemplate: false,
+    formatVersion: undefined,
     parameters: new CfnType("Parameter"),
     resources: new CfnType("Resource"),
   };
@@ -78,6 +82,12 @@ export function getNode(
         if (["Resources", "Parameters"].indexOf(visit.keyNode.value) > -1) {
           if (visit.valueNode instanceof ObjectASTNodeImpl) {
             filteredSections.set(visit.keyNode.value, visit.valueNode);
+          }
+        } else if (
+          ["AWSTemplateFormatVersion"].indexOf(visit.keyNode.value) > -1
+        ) {
+          if (visit.valueNode instanceof StringASTNodeImpl) {
+            cfnTypes.formatVersion = visit.valueNode.value;
           }
         }
       });
@@ -100,6 +110,10 @@ export function getNode(
           cfnTypes.parameters.set(parameter.keyNode.value, new TypeInfo(type));
         }
       });
+    }
+
+    if (cfnTypes.resources.size > 0 || cfnTypes.formatVersion !== undefined) {
+      cfnTypes.isValidTemplate = true;
     }
     return [currentDoc.getNodeFromOffset(offset), cfnTypes];
   } catch (error) {

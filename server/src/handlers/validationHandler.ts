@@ -23,7 +23,7 @@ import { CfnLint } from "../services/cfnlint";
 import { Diagnostic } from "vscode-languageserver-types";
 import { LanguageService } from "yaml-language-server";
 import { ValidationHandler as YamlValidationHandler } from "yaml-language-server/out/server/src/languageserver/handlers/validationHandlers";
-import { isCloudFormation } from "./helpers";
+import { getNode } from "../utils/cfnParser";
 
 // code adopted from https://github.com/redhat-developer/yaml-language-server/blob/main/src/languageserver/handlers/validationHandlers.ts
 export class ValidationHandler extends YamlValidationHandler {
@@ -115,18 +115,23 @@ export class ValidationHandler extends YamlValidationHandler {
 
     let fileToLint = URI.parse(uri).fsPath;
 
-    let isCfn = isCloudFormation(
-      document.getText(),
-      uri.toString(),
-      this.cfnConnection
-    );
+    let [_, template] = getNode(document, {
+      textDocument: document,
+      position: {
+        line: 0,
+        character: 0,
+      },
+    });
 
-    this.cfnConnection.sendNotification("cfn/isPreviewable", isCfn);
+    this.cfnConnection.sendNotification(
+      "cfn/isPreviewable",
+      template.isValidTemplate
+    );
 
     let buildGraph = this.cfnSettings.isPreviewing[uri];
 
     return new Promise<Diagnostic[]>((resolve, reject) => {
-      if (isCfn) {
+      if (template.isValidTemplate) {
         if (
           this.cfnSettings.cfnLintPath.includes(" --registry-schemas ") ||
           this.cfnSettings.cfnLintPath.includes(" -s ")

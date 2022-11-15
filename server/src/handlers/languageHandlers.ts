@@ -30,6 +30,7 @@ import {
   PropertyASTNodeImpl,
   StringASTNodeImpl,
 } from "yaml-language-server/out/server/src/languageservice/parser/jsonParser07";
+import { MarkdownString } from "../utils/markdownString";
 
 // code adopted from https://github.com/redhat-developer/yaml-language-server/blob/main/src/languageserver/handlers/languageHandlers.ts
 export class LanguageHandlers extends YamlLanguageHandlers {
@@ -187,16 +188,24 @@ export class LanguageHandlers extends YamlLanguageHandlers {
       return Promise.resolve(undefined);
     }
 
-    const results = await this.cfnLanguageService.doHover(
+    let hover: Hover = {
+      contents: new MarkdownString().toMarkupContent(),
+    };
+
+    let results = await this.cfnLanguageService.doHover(
       document,
       textDocumentPositionParams.position
     );
+
+    if (results !== null) {
+      hover = results;
+    }
 
     let [node, template] = getNode(document, textDocumentPositionParams);
 
     function updateHover(map: CfnType, nodeValue: string) {
       if (map.has(nodeValue)) {
-        results.contents = map.getKeyMarkupContent(nodeValue);
+        hover.contents = map.getKeyMarkupContent(nodeValue);
       }
     }
 
@@ -224,6 +233,6 @@ export class LanguageHandlers extends YamlLanguageHandlers {
       console.debug(error);
     }
 
-    return results;
+    return hover;
   }
 }
