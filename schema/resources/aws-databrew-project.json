@@ -1,34 +1,136 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://aws.amazon.com/cloudformation/resources/AWS_DataBrew_Project.json",
-  "title": "",
-  "description": "CFN JSON specification generated from version 68.1.0",
-  "type": "object",
+  "typeName": "AWS::DataBrew::Project",
+  "description": "Resource schema for AWS::DataBrew::Project.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-databrew.git",
+  "taggable": true,
+  "properties": {
+    "DatasetName": {
+      "description": "Dataset name",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "Name": {
+      "description": "Project name",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "RecipeName": {
+      "description": "Recipe name",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "RoleArn": {
+      "description": "Role arn",
+      "type": "string"
+    },
+    "Sample": {
+      "description": "Sample",
+      "$ref": "#/definitions/Sample"
+    },
+    "Tags": {
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
   "definitions": {
-    "AWS_DataBrew_Project": {
+    "Sample": {
       "type": "object",
-      "description": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-databrew-project.html",
-      "allOf": [
-        {
-          "type": "object",
-          "properties": {
-            "Type": {
-              "description": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-databrew-project.html",
-              "type": "string",
-              "enum": ["AWS::DataBrew::Project"]
-            },
-            "Properties": {
-              "$ref": "properties/aws-databrew-project.json"
-            }
-          },
-          "required": ["Type"]
+      "properties": {
+        "Size": {
+          "description": "Sample size",
+          "minimum": 1,
+          "type": "integer"
         },
-        {
-          "$ref": "attributes.schema.json#/definitions/ResourceAttributes"
+        "Type": {
+          "description": "Sample type",
+          "enum": [
+            "FIRST_N",
+            "LAST_N",
+            "RANDOM"
+          ],
+          "type": "string"
         }
-      ],
-
-      "additionalProperties": false
+      },
+      "additionalProperties": false,
+      "required": [
+        "Type"
+      ]
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 256
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Value",
+        "Key"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "DatasetName",
+    "Name",
+    "RecipeName",
+    "RoleArn"
+  ],
+  "primaryIdentifier": [
+    "/properties/Name"
+  ],
+  "createOnlyProperties": [
+    "/properties/Name",
+    "/properties/Tags"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "databrew:CreateProject",
+        "databrew:TagResource",
+        "databrew:UntagResource",
+        "iam:PassRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "databrew:DescribeProject",
+        "databrew:ListTagsForResource",
+        "iam:ListRoles"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "databrew:UpdateProject"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "databrew:DeleteProject"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "databrew:ListProjects",
+        "databrew:ListTagsForResource",
+        "iam:ListRoles"
+      ]
     }
   }
 }

@@ -1,34 +1,146 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://aws.amazon.com/cloudformation/resources/AWS_Backup_BackupVault.json",
-  "title": "",
-  "description": "CFN JSON specification generated from version 68.1.0",
-  "type": "object",
+  "typeName": "AWS::Backup::BackupVault",
+  "description": "Resource Type definition for AWS::Backup::BackupVault",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
   "definitions": {
-    "AWS_Backup_BackupVault": {
+    "NotificationObjectType": {
       "type": "object",
-      "description": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-backup-backupvault.html",
-      "allOf": [
-        {
-          "type": "object",
-          "properties": {
-            "Type": {
-              "description": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-backup-backupvault.html",
-              "type": "string",
-              "enum": ["AWS::Backup::BackupVault"]
-            },
-            "Properties": {
-              "$ref": "properties/aws-backup-backupvault.json"
-            }
-          },
-          "required": ["Type"]
+      "additionalProperties": false,
+      "properties": {
+        "BackupVaultEvents": {
+          "type": "array",
+          "insertionOrder": false,
+          "uniqueItems": false,
+          "items": {
+            "type": "string"
+          }
         },
-        {
-          "$ref": "attributes.schema.json#/definitions/ResourceAttributes"
+        "SNSTopicArn": {
+          "type": "string"
         }
-      ],
-
-      "additionalProperties": false
+      },
+      "required": [
+        "SNSTopicArn",
+        "BackupVaultEvents"
+      ]
+    },
+    "LockConfigurationType": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "MinRetentionDays": {
+          "type": "number"
+        },
+        "MaxRetentionDays": {
+          "type": "number"
+        },
+        "ChangeableForDays": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "MinRetentionDays"
+      ]
+    },
+    "BackupVaultNamePattern": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9\\-\\_]{2,50}$"
+    }
+  },
+  "properties": {
+    "AccessPolicy": {
+      "type": [
+        "object",
+        "string"
+      ]
+    },
+    "BackupVaultName": {
+      "$ref": "#/definitions/BackupVaultNamePattern"
+    },
+    "BackupVaultTags": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^.{1,128}$": {
+          "type": "string"
+        }
+      }
+    },
+    "EncryptionKeyArn": {
+      "type": "string"
+    },
+    "Notifications": {
+      "$ref": "#/definitions/NotificationObjectType"
+    },
+    "LockConfiguration": {
+      "$ref": "#/definitions/LockConfigurationType"
+    },
+    "BackupVaultArn": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "taggable": true,
+  "required": [
+    "BackupVaultName"
+  ],
+  "createOnlyProperties": [
+    "/properties/BackupVaultName",
+    "/properties/EncryptionKeyArn"
+  ],
+  "readOnlyProperties": [
+    "/properties/BackupVaultArn"
+  ],
+  "primaryIdentifier": [
+    "/properties/BackupVaultName"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "backup:CreateBackupVault",
+        "backup:PutBackupVaultAccessPolicy",
+        "backup:PutBackupVaultNotifications",
+        "backup:PutBackupVaultLockConfiguration",
+        "backup-storage:Mount",
+        "backup-storage:MountCapsule",
+        "kms:CreateGrant",
+        "kms:GenerateDataKey",
+        "kms:Decrypt",
+        "kms:RetireGrant",
+        "kms:DescribeKey"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "backup:DescribeBackupVault",
+        "backup:GetBackupVaultNotifications",
+        "backup:GetBackupVaultAccessPolicy",
+        "backup:ListTags"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "backup:DescribeBackupVault",
+        "backup:DeleteBackupVaultAccessPolicy",
+        "backup:DeleteBackupVaultNotifications",
+        "backup:DeleteBackupVaultLockConfiguration",
+        "backup:ListTags",
+        "backup:TagResource",
+        "backup:UntagResource",
+        "backup:PutBackupVaultAccessPolicy",
+        "backup:PutBackupVaultNotifications",
+        "backup:PutBackupVaultLockConfiguration"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "backup:DeleteBackupVault"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "backup:ListBackupVaults"
+      ]
     }
   }
 }

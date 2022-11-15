@@ -1,34 +1,86 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://aws.amazon.com/cloudformation/resources/AWS_Logs_QueryDefinition.json",
-  "title": "",
-  "description": "CFN JSON specification generated from version 68.1.0",
-  "type": "object",
+  "typeName": "AWS::Logs::QueryDefinition",
+  "description": "The resource schema for AWSLogs QueryDefinition",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs.git",
   "definitions": {
-    "AWS_Logs_QueryDefinition": {
-      "type": "object",
-      "description": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-logs-querydefinition.html",
-      "allOf": [
-        {
-          "type": "object",
-          "properties": {
-            "Type": {
-              "description": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-logs-querydefinition.html",
-              "type": "string",
-              "enum": ["AWS::Logs::QueryDefinition"]
-            },
-            "Properties": {
-              "$ref": "properties/aws-logs-querydefinition.json"
-            }
-          },
-          "required": ["Type"]
-        },
-        {
-          "$ref": "attributes.schema.json#/definitions/ResourceAttributes"
-        }
-      ],
-
-      "additionalProperties": false
+    "LogGroup": {
+      "type": "string",
+      "pattern": "[\\.\\-_/#A-Za-z0-9]+",
+      "minLength": 1,
+      "maxLength": 512
     }
-  }
+  },
+  "properties": {
+    "Name": {
+      "description": "A name for the saved query definition",
+      "type": "string",
+      "pattern": "^([^:*\\/]+\\/?)*[^:*\\/]+$",
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "QueryString": {
+      "description": "The query string to use for this definition",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 10000
+    },
+    "LogGroupNames": {
+      "description": "Optionally define specific log groups as part of your query definition",
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "description": "LogGroup name",
+        "$ref": "#/definitions/LogGroup"
+      }
+    },
+    "QueryDefinitionId": {
+      "description": "Unique identifier of a query definition",
+      "type": "string",
+      "minLength": 0,
+      "maxLength": 256
+    }
+  },
+  "required": [
+    "Name",
+    "QueryString"
+  ],
+  "additionalProperties": false,
+  "readOnlyProperties": [
+    "/properties/QueryDefinitionId"
+  ],
+  "primaryIdentifier": [
+    "/properties/QueryDefinitionId"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "logs:PutQueryDefinition",
+        "logs:DescribeQueryDefinition"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "logs:DescribeQueryDefinition"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "logs:PutQueryDefinition",
+        "logs:DescribeQueryDefinition",
+        "logs:DeleteQueryDefinition"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "logs:DescribeQueryDefinition",
+        "logs:DeleteQueryDefinition"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "logs:DescribeQueryDefinition"
+      ]
+    }
+  },
+  "taggable": false
 }

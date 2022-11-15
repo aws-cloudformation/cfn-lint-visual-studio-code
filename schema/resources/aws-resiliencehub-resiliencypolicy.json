@@ -1,34 +1,136 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://aws.amazon.com/cloudformation/resources/AWS_ResilienceHub_ResiliencyPolicy.json",
-  "title": "",
-  "description": "CFN JSON specification generated from version 68.1.0",
-  "type": "object",
+  "typeName": "AWS::ResilienceHub::ResiliencyPolicy",
+  "description": "Resource Type Definition for Resiliency Policy.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-resiliencehub",
   "definitions": {
-    "AWS_ResilienceHub_ResiliencyPolicy": {
+    "FailurePolicy": {
+      "description": "Failure Policy.",
       "type": "object",
-      "description": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-resiliencehub-resiliencypolicy.html",
-      "allOf": [
-        {
-          "type": "object",
-          "properties": {
-            "Type": {
-              "description": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-resiliencehub-resiliencypolicy.html",
-              "type": "string",
-              "enum": ["AWS::ResilienceHub::ResiliencyPolicy"]
-            },
-            "Properties": {
-              "$ref": "properties/aws-resiliencehub-resiliencypolicy.json"
-            }
-          },
-          "required": ["Type"]
+      "properties": {
+        "RtoInSecs": {
+          "description": "RTO in seconds.",
+          "type": "integer"
         },
-        {
-          "$ref": "attributes.schema.json#/definitions/ResourceAttributes"
+        "RpoInSecs": {
+          "description": "RPO in seconds.",
+          "type": "integer"
         }
+      },
+      "required": [
+        "RtoInSecs",
+        "RpoInSecs"
       ],
-
       "additionalProperties": false
+    },
+    "PolicyMap": {
+      "type": "object",
+      "patternProperties": {
+        ".*{1,8}": {
+          "$ref": "#/definitions/FailurePolicy"
+        }
+      },
+      "additionalProperties": false
+    },
+    "TagValue": {
+      "type": "string",
+      "maxLength": 256
+    },
+    "TagMap": {
+      "type": "object",
+      "patternProperties": {
+        ".{1,128}": {
+          "$ref": "#/definitions/TagValue"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "PolicyName": {
+      "description": "Name of Resiliency Policy.",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_\\-]{1,59}$"
+    },
+    "PolicyDescription": {
+      "description": "Description of Resiliency Policy.",
+      "type": "string",
+      "maxLength": 500
+    },
+    "DataLocationConstraint": {
+      "type": "string",
+      "description": "Data Location Constraint of the Policy.",
+      "enum": [
+        "AnyLocation",
+        "SameContinent",
+        "SameCountry"
+      ]
+    },
+    "Tier": {
+      "type": "string",
+      "description": "Resiliency Policy Tier.",
+      "enum": [
+        "MissionCritical",
+        "Critical",
+        "Important",
+        "CoreServices",
+        "NonCritical"
+      ]
+    },
+    "Policy": {
+      "$ref": "#/definitions/PolicyMap"
+    },
+    "PolicyArn": {
+      "type": "string",
+      "description": "Amazon Resource Name (ARN) of the Resiliency Policy.",
+      "pattern": "^arn:(aws|aws-cn|aws-iso|aws-iso-[a-z]{1}|aws-us-gov):[A-Za-z0-9][A-Za-z0-9_/.-]{0,62}:([a-z]{2}-((iso[a-z]{0,1}-)|(gov-)){0,1}[a-z]+-[0-9]):[0-9]{12}:[A-Za-z0-9][A-Za-z0-9:_/+=,@.-]{0,1023}$"
+    },
+    "Tags": {
+      "$ref": "#/definitions/TagMap"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "PolicyName",
+    "Tier",
+    "Policy"
+  ],
+  "readOnlyProperties": [
+    "/properties/PolicyArn"
+  ],
+  "primaryIdentifier": [
+    "/properties/PolicyArn"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "resiliencehub:CreateResiliencyPolicy",
+        "resiliencehub:TagResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "resiliencehub:UpdateResiliencyPolicy",
+        "resiliencehub:TagResource",
+        "resiliencehub:UntagResource",
+        "resiliencehub:ListTagsForResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "resiliencehub:DescribeResiliencyPolicy",
+        "resiliencehub:ListTagsForResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "resiliencehub:DeleteResiliencyPolicy",
+        "resiliencehub:UntagResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "resiliencehub:ListResiliencyPolicies"
+      ]
     }
   }
 }

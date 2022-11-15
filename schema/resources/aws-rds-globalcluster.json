@@ -1,34 +1,101 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://aws.amazon.com/cloudformation/resources/AWS_RDS_GlobalCluster.json",
-  "title": "",
-  "description": "CFN JSON specification generated from version 68.1.0",
-  "type": "object",
-  "definitions": {
-    "AWS_RDS_GlobalCluster": {
-      "type": "object",
-      "description": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-globalcluster.html",
-      "allOf": [
+  "typeName": "AWS::RDS::GlobalCluster",
+  "description": "Resource Type definition for AWS::RDS::GlobalCluster",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-rds",
+  "properties": {
+    "Engine": {
+      "description": "The name of the database engine to be used for this DB cluster. Valid Values: aurora (for MySQL 5.6-compatible Aurora), aurora-mysql (for MySQL 5.7-compatible Aurora).\nIf you specify the SourceDBClusterIdentifier property, don't specify this property. The value is inherited from the cluster.",
+      "type": "string",
+      "enum": [
+        "aurora",
+        "aurora-mysql",
+        "aurora-postgresql"
+      ]
+    },
+    "EngineVersion": {
+      "description": "The version number of the database engine to use. If you specify the SourceDBClusterIdentifier property, don't specify this property. The value is inherited from the cluster.",
+      "type": "string"
+    },
+    "DeletionProtection": {
+      "description": "The deletion protection setting for the new global database. The global database can't be deleted when deletion protection is enabled.",
+      "type": "boolean"
+    },
+    "GlobalClusterIdentifier": {
+      "description": "The cluster identifier of the new global database cluster. This parameter is stored as a lowercase string.",
+      "type": "string",
+      "pattern": "^[a-zA-Z]{1}(?:-?[a-zA-Z0-9]){0,62}$"
+    },
+    "SourceDBClusterIdentifier": {
+      "description": "The Amazon Resource Name (ARN) to use as the primary cluster of the global database. This parameter is optional. This parameter is stored as a lowercase string.",
+      "type": "string",
+      "oneOf": [
         {
-          "type": "object",
-          "properties": {
-            "Type": {
-              "description": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-globalcluster.html",
-              "type": "string",
-              "enum": ["AWS::RDS::GlobalCluster"]
-            },
-            "Properties": {
-              "$ref": "properties/aws-rds-globalcluster.json"
-            }
-          },
-          "required": ["Type"]
+          "pattern": "^[a-zA-Z]{1}(?:-?[a-zA-Z0-9]){0,62}$"
         },
         {
-          "$ref": "attributes.schema.json#/definitions/ResourceAttributes"
+          "pattern": "^(?=.{40,128}$)arn.*"
         }
-      ],
-
-      "additionalProperties": false
+      ]
+    },
+    "StorageEncrypted": {
+      "description": " The storage encryption setting for the new global database cluster.\nIf you specify the SourceDBClusterIdentifier property, don't specify this property. The value is inherited from the cluster.",
+      "type": "boolean"
+    }
+  },
+  "oneOf": [
+    {
+      "required": [
+        "SourceDBClusterIdentifier"
+      ]
+    },
+    {
+      "required": [
+        "Engine"
+      ]
+    }
+  ],
+  "additionalProperties": false,
+  "createOnlyProperties": [
+    "/properties/GlobalClusterIdentifier",
+    "/properties/SourceDBClusterIdentifier",
+    "/properties/StorageEncrypted",
+    "/properties/Engine",
+    "/properties/EngineVersion"
+  ],
+  "primaryIdentifier": [
+    "/properties/GlobalClusterIdentifier"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "rds:CreateGlobalCluster",
+        "rds:DescribeDBClusters",
+        "rds:DescribeGlobalClusters"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "rds:DescribeGlobalClusters"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "rds:ModifyGlobalCluster",
+        "rds:DescribeGlobalClusters"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "rds:DescribeGlobalClusters",
+        "rds:DeleteGlobalCluster",
+        "rds:RemoveFromGlobalCluster",
+        "rds:DescribeDBClusters"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "rds:DescribeGlobalClusters"
+      ]
     }
   }
 }

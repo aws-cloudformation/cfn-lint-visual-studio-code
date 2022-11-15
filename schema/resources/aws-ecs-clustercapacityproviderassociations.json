@@ -1,34 +1,128 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://aws.amazon.com/cloudformation/resources/AWS_ECS_ClusterCapacityProviderAssociations.json",
-  "title": "",
-  "description": "CFN JSON specification generated from version 68.1.0",
-  "type": "object",
+  "typeName": "AWS::ECS::ClusterCapacityProviderAssociations",
+  "description": "Associate a set of ECS Capacity Providers with a specified ECS Cluster",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
   "definitions": {
-    "AWS_ECS_ClusterCapacityProviderAssociations": {
-      "type": "object",
-      "description": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ecs-clustercapacityproviderassociations.html",
-      "allOf": [
+    "CapacityProviders": {
+      "description": "List of capacity providers to associate with the cluster",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/CapacityProvider"
+      },
+      "uniqueItems": true
+    },
+    "CapacityProvider": {
+      "description": "If using ec2 auto-scaling, the name of the associated capacity provider. Otherwise FARGATE, FARGATE_SPOT.",
+      "type": "string",
+      "anyOf": [
         {
-          "type": "object",
-          "properties": {
-            "Type": {
-              "description": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ecs-clustercapacityproviderassociations.html",
-              "type": "string",
-              "enum": ["AWS::ECS::ClusterCapacityProviderAssociations"]
-            },
-            "Properties": {
-              "$ref": "properties/aws-ecs-clustercapacityproviderassociations.json"
-            }
-          },
-          "required": ["Type"]
+          "type": "string",
+          "enum": [
+            "FARGATE",
+            "FARGATE_SPOT"
+          ]
         },
         {
-          "$ref": "attributes.schema.json#/definitions/ResourceAttributes"
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
         }
+      ]
+    },
+    "Cluster": {
+      "description": "The name of the cluster",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048
+    },
+    "DefaultCapacityProviderStrategy": {
+      "description": "List of capacity providers to associate with the cluster",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/CapacityProviderStrategy"
+      }
+    },
+    "CapacityProviderStrategy": {
+      "type": "object",
+      "properties": {
+        "Base": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100000
+        },
+        "Weight": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "CapacityProvider": {
+          "$ref": "#/definitions/CapacityProvider"
+        }
+      },
+      "required": [
+        "CapacityProvider"
       ],
-
       "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "CapacityProviders": {
+      "$ref": "#/definitions/CapacityProviders"
+    },
+    "Cluster": {
+      "$ref": "#/definitions/Cluster"
+    },
+    "DefaultCapacityProviderStrategy": {
+      "$ref": "#/definitions/DefaultCapacityProviderStrategy"
+    }
+  },
+  "required": [
+    "CapacityProviders",
+    "Cluster",
+    "DefaultCapacityProviderStrategy"
+  ],
+  "createOnlyProperties": [
+    "/properties/Cluster"
+  ],
+  "primaryIdentifier": [
+    "/properties/Cluster"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/DefaultCapacityProviderStrategy",
+      "/properties/CapacityProviders"
+    ]
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ecs:DescribeClusters",
+        "ecs:PutClusterCapacityProviders"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "ecs:DescribeClusters"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ecs:DescribeClusters",
+        "ecs:PutClusterCapacityProviders"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ecs:PutClusterCapacityProviders",
+        "ecs:DescribeClusters"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ecs:DescribeClusters",
+        "ecs:ListClusters"
+      ]
     }
   }
 }

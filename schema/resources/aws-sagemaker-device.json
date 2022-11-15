@@ -1,34 +1,113 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://aws.amazon.com/cloudformation/resources/AWS_SageMaker_Device.json",
-  "title": "",
-  "description": "CFN JSON specification generated from version 68.1.0",
-  "type": "object",
+  "typeName": "AWS::SageMaker::Device",
+  "description": "Resource schema for AWS::SageMaker::Device",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-sagemaker-edge.git",
   "definitions": {
-    "AWS_SageMaker_Device": {
+    "Device": {
+      "description": "Edge device you want to create",
       "type": "object",
-      "description": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sagemaker-device.html",
-      "allOf": [
-        {
-          "type": "object",
-          "properties": {
-            "Type": {
-              "description": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sagemaker-device.html",
-              "type": "string",
-              "enum": ["AWS::SageMaker::Device"]
-            },
-            "Properties": {
-              "$ref": "properties/aws-sagemaker-device.json"
-            }
-          },
-          "required": ["Type"]
+      "properties": {
+        "Description": {
+          "description": "Description of the device",
+          "type": "string",
+          "pattern": "[\\S\\s]+",
+          "minLength": 1,
+          "maxLength": 40
         },
-        {
-          "$ref": "attributes.schema.json#/definitions/ResourceAttributes"
+        "DeviceName": {
+          "description": "The name of the device",
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9](-*[a-zA-Z0-9])*$",
+          "minLength": 1,
+          "maxLength": 63
+        },
+        "IotThingName": {
+          "description": "AWS Internet of Things (IoT) object name.",
+          "type": "string",
+          "pattern": "[a-zA-Z0-9:_-]+",
+          "maxLength": 128
         }
+      },
+      "required": [
+        "DeviceName"
       ],
-
       "additionalProperties": false
+    },
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "description": "The key name of the tag. You can specify a value that is 1 to 127 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "type": "string",
+          "pattern": "^((?!aws:)[\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "description": "The key value of the tag. You can specify a value that is 1 to 127 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "type": "string",
+          "pattern": "^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$",
+          "minLength": 0,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "DeviceFleetName": {
+      "description": "The name of the edge device fleet",
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9](-*_*[a-zA-Z0-9])*$",
+      "minLength": 1,
+      "maxLength": 63
+    },
+    "Device": {
+      "description": "The Edge Device you want to register against a device fleet",
+      "$ref": "#/definitions/Device"
+    },
+    "Tags": {
+      "description": "Associate tags with the resource",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "required": [
+    "DeviceFleetName"
+  ],
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/Device/DeviceName"
+  ],
+  "createOnlyProperties": [
+    "/properties/Device/DeviceName"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "sagemaker:RegisterDevices"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "sagemaker:DescribeDevice"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "sagemaker:UpdateDevices"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "sagemaker:DeregisterDevices"
+      ]
     }
   }
 }

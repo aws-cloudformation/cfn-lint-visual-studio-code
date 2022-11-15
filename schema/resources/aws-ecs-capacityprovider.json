@@ -1,34 +1,130 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://aws.amazon.com/cloudformation/resources/AWS_ECS_CapacityProvider.json",
-  "title": "",
-  "description": "CFN JSON specification generated from version 68.1.0",
-  "type": "object",
+  "typeName": "AWS::ECS::CapacityProvider",
+  "description": "Resource Type definition for AWS::ECS::CapacityProvider.",
   "definitions": {
-    "AWS_ECS_CapacityProvider": {
+    "ManagedScaling": {
+      "description": "The managed scaling settings for the Auto Scaling group capacity provider.",
       "type": "object",
-      "description": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ecs-capacityprovider.html",
-      "allOf": [
-        {
-          "type": "object",
-          "properties": {
-            "Type": {
-              "description": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ecs-capacityprovider.html",
-              "type": "string",
-              "enum": ["AWS::ECS::CapacityProvider"]
-            },
-            "Properties": {
-              "$ref": "properties/aws-ecs-capacityprovider.json"
-            }
-          },
-          "required": ["Type"]
+      "properties": {
+        "MinimumScalingStepSize": {
+          "type": "integer"
         },
-        {
-          "$ref": "attributes.schema.json#/definitions/ResourceAttributes"
+        "MaximumScalingStepSize": {
+          "type": "integer"
+        },
+        "Status": {
+          "type": "string",
+          "enum": [
+            "DISABLED",
+            "ENABLED"
+          ]
+        },
+        "TargetCapacity": {
+          "type": "integer"
+        },
+        "InstanceWarmupPeriod": {
+          "type": "integer"
         }
+      },
+      "additionalProperties": false
+    },
+    "AutoScalingGroupProvider": {
+      "type": "object",
+      "properties": {
+        "AutoScalingGroupArn": {
+          "type": "string"
+        },
+        "ManagedScaling": {
+          "$ref": "#/definitions/ManagedScaling"
+        },
+        "ManagedTerminationProtection": {
+          "type": "string",
+          "enum": [
+            "DISABLED",
+            "ENABLED"
+          ]
+        }
+      },
+      "required": [
+        "AutoScalingGroupArn"
       ],
-
+      "additionalProperties": false
+    },
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
       "additionalProperties": false
     }
-  }
+  },
+  "properties": {
+    "AutoScalingGroupProvider": {
+      "$ref": "#/definitions/AutoScalingGroupProvider"
+    },
+    "Name": {
+      "type": "string"
+    },
+    "Tags": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/Name"
+  ],
+  "createOnlyProperties": [
+    "/properties/AutoScalingGroupProvider/AutoScalingGroupArn",
+    "/properties/Name"
+  ],
+  "propertyTransform": {
+    "/properties/AutoScalingGroupProvider/AutoScalingGroupArn": "$split(AutoScalingGroupProvider.AutoScalingGroupArn, \"autoScalingGroupName/\")[-1]"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "autoscaling:CreateOrUpdateTags",
+        "ecs:CreateCapacityProvider",
+        "ecs:DescribeCapacityProviders"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ecs:DescribeCapacityProviders",
+        "ecs:DeleteCapacityProvider"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "ecs:DescribeCapacityProviders"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ecs:UpdateCapacityProvider",
+        "ecs:DescribeCapacityProviders",
+        "ecs:ListTagsForResource",
+        "ecs:TagResource",
+        "ecs:UntagResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ecs:DescribeCapacityProviders"
+      ]
+    }
+  },
+  "required": [
+    "AutoScalingGroupProvider"
+  ]
 }

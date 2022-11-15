@@ -1,34 +1,82 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://aws.amazon.com/cloudformation/resources/AWS_Personalize_DatasetGroup.json",
-  "title": "",
-  "description": "CFN JSON specification generated from version 68.1.0",
-  "type": "object",
-  "definitions": {
-    "AWS_Personalize_DatasetGroup": {
-      "type": "object",
-      "description": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-personalize-datasetgroup.html",
-      "allOf": [
-        {
-          "type": "object",
-          "properties": {
-            "Type": {
-              "description": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-personalize-datasetgroup.html",
-              "type": "string",
-              "enum": ["AWS::Personalize::DatasetGroup"]
-            },
-            "Properties": {
-              "$ref": "properties/aws-personalize-datasetgroup.json"
-            }
-          },
-          "required": ["Type"]
-        },
-        {
-          "$ref": "attributes.schema.json#/definitions/ResourceAttributes"
-        }
-      ],
-
-      "additionalProperties": false
+  "typeName": "AWS::Personalize::DatasetGroup",
+  "description": "Resource Schema for AWS::Personalize::DatasetGroup.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-personalize",
+  "properties": {
+    "DatasetGroupArn": {
+      "description": "The Amazon Resource Name (ARN) of the dataset group.",
+      "type": "string",
+      "pattern": "arn:([a-z\\d-]+):personalize:.*:.*:.+",
+      "maxLength": 256
+    },
+    "Name": {
+      "description": "The name for the new dataset group.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63,
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9\\-_]*"
+    },
+    "KmsKeyArn": {
+      "description": "The Amazon Resource Name(ARN) of a AWS Key Management Service (KMS) key used to encrypt the datasets.",
+      "type": "string",
+      "maxLength": 2048,
+      "pattern": "arn:aws.*:kms:.*:[0-9]{12}:key/.*"
+    },
+    "RoleArn": {
+      "description": "The ARN of the AWS Identity and Access Management (IAM) role that has permissions to access the AWS Key Management Service (KMS) key. Supplying an IAM role is only valid when also specifying a KMS key.",
+      "type": "string",
+      "pattern": "arn:([a-z\\d-]+):iam::\\d{12}:role/?[a-zA-Z_0-9+=,.@\\-_/]+",
+      "minLength": 0,
+      "maxLength": 256
+    },
+    "Domain": {
+      "description": "The domain of a Domain dataset group.",
+      "type": "string",
+      "enum": [
+        "ECOMMERCE",
+        "VIDEO_ON_DEMAND"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "Name"
+  ],
+  "createOnlyProperties": [
+    "/properties/Name",
+    "/properties/RoleArn",
+    "/properties/KmsKeyArn",
+    "/properties/Domain"
+  ],
+  "readOnlyProperties": [
+    "/properties/DatasetGroupArn"
+  ],
+  "primaryIdentifier": [
+    "/properties/DatasetGroupArn"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "personalize:CreateDatasetGroup",
+        "personalize:DescribeDatasetGroup",
+        "iam:PassRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "personalize:DescribeDatasetGroup"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "personalize:DescribeDatasetGroup",
+        "personalize:DeleteDatasetGroup"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "personalize:ListDatasetGroups"
+      ]
     }
   }
 }

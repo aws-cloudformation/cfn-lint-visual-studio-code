@@ -1,34 +1,122 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://aws.amazon.com/cloudformation/resources/AWS_Batch_JobQueue.json",
-  "title": "",
-  "description": "CFN JSON specification generated from version 68.1.0",
-  "type": "object",
+  "typeName": "AWS::Batch::JobQueue",
+  "description": "Resource Type definition for AWS::Batch::JobQueue",
+  "additionalProperties": false,
   "definitions": {
-    "AWS_Batch_JobQueue": {
+    "ResourceArn": {
+      "type": "string",
+      "pattern": "arn:[a-z0-9-\\.]{1,63}:[a-z0-9-\\.]{0,63}:[a-z0-9-\\.]{0,63}:[a-z0-9-\\.]{0,63}:[^/].{0,1023}"
+    },
+    "ComputeEnvironmentOrder": {
       "type": "object",
-      "description": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-batch-jobqueue.html",
-      "allOf": [
-        {
-          "type": "object",
-          "properties": {
-            "Type": {
-              "description": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-batch-jobqueue.html",
-              "type": "string",
-              "enum": ["AWS::Batch::JobQueue"]
-            },
-            "Properties": {
-              "$ref": "properties/aws-batch-jobqueue.json"
-            }
-          },
-          "required": ["Type"]
+      "additionalProperties": false,
+      "properties": {
+        "ComputeEnvironment": {
+          "type": "string"
         },
-        {
-          "$ref": "attributes.schema.json#/definitions/ResourceAttributes"
+        "Order": {
+          "type": "integer"
         }
-      ],
-
+      },
+      "required": [
+        "ComputeEnvironment",
+        "Order"
+      ]
+    }
+  },
+  "properties": {
+    "JobQueueName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "JobQueueArn": {
+      "$ref": "#/definitions/ResourceArn"
+    },
+    "ComputeEnvironmentOrder": {
+      "type": "array",
+      "insertionOrder": true,
+      "uniqueItems": false,
+      "items": {
+        "$ref": "#/definitions/ComputeEnvironmentOrder"
+      }
+    },
+    "Priority": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000
+    },
+    "State": {
+      "type": "string",
+      "enum": [
+        "DISABLED",
+        "ENABLED"
+      ]
+    },
+    "SchedulingPolicyArn": {
+      "$ref": "#/definitions/ResourceArn"
+    },
+    "Tags": {
+      "type": "object",
+      "description": "A key-value pair to associate with a resource.",
+      "patternProperties": {
+        ".*": {
+          "type": "string"
+        }
+      },
       "additionalProperties": false
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
+  "required": [
+    "ComputeEnvironmentOrder",
+    "Priority"
+  ],
+  "primaryIdentifier": [
+    "/properties/JobQueueArn"
+  ],
+  "createOnlyProperties": [
+    "/properties/Tags",
+    "/properties/JobQueueName"
+  ],
+  "readOnlyProperties": [
+    "/properties/JobQueueArn"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "Batch:CreateJobQueue",
+        "Batch:TagResource",
+        "Batch:DescribeJobQueues"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "Batch:DescribeJobQueues"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "Batch:UpdateJobQueue",
+        "Batch:TagResource",
+        "Batch:UnTagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "Batch:DeleteJobQueue"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "Batch:DescribeJobQueues"
+      ]
     }
   }
 }

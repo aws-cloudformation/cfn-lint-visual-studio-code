@@ -1,34 +1,120 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://aws.amazon.com/cloudformation/resources/AWS_IoT_Dimension.json",
-  "title": "",
-  "description": "CFN JSON specification generated from version 68.1.0",
-  "type": "object",
+  "typeName": "AWS::IoT::Dimension",
+  "description": "A dimension can be used to limit the scope of a metric used in a security profile for AWS IoT Device Defender.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-iot.git",
   "definitions": {
-    "AWS_IoT_Dimension": {
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
       "type": "object",
-      "description": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iot-dimension.html",
-      "allOf": [
-        {
-          "type": "object",
-          "properties": {
-            "Type": {
-              "description": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iot-dimension.html",
-              "type": "string",
-              "enum": ["AWS::IoT::Dimension"]
-            },
-            "Properties": {
-              "$ref": "properties/aws-iot-dimension.json"
-            }
-          },
-          "required": ["Type"]
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The tag's key.",
+          "minLength": 1,
+          "maxLength": 128
         },
-        {
-          "$ref": "attributes.schema.json#/definitions/ResourceAttributes"
+        "Value": {
+          "type": "string",
+          "description": "The tag's value.",
+          "minLength": 1,
+          "maxLength": 256
         }
+      },
+      "required": [
+        "Value",
+        "Key"
       ],
-
       "additionalProperties": false
+    }
+  },
+  "properties": {
+    "Name": {
+      "description": "A unique identifier for the dimension.",
+      "type": "string",
+      "pattern": "[a-zA-Z0-9:_-]+",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "Type": {
+      "description": "Specifies the type of the dimension.",
+      "type": "string",
+      "enum": [
+        "TOPIC_FILTER"
+      ]
+    },
+    "StringValues": {
+      "description": "Specifies the value or list of values for the dimension.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 256
+      },
+      "minItems": 1,
+      "maxItems": 5
+    },
+    "Tags": {
+      "description": "Metadata that can be used to manage the dimension.",
+      "type": "array",
+      "maxItems": 50,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    },
+    "Arn": {
+      "description": "The ARN (Amazon resource name) of the created dimension.",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/Name"
+  ],
+  "required": [
+    "Type",
+    "StringValues"
+  ],
+  "createOnlyProperties": [
+    "/properties/Name",
+    "/properties/Type"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "iot:CreateDimension"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "iot:DescribeDimension",
+        "iot:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "iot:UpdateDimension",
+        "iot:ListTagsForResource",
+        "iot:UntagResource",
+        "iot:TagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "iot:DescribeDimension",
+        "iot:DeleteDimension"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "iot:ListDimensions"
+      ]
     }
   }
 }

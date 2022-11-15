@@ -90,7 +90,7 @@ export class CfnServerInit {
     );
 
     readFile(
-      path.join(__dirname, `../../schema/all-spec.json`),
+      path.join(__dirname, `../../schema/base.schema.json`),
       "utf8",
       (err, data) => {
         if (err) {
@@ -98,7 +98,33 @@ export class CfnServerInit {
         }
         let schema: JSONSchema;
         schema = data as JSONSchema;
-        this.languageService.addSchema("CLOUDFORMATION", schema);
+        this.languageService.addSchema("https://aws.amazon.com/cloudformation/template/base", schema);
+      }
+    );
+
+    readFile(
+      path.join(__dirname, `../../schema/mappings.schema.json`),
+      "utf8",
+      (err, data) => {
+        if (err) {
+          this.connection.console.log(err.message);
+        }
+        let schema: JSONSchema;
+        schema = data as JSONSchema;
+        this.languageService.addSchema("https://aws.amazon.com/cloudformation/template/mappings", schema);
+      }
+    );
+
+    readFile(
+      path.join(__dirname, `../../schema/resource.attributes.schema.json`),
+      "utf8",
+      (err, data) => {
+        if (err) {
+          this.connection.console.log(err.message);
+        }
+        let schema: JSONSchema;
+        schema = data as JSONSchema;
+        this.languageService.addSchema("https://aws.amazon.com/cloudformation/template/resource.attributes", schema);
       }
     );
 

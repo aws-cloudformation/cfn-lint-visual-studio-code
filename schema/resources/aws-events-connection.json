@@ -1,34 +1,251 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://aws.amazon.com/cloudformation/resources/AWS_Events_Connection.json",
-  "title": "",
-  "description": "CFN JSON specification generated from version 68.1.0",
-  "type": "object",
+  "typeName": "AWS::Events::Connection",
+  "description": "Resource Type definition for AWS::Events::Connection.",
   "definitions": {
-    "AWS_Events_Connection": {
+    "AuthParameters": {
       "type": "object",
-      "description": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-connection.html",
-      "allOf": [
+      "minProperties": 1,
+      "maxProperties": 2,
+      "properties": {
+        "ApiKeyAuthParameters": {
+          "$ref": "#/definitions/ApiKeyAuthParameters"
+        },
+        "BasicAuthParameters": {
+          "$ref": "#/definitions/BasicAuthParameters"
+        },
+        "OAuthParameters": {
+          "$ref": "#/definitions/OAuthParameters"
+        },
+        "InvocationHttpParameters": {
+          "$ref": "#/definitions/ConnectionHttpParameters"
+        }
+      },
+      "oneOf": [
         {
-          "type": "object",
-          "properties": {
-            "Type": {
-              "description": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-connection.html",
-              "type": "string",
-              "enum": ["AWS::Events::Connection"]
-            },
-            "Properties": {
-              "$ref": "properties/aws-events-connection.json"
-            }
-          },
-          "required": ["Type"]
+          "required": [
+            "BasicAuthParameters"
+          ]
         },
         {
-          "$ref": "attributes.schema.json#/definitions/ResourceAttributes"
+          "required": [
+            "OAuthParameters"
+          ]
+        },
+        {
+          "required": [
+            "ApiKeyAuthParameters"
+          ]
         }
       ],
-
       "additionalProperties": false
+    },
+    "BasicAuthParameters": {
+      "type": "object",
+      "properties": {
+        "Username": {
+          "type": "string"
+        },
+        "Password": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Username",
+        "Password"
+      ],
+      "additionalProperties": false
+    },
+    "OAuthParameters": {
+      "type": "object",
+      "properties": {
+        "ClientParameters": {
+          "$ref": "#/definitions/ClientParameters"
+        },
+        "AuthorizationEndpoint": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "HttpMethod": {
+          "type": "string",
+          "enum": [
+            "GET",
+            "POST",
+            "PUT"
+          ]
+        },
+        "OAuthHttpParameters": {
+          "$ref": "#/definitions/ConnectionHttpParameters"
+        }
+      },
+      "required": [
+        "ClientParameters",
+        "AuthorizationEndpoint",
+        "HttpMethod"
+      ],
+      "additionalProperties": false
+    },
+    "ApiKeyAuthParameters": {
+      "type": "object",
+      "properties": {
+        "ApiKeyName": {
+          "type": "string"
+        },
+        "ApiKeyValue": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "ApiKeyName",
+        "ApiKeyValue"
+      ],
+      "additionalProperties": false
+    },
+    "ClientParameters": {
+      "type": "object",
+      "properties": {
+        "ClientID": {
+          "type": "string"
+        },
+        "ClientSecret": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "ClientID",
+        "ClientSecret"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectionHttpParameters": {
+      "type": "object",
+      "properties": {
+        "HeaderParameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Parameter"
+          }
+        },
+        "QueryStringParameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Parameter"
+          }
+        },
+        "BodyParameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Parameter"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "Parameter": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string"
+        },
+        "Value": {
+          "type": "string"
+        },
+        "IsValueSecret": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "Name": {
+      "description": "Name of the connection.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "Arn": {
+      "description": "The arn of the connection resource.",
+      "type": "string"
+    },
+    "SecretArn": {
+      "description": "The arn of the secrets manager secret created in the customer account.",
+      "type": "string"
+    },
+    "Description": {
+      "description": "Description of the connection.",
+      "type": "string",
+      "maxLength": 512
+    },
+    "AuthorizationType": {
+      "type": "string",
+      "enum": [
+        "API_KEY",
+        "BASIC",
+        "OAUTH_CLIENT_CREDENTIALS"
+      ]
+    },
+    "AuthParameters": {
+      "$ref": "#/definitions/AuthParameters"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "AuthorizationType",
+    "AuthParameters"
+  ],
+  "createOnlyProperties": [
+    "/properties/Name"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/SecretArn"
+  ],
+  "writeOnlyProperties": [
+    "/properties/AuthParameters"
+  ],
+  "primaryIdentifier": [
+    "/properties/Name"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "events:CreateConnection",
+        "secretsmanager:CreateSecret",
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:PutSecretValue",
+        "iam:CreateServiceLinkedRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "events:DescribeConnection"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "events:UpdateConnection",
+        "events:DescribeConnection",
+        "secretsmanager:CreateSecret",
+        "secretsmanager:UpdateSecret",
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:PutSecretValue"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "events:DeleteConnection"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "events:ListConnections"
+      ]
     }
   }
 }
