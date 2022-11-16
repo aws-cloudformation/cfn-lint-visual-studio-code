@@ -78,7 +78,7 @@ suite("Should code complete", () => {
       items: [
         ...intrinsics,
         {
-          label: "object",
+          label: "base",
           kind: 6,
         },
         {
@@ -225,6 +225,8 @@ export async function testCompletion(
     .sort((a, b) => (a.label > b.label ? 1 : -1))
     .forEach((expectedItem, i) => {
       const actualItem = sortedActualCompletionList[i];
+      console.log(actualItem);
+      console.log(expectedItem);
       assert.equal(
         actualItem.label,
         expectedItem.label,
