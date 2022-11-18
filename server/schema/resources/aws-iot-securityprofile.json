@@ -1,0 +1,433 @@
+{
+  "typeName": "AWS::IoT::SecurityProfile",
+  "description": "A security profile defines a set of expected behaviors for devices in your account.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-iot.git",
+  "definitions": {
+    "Behavior": {
+      "description": "A security profile behavior.",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "The name for the behavior.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The name for the behavior.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: [a-zA-Z0-9:_-]+  \nUpdate requires: No interruption"
+        },
+        "Metric": {
+          "description": "What is measured by the behavior.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "What is measured by the behavior.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: [a-zA-Z0-9:_-]+  \nUpdate requires: No interruption"
+        },
+        "MetricDimension": {
+          "$ref": "#/definitions/MetricDimension"
+        },
+        "Criteria": {
+          "$ref": "#/definitions/BehaviorCriteria"
+        },
+        "SuppressAlerts": {
+          "description": "Manage Detect alarm SNS notifications by setting behavior notification to on or suppressed. Detect will continue to performing device behavior evaluations. However, suppressed alarms wouldn't be forwarded for SNS notification.",
+          "type": "boolean",
+          "markdownDescription": "Manage Detect alarm SNS notifications by setting behavior notification to on or suppressed. Detect will continue to performing device behavior evaluations. However, suppressed alarms wouldn't be forwarded for SNS notification.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Name"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A security profile behavior.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "MetricDimension": {
+      "description": "The dimension of a metric.",
+      "type": "object",
+      "properties": {
+        "DimensionName": {
+          "description": "A unique identifier for the dimension.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "A unique identifier for the dimension.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: [a-zA-Z0-9:_-]+  \nUpdate requires: No interruption"
+        },
+        "Operator": {
+          "description": "Defines how the dimensionValues of a dimension are interpreted.",
+          "type": "string",
+          "enum": [
+            "IN",
+            "NOT_IN"
+          ],
+          "markdownDescription": "Defines how the dimensionValues of a dimension are interpreted.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: IN | NOT_IN  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "DimensionName"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The dimension of a metric.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "BehaviorCriteria": {
+      "description": "The criteria by which the behavior is determined to be normal.",
+      "type": "object",
+      "properties": {
+        "ComparisonOperator": {
+          "description": "The operator that relates the thing measured (metric) to the criteria (containing a value or statisticalThreshold).",
+          "type": "string",
+          "enum": [
+            "less-than",
+            "less-than-equals",
+            "greater-than",
+            "greater-than-equals",
+            "in-cidr-set",
+            "not-in-cidr-set",
+            "in-port-set",
+            "not-in-port-set",
+            "in-set",
+            "not-in-set"
+          ],
+          "markdownDescription": "The operator that relates the thing measured (metric) to the criteria (containing a value or statisticalThreshold).\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: less-than | less-than-equals | greater-than | greater-than-equals | in-cidr-set | not-in-cidr-set | in-port-set | not-in-port-set | in-set | not-in-set  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "$ref": "#/definitions/MetricValue"
+        },
+        "DurationSeconds": {
+          "type": "integer",
+          "description": "Use this to specify the time duration over which the behavior is evaluated.",
+          "markdownDescription": "Use this to specify the time duration over which the behavior is evaluated.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "ConsecutiveDatapointsToAlarm": {
+          "description": "If a device is in violation of the behavior for the specified number of consecutive datapoints, an alarm occurs. If not specified, the default is 1.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "markdownDescription": "If a device is in violation of the behavior for the specified number of consecutive datapoints, an alarm occurs. If not specified, the default is 1.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "ConsecutiveDatapointsToClear": {
+          "description": "If an alarm has occurred and the offending device is no longer in violation of the behavior for the specified number of consecutive datapoints, the alarm is cleared. If not specified, the default is 1.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "markdownDescription": "If an alarm has occurred and the offending device is no longer in violation of the behavior for the specified number of consecutive datapoints, the alarm is cleared. If not specified, the default is 1.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "StatisticalThreshold": {
+          "$ref": "#/definitions/StatisticalThreshold"
+        },
+        "MlDetectionConfig": {
+          "$ref": "#/definitions/MachineLearningDetectionConfig"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The criteria by which the behavior is determined to be normal.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "MetricValue": {
+      "description": "The value to be compared with the metric.",
+      "type": "object",
+      "properties": {
+        "Count": {
+          "description": "If the ComparisonOperator calls for a numeric value, use this to specify that (integer) numeric value to be compared with the metric.",
+          "type": "string",
+          "minimum": 0,
+          "markdownDescription": "If the ComparisonOperator calls for a numeric value, use this to specify that (integer) numeric value to be compared with the metric.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Cidrs": {
+          "description": "If the ComparisonOperator calls for a set of CIDRs, use this to specify that set to be compared with the metric.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "If the ComparisonOperator calls for a set of CIDRs, use this to specify that set to be compared with the metric.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Ports": {
+          "description": "If the ComparisonOperator calls for a set of ports, use this to specify that set to be compared with the metric.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 65535,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "If the ComparisonOperator calls for a set of ports, use this to specify that set to be compared with the metric.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Number": {
+          "description": "The numeral value of a metric.",
+          "type": "number",
+          "markdownDescription": "The numeral value of a metric.\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+        },
+        "Numbers": {
+          "description": "The numeral values of a metric.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "type": "number",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "The numeral values of a metric.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Strings": {
+          "description": "The string values of a metric.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "The string values of a metric.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The value to be compared with the metric.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "StatisticalThreshold": {
+      "description": "A statistical ranking (percentile) which indicates a threshold value by which a behavior is determined to be in compliance or in violation of the behavior.",
+      "type": "object",
+      "properties": {
+        "Statistic": {
+          "description": "The percentile which resolves to a threshold value by which compliance with a behavior is determined",
+          "type": "string",
+          "enum": [
+            "Average",
+            "p0",
+            "p0.1",
+            "p0.01",
+            "p1",
+            "p10",
+            "p50",
+            "p90",
+            "p99",
+            "p99.9",
+            "p99.99",
+            "p100"
+          ],
+          "markdownDescription": "The percentile which resolves to a threshold value by which compliance with a behavior is determined\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Average | p0 | p0.1 | p0.01 | p1 | p10 | p50 | p90 | p99 | p99.9 | p99.99 | p100  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "A statistical ranking (percentile) which indicates a threshold value by which a behavior is determined to be in compliance or in violation of the behavior.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "MachineLearningDetectionConfig": {
+      "description": "The configuration of an ML Detect Security Profile.",
+      "type": "object",
+      "properties": {
+        "ConfidenceLevel": {
+          "description": "The sensitivity of anomalous behavior evaluation. Can be Low, Medium, or High.",
+          "type": "string",
+          "enum": [
+            "LOW",
+            "MEDIUM",
+            "HIGH"
+          ],
+          "markdownDescription": "The sensitivity of anomalous behavior evaluation. Can be Low, Medium, or High.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: LOW | MEDIUM | HIGH  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The configuration of an ML Detect Security Profile.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AlertTarget": {
+      "description": "A structure containing the alert target ARN and the role ARN.",
+      "type": "object",
+      "properties": {
+        "AlertTargetArn": {
+          "description": "The ARN of the notification target to which alerts are sent.",
+          "type": "string",
+          "maxLength": 2048,
+          "markdownDescription": "The ARN of the notification target to which alerts are sent.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nUpdate requires: No interruption"
+        },
+        "RoleArn": {
+          "description": "The ARN of the role that grants permission to send alerts to the notification target.",
+          "type": "string",
+          "minLength": 20,
+          "maxLength": 2048,
+          "markdownDescription": "The ARN of the role that grants permission to send alerts to the notification target.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "AlertTargetArn",
+        "RoleArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A structure containing the alert target ARN and the role ARN.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "MetricToRetain": {
+      "description": "The metric you want to retain. Dimensions are optional.",
+      "type": "object",
+      "properties": {
+        "Metric": {
+          "description": "What is measured by the behavior.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "What is measured by the behavior.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: [a-zA-Z0-9:_-]+  \nUpdate requires: No interruption"
+        },
+        "MetricDimension": {
+          "$ref": "#/definitions/MetricDimension"
+        }
+      },
+      "required": [
+        "Metric"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The metric you want to retain. Dimensions are optional.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The tag's key.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The tag's key.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The tag's value.",
+          "minLength": 1,
+          "maxLength": 256,
+          "markdownDescription": "The tag's value.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "SecurityProfileName": {
+      "description": "A unique identifier for the security profile.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "markdownDescription": "A unique identifier for the security profile.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: [a-zA-Z0-9:_-]+  \nUpdate requires: Replacement"
+    },
+    "SecurityProfileDescription": {
+      "description": "A description of the security profile.",
+      "type": "string",
+      "maxLength": 1000,
+      "markdownDescription": "A description of the security profile.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1000  \nUpdate requires: No interruption"
+    },
+    "Behaviors": {
+      "description": "Specifies the behaviors that, when violated by a device (thing), cause an alert.",
+      "type": "array",
+      "maxLength": 100,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Behavior"
+      },
+      "markdownDescription": "Specifies the behaviors that, when violated by a device (thing), cause an alert.\n\n---\n\nRequired: No  \nType: Array  \nMaximum Length: 100  \nUpdate requires: No interruption"
+    },
+    "AlertTargets": {
+      "description": "Specifies the destinations to which alerts are sent.",
+      "type": "object",
+      "patternProperties": {
+        "[a-zA-Z0-9:_-]+": {
+          "$ref": "#/definitions/AlertTarget"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Specifies the destinations to which alerts are sent.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AdditionalMetricsToRetainV2": {
+      "description": "A list of metrics whose data is retained (stored). By default, data is retained for any metric used in the profile's behaviors, but it is also retained for any metric specified here.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/MetricToRetain"
+      },
+      "markdownDescription": "A list of metrics whose data is retained (stored). By default, data is retained for any metric used in the profile's behaviors, but it is also retained for any metric specified here.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "Tags": {
+      "description": "Metadata that can be used to manage the security profile.",
+      "type": "array",
+      "maxItems": 50,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "Metadata that can be used to manage the security profile.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "TargetArns": {
+      "description": "A set of target ARNs that the security profile is attached to.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "description": "The ARN of the target to which the security profile is attached.",
+        "type": "string",
+        "maxLength": 2048,
+        "markdownDescription": "The ARN of the target to which the security profile is attached.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nUpdate requires: No interruption"
+      },
+      "markdownDescription": "A set of target ARNs that the security profile is attached to.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    }
+  },
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/SecurityProfileName"
+  ],
+  "required": [],
+  "createOnlyProperties": [
+    "/properties/SecurityProfileName"
+  ],
+  "readOnlyProperties": [
+    "/properties/SecurityProfileArn"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "iot:CreateSecurityProfile",
+        "iot:AttachSecurityProfile",
+        "iam:PassRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "iot:DescribeSecurityProfile",
+        "iot:ListTagsForResource",
+        "iot:ListTargetsForSecurityProfile"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "iot:UpdateSecurityProfile",
+        "iot:ListTargetsForSecurityProfile",
+        "iot:AttachSecurityProfile",
+        "iot:DetachSecurityProfile",
+        "iot:ListTagsForResource",
+        "iot:UntagResource",
+        "iot:TagResource",
+        "iam:PassRole"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "iot:DescribeSecurityProfile",
+        "iot:DeleteSecurityProfile"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "iot:ListSecurityProfiles"
+      ]
+    }
+  },
+  "attributes": {
+    "SecurityProfileArn": {
+      "description": "The ARN (Amazon resource name) of the created security profile.",
+      "type": "string",
+      "markdownDescription": "The ARN (Amazon resource name) of the created security profile.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    }
+  }
+}

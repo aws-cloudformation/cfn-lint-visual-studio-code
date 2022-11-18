@@ -1,0 +1,161 @@
+{
+  "typeName": "AWS::Config::ConformancePack",
+  "description": "A conformance pack is a collection of AWS Config rules and remediation actions that can be easily deployed as a single entity in an account and a region or across an entire AWS Organization.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-config.git",
+  "documentationUrl": "https://docs.aws.amazon.com/config/latest/developerguide/conformance-packs.html",
+  "definitions": {
+    "ParameterName": {
+      "description": "Key part of key-value pair with value being parameter value",
+      "type": "string",
+      "minLength": 0,
+      "maxLength": 255,
+      "markdownDescription": "Key part of key-value pair with value being parameter value\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 255  \nUpdate requires: No interruption"
+    },
+    "ParameterValue": {
+      "description": "Value part of key-value pair with key being parameter Name",
+      "type": "string",
+      "minLength": 0,
+      "maxLength": 4096,
+      "markdownDescription": "Value part of key-value pair with key being parameter Name\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 4096  \nUpdate requires: No interruption"
+    },
+    "ConformancePackInputParameter": {
+      "description": "Input parameters in the form of key-value pairs for the conformance pack.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ParameterName": {
+          "$ref": "#/definitions/ParameterName"
+        },
+        "ParameterValue": {
+          "$ref": "#/definitions/ParameterValue"
+        }
+      },
+      "required": [
+        "ParameterName",
+        "ParameterValue"
+      ],
+      "markdownDescription": "Input parameters in the form of key-value pairs for the conformance pack.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "ConformancePackName": {
+      "description": "Name of the conformance pack which will be assigned as the unique identifier.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "markdownDescription": "Name of the conformance pack which will be assigned as the unique identifier.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: [a-zA-Z][-a-zA-Z0-9]*  \nUpdate requires: Replacement"
+    },
+    "DeliveryS3Bucket": {
+      "description": "AWS Config stores intermediate files while processing conformance pack template.",
+      "type": "string",
+      "minLength": 0,
+      "maxLength": 63,
+      "markdownDescription": "AWS Config stores intermediate files while processing conformance pack template.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 63  \nUpdate requires: No interruption"
+    },
+    "DeliveryS3KeyPrefix": {
+      "description": "The prefix for delivery S3 bucket.",
+      "type": "string",
+      "minLength": 0,
+      "maxLength": 1024,
+      "markdownDescription": "The prefix for delivery S3 bucket.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nUpdate requires: No interruption"
+    },
+    "TemplateBody": {
+      "description": "A string containing full conformance pack template body. You can only specify one of the template body or template S3Uri fields.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 51200,
+      "markdownDescription": "A string containing full conformance pack template body. You can only specify one of the template body or template S3Uri fields.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 51200  \nUpdate requires: No interruption"
+    },
+    "TemplateS3Uri": {
+      "description": "Location of file containing the template body which points to the conformance pack template that is located in an Amazon S3 bucket. You can only specify one of the template body or template S3Uri fields.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "markdownDescription": "Location of file containing the template body which points to the conformance pack template that is located in an Amazon S3 bucket. You can only specify one of the template body or template S3Uri fields.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nPattern: s3://.*  \nUpdate requires: No interruption"
+    },
+    "TemplateSSMDocumentDetails": {
+      "description": "The TemplateSSMDocumentDetails object contains the name of the SSM document and the version of the SSM document.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "DocumentName": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        },
+        "DocumentVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "The TemplateSSMDocumentDetails object contains the name of the SSM document and the version of the SSM document.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ConformancePackInputParameters": {
+      "description": "A list of ConformancePackInputParameter objects.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ConformancePackInputParameter"
+      },
+      "minItems": 0,
+      "maxItems": 60,
+      "markdownDescription": "A list of ConformancePackInputParameter objects.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "ConformancePackName"
+  ],
+  "writeOnlyProperties": [
+    "/properties/TemplateBody",
+    "/properties/TemplateS3Uri",
+    "/properties/TemplateSSMDocumentDetails"
+  ],
+  "createOnlyProperties": [
+    "/properties/ConformancePackName"
+  ],
+  "primaryIdentifier": [
+    "/properties/ConformancePackName"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "config:PutConformancePack",
+        "config:DescribeConformancePackStatus",
+        "s3:GetObject",
+        "s3:GetBucketAcl",
+        "iam:CreateServiceLinkedRole",
+        "iam:PassRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "config:DescribeConformancePacks"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "config:PutConformancePack",
+        "config:DescribeConformancePackStatus",
+        "s3:GetObject",
+        "s3:GetBucketAcl",
+        "iam:CreateServiceLinkedRole",
+        "iam:PassRole"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "config:DeleteConformancePack",
+        "config:DescribeConformancePackStatus"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "config:DescribeConformancePacks"
+      ]
+    }
+  },
+  "attributes": {}
+}

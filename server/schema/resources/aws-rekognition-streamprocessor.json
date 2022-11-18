@@ -1,0 +1,429 @@
+{
+  "typeName": "AWS::Rekognition::StreamProcessor",
+  "description": "The AWS::Rekognition::StreamProcessor type is used to create an Amazon Rekognition StreamProcessor that you can use to analyze streaming videos.\n\n",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "definitions": {
+    "Arn": {
+      "description": "The ARN of the stream processor",
+      "type": "string",
+      "maxLength": 2048,
+      "markdownDescription": "The ARN of the stream processor\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nUpdate requires: No interruption"
+    },
+    "KinesisVideoStream": {
+      "description": "The Kinesis Video Stream that streams the source video.",
+      "type": "object",
+      "properties": {
+        "Arn": {
+          "description": "ARN of the Kinesis Video Stream that streams the source video.",
+          "type": "string",
+          "maxLength": 2048,
+          "markdownDescription": "ARN of the Kinesis Video Stream that streams the source video.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nPattern: (^arn:([a-z\\d-]+):kinesisvideo:([a-z\\d-]+):\\d{12}:.+$)  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Arn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The Kinesis Video Stream that streams the source video.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "S3Destination": {
+      "description": "The S3 location in customer's account where inference output & artifacts are stored, as part of connected home feature.",
+      "type": "object",
+      "properties": {
+        "BucketName": {
+          "description": "Name of the S3 bucket.",
+          "type": "string",
+          "maxLength": 63,
+          "markdownDescription": "Name of the S3 bucket.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 63  \nUpdate requires: No interruption"
+        },
+        "ObjectKeyPrefix": {
+          "description": "The object key prefix path where the results will be stored. Default is no prefix path",
+          "type": "string",
+          "maxLength": 256,
+          "markdownDescription": "The object key prefix path where the results will be stored. Default is no prefix path\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "BucketName"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The S3 location in customer's account where inference output & artifacts are stored, as part of connected home feature.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "KinesisDataStream": {
+      "description": "The Amazon Kinesis Data Stream stream to which the Amazon Rekognition stream processor streams the analysis results, as part of face search feature.",
+      "type": "object",
+      "properties": {
+        "Arn": {
+          "description": "ARN of the Kinesis Data Stream stream.",
+          "type": "string",
+          "maxLength": 2048,
+          "markdownDescription": "ARN of the Kinesis Data Stream stream.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nPattern: (^arn:([a-z\\d-]+):kinesis:([a-z\\d-]+):\\d{12}:.+$)  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Arn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The Amazon Kinesis Data Stream stream to which the Amazon Rekognition stream processor streams the analysis results, as part of face search feature.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Labels": {
+      "description": "List of labels that need to be detected in the video stream. Current supported values are PERSON, PET, PACKAGE, ALL.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+      },
+      "markdownDescription": "List of labels that need to be detected in the video stream. Current supported values are PERSON, PET, PACKAGE, ALL.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "ConnectedHomeSettings": {
+      "description": "Connected home settings to use on a streaming video. Note that either ConnectedHomeSettings or FaceSearchSettings should be set. Not both",
+      "type": "object",
+      "properties": {
+        "Labels": {
+          "$ref": "#/definitions/Labels"
+        },
+        "MinConfidence": {
+          "description": "Minimum object class match confidence score that must be met to return a result for a recognized object.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "markdownDescription": "Minimum object class match confidence score that must be met to return a result for a recognized object.\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Labels"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Connected home settings to use on a streaming video. Note that either ConnectedHomeSettings or FaceSearchSettings should be set. Not both\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "FaceSearchSettings": {
+      "description": "Face search settings to use on a streaming video. Note that either FaceSearchSettings or ConnectedHomeSettings should be set. Not both",
+      "type": "object",
+      "properties": {
+        "CollectionId": {
+          "description": "The ID of a collection that contains faces that you want to search for.",
+          "type": "string",
+          "maxLength": 255,
+          "markdownDescription": "The ID of a collection that contains faces that you want to search for.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 255  \nPattern: \\A[a-zA-Z0-9_\\.\\-]+$  \nUpdate requires: No interruption"
+        },
+        "FaceMatchThreshold": {
+          "description": "Minimum face match confidence score percentage that must be met to return a result for a recognized face. The default is 80. 0 is the lowest confidence. 100 is the highest confidence. Values between 0 and 100 are accepted.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "markdownDescription": "Minimum face match confidence score percentage that must be met to return a result for a recognized face. The default is 80. 0 is the lowest confidence. 100 is the highest confidence. Values between 0 and 100 are accepted.\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "CollectionId"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Face search settings to use on a streaming video. Note that either FaceSearchSettings or ConnectedHomeSettings should be set. Not both\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "NotificationChannel": {
+      "description": "The ARN of the SNS notification channel where events of interests are published, as part of connected home feature.",
+      "type": "object",
+      "properties": {
+        "Arn": {
+          "description": "ARN of the SNS topic.",
+          "type": "string",
+          "maxLength": 2048,
+          "markdownDescription": "ARN of the SNS topic.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Arn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The ARN of the SNS notification channel where events of interests are published, as part of connected home feature.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Point": {
+      "description": "An (X, Y) cartesian coordinate denoting a point on the frame",
+      "type": "object",
+      "properties": {
+        "X": {
+          "description": "The X coordinate of the point.",
+          "type": "number",
+          "markdownDescription": "The X coordinate of the point.\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
+        },
+        "Y": {
+          "description": "The Y coordinate of the point.",
+          "type": "number",
+          "markdownDescription": "The Y coordinate of the point.\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "X",
+        "Y"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "An (X, Y) cartesian coordinate denoting a point on the frame\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Polygon": {
+      "description": "A polygon showing a region of interest. Note that the ordering of the Point entries matter in defining the polygon",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": true,
+      "minItems": 3,
+      "items": {
+        "$ref": "#/definitions/Point"
+      },
+      "markdownDescription": "A polygon showing a region of interest. Note that the ordering of the Point entries matter in defining the polygon\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "BoundingBox": {
+      "description": "A bounding box denoting a region of interest in the frame to be analyzed.",
+      "type": "object",
+      "properties": {
+        "Height": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
+        },
+        "Width": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
+        },
+        "Left": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
+        },
+        "Top": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Height",
+        "Width",
+        "Left",
+        "Top"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A bounding box denoting a region of interest in the frame to be analyzed.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "DataSharingPreference": {
+      "description": "Indicates whether Rekognition is allowed to store the video stream data for model-training.",
+      "properties": {
+        "OptIn": {
+          "description": "Flag to enable data-sharing",
+          "type": "boolean",
+          "markdownDescription": "Flag to enable data-sharing\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "OptIn"
+      ],
+      "type": "object",
+      "additionalProperties": false,
+      "markdownDescription": "Indicates whether Rekognition is allowed to store the video stream data for model-training.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: \\A(?!aws:)[a-zA-Z0-9+\\-=\\._\\:\\/@]+$  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: \\A[a-zA-Z0-9+\\-=\\._\\:\\/@]+$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "Name": {
+      "description": "Name of the stream processor. It's an identifier you assign to the stream processor. You can use it to manage the stream processor.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "markdownDescription": "Name of the stream processor. It's an identifier you assign to the stream processor. You can use it to manage the stream processor.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: [a-zA-Z0-9_.\\-]+  \nUpdate requires: Replacement"
+    },
+    "KmsKeyId": {
+      "description": "The KMS key that is used by Rekognition to encrypt any intermediate customer metadata and store in the customer's S3 bucket.",
+      "type": "string",
+      "markdownDescription": "The KMS key that is used by Rekognition to encrypt any intermediate customer metadata and store in the customer's S3 bucket.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "RoleArn": {
+      "description": "ARN of the IAM role that allows access to the stream processor, and provides Rekognition read permissions for KVS stream and write permissions to S3 bucket and SNS topic.",
+      "type": "string",
+      "maxLength": 2048,
+      "markdownDescription": "ARN of the IAM role that allows access to the stream processor, and provides Rekognition read permissions for KVS stream and write permissions to S3 bucket and SNS topic.\n\n---\n\nRequired: Conditional  \nType: String  \nMaximum Length: 2048  \nPattern: arn:aws(-[\\w]+)*:iam::[0-9]{12}:role/.*  \nUpdate requires: Replacement"
+    },
+    "KinesisVideoStream": {
+      "$ref": "#/definitions/KinesisVideoStream"
+    },
+    "FaceSearchSettings": {
+      "$ref": "#/definitions/FaceSearchSettings"
+    },
+    "ConnectedHomeSettings": {
+      "$ref": "#/definitions/ConnectedHomeSettings"
+    },
+    "KinesisDataStream": {
+      "$ref": "#/definitions/KinesisDataStream"
+    },
+    "S3Destination": {
+      "$ref": "#/definitions/S3Destination"
+    },
+    "NotificationChannel": {
+      "$ref": "#/definitions/NotificationChannel"
+    },
+    "DataSharingPreference": {
+      "$ref": "#/definitions/DataSharingPreference"
+    },
+    "PolygonRegionsOfInterest": {
+      "description": "The PolygonRegionsOfInterest specifies a set of polygon areas of interest in the video frames to analyze, as part of connected home feature. Each polygon is in turn, an ordered list of Point",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "minItems": 0,
+      "items": {
+        "$ref": "#/definitions/Polygon"
+      },
+      "markdownDescription": "The PolygonRegionsOfInterest specifies a set of polygon areas of interest in the video frames to analyze, as part of connected home feature. Each polygon is in turn, an ordered list of Point\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement"
+    },
+    "BoundingBoxRegionsOfInterest": {
+      "description": "The BoundingBoxRegionsOfInterest specifies an array of bounding boxes of interest in the video frames to analyze, as part of connected home feature. If an object is partially in a region of interest, Rekognition will tag it as detected if the overlap of the object with the region-of-interest is greater than 20%.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "minItems": 0,
+      "items": {
+        "$ref": "#/definitions/BoundingBox"
+      },
+      "markdownDescription": "The BoundingBoxRegionsOfInterest specifies an array of bounding boxes of interest in the video frames to analyze, as part of connected home feature. If an object is partially in a region of interest, Rekognition will tag it as detected if the overlap of the object with the region-of-interest is greater than 20%.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement"
+    },
+    "Tags": {
+      "description": "An array of key-value pairs to apply to this resource.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "minItems": 0,
+      "maxItems": 200,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "An array of key-value pairs to apply to this resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    }
+  },
+  "taggable": true,
+  "additionalProperties": false,
+  "required": [
+    "RoleArn",
+    "KinesisVideoStream"
+  ],
+  "oneOf": [
+    {
+      "required": [
+        "ConnectedHomeSettings",
+        "S3Destination",
+        "NotificationChannel"
+      ]
+    },
+    {
+      "required": [
+        "FaceSearchSettings",
+        "KinesisDataStream"
+      ]
+    }
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/Status",
+    "/properties/StatusMessage"
+  ],
+  "primaryIdentifier": [
+    "/properties/Name"
+  ],
+  "createOnlyProperties": [
+    "/properties/Name",
+    "/properties/KmsKeyId",
+    "/properties/RoleArn",
+    "/properties/KinesisVideoStream",
+    "/properties/ConnectedHomeSettings",
+    "/properties/FaceSearchSettings",
+    "/properties/KinesisDataStream",
+    "/properties/S3Destination",
+    "/properties/NotificationChannel",
+    "/properties/BoundingBoxRegionsOfInterest",
+    "/properties/PolygonRegionsOfInterest",
+    "/properties/DataSharingPreference"
+  ],
+  "$comment": "We explicitly specify the replacement strategy to be delete_then_create because we cannot create a new SP resource with the same name or same KVS input before deleting the old one",
+  "replacementStrategy": "delete_then_create",
+  "handlers": {
+    "create": {
+      "permissions": [
+        "rekognition:CreateStreamProcessor",
+        "iam:PassRole",
+        "rekognition:DescribeStreamProcessor",
+        "rekognition:ListTagsForResource",
+        "rekognition:TagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "rekognition:DescribeStreamProcessor",
+        "rekognition:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "rekognition:TagResource",
+        "rekognition:UntagResource",
+        "rekognition:ListTagsForResource",
+        "rekognition:DescribeStreamProcessor"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "rekognition:DeleteStreamProcessor"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "rekognition:ListStreamProcessors"
+      ]
+    }
+  },
+  "attributes": {
+    "Arn": {
+      "$ref": "#/definitions/Arn"
+    },
+    "Status": {
+      "description": "Current status of the stream processor.",
+      "type": "string",
+      "markdownDescription": "Current status of the stream processor.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "StatusMessage": {
+      "description": "Detailed status message about the stream processor.",
+      "type": "string",
+      "markdownDescription": "Detailed status message about the stream processor.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    }
+  }
+}

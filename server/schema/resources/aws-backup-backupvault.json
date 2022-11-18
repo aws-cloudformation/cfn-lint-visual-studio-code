@@ -1,0 +1,161 @@
+{
+  "typeName": "AWS::Backup::BackupVault",
+  "description": "Resource Type definition for AWS::Backup::BackupVault",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "definitions": {
+    "NotificationObjectType": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "BackupVaultEvents": {
+          "type": "array",
+          "insertionOrder": false,
+          "uniqueItems": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "SNSTopicArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "SNSTopicArn",
+        "BackupVaultEvents"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "LockConfigurationType": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "MinRetentionDays": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
+        },
+        "MaxRetentionDays": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+        },
+        "ChangeableForDays": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "MinRetentionDays"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "BackupVaultNamePattern": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9\\-\\_]{2,50}$  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "AccessPolicy": {
+      "type": [
+        "object",
+        "string"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: ['object', 'string']  \nUpdate requires: No interruption"
+    },
+    "BackupVaultName": {
+      "$ref": "#/definitions/BackupVaultNamePattern"
+    },
+    "BackupVaultTags": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^.{1,128}$": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "EncryptionKeyArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "Notifications": {
+      "$ref": "#/definitions/NotificationObjectType"
+    },
+    "LockConfiguration": {
+      "$ref": "#/definitions/LockConfigurationType"
+    }
+  },
+  "additionalProperties": false,
+  "taggable": true,
+  "required": [
+    "BackupVaultName"
+  ],
+  "createOnlyProperties": [
+    "/properties/BackupVaultName",
+    "/properties/EncryptionKeyArn"
+  ],
+  "readOnlyProperties": [
+    "/properties/BackupVaultArn"
+  ],
+  "primaryIdentifier": [
+    "/properties/BackupVaultName"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "backup:CreateBackupVault",
+        "backup:PutBackupVaultAccessPolicy",
+        "backup:PutBackupVaultNotifications",
+        "backup:PutBackupVaultLockConfiguration",
+        "backup-storage:Mount",
+        "backup-storage:MountCapsule",
+        "kms:CreateGrant",
+        "kms:GenerateDataKey",
+        "kms:Decrypt",
+        "kms:RetireGrant",
+        "kms:DescribeKey"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "backup:DescribeBackupVault",
+        "backup:GetBackupVaultNotifications",
+        "backup:GetBackupVaultAccessPolicy",
+        "backup:ListTags"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "backup:DescribeBackupVault",
+        "backup:DeleteBackupVaultAccessPolicy",
+        "backup:DeleteBackupVaultNotifications",
+        "backup:DeleteBackupVaultLockConfiguration",
+        "backup:ListTags",
+        "backup:TagResource",
+        "backup:UntagResource",
+        "backup:PutBackupVaultAccessPolicy",
+        "backup:PutBackupVaultNotifications",
+        "backup:PutBackupVaultLockConfiguration"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "backup:DeleteBackupVault"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "backup:ListBackupVaults"
+      ]
+    }
+  },
+  "attributes": {
+    "BackupVaultArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    }
+  }
+}

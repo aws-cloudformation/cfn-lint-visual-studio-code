@@ -1,5 +1,8 @@
 import { TextDocumentPositionParams } from "vscode-languageserver-protocol";
-import { yamlDocumentsCache } from "yaml-language-server/out/server/src/languageservice/parser/yaml-documents";
+import {
+  SingleYAMLDocument,
+  yamlDocumentsCache,
+} from "yaml-language-server/out/server/src/languageservice/parser/yaml-documents";
 import { matchOffsetToDocument } from "yaml-language-server/out/server/src/languageservice/utils/arrUtils";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { ASTNode } from "yaml-language-server/out/server/src/languageservice/jsonASTTypes";
@@ -58,7 +61,7 @@ function getTypeFromObject(item: ObjectASTNodeImpl): string | undefined {
 export function getNode(
   document: TextDocument,
   position: TextDocumentPositionParams
-): [ASTNode, CfnTypes] | null {
+): [ASTNode, CfnTypes, SingleYAMLDocument] | null {
   let cfnTypes: CfnTypes = {
     isValidTemplate: false,
     formatVersion: undefined,
@@ -67,7 +70,6 @@ export function getNode(
   };
 
   const doc = yamlDocumentsCache.getYamlDocument(document);
-
   // Build resource types
   try {
     const offset = document.offsetAt(position.position);
@@ -115,10 +117,10 @@ export function getNode(
     if (cfnTypes.resources.size > 0 || cfnTypes.formatVersion !== undefined) {
       cfnTypes.isValidTemplate = true;
     }
-    return [currentDoc.getNodeFromOffset(offset), cfnTypes];
+    return [currentDoc.getNodeFromOffset(offset), cfnTypes, currentDoc];
   } catch (error) {
     console.debug(error);
   }
 
-  return [null, null];
+  return [null, null, null];
 }

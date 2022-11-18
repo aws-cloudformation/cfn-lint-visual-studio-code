@@ -1,0 +1,207 @@
+{
+  "typeName": "AWS::BillingConductor::BillingGroup",
+  "description": "A billing group is a set of linked account which belong to the same end customer. It can be seen as a virtual consolidated billing family.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-billing-conductor.git",
+  "definitions": {
+    "BillingGroupStatus": {
+      "type": "string",
+      "enum": [
+        "ACTIVE",
+        "PRIMARY_ACCOUNT_MISSING"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ACTIVE | PRIMARY_ACCOUNT_MISSING  \nUpdate requires: No interruption"
+    },
+    "ComputationPreference": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "PricingPlanArn": {
+          "description": "ARN of the attached pricing plan",
+          "type": "string",
+          "markdownDescription": "ARN of the attached pricing plan\n\n---\n\nRequired: Yes  \nType: String  \nPattern: arn:aws(-cn)?:billingconductor::[0-9]{12}:pricingplan/[a-zA-Z0-9]{10}  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "PricingPlanArn"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AccountGrouping": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "LinkedAccountIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: [0-9]{12}  \nUpdate requires: No interruption"
+          },
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "LinkedAccountIds"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "Name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: [a-zA-Z0-9_\\+=\\.\\-@]+  \nUpdate requires: No interruption"
+    },
+    "Description": {
+      "type": "string",
+      "maxLength": 1024,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nUpdate requires: No interruption"
+    },
+    "PrimaryAccountId": {
+      "description": "This account will act as a virtual payer account of the billing group",
+      "type": "string",
+      "markdownDescription": "This account will act as a virtual payer account of the billing group\n\n---\n\nRequired: Yes  \nType: String  \nPattern: [0-9]{12}  \nUpdate requires: Replacement"
+    },
+    "ComputationPreference": {
+      "$ref": "#/definitions/ComputationPreference"
+    },
+    "AccountGrouping": {
+      "$ref": "#/definitions/AccountGrouping"
+    },
+    "Tags": {
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    }
+  },
+  "additionalProperties": false,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "required": [
+    "Name",
+    "AccountGrouping",
+    "PrimaryAccountId",
+    "ComputationPreference"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/Size",
+    "/properties/Status",
+    "/properties/StatusReason",
+    "/properties/CreationTime",
+    "/properties/LastModifiedTime"
+  ],
+  "createOnlyProperties": [
+    "/properties/PrimaryAccountId"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "billingconductor:CreateBillingGroup",
+        "billingconductor:AssociateAccounts",
+        "billingconductor:ListBillingGroups"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "billingconductor:ListBillingGroups",
+        "billingconductor:ListAccountAssociations",
+        "organizations:ListAccounts",
+        "billingconductor:ListTagsForResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "billingconductor:ListBillingGroups",
+        "billingconductor:ListAccountAssociations",
+        "organizations:ListAccounts",
+        "billingconductor:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "billingconductor:UpdateBillingGroup",
+        "billingconductor:ListAccountAssociations",
+        "organizations:ListAccounts",
+        "billingconductor:AssociateAccounts",
+        "billingconductor:DisassociateAccounts",
+        "billingconductor:ListBillingGroups",
+        "billingconductor:TagResource",
+        "billingconductor:UntagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "billingconductor:DeleteBillingGroup",
+        "billingconductor:ListBillingGroups"
+      ]
+    }
+  },
+  "attributes": {
+    "Arn": {
+      "description": "Billing Group ARN",
+      "type": "string",
+      "markdownDescription": "Billing Group ARN\n\n---\n\nRequired: No  \nType: String  \nPattern: arn:aws(-cn)?:billingconductor::[0-9]{12}:billinggroup/?[0-9]{12}  \nUpdate requires: No interruption"
+    },
+    "Size": {
+      "description": "Number of accounts in the billing group",
+      "type": "integer",
+      "markdownDescription": "Number of accounts in the billing group\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+    },
+    "Status": {
+      "$ref": "#/definitions/BillingGroupStatus"
+    },
+    "StatusReason": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "CreationTime": {
+      "description": "Creation timestamp in UNIX epoch time format",
+      "type": "integer",
+      "markdownDescription": "Creation timestamp in UNIX epoch time format\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+    },
+    "LastModifiedTime": {
+      "description": "Latest modified timestamp in UNIX epoch time format",
+      "type": "integer",
+      "markdownDescription": "Latest modified timestamp in UNIX epoch time format\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+    }
+  }
+}

@@ -1,0 +1,154 @@
+{
+  "typeName": "AWS::Amplify::Domain",
+  "description": "The AWS::Amplify::Domain resource allows you to connect a custom domain to your app.",
+  "additionalProperties": false,
+  "properties": {
+    "AppId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 20,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 20  \nPattern: d[a-z0-9]+  \nUpdate requires: Replacement"
+    },
+    "AutoSubDomainCreationPatterns": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 2048,
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: (?s).+  \nUpdate requires: No interruption"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "AutoSubDomainIAMRole": {
+      "type": "string",
+      "maxLength": 1000,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1000  \nPattern: ^$|^arn:.+:iam::\\d{12}:role.+  \nUpdate requires: No interruption"
+    },
+    "DomainName": {
+      "type": "string",
+      "maxLength": 255,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 255  \nPattern: ^(((?!-)[A-Za-z0-9-]{0,62}[A-Za-z0-9])\\.)+((?!-)[A-Za-z0-9-]{1,62}[A-Za-z0-9])(\\.)?$  \nUpdate requires: Replacement"
+    },
+    "EnableAutoSubDomain": {
+      "type": "boolean",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+    },
+    "SubDomainSettings": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "$ref": "#/definitions/SubDomainSetting"
+      },
+      "maxItems": 255,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+    }
+  },
+  "definitions": {
+    "SubDomainSetting": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Prefix": {
+          "type": "string",
+          "maxLength": 255,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 255  \nPattern: (?s).*  \nUpdate requires: No interruption"
+        },
+        "BranchName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: (?s).+  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Prefix",
+        "BranchName"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "required": [
+    "AppId",
+    "DomainName",
+    "SubDomainSettings"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "createOnlyProperties": [
+    "/properties/AppId",
+    "/properties/DomainName"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/DomainStatus",
+    "/properties/StatusReason",
+    "/properties/CertificateRecord"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "amplify:CreateDomainAssociation",
+        "route53:ListHostedZones",
+        "route53:ChangeResourceRecordSets",
+        "iam:PassRole",
+        "amplify:TagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "amplify:DeleteDomainAssociation",
+        "iam:PassRole",
+        "amplify:DeleteDomainAssociation"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "amplify:ListDomainAssociations",
+        "iam:PassRole",
+        "amplify:ListTagsForResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "amplify:GetDomainAssociation",
+        "route53:ListHostedZones",
+        "iam:PassRole",
+        "amplify:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "amplify:UpdateDomainAssociation",
+        "route53:ListHostedZones",
+        "route53:ChangeResourceRecordSets",
+        "iam:PassRole",
+        "amplify:ListTagsForResource",
+        "amplify:TagResource",
+        "amplify:UntagResource"
+      ]
+    }
+  },
+  "attributes": {
+    "Arn": {
+      "type": "string",
+      "maxLength": 1000,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1000  \nPattern: (?s).*  \nUpdate requires: No interruption"
+    },
+    "CertificateRecord": {
+      "type": "string",
+      "maxLength": 1000,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1000  \nUpdate requires: No interruption"
+    },
+    "DomainStatus": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "StatusReason": {
+      "type": "string",
+      "maxLength": 1000,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1000  \nUpdate requires: No interruption"
+    }
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "typeName": "AWS::ECS::ClusterCapacityProviderAssociations",
+  "description": "Associate a set of ECS Capacity Providers with a specified ECS Cluster",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "definitions": {
+    "CapacityProviders": {
+      "description": "List of capacity providers to associate with the cluster",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/CapacityProvider"
+      },
+      "uniqueItems": true,
+      "markdownDescription": "List of capacity providers to associate with the cluster\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "CapacityProvider": {
+      "description": "If using ec2 auto-scaling, the name of the associated capacity provider. Otherwise FARGATE, FARGATE_SPOT.",
+      "type": "string",
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "FARGATE",
+            "FARGATE_SPOT"
+          ]
+        },
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        }
+      ],
+      "markdownDescription": "If using ec2 auto-scaling, the name of the associated capacity provider. Otherwise FARGATE, FARGATE_SPOT.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "Cluster": {
+      "description": "The name of the cluster",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048,
+      "markdownDescription": "The name of the cluster\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: No interruption"
+    },
+    "DefaultCapacityProviderStrategy": {
+      "description": "List of capacity providers to associate with the cluster",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/CapacityProviderStrategy"
+      },
+      "markdownDescription": "List of capacity providers to associate with the cluster\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "CapacityProviderStrategy": {
+      "type": "object",
+      "properties": {
+        "Base": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100000,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "Weight": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "CapacityProvider": {
+          "$ref": "#/definitions/CapacityProvider"
+        }
+      },
+      "required": [
+        "CapacityProvider"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "CapacityProviders": {
+      "$ref": "#/definitions/CapacityProviders"
+    },
+    "Cluster": {
+      "$ref": "#/definitions/Cluster"
+    },
+    "DefaultCapacityProviderStrategy": {
+      "$ref": "#/definitions/DefaultCapacityProviderStrategy"
+    }
+  },
+  "required": [
+    "CapacityProviders",
+    "Cluster",
+    "DefaultCapacityProviderStrategy"
+  ],
+  "createOnlyProperties": [
+    "/properties/Cluster"
+  ],
+  "primaryIdentifier": [
+    "/properties/Cluster"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/DefaultCapacityProviderStrategy",
+      "/properties/CapacityProviders"
+    ]
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ecs:DescribeClusters",
+        "ecs:PutClusterCapacityProviders"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "ecs:DescribeClusters"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ecs:DescribeClusters",
+        "ecs:PutClusterCapacityProviders"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ecs:PutClusterCapacityProviders",
+        "ecs:DescribeClusters"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ecs:DescribeClusters",
+        "ecs:ListClusters"
+      ]
+    }
+  },
+  "attributes": {}
+}

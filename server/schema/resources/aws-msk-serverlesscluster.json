@@ -1,0 +1,172 @@
+{
+  "typeName": "AWS::MSK::ServerlessCluster",
+  "description": "Resource Type definition for AWS::MSK::ServerlessCluster",
+  "additionalProperties": false,
+  "properties": {
+    "ClusterName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nUpdate requires: Replacement"
+    },
+    "VpcConfigs": {
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/VpcConfig"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: Replacement"
+    },
+    "ClientAuthentication": {
+      "$ref": "#/definitions/ClientAuthentication"
+    },
+    "Tags": {
+      "type": "object",
+      "description": "A key-value pair to associate with a resource.",
+      "patternProperties": {
+        "^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: Replacement"
+    }
+  },
+  "definitions": {
+    "VpcConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "SecurityGroups": {
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "SubnetIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "SubnetIds"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ClientAuthentication": {
+      "type": "object",
+      "properties": {
+        "Sasl": {
+          "$ref": "#/definitions/Sasl"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Sasl"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Sasl": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Iam": {
+          "$ref": "#/definitions/Iam"
+        }
+      },
+      "required": [
+        "Iam"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Iam": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Enabled": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Enabled"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "required": [
+    "ClusterName",
+    "VpcConfigs",
+    "ClientAuthentication"
+  ],
+  "createOnlyProperties": [
+    "/properties/ClusterName",
+    "/properties/VpcConfigs",
+    "/properties/ClientAuthentication",
+    "/properties/Tags"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "kafka:CreateClusterV2",
+        "kafka:TagResource",
+        "ec2:CreateVpcEndpoint",
+        "ec2:CreateTags",
+        "ec2:DescribeVpcAttribute",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeVpcEndpoints",
+        "ec2:DescribeVpcs",
+        "ec2:DescribeSecurityGroups"
+      ],
+      "timeoutInMinutes": 120
+    },
+    "read": {
+      "permissions": [
+        "kafka:DescribeClusterV2"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "kafka:DeleteCluster",
+        "ec2:DeleteVpcEndpoints"
+      ],
+      "timeoutInMinutes": 75
+    },
+    "list": {
+      "permissions": [
+        "kafka:ListClustersV2"
+      ]
+    }
+  },
+  "attributes": {
+    "Arn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    }
+  }
+}

@@ -1,0 +1,149 @@
+{
+  "typeName": "AWS::IoT::ScheduledAudit",
+  "description": "Scheduled audits can be used to specify the checks you want to perform during an audit and how often the audit should be run.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-iot.git",
+  "definitions": {
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The tag's key.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The tag's key.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The tag's value.",
+          "minLength": 1,
+          "maxLength": 256,
+          "markdownDescription": "The tag's value.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "ScheduledAuditName": {
+      "description": "The name you want to give to the scheduled audit.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "markdownDescription": "The name you want to give to the scheduled audit.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: [a-zA-Z0-9:_-]+  \nUpdate requires: Replacement"
+    },
+    "Frequency": {
+      "description": "How often the scheduled audit takes place. Can be one of DAILY, WEEKLY, BIWEEKLY, or MONTHLY.",
+      "type": "string",
+      "enum": [
+        "DAILY",
+        "WEEKLY",
+        "BIWEEKLY",
+        "MONTHLY"
+      ],
+      "markdownDescription": "How often the scheduled audit takes place. Can be one of DAILY, WEEKLY, BIWEEKLY, or MONTHLY.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: DAILY | WEEKLY | BIWEEKLY | MONTHLY  \nUpdate requires: No interruption"
+    },
+    "DayOfMonth": {
+      "description": "The day of the month on which the scheduled audit takes place. Can be 1 through 31 or LAST. This field is required if the frequency parameter is set to MONTHLY.",
+      "type": "string",
+      "markdownDescription": "The day of the month on which the scheduled audit takes place. Can be 1 through 31 or LAST. This field is required if the frequency parameter is set to MONTHLY.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^([1-9]|[12][0-9]|3[01])$|^LAST$  \nUpdate requires: No interruption"
+    },
+    "DayOfWeek": {
+      "description": "The day of the week on which the scheduled audit takes place. Can be one of SUN, MON, TUE,WED, THU, FRI, or SAT. This field is required if the frequency parameter is set to WEEKLY or BIWEEKLY.",
+      "type": "string",
+      "enum": [
+        "SUN",
+        "MON",
+        "TUE",
+        "WED",
+        "THU",
+        "FRI",
+        "SAT"
+      ],
+      "markdownDescription": "The day of the week on which the scheduled audit takes place. Can be one of SUN, MON, TUE,WED, THU, FRI, or SAT. This field is required if the frequency parameter is set to WEEKLY or BIWEEKLY.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SUN | MON | TUE | WED | THU | FRI | SAT  \nUpdate requires: No interruption"
+    },
+    "TargetCheckNames": {
+      "description": "Which checks are performed during the scheduled audit. Checks must be enabled for your account.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      },
+      "markdownDescription": "Which checks are performed during the scheduled audit. Checks must be enabled for your account.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "Tags": {
+      "type": "array",
+      "maxItems": 50,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "description": "An array of key-value pairs to apply to this resource.",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "An array of key-value pairs to apply to this resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    }
+  },
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/ScheduledAuditName"
+  ],
+  "required": [
+    "Frequency",
+    "TargetCheckNames"
+  ],
+  "createOnlyProperties": [
+    "/properties/ScheduledAuditName"
+  ],
+  "readOnlyProperties": [
+    "/properties/ScheduledAuditArn"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "iot:CreateScheduledAudit"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "iot:DescribeScheduledAudit",
+        "iot:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "iot:UpdateScheduledAudit",
+        "iot:ListTagsForResource",
+        "iot:UntagResource",
+        "iot:TagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "iot:DescribeScheduledAudit",
+        "iot:DeleteScheduledAudit"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "iot:ListScheduledAudits"
+      ]
+    }
+  },
+  "attributes": {
+    "ScheduledAuditArn": {
+      "description": "The ARN (Amazon resource name) of the scheduled audit.",
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 2048,
+      "markdownDescription": "The ARN (Amazon resource name) of the scheduled audit.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nUpdate requires: No interruption"
+    }
+  }
+}
