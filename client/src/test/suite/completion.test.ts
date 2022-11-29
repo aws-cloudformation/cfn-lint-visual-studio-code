@@ -133,13 +133,13 @@ suite("Should code complete", () => {
     const docUri = getDocUri("completion", "completion2.yaml");
     await activate(docUri);
 
-    const completion_intrinsics = intrinsics.filter(
+    const completionIntrinsics = intrinsics.filter(
       (intrinsic) => intrinsic.label !== "!Ref"
     );
 
     await testCompletion(docUri, new vscode.Position(17, 19), {
       items: [
-        ...completion_intrinsics,
+        ...completionIntrinsics,
         {
           label: "Subnet1",
           kind: 11,
@@ -168,13 +168,13 @@ suite("Should code complete", () => {
     const docUri = getDocUri("completion", "completion2.yaml");
     await activate(docUri);
 
-    const completion_intrinsics = intrinsics.filter(
+    const completionIntrinsics = intrinsics.filter(
       (intrinsic) => intrinsic.label !== "!Ref"
     );
 
     await testCompletion(docUri, new vscode.Position(21, 22), {
       items: [
-        ...completion_intrinsics,
+        ...completionIntrinsics,
         {
           label: "!Ref Subnet1",
           kind: 11,
