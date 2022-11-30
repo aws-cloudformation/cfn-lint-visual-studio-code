@@ -19,7 +19,7 @@ import {
 import { TextBuffer } from "yaml-language-server/out/server/src/languageservice/utils/textBuffer";
 import { YAMLMap, YAMLSeq } from "yaml";
 
-class refExp {
+class RefExp {
   tag: string;
   readonly type: string;
   default: never;
@@ -47,7 +47,7 @@ module.exports.parse = function (
 ): YAMLDocument {
   const options: ParseOptions & DocumentOptions & SchemaOptions = {
     strict: false,
-    customTags: [new refExp()],
+    customTags: [new RefExp()],
     version: parserOptions.yamlVersion ?? defaultOptions.yamlVersion,
     keepSourceTokens: true,
   };
