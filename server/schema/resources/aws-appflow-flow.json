@@ -57,6 +57,11 @@
         "$ref": "#/definitions/Tag"
       },
       "markdownDescription": "List of Tags.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "MetadataCatalogConfig": {
+      "description": "Configurations of metadata catalog of the flow.",
+      "$ref": "#/definitions/MetadataCatalogConfig",
+      "markdownDescription": "Configurations of metadata catalog of the flow.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
     }
   },
   "definitions": {
@@ -220,6 +225,53 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "A label for tagging AppFlow resources\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "MetadataCatalogConfig": {
+      "description": "Configurations of metadata catalog of the flow.",
+      "type": "object",
+      "properties": {
+        "GlueDataCatalog": {
+          "description": "Configurations of glue data catalog of the flow.",
+          "$ref": "#/definitions/GlueDataCatalog",
+          "markdownDescription": "Configurations of glue data catalog of the flow.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Configurations of metadata catalog of the flow.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "GlueDataCatalog": {
+      "description": "Trigger settings of the flow.",
+      "type": "object",
+      "properties": {
+        "RoleArn": {
+          "description": "A string containing the value for the tag",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 512,
+          "markdownDescription": "A string containing the value for the tag\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 512  \nPattern: arn:aws:iam:.*:[0-9]+:.*  \nUpdate requires: No interruption"
+        },
+        "DatabaseName": {
+          "description": "A string containing the value for the tag",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 255,
+          "markdownDescription": "A string containing the value for the tag\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 255  \nPattern: [\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDC00-\\uDBFF\\uDFFF\\t]*  \nUpdate requires: No interruption"
+        },
+        "TablePrefix": {
+          "description": "A string containing the value for the tag",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 128,
+          "markdownDescription": "A string containing the value for the tag\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 128  \nPattern: [\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDC00-\\uDBFF\\uDFFF\\t]*  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "RoleArn",
+        "DatabaseName",
+        "TablePrefix"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Trigger settings of the flow.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "DestinationConnectorProperties": {
       "description": "Destination connector details",
@@ -588,6 +640,10 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: None | SingleFile  \nUpdate requires: No interruption"
     },
+    "TargetFileSize": {
+      "type": "integer",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+    },
     "PreserveSourceDataTyping": {
       "type": "boolean",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
@@ -612,6 +668,21 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: YEAR | MONTH | DAY | HOUR | MINUTE  \nUpdate requires: No interruption"
     },
+    "PathPrefixHierarchy": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PathPrefix"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "PathPrefix": {
+      "type": "string",
+      "enum": [
+        "EXECUTION_ID",
+        "SCHEMA_VERSION"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: EXECUTION_ID | SCHEMA_VERSION  \nUpdate requires: No interruption"
+    },
     "PrefixConfig": {
       "type": "object",
       "properties": {
@@ -620,6 +691,9 @@
         },
         "PrefixFormat": {
           "$ref": "#/definitions/PrefixFormat"
+        },
+        "PathPrefixHierarchy": {
+          "$ref": "#/definitions/PathPrefixHierarchy"
         }
       },
       "additionalProperties": false,
@@ -630,6 +704,9 @@
       "properties": {
         "AggregationType": {
           "$ref": "#/definitions/AggregationType"
+        },
+        "TargetFileSize": {
+          "$ref": "#/definitions/TargetFileSize"
         }
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
@@ -1215,9 +1292,10 @@
         "Merge",
         "Passthrough",
         "Truncate",
-        "Validate"
+        "Validate",
+        "Partition"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Arithmetic | Filter | Map | Map_all | Mask | Merge | Passthrough | Truncate | Validate  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Arithmetic | Filter | Map | Map_all | Mask | Merge | Passthrough | Truncate | Validate | Partition  \nUpdate requires: No interruption"
     },
     "OperatorPropertiesKeys": {
       "type": "string",
@@ -1237,9 +1315,10 @@
         "CONCAT_FORMAT",
         "SUBFIELD_CATEGORY_MAP",
         "EXCLUDE_SOURCE_FIELDS_LIST",
-        "INCLUDE_NEW_FIELDS"
+        "INCLUDE_NEW_FIELDS",
+        "ORDERED_PARTITION_KEYS_LIST"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: VALUE | VALUES | DATA_TYPE | UPPER_BOUND | LOWER_BOUND | SOURCE_DATA_TYPE | DESTINATION_DATA_TYPE | VALIDATION_ACTION | MASK_VALUE | MASK_LENGTH | TRUNCATE_LENGTH | MATH_OPERATION_FIELDS_ORDER | CONCAT_FORMAT | SUBFIELD_CATEGORY_MAP | EXCLUDE_SOURCE_FIELDS_LIST | INCLUDE_NEW_FIELDS  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: VALUE | VALUES | DATA_TYPE | UPPER_BOUND | LOWER_BOUND | SOURCE_DATA_TYPE | DESTINATION_DATA_TYPE | VALIDATION_ACTION | MASK_VALUE | MASK_LENGTH | TRUNCATE_LENGTH | MATH_OPERATION_FIELDS_ORDER | CONCAT_FORMAT | SUBFIELD_CATEGORY_MAP | EXCLUDE_SOURCE_FIELDS_LIST | INCLUDE_NEW_FIELDS | ORDERED_PARTITION_KEYS_LIST  \nUpdate requires: No interruption"
     },
     "TaskPropertiesObject": {
       "description": "An object used to store task related info",
