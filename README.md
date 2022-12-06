@@ -25,6 +25,14 @@ If you want to be able to preview templates as graphs, you also need to install 
 
 ![](/images/settings.png)
 
+## Community
+
+Join us on Discord! Connect & interact with CloudFormation developers &
+experts, find channels to discuss and get help for cfn-lint, CloudFormation registry, StackSets,
+Guard and more:
+
+[![Join our Discord](https://discordapp.com/api/guilds/981586120448020580/widget.png?style=banner3)](https://discord.gg/9zpd7TTRwq)
+
 ## Contribute
 
 The code for this plugin can be found on GitHub at [awslabs/aws-cfn-lint-visual-studio-code](https://github.com/awslabs/aws-cfn-lint-visual-studio-code)
