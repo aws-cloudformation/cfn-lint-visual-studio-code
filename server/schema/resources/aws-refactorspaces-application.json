@@ -1,0 +1,200 @@
+{
+  "typeName": "AWS::RefactorSpaces::Application",
+  "description": "Definition of AWS::RefactorSpaces::Application Resource Type",
+  "definitions": {
+    "ApiGatewayEndpointType": {
+      "type": "string",
+      "enum": [
+        "REGIONAL",
+        "PRIVATE"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: REGIONAL | PRIVATE  \nUpdate requires: No interruption"
+    },
+    "ApiGatewayProxyInput": {
+      "type": "object",
+      "properties": {
+        "StageName": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[-a-zA-Z0-9_]*$  \nUpdate requires: No interruption"
+        },
+        "EndpointType": {
+          "$ref": "#/definitions/ApiGatewayEndpointType"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ProxyType": {
+      "type": "string",
+      "enum": [
+        "API_GATEWAY"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: API_GATEWAY  \nUpdate requires: No interruption"
+    },
+    "Tag": {
+      "description": "A label for tagging Environment resource",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "description": "A string used to identify this tag",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "A string used to identify this tag\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^(?!aws:).+  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "description": "A string containing the value for the tag",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "A string containing the value for the tag\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A label for tagging Environment resource\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "ApiGatewayProxy": {
+      "$ref": "#/definitions/ApiGatewayProxyInput"
+    },
+    "EnvironmentIdentifier": {
+      "type": "string",
+      "maxLength": 14,
+      "minLength": 14,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 14  \nMaximum Length: 14  \nPattern: ^env-([0-9A-Za-z]{10}$)  \nUpdate requires: Replacement"
+    },
+    "Name": {
+      "type": "string",
+      "maxLength": 63,
+      "minLength": 3,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 63  \nPattern: ^(?!app-)[a-zA-Z0-9]+[a-zA-Z0-9-_ ]+$  \nUpdate requires: Replacement"
+    },
+    "ProxyType": {
+      "$ref": "#/definitions/ProxyType"
+    },
+    "VpcId": {
+      "type": "string",
+      "maxLength": 21,
+      "minLength": 12,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 12  \nMaximum Length: 21  \nPattern: ^vpc-[-a-f0-9]{8}([-a-f0-9]{9})?$  \nUpdate requires: Replacement"
+    },
+    "Tags": {
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "description": "Metadata that you can assign to help organize the frameworks that you create. Each tag is a key-value pair.",
+      "markdownDescription": "Metadata that you can assign to help organize the frameworks that you create. Each tag is a key-value pair.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    }
+  },
+  "readOnlyProperties": [
+    "/properties/ApplicationIdentifier",
+    "/properties/Arn",
+    "/properties/ApiGatewayId",
+    "/properties/VpcLinkId",
+    "/properties/NlbArn",
+    "/properties/NlbName",
+    "/properties/ProxyUrl",
+    "/properties/StageName"
+  ],
+  "writeOnlyProperties": [
+    "/properties/ApiGatewayProxy"
+  ],
+  "createOnlyProperties": [
+    "/properties/ApiGatewayProxy",
+    "/properties/EnvironmentIdentifier",
+    "/properties/Name",
+    "/properties/ProxyType",
+    "/properties/VpcId"
+  ],
+  "primaryIdentifier": [
+    "/properties/EnvironmentIdentifier",
+    "/properties/ApplicationIdentifier"
+  ],
+  "additionalProperties": false,
+  "handlers": {
+    "create": {
+      "permissions": [
+        "refactor-spaces:CreateApplication",
+        "refactor-spaces:TagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "refactor-spaces:GetApplication",
+        "refactor-spaces:ListTagsForResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "refactor-spaces:DeleteApplication",
+        "refactor-spaces:UntagResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "refactor-spaces:ListApplications",
+        "refactor-spaces:ListTagsForResource"
+      ]
+    }
+  },
+  "taggable": true,
+  "attributes": {
+    "Arn": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 20,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:(aws[a-zA-Z-]*)?:refactor-spaces:[a-zA-Z0-9\\-]+:\\w{12}:[a-zA-Z_0-9+=,.@\\-_/]+$  \nUpdate requires: No interruption"
+    },
+    "ApiGatewayId": {
+      "type": "string",
+      "maxLength": 10,
+      "minLength": 10,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 10  \nMaximum Length: 10  \nPattern: ^[a-z0-9]{10}$  \nUpdate requires: No interruption"
+    },
+    "VpcLinkId": {
+      "type": "string",
+      "maxLength": 10,
+      "minLength": 10,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 10  \nMaximum Length: 10  \nPattern: ^[a-z0-9]{10}$  \nUpdate requires: No interruption"
+    },
+    "NlbArn": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 20,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:(aws[a-zA-Z-]*)?:elasticloadbalancing:[a-zA-Z0-9\\\\-]+:\\\\w{12}:[a-zA-Z_0-9+=,.@\\\\-_\\/]+$  \nUpdate requires: No interruption"
+    },
+    "NlbName": {
+      "type": "string",
+      "maxLength": 32,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 32  \nPattern: ^(?!internal-)[a-zA-Z0-9]+[a-zA-Z0-9-_ ]+.*[^-]$  \nUpdate requires: No interruption"
+    },
+    "ApplicationIdentifier": {
+      "type": "string",
+      "maxLength": 14,
+      "minLength": 14,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 14  \nMaximum Length: 14  \nPattern: ^app-([0-9A-Za-z]{10}$)  \nUpdate requires: No interruption"
+    },
+    "StageName": {
+      "type": "string",
+      "maxLength": 128,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[-a-zA-Z0-9_]*$  \nUpdate requires: No interruption"
+    },
+    "ProxyUrl": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^http://[-a-zA-Z0-9+\\x38@#/%?=~_|!:,.;]*[-a-zA-Z0-9+\\x38@#/%=~_|]$  \nUpdate requires: No interruption"
+    }
+  }
+}

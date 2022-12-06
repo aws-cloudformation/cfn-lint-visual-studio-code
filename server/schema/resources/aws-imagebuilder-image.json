@@ -1,0 +1,159 @@
+{
+  "typeName": "AWS::ImageBuilder::Image",
+  "description": "Resource schema for AWS::ImageBuilder::Image",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-imagebuilder.git",
+  "properties": {
+    "ImageTestsConfiguration": {
+      "description": "The image tests configuration used when creating this image.",
+      "$ref": "#/definitions/ImageTestsConfiguration",
+      "markdownDescription": "The image tests configuration used when creating this image.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement"
+    },
+    "ImageRecipeArn": {
+      "description": "The Amazon Resource Name (ARN) of the image recipe that defines how images are configured, tested, and assessed.",
+      "type": "string",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the image recipe that defines how images are configured, tested, and assessed.\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: Replacement"
+    },
+    "ContainerRecipeArn": {
+      "description": "The Amazon Resource Name (ARN) of the container recipe that defines how images are configured and tested.",
+      "type": "string",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the container recipe that defines how images are configured and tested.\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: Replacement"
+    },
+    "DistributionConfigurationArn": {
+      "description": "The Amazon Resource Name (ARN) of the distribution configuration.",
+      "type": "string",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the distribution configuration.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "InfrastructureConfigurationArn": {
+      "description": "The Amazon Resource Name (ARN) of the infrastructure configuration.",
+      "type": "string",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the infrastructure configuration.\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: Replacement"
+    },
+    "EnhancedImageMetadataEnabled": {
+      "description": "Collects additional information about the image being created, including the operating system (OS) version and package list.",
+      "type": "boolean",
+      "markdownDescription": "Collects additional information about the image being created, including the operating system (OS) version and package list.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: Replacement"
+    },
+    "Tags": {
+      "description": "The tags associated with the image.",
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        ".{1,}": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "The tags associated with the image.\n\n---\n\nRequired: No  \nUpdate requires: Replacement"
+    }
+  },
+  "definitions": {
+    "ImageTestsConfiguration": {
+      "description": "The image tests configuration used when creating this image.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ImageTestsEnabled": {
+          "description": "ImageTestsEnabled",
+          "type": "boolean",
+          "markdownDescription": "ImageTestsEnabled\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        },
+        "TimeoutMinutes": {
+          "description": "TimeoutMinutes",
+          "type": "integer",
+          "minimum": 60,
+          "maximum": 1440,
+          "markdownDescription": "TimeoutMinutes\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "The image tests configuration used when creating this image.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "additionalProperties": false,
+  "oneOf": [
+    {
+      "required": [
+        "ContainerRecipeArn",
+        "InfrastructureConfigurationArn"
+      ]
+    },
+    {
+      "required": [
+        "ImageRecipeArn",
+        "InfrastructureConfigurationArn"
+      ]
+    }
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/Name",
+    "/properties/ImageId",
+    "/properties/ImageUri"
+  ],
+  "createOnlyProperties": [
+    "/properties/ImageRecipeArn",
+    "/properties/ContainerRecipeArn",
+    "/properties/InfrastructureConfigurationArn",
+    "/properties/DistributionConfigurationArn",
+    "/properties/ImageTestsConfiguration",
+    "/properties/EnhancedImageMetadataEnabled",
+    "/properties/Tags"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "iam:GetRole",
+        "iam:CreateServiceLinkedRole",
+        "imagebuilder:GetImageRecipe",
+        "imagebuilder:GetInfrastructureConfiguration",
+        "imagebuilder:GetDistributionConfiguration",
+        "imagebuilder:GetImage",
+        "imagebuilder:CreateImage",
+        "imagebuilder:TagResource"
+      ],
+      "timeoutInMinutes": 720
+    },
+    "read": {
+      "permissions": [
+        "imagebuilder:GetImage"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "imagebuilder:GetImage",
+        "imagebuilder:DeleteImage",
+        "imagebuilder:UnTagResource",
+        "imagebuilder:CancelImageCreation"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "imagebuilder:ListImages"
+      ]
+    }
+  },
+  "attributes": {
+    "Arn": {
+      "description": "The Amazon Resource Name (ARN) of the image.",
+      "type": "string",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the image.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "Name": {
+      "description": "The name of the image.",
+      "type": "string",
+      "markdownDescription": "The name of the image.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "ImageId": {
+      "description": "The AMI ID of the EC2 AMI in current region.",
+      "type": "string",
+      "markdownDescription": "The AMI ID of the EC2 AMI in current region.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "ImageUri": {
+      "description": "URI for containers created in current Region with default ECR image tag",
+      "type": "string",
+      "markdownDescription": "URI for containers created in current Region with default ECR image tag\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    }
+  }
+}

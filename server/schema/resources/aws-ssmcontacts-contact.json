@@ -1,0 +1,190 @@
+{
+  "typeName": "AWS::SSMContacts::Contact",
+  "description": "Resource Type definition for AWS::SSMContacts::Contact",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "definitions": {
+    "ContactTargetInfo": {
+      "type": "object",
+      "description": "The contact that SSM Incident Manager is engaging during an incident.",
+      "properties": {
+        "ContactId": {
+          "description": "The Amazon Resource Name (ARN) of the contact.",
+          "type": "string",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the contact.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "IsEssential": {
+          "type": "boolean",
+          "description": "A Boolean value determining if the contact's acknowledgement stops the progress of stages in the plan.",
+          "markdownDescription": "A Boolean value determining if the contact's acknowledgement stops the progress of stages in the plan.\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "ContactId",
+        "IsEssential"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The contact that SSM Incident Manager is engaging during an incident.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ChannelTargetInfo": {
+      "type": "object",
+      "description": "Information about the contact channel that SSM Incident Manager uses to engage the contact.",
+      "properties": {
+        "ChannelId": {
+          "description": "The Amazon Resource Name (ARN) of the contact channel.",
+          "type": "string",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the contact channel.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "RetryIntervalInMinutes": {
+          "type": "integer",
+          "description": "The number of minutes to wait to retry sending engagement in the case the engagement initially fails.",
+          "markdownDescription": "The number of minutes to wait to retry sending engagement in the case the engagement initially fails.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "ChannelId",
+        "RetryIntervalInMinutes"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Information about the contact channel that SSM Incident Manager uses to engage the contact.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Stage": {
+      "description": "A set amount of time that an escalation plan or engagement plan engages the specified contacts or contact methods.",
+      "type": "object",
+      "properties": {
+        "DurationInMinutes": {
+          "description": "The time to wait until beginning the next stage.",
+          "type": "integer",
+          "markdownDescription": "The time to wait until beginning the next stage.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "Targets": {
+          "type": "array",
+          "description": "The contacts or contact methods that the escalation plan or engagement plan is engaging.",
+          "items": {
+            "$ref": "#/definitions/Targets"
+          },
+          "markdownDescription": "The contacts or contact methods that the escalation plan or engagement plan is engaging.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "DurationInMinutes"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A set amount of time that an escalation plan or engagement plan engages the specified contacts or contact methods.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Targets": {
+      "description": "The contacts or contact methods that the escalation plan or engagement plan is engaging.",
+      "type": "object",
+      "properties": {
+        "ContactTargetInfo": {
+          "$ref": "#/definitions/ContactTargetInfo"
+        },
+        "ChannelTargetInfo": {
+          "$ref": "#/definitions/ChannelTargetInfo"
+        }
+      },
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "required": [
+            "ChannelTargetInfo"
+          ]
+        },
+        {
+          "required": [
+            "ContactTargetInfo"
+          ]
+        }
+      ],
+      "markdownDescription": "The contacts or contact methods that the escalation plan or engagement plan is engaging.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "Alias": {
+      "description": "Alias of the contact. String value with 20 to 256 characters. Only alphabetical, numeric characters, dash, or underscore allowed.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "markdownDescription": "Alias of the contact. String value with 20 to 256 characters. Only alphabetical, numeric characters, dash, or underscore allowed.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[a-z0-9_\\-\\.]*$  \nUpdate requires: Replacement"
+    },
+    "DisplayName": {
+      "description": "Name of the contact. String value with 3 to 256 characters. Only alphabetical, space, numeric characters, dash, or underscore allowed.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "markdownDescription": "Name of the contact. String value with 3 to 256 characters. Only alphabetical, space, numeric characters, dash, or underscore allowed.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[a-zA-Z0-9_\\-\\s]*$  \nUpdate requires: No interruption"
+    },
+    "Type": {
+      "description": "Contact type, which specify type of contact. Currently supported values: \u201cPERSONAL\u201d, \u201cSHARED\u201d, \u201cOTHER\u201c.",
+      "type": "string",
+      "enum": [
+        "PERSONAL",
+        "CUSTOM",
+        "SERVICE",
+        "ESCALATION"
+      ],
+      "markdownDescription": "Contact type, which specify type of contact. Currently supported values: \u201cPERSONAL\u201d, \u201cSHARED\u201d, \u201cOTHER\u201c.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: PERSONAL | CUSTOM | SERVICE | ESCALATION  \nUpdate requires: Replacement"
+    },
+    "Plan": {
+      "description": "The stages that an escalation plan or engagement plan engages contacts and contact methods in.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Stage"
+      },
+      "markdownDescription": "The stages that an escalation plan or engagement plan engages contacts and contact methods in.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "Alias",
+    "DisplayName",
+    "Type",
+    "Plan"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "writeOnlyProperties": [
+    "/properties/Plan"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn"
+  ],
+  "createOnlyProperties": [
+    "/properties/Alias",
+    "/properties/Type"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ssm-contacts:CreateContact"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "ssm-contacts:GetContact"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ssm-contacts:UpdateContact"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ssm-contacts:DeleteContact"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ssm-contacts:ListContacts"
+      ]
+    }
+  },
+  "attributes": {
+    "Arn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the contact.",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the contact.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    }
+  }
+}

@@ -1,0 +1,145 @@
+{
+  "typeName": "AWS::ECS::CapacityProvider",
+  "description": "Resource Type definition for AWS::ECS::CapacityProvider.",
+  "definitions": {
+    "ManagedScaling": {
+      "description": "The managed scaling settings for the Auto Scaling group capacity provider.",
+      "type": "object",
+      "properties": {
+        "MinimumScalingStepSize": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "MaximumScalingStepSize": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "Status": {
+          "type": "string",
+          "enum": [
+            "DISABLED",
+            "ENABLED"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DISABLED | ENABLED  \nUpdate requires: No interruption"
+        },
+        "TargetCapacity": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "InstanceWarmupPeriod": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The managed scaling settings for the Auto Scaling group capacity provider.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AutoScalingGroupProvider": {
+      "type": "object",
+      "properties": {
+        "AutoScalingGroupArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "ManagedScaling": {
+          "$ref": "#/definitions/ManagedScaling"
+        },
+        "ManagedTerminationProtection": {
+          "type": "string",
+          "enum": [
+            "DISABLED",
+            "ENABLED"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DISABLED | ENABLED  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "AutoScalingGroupArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: Replacement"
+    },
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "AutoScalingGroupProvider": {
+      "$ref": "#/definitions/AutoScalingGroupProvider"
+    },
+    "Name": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "Tags": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    }
+  },
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/Name"
+  ],
+  "createOnlyProperties": [
+    "/properties/AutoScalingGroupProvider/AutoScalingGroupArn",
+    "/properties/Name"
+  ],
+  "propertyTransform": {
+    "/properties/AutoScalingGroupProvider/AutoScalingGroupArn": "$split(AutoScalingGroupProvider.AutoScalingGroupArn, \"autoScalingGroupName/\")[-1]"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "autoscaling:CreateOrUpdateTags",
+        "ecs:CreateCapacityProvider",
+        "ecs:DescribeCapacityProviders"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ecs:DescribeCapacityProviders",
+        "ecs:DeleteCapacityProvider"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "ecs:DescribeCapacityProviders"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ecs:UpdateCapacityProvider",
+        "ecs:DescribeCapacityProviders",
+        "ecs:ListTagsForResource",
+        "ecs:TagResource",
+        "ecs:UntagResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ecs:DescribeCapacityProviders"
+      ]
+    }
+  },
+  "required": [
+    "AutoScalingGroupProvider"
+  ],
+  "attributes": {}
+}

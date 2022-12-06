@@ -1,0 +1,170 @@
+{
+  "typeName": "AWS::Organizations::Policy",
+  "description": "Policies in AWS Organizations enable you to manage different features of the AWS accounts in your organization.  You can use policies when all features are enabled in your organization.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-organizations.git",
+  "properties": {
+    "Name": {
+      "description": "Name of the Policy",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "markdownDescription": "Name of the Policy\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: [\\s\\S]*  \nUpdate requires: No interruption"
+    },
+    "Type": {
+      "description": "The type of policy to create. You can specify one of the following values: AISERVICES_OPT_OUT_POLICY, BACKUP_POLICY, SERVICE_CONTROL_POLICY, TAG_POLICY",
+      "type": "string",
+      "enum": [
+        "SERVICE_CONTROL_POLICY",
+        "AISERVICES_OPT_OUT_POLICY",
+        "BACKUP_POLICY",
+        "TAG_POLICY"
+      ],
+      "markdownDescription": "The type of policy to create. You can specify one of the following values: AISERVICES_OPT_OUT_POLICY, BACKUP_POLICY, SERVICE_CONTROL_POLICY, TAG_POLICY\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: SERVICE_CONTROL_POLICY | AISERVICES_OPT_OUT_POLICY | BACKUP_POLICY | TAG_POLICY  \nUpdate requires: Replacement"
+    },
+    "Content": {
+      "description": "The Policy text content",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000000,
+      "markdownDescription": "The Policy text content\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1000000  \nPattern: [\\s\\S]*  \nUpdate requires: No interruption"
+    },
+    "Description": {
+      "description": "Human readable description of the policy",
+      "type": "string",
+      "maxLength": 512,
+      "markdownDescription": "Human readable description of the policy\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 512  \nPattern: [\\s\\S]*  \nUpdate requires: No interruption"
+    },
+    "TargetIds": {
+      "description": "List of unique identifiers (IDs) of the root, OU, or account that you want to attach the policy to",
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(r-[0-9a-z]{4,32})|(\\d{12})|(ou-[0-9a-z]{4,32}-[a-z0-9]{8,32})$  \nUpdate requires: No interruption"
+      },
+      "markdownDescription": "List of unique identifiers (IDs) of the root, OU, or account that you want to attach the policy to\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "Tags": {
+      "description": "A list of tags that you want to attach to the newly created policy. For each tag in the list, you must specify both a tag key and a value. You can set the value to an empty string, but you can't set it to null.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "A list of tags that you want to attach to the newly created policy. For each tag in the list, you must specify both a tag key and a value. You can set the value to an empty string, but you can't set it to null.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    }
+  },
+  "definitions": {
+    "Tag": {
+      "description": "A custom key-value pair associated with a resource within your organization.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "description": "The key identifier, or name, of the tag.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The key identifier, or name, of the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: [\\s\\S]*  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "description": "The string value that's associated with the key of the tag. You can set the value of a tag to an empty string, but you can't set the value of a tag to null.",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The string value that's associated with the key of the tag. You can set the value of a tag to an empty string, but you can't set the value of a tag to null.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: [\\s\\S]*  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ],
+      "markdownDescription": "A custom key-value pair associated with a resource within your organization.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
+  "required": [
+    "Name",
+    "Type",
+    "Content"
+  ],
+  "primaryIdentifier": [
+    "/properties/Id"
+  ],
+  "readOnlyProperties": [
+    "/properties/Id",
+    "/properties/Arn",
+    "/properties/AwsManaged"
+  ],
+  "createOnlyProperties": [
+    "/properties/Type"
+  ],
+  "additionalProperties": false,
+  "handlers": {
+    "create": {
+      "permissions": [
+        "organizations:CreatePolicy",
+        "organizations:DescribePolicy",
+        "organizations:AttachPolicy",
+        "organizations:ListTagsForResource",
+        "organizations:ListTargetsForPolicy",
+        "organizations:TagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "organizations:DescribePolicy",
+        "organizations:ListTargetsForPolicy",
+        "organizations:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "organizations:AttachPolicy",
+        "organizations:DetachPolicy",
+        "organizations:UpdatePolicy",
+        "organizations:ListTagsForResource",
+        "organizations:ListTargetsForPolicy",
+        "organizations:TagResource",
+        "organizations:UntagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "organizations:DetachPolicy",
+        "organizations:DeletePolicy"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "organizations:ListPolicies"
+      ]
+    }
+  },
+  "attributes": {
+    "Id": {
+      "description": "Id of the Policy",
+      "type": "string",
+      "maxLength": 130,
+      "markdownDescription": "Id of the Policy\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 130  \nPattern: ^p-[0-9a-zA-Z_]{8,128}$  \nUpdate requires: No interruption"
+    },
+    "Arn": {
+      "description": "ARN of the Policy",
+      "type": "string",
+      "markdownDescription": "ARN of the Policy\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws.*:organizations::[0-9]{12}:policy/o-[a-z0-9]{10}/(service_control|tag|backup|aiservices_opt_out)_policy/p-[a-z0-9]{8}  \nUpdate requires: No interruption"
+    },
+    "AwsManaged": {
+      "description": "A boolean value that indicates whether the specified policy is an AWS managed policy. If true, then you can attach the policy to roots, OUs, or accounts, but you cannot edit it.",
+      "type": "boolean",
+      "markdownDescription": "A boolean value that indicates whether the specified policy is an AWS managed policy. If true, then you can attach the policy to roots, OUs, or accounts, but you cannot edit it.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+    }
+  }
+}

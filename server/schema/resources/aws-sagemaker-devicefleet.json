@@ -1,0 +1,129 @@
+{
+  "typeName": "AWS::SageMaker::DeviceFleet",
+  "description": "Resource schema for AWS::SageMaker::DeviceFleet",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-sagemaker-edge.git",
+  "definitions": {
+    "EdgeOutputConfig": {
+      "type": "object",
+      "properties": {
+        "S3OutputLocation": {
+          "description": "The Amazon Simple Storage (S3) bucket URI",
+          "type": "string",
+          "maxLength": 1024,
+          "markdownDescription": "The Amazon Simple Storage (S3) bucket URI\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 1024  \nPattern: ^s3://([^/]+)/?(.*)$  \nUpdate requires: No interruption"
+        },
+        "KmsKeyId": {
+          "description": "The KMS key id used for encryption on the S3 bucket",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "markdownDescription": "The KMS key id used for encryption on the S3 bucket\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: [a-zA-Z0-9:_-]+  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "S3OutputLocation"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Tag": {
+      "description": "Key-value pair to associate as a tag for the resource",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "description": "The key name of the tag. You can specify a value that is 1 to 127 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 127 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. \n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^((?!aws:)[\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "description": "The key value of the tag. You can specify a value that is 1 to 127 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The key value of the tag. You can specify a value that is 1 to 127 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. \n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: ^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Key-value pair to associate as a tag for the resource\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "Description": {
+      "description": "Description for the edge device fleet",
+      "type": "string",
+      "minLength": 0,
+      "maxLength": 800,
+      "markdownDescription": "Description for the edge device fleet\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 800  \nPattern: [\\S\\s]+  \nUpdate requires: No interruption"
+    },
+    "DeviceFleetName": {
+      "description": "The name of the edge device fleet",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63,
+      "markdownDescription": "The name of the edge device fleet\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 63  \nPattern: ^[a-zA-Z0-9](-*_*[a-zA-Z0-9])*$  \nUpdate requires: Replacement"
+    },
+    "OutputConfig": {
+      "description": "S3 bucket and an ecryption key id (if available) to store outputs for the fleet",
+      "$ref": "#/definitions/EdgeOutputConfig",
+      "markdownDescription": "S3 bucket and an ecryption key id (if available) to store outputs for the fleet\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption"
+    },
+    "RoleArn": {
+      "description": "Role associated with the device fleet",
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 2048,
+      "markdownDescription": "Role associated with the device fleet\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:aws[a-z\\-]*:iam::\\d{12}:role/?[a-zA-Z_0-9+=,.@\\-_/]+$  \nUpdate requires: No interruption"
+    },
+    "Tags": {
+      "description": "Associate tags with the resource",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "Associate tags with the resource\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    }
+  },
+  "required": [
+    "DeviceFleetName",
+    "OutputConfig",
+    "RoleArn"
+  ],
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/DeviceFleetName"
+  ],
+  "createOnlyProperties": [
+    "/properties/DeviceFleetName"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "sagemaker:CreateDeviceFleet",
+        "iam:PassRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "sagemaker:DescribeDeviceFleet"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "sagemaker:UpdateDeviceFleet",
+        "iam:PassRole"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "sagemaker:DeleteDeviceFleet"
+      ]
+    }
+  },
+  "attributes": {}
+}

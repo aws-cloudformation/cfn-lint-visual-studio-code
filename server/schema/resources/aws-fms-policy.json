@@ -1,0 +1,354 @@
+{
+  "typeName": "AWS::FMS::Policy",
+  "description": "Creates an AWS Firewall Manager policy.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-fms.git",
+  "definitions": {
+    "AccountId": {
+      "description": "An AWS account ID.",
+      "type": "string",
+      "minLength": 12,
+      "maxLength": 12,
+      "markdownDescription": "An AWS account ID.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 12  \nMaximum Length: 12  \nPattern: ^([0-9]*)$  \nUpdate requires: No interruption"
+    },
+    "OrganizationalUnitId": {
+      "description": "An Organizational Unit ID.",
+      "type": "string",
+      "minLength": 16,
+      "maxLength": 68,
+      "markdownDescription": "An Organizational Unit ID.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 16  \nMaximum Length: 68  \nPattern: ^(ou-[0-9a-z]{4,32}-[a-z0-9]{8,32})$  \nUpdate requires: No interruption"
+    },
+    "IEMap": {
+      "description": "An FMS includeMap or excludeMap.",
+      "type": "object",
+      "properties": {
+        "ACCOUNT": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AccountId"
+          },
+          "insertionOrder": true,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ORGUNIT": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OrganizationalUnitId"
+          },
+          "insertionOrder": true,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "An FMS includeMap or excludeMap.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PolicyTag": {
+      "description": "A policy tag.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^([^\\s]*)$  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "string",
+          "maxLength": 256,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: ^([^\\s]*)$  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "A policy tag.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ResourceTag": {
+      "description": "A resource tag.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "string",
+          "maxLength": 256,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Key"
+      ],
+      "markdownDescription": "A resource tag.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ResourceType": {
+      "description": "An AWS resource type",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "markdownDescription": "An AWS resource type\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^([^\\s]*)$  \nUpdate requires: No interruption"
+    },
+    "ResourceArn": {
+      "description": "A resource ARN.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "markdownDescription": "A resource ARN.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nPattern: ^([^\\s]*)$  \nUpdate requires: No interruption"
+    },
+    "SecurityServicePolicyData": {
+      "description": "Firewall security service policy data.",
+      "type": "object",
+      "properties": {
+        "ManagedServiceData": {
+          "$ref": "#/definitions/ManagedServiceData"
+        },
+        "Type": {
+          "$ref": "#/definitions/PolicyType"
+        },
+        "PolicyOption": {
+          "$ref": "#/definitions/PolicyOption"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Type"
+      ],
+      "markdownDescription": "Firewall security service policy data.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "FirewallDeploymentModel": {
+      "description": "Firewall deployment mode.",
+      "type": "string",
+      "enum": [
+        "DISTRIBUTED",
+        "CENTRALIZED"
+      ],
+      "markdownDescription": "Firewall deployment mode.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DISTRIBUTED | CENTRALIZED  \nUpdate requires: No interruption"
+    },
+    "ManagedServiceData": {
+      "description": "Firewall managed service data.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 8192,
+      "markdownDescription": "Firewall managed service data.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 8192  \nUpdate requires: No interruption"
+    },
+    "PolicyType": {
+      "description": "Firewall policy type.",
+      "type": "string",
+      "enum": [
+        "WAF",
+        "WAFV2",
+        "SHIELD_ADVANCED",
+        "SECURITY_GROUPS_COMMON",
+        "SECURITY_GROUPS_CONTENT_AUDIT",
+        "SECURITY_GROUPS_USAGE_AUDIT",
+        "NETWORK_FIREWALL",
+        "THIRD_PARTY_FIREWALL",
+        "DNS_FIREWALL"
+      ],
+      "markdownDescription": "Firewall policy type.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: WAF | WAFV2 | SHIELD_ADVANCED | SECURITY_GROUPS_COMMON | SECURITY_GROUPS_CONTENT_AUDIT | SECURITY_GROUPS_USAGE_AUDIT | NETWORK_FIREWALL | THIRD_PARTY_FIREWALL | DNS_FIREWALL  \nUpdate requires: No interruption"
+    },
+    "NetworkFirewallPolicy": {
+      "description": "Network firewall policy.",
+      "type": "object",
+      "properties": {
+        "FirewallDeploymentModel": {
+          "$ref": "#/definitions/FirewallDeploymentModel"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "FirewallDeploymentModel"
+      ],
+      "markdownDescription": "Network firewall policy.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ThirdPartyFirewallPolicy": {
+      "description": "Third party firewall policy.",
+      "type": "object",
+      "properties": {
+        "FirewallDeploymentModel": {
+          "$ref": "#/definitions/FirewallDeploymentModel"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "FirewallDeploymentModel"
+      ],
+      "markdownDescription": "Third party firewall policy.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PolicyOption": {
+      "description": "Firewall policy option.",
+      "type": "object",
+      "properties": {
+        "NetworkFirewallPolicy": {
+          "$ref": "#/definitions/NetworkFirewallPolicy"
+        },
+        "ThirdPartyFirewallPolicy": {
+          "$ref": "#/definitions/ThirdPartyFirewallPolicy"
+        }
+      },
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "required": [
+            "NetworkFirewallPolicy"
+          ]
+        },
+        {
+          "required": [
+            "ThirdPartyFirewallPolicy"
+          ]
+        }
+      ],
+      "markdownDescription": "Firewall policy option.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "ExcludeMap": {
+      "$ref": "#/definitions/IEMap"
+    },
+    "ExcludeResourceTags": {
+      "type": "boolean",
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
+    },
+    "IncludeMap": {
+      "$ref": "#/definitions/IEMap"
+    },
+    "PolicyName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nPattern: ^([a-zA-Z0-9_.:/=+\\-@]+)$  \nUpdate requires: No interruption"
+    },
+    "RemediationEnabled": {
+      "type": "boolean",
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
+    },
+    "ResourceTags": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ResourceTag"
+      },
+      "maxItems": 8,
+      "insertionOrder": true,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "ResourceType": {
+      "$ref": "#/definitions/ResourceType"
+    },
+    "ResourceTypeList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ResourceType"
+      },
+      "insertionOrder": true,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "SecurityServicePolicyData": {
+      "$ref": "#/definitions/SecurityServicePolicyData"
+    },
+    "DeleteAllPolicyResources": {
+      "type": "boolean",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+    },
+    "ResourcesCleanUp": {
+      "type": "boolean",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+    },
+    "Tags": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PolicyTag"
+      },
+      "insertionOrder": true,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "ExcludeResourceTags",
+    "PolicyName",
+    "RemediationEnabled",
+    "ResourceType",
+    "SecurityServicePolicyData"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/Id"
+  ],
+  "writeOnlyProperties": [
+    "/properties/DeleteAllPolicyResources"
+  ],
+  "primaryIdentifier": [
+    "/properties/Id"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "fms:PutPolicy",
+        "fms:TagResource",
+        "waf-regional:ListRuleGroups",
+        "wafv2:CheckCapacity",
+        "wafv2:ListRuleGroups",
+        "wafv2:ListAvailableManagedRuleGroups",
+        "wafv2:ListAvailableManagedRuleGroupVersions",
+        "network-firewall:DescribeRuleGroup",
+        "route53resolver:ListFirewallRuleGroups",
+        "ec2:DescribeAvailabilityZones",
+        "s3:PutBucketPolicy",
+        "s3:GetBucketPolicy"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "fms:PutPolicy",
+        "fms:GetPolicy",
+        "fms:TagResource",
+        "fms:UntagResource",
+        "fms:ListTagsForResource",
+        "waf-regional:ListRuleGroups",
+        "wafv2:CheckCapacity",
+        "wafv2:ListRuleGroups",
+        "wafv2:ListAvailableManagedRuleGroups",
+        "wafv2:ListAvailableManagedRuleGroupVersions",
+        "network-firewall:DescribeRuleGroup",
+        "route53resolver:ListFirewallRuleGroups",
+        "ec2:DescribeAvailabilityZones",
+        "s3:PutBucketPolicy",
+        "s3:GetBucketPolicy"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "fms:GetPolicy",
+        "fms:ListTagsForResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "fms:DeletePolicy"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "fms:ListPolicies",
+        "fms:ListTagsForResource"
+      ]
+    }
+  },
+  "attributes": {
+    "Id": {
+      "type": "string",
+      "minLength": 36,
+      "maxLength": 36,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 36  \nMaximum Length: 36  \nPattern: ^[a-z0-9A-Z-]{36}$  \nUpdate requires: No interruption"
+    },
+    "Arn": {
+      "$ref": "#/definitions/ResourceArn"
+    }
+  }
+}

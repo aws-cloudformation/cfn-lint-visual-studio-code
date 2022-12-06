@@ -1,0 +1,182 @@
+{
+  "typeName": "AWS::CE::AnomalySubscription",
+  "description": "AWS Cost Anomaly Detection leverages advanced Machine Learning technologies to identify anomalous spend and root causes, so you can quickly take action. Create subscription to be notified",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "definitions": {
+    "Arn": {
+      "description": "Subscription ARN",
+      "type": "string",
+      "markdownDescription": "Subscription ARN\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[-a-z0-9]*:[a-z0-9]+:[-a-z0-9]*:[0-9]{12}:[-a-zA-Z0-9/:_]+$  \nUpdate requires: No interruption"
+    },
+    "Subscriber": {
+      "type": "object",
+      "properties": {
+        "Address": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: (^[a-zA-Z0-9.!#$%&'*+=?^_\u2018{|}~-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+$)|(^arn:(aws[a-zA-Z-]*):sns:[a-zA-Z0-9-]+:[0-9]{12}:[a-zA-Z0-9_-]+(\\.fifo)?$)  \nUpdate requires: No interruption"
+        },
+        "Status": {
+          "type": "string",
+          "enum": [
+            "CONFIRMED",
+            "DECLINED"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CONFIRMED | DECLINED  \nUpdate requires: No interruption"
+        },
+        "Type": {
+          "type": "string",
+          "enum": [
+            "EMAIL",
+            "SNS"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: EMAIL | SNS  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Address",
+        "Type"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ResourceTag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name for the tag.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The key name for the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^(?!aws:).*$  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag.",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The value for the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "SubscriptionName": {
+      "description": "The name of the subscription.",
+      "type": "string",
+      "minLength": 0,
+      "maxLength": 1024,
+      "markdownDescription": "The name of the subscription.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 1024  \nPattern: [\\S\\s]*  \nUpdate requires: No interruption"
+    },
+    "MonitorArnList": {
+      "description": "A list of cost anomaly monitors.",
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Arn"
+      },
+      "markdownDescription": "A list of cost anomaly monitors.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "Subscribers": {
+      "description": "A list of subscriber",
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Subscriber"
+      },
+      "markdownDescription": "A list of subscriber\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "Threshold": {
+      "description": "The dollar value that triggers a notification if the threshold is exceeded. ",
+      "type": "number",
+      "minimum": 0,
+      "markdownDescription": "The dollar value that triggers a notification if the threshold is exceeded. \n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
+    },
+    "Frequency": {
+      "description": "The frequency at which anomaly reports are sent over email. ",
+      "type": "string",
+      "enum": [
+        "DAILY",
+        "IMMEDIATE",
+        "WEEKLY"
+      ],
+      "markdownDescription": "The frequency at which anomaly reports are sent over email. \n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: DAILY | IMMEDIATE | WEEKLY  \nUpdate requires: No interruption"
+    },
+    "ResourceTags": {
+      "type": "array",
+      "description": "Tags to assign to subscription.",
+      "items": {
+        "$ref": "#/definitions/ResourceTag"
+      },
+      "minItems": 0,
+      "maxItems": 200,
+      "insertionOrder": false,
+      "markdownDescription": "Tags to assign to subscription.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "MonitorArnList",
+    "Subscribers",
+    "Threshold",
+    "Frequency",
+    "SubscriptionName"
+  ],
+  "createOnlyProperties": [
+    "/properties/ResourceTags"
+  ],
+  "readOnlyProperties": [
+    "/properties/SubscriptionArn",
+    "/properties/AccountId",
+    "/properties/Subscribers/*/Status"
+  ],
+  "primaryIdentifier": [
+    "/properties/SubscriptionArn"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ce:CreateAnomalySubscription",
+        "ce:TagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "ce:GetAnomalySubscriptions"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ce:UpdateAnomalySubscription"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ce:DeleteAnomalySubscription"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ce:GetAnomalySubscriptions"
+      ]
+    }
+  },
+  "attributes": {
+    "SubscriptionArn": {
+      "$ref": "#/definitions/Arn"
+    },
+    "AccountId": {
+      "description": "The accountId",
+      "type": "string",
+      "minLength": 0,
+      "maxLength": 1024,
+      "markdownDescription": "The accountId\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nUpdate requires: No interruption"
+    }
+  }
+}

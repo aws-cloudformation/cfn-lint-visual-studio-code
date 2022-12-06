@@ -1,0 +1,401 @@
+{
+  "typeName": "AWS::SSMIncidents::ResponsePlan",
+  "description": "Resource type definition for AWS::SSMIncidents::ResponsePlan",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-ssm-incidents.git",
+  "definitions": {
+    "SSMContact": {
+      "description": "The ARN of the contact.",
+      "type": "string",
+      "maxLength": 1000,
+      "markdownDescription": "The ARN of the contact.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1000  \nPattern: ^arn:aws(-(cn|us-gov))?:ssm-contacts:(([a-z]+-)+[0-9])?:([0-9]{12})?:[^.]+$  \nUpdate requires: No interruption"
+    },
+    "SnsArn": {
+      "description": "The ARN of the Chatbot SNS topic.",
+      "type": "string",
+      "maxLength": 1000,
+      "markdownDescription": "The ARN of the Chatbot SNS topic.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1000  \nPattern: ^arn:aws(-(cn|us-gov))?:sns:(([a-z]+-)+[0-9])?:([0-9]{12})?:[^.]+$  \nUpdate requires: No interruption"
+    },
+    "NotificationTargetItem": {
+      "description": "A notification target.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "SnsTopicArn": {
+          "$ref": "#/definitions/SnsArn"
+        }
+      },
+      "markdownDescription": "A notification target.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Action": {
+      "description": "The automation configuration to launch.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "SsmAutomation": {
+          "$ref": "#/definitions/SsmAutomation"
+        }
+      },
+      "markdownDescription": "The automation configuration to launch.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "SsmAutomation": {
+      "description": "The configuration to use when starting the SSM automation document.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "RoleArn",
+        "DocumentName"
+      ],
+      "properties": {
+        "RoleArn": {
+          "description": "The role ARN to use when starting the SSM automation document.",
+          "type": "string",
+          "maxLength": 1000,
+          "markdownDescription": "The role ARN to use when starting the SSM automation document.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 1000  \nPattern: ^arn:aws(-(cn|us-gov))?:[a-z-]+:(([a-z]+-)+[0-9])?:([0-9]{12})?:[^.]+$  \nUpdate requires: No interruption"
+        },
+        "DocumentName": {
+          "description": "The document name to use when starting the SSM automation document.",
+          "type": "string",
+          "maxLength": 128,
+          "markdownDescription": "The document name to use when starting the SSM automation document.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        },
+        "DocumentVersion": {
+          "description": "The version of the document to use when starting the SSM automation document.",
+          "type": "string",
+          "maxLength": 128,
+          "markdownDescription": "The version of the document to use when starting the SSM automation document.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        },
+        "TargetAccount": {
+          "description": "The account type to use when starting the SSM automation document.",
+          "type": "string",
+          "enum": [
+            "IMPACTED_ACCOUNT",
+            "RESPONSE_PLAN_OWNER_ACCOUNT"
+          ],
+          "markdownDescription": "The account type to use when starting the SSM automation document.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: IMPACTED_ACCOUNT | RESPONSE_PLAN_OWNER_ACCOUNT  \nUpdate requires: No interruption"
+        },
+        "Parameters": {
+          "description": "The parameters to set when starting the SSM automation document.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/SsmParameter"
+          },
+          "minItems": 1,
+          "maxItems": 200,
+          "default": [],
+          "markdownDescription": "The parameters to set when starting the SSM automation document.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "DynamicParameters": {
+          "description": "The parameters with dynamic values to set when starting the SSM automation document.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/DynamicSsmParameter"
+          },
+          "maxItems": 200,
+          "default": [],
+          "markdownDescription": "The parameters with dynamic values to set when starting the SSM automation document.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "The configuration to use when starting the SSM automation document.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "SsmParameter": {
+      "description": "A parameter to set when starting the SSM automation document.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 50  \nUpdate requires: No interruption"
+        },
+        "Values": {
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": true,
+          "maxItems": 10,
+          "items": {
+            "$ref": "#/definitions/SsmParameterValue"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Values",
+        "Key"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A parameter to set when starting the SSM automation document.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "SsmParameterValue": {
+      "description": "A value of the parameter to set when starting the SSM automation document.",
+      "type": "string",
+      "maxLength": 10000,
+      "markdownDescription": "A value of the parameter to set when starting the SSM automation document.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 10000  \nUpdate requires: No interruption"
+    },
+    "DynamicSsmParameter": {
+      "description": "A parameter with a dynamic value to set when starting the SSM automation document.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 50  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "$ref": "#/definitions/DynamicSsmParameterValue"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A parameter with a dynamic value to set when starting the SSM automation document.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "DynamicSsmParameterValue": {
+      "description": "Value of the dynamic parameter to set when starting the SSM automation document.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Variable": {
+          "$ref": "#/definitions/VariableType"
+        }
+      },
+      "markdownDescription": "Value of the dynamic parameter to set when starting the SSM automation document.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "VariableType": {
+      "description": "The variable types used as dynamic parameter value when starting the SSM automation document.",
+      "type": "string",
+      "enum": [
+        "INCIDENT_RECORD_ARN",
+        "INVOLVED_RESOURCES"
+      ],
+      "markdownDescription": "The variable types used as dynamic parameter value when starting the SSM automation document.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: INCIDENT_RECORD_ARN | INVOLVED_RESOURCES  \nUpdate requires: No interruption"
+    },
+    "Tag": {
+      "description": "A key-value pair to tag a resource.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^(?!aws:)[a-zA-Z+-=._:/]+$  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ],
+      "markdownDescription": "A key-value pair to tag a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "IncidentTemplate": {
+      "description": "The incident template configuration.",
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "Title",
+        "Impact"
+      ],
+      "properties": {
+        "DedupeString": {
+          "description": "The deduplication string.",
+          "type": "string",
+          "maxLength": 1000,
+          "minLength": 1,
+          "markdownDescription": "The deduplication string.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1000  \nUpdate requires: No interruption"
+        },
+        "Impact": {
+          "description": "The impact value.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "markdownDescription": "The impact value.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "NotificationTargets": {
+          "description": "The list of notification targets.",
+          "type": "array",
+          "default": [],
+          "maxItems": 10,
+          "items": {
+            "$ref": "#/definitions/NotificationTargetItem"
+          },
+          "insertionOrder": false,
+          "markdownDescription": "The list of notification targets.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Summary": {
+          "description": "The summary string.",
+          "type": "string",
+          "maxLength": 4000,
+          "minLength": 1,
+          "markdownDescription": "The summary string.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 4000  \nUpdate requires: No interruption"
+        },
+        "Title": {
+          "description": "The title string.",
+          "type": "string",
+          "maxLength": 200,
+          "markdownDescription": "The title string.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 200  \nUpdate requires: No interruption"
+        },
+        "IncidentTags": {
+          "description": "Tags that get applied to incidents created by the StartIncident API action.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "default": [],
+          "maxItems": 50,
+          "items": {
+            "$ref": "#/definitions/Tag"
+          },
+          "markdownDescription": "Tags that get applied to incidents created by the StartIncident API action.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "The incident template configuration.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ChatbotSns": {
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": true,
+      "default": [],
+      "items": {
+        "$ref": "#/definitions/SnsArn"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "ChatChannel": {
+      "description": "The chat channel configuration.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ChatbotSns": {
+          "$ref": "#/definitions/ChatbotSns"
+        }
+      },
+      "markdownDescription": "The chat channel configuration.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "Name": {
+      "description": "The name of the response plan.",
+      "type": "string",
+      "maxLength": 200,
+      "minLength": 1,
+      "markdownDescription": "The name of the response plan.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 200  \nPattern: ^[a-zA-Z0-9_-]*$  \nUpdate requires: Replacement"
+    },
+    "DisplayName": {
+      "description": "The display name of the response plan.",
+      "type": "string",
+      "maxLength": 200,
+      "minLength": 1,
+      "markdownDescription": "The display name of the response plan.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 200  \nUpdate requires: No interruption"
+    },
+    "ChatChannel": {
+      "$ref": "#/definitions/ChatChannel"
+    },
+    "Engagements": {
+      "description": "The list of engagements to use.",
+      "type": "array",
+      "default": [],
+      "maxItems": 5,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/SSMContact"
+      },
+      "markdownDescription": "The list of engagements to use.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "Actions": {
+      "description": "The list of actions.",
+      "type": "array",
+      "default": [],
+      "uniqueItems": true,
+      "insertionOrder": true,
+      "maxItems": 1,
+      "items": {
+        "$ref": "#/definitions/Action"
+      },
+      "markdownDescription": "The list of actions.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "Tags": {
+      "description": "The tags to apply to the response plan.",
+      "type": "array",
+      "default": [],
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "maxItems": 50,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "The tags to apply to the response plan.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "IncidentTemplate": {
+      "$ref": "#/definitions/IncidentTemplate"
+    }
+  },
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "createOnlyProperties": [
+    "/properties/Name"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn"
+  ],
+  "required": [
+    "Name",
+    "IncidentTemplate"
+  ],
+  "taggable": true,
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ssm-incidents:CreateResponsePlan",
+        "iam:PassRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "ssm-incidents:GetResponsePlan",
+        "ssm-incidents:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ssm-incidents:UpdateResponsePlan",
+        "iam:PassRole",
+        "ssm-incidents:TagResource",
+        "ssm-incidents:UntagResource",
+        "ssm-incidents:ListTagsForResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ssm-incidents:DeleteResponsePlan"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ssm-incidents:ListResponsePlans"
+      ]
+    }
+  },
+  "attributes": {
+    "Arn": {
+      "description": "The ARN of the response plan.",
+      "type": "string",
+      "maxLength": 1000,
+      "markdownDescription": "The ARN of the response plan.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1000  \nPattern: ^arn:aws(-(cn|us-gov))?:[a-z-]+:(([a-z]+-)+[0-9])?:([0-9]{12})?:[^.]+$  \nUpdate requires: No interruption"
+    }
+  }
+}

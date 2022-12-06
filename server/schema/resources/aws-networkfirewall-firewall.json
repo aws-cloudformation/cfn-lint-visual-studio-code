@@ -1,0 +1,198 @@
+{
+  "typeName": "AWS::NetworkFirewall::Firewall",
+  "description": "Resource type definition for AWS::NetworkFirewall::Firewall",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-networkfirewall.git",
+  "additionalProperties": false,
+  "definitions": {
+    "ResourceArn": {
+      "description": "A resource ARN.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "markdownDescription": "A resource ARN.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^arn:aws.*$  \nUpdate requires: No interruption"
+    },
+    "EndpointId": {
+      "description": "An endpoint Id.",
+      "type": "string",
+      "markdownDescription": "An endpoint Id.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "SubnetMapping": {
+      "type": "object",
+      "properties": {
+        "SubnetId": {
+          "description": "A SubnetId.",
+          "type": "string",
+          "markdownDescription": "A SubnetId.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "SubnetId"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 255,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 255  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "FirewallName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9-]+$  \nUpdate requires: Replacement"
+    },
+    "FirewallPolicyArn": {
+      "$ref": "#/definitions/ResourceArn"
+    },
+    "VpcId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^vpc-[0-9a-f]+$  \nUpdate requires: Replacement"
+    },
+    "SubnetMappings": {
+      "type": "array",
+      "minItems": 1,
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/SubnetMapping"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "DeleteProtection": {
+      "type": "boolean",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+    },
+    "SubnetChangeProtection": {
+      "type": "boolean",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+    },
+    "FirewallPolicyChangeProtection": {
+      "type": "boolean",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+    },
+    "Description": {
+      "type": "string",
+      "maxLength": 512,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 512  \nPattern: ^.*$  \nUpdate requires: No interruption"
+    },
+    "Tags": {
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    }
+  },
+  "required": [
+    "FirewallName",
+    "FirewallPolicyArn",
+    "VpcId",
+    "SubnetMappings"
+  ],
+  "readOnlyProperties": [
+    "/properties/FirewallArn",
+    "/properties/FirewallId",
+    "/properties/EndpointIds"
+  ],
+  "primaryIdentifier": [
+    "/properties/FirewallArn"
+  ],
+  "createOnlyProperties": [
+    "/properties/VpcId",
+    "/properties/FirewallName"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ec2:CreateVpcEndpoint",
+        "ec2:DescribeVpcEndpoints",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeVpcs",
+        "network-firewall:CreateFirewall",
+        "network-firewall:DescribeFirewallPolicy",
+        "network-firewall:DescribeRuleGroup",
+        "network-firewall:TagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "network-firewall:DescribeFirewall",
+        "network-firewall:ListTagsForResources"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "network-firewall:AssociateSubnets",
+        "network-firewall:DisassociateSubnets",
+        "network-firewall:UpdateFirewallDescription",
+        "network-firewall:UpdateFirewallDeleteProtection",
+        "network-firewall:UpdateSubnetChangeProtection",
+        "network-firewall:UpdateFirewallPolicyChangeProtection",
+        "network-firewall:AssociateFirewallPolicy",
+        "network-firewall:TagResource",
+        "network-firewall:UntagResource",
+        "network-firewall:DescribeFirewall"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ec2:DeleteVpcEndpoints",
+        "logs:DescribeLogGroups",
+        "logs:DescribeResourcePolicies",
+        "logs:GetLogDelivery",
+        "logs:ListLogDeliveries",
+        "network-firewall:DeleteFirewall",
+        "network-firewall:UntagResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "network-firewall:ListFirewalls"
+      ]
+    }
+  },
+  "attributes": {
+    "FirewallArn": {
+      "$ref": "#/definitions/ResourceArn"
+    },
+    "FirewallId": {
+      "type": "string",
+      "minLength": 36,
+      "maxLength": 36,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 36  \nMaximum Length: 36  \nPattern: ^([0-9a-f]{8})-([0-9a-f]{4}-){3}([0-9a-f]{12})$  \nUpdate requires: No interruption"
+    },
+    "EndpointIds": {
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/EndpointId"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    }
+  }
+}

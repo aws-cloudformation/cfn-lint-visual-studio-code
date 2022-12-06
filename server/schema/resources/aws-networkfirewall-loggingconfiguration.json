@@ -1,0 +1,160 @@
+{
+  "typeName": "AWS::NetworkFirewall::LoggingConfiguration",
+  "description": "Resource type definition for AWS::NetworkFirewall::LoggingConfiguration",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-networkfirewall.git",
+  "additionalProperties": false,
+  "definitions": {
+    "ResourceArn": {
+      "description": "A resource ARN.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "markdownDescription": "A resource ARN.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^arn:aws.*$  \nUpdate requires: No interruption"
+    },
+    "LoggingConfiguration": {
+      "type": "object",
+      "properties": {
+        "LogDestinationConfigs": {
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/LogDestinationConfig"
+          },
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "LogDestinationConfigs"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "LogDestinationConfig": {
+      "type": "object",
+      "properties": {
+        "LogType": {
+          "type": "string",
+          "enum": [
+            "ALERT",
+            "FLOW"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: ALERT | FLOW  \nUpdate requires: No interruption"
+        },
+        "LogDestinationType": {
+          "type": "string",
+          "enum": [
+            "S3",
+            "CloudWatchLogs",
+            "KinesisDataFirehose"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: S3 | CloudWatchLogs | KinesisDataFirehose  \nUpdate requires: No interruption"
+        },
+        "LogDestination": {
+          "type": "object",
+          "description": "A key-value pair to configure the logDestinations.",
+          "patternProperties": {
+            "^[0-9A-Za-z.\\-_@\\/]+$": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024,
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption"
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false,
+          "markdownDescription": "A key-value pair to configure the logDestinations.\n\n---\n\nRequired: Yes  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "LogType",
+        "LogDestinationType",
+        "LogDestination"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "FirewallName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9-]+$  \nUpdate requires: Replacement"
+    },
+    "FirewallArn": {
+      "$ref": "#/definitions/ResourceArn"
+    },
+    "LoggingConfiguration": {
+      "$ref": "#/definitions/LoggingConfiguration"
+    }
+  },
+  "required": [
+    "FirewallArn",
+    "LoggingConfiguration"
+  ],
+  "createOnlyProperties": [
+    "/properties/FirewallName",
+    "/properties/FirewallArn"
+  ],
+  "primaryIdentifier": [
+    "/properties/FirewallArn"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "logs:CreateLogDelivery",
+        "logs:GetLogDelivery",
+        "logs:ListLogDeliveries",
+        "s3:PutBucketPolicy",
+        "s3:GetBucketPolicy",
+        "logs:PutResourcePolicy",
+        "logs:DescribeResourcePolicies",
+        "logs:DescribeLogGroups",
+        "iam:CreateServiceLinkedRole",
+        "firehose:TagDeliveryStream",
+        "network-firewall:UpdateLoggingConfiguration"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "logs:GetLogDelivery",
+        "logs:ListLogDeliveries",
+        "network-firewall:DescribeLoggingConfiguration"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "logs:CreateLogDelivery",
+        "logs:DeleteLogDelivery",
+        "logs:GetLogDelivery",
+        "logs:UpdateLogDelivery",
+        "logs:ListLogDeliveries",
+        "s3:PutBucketPolicy",
+        "s3:GetBucketPolicy",
+        "logs:PutResourcePolicy",
+        "logs:DescribeResourcePolicies",
+        "logs:DescribeLogGroups",
+        "iam:CreateServiceLinkedRole",
+        "firehose:TagDeliveryStream",
+        "network-firewall:UpdateLoggingConfiguration"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "logs:DeleteLogDelivery",
+        "logs:ListLogDeliveries",
+        "logs:GetLogDelivery",
+        "network-firewall:UpdateLoggingConfiguration"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "logs:GetLogDelivery",
+        "logs:ListLogDeliveries",
+        "network-firewall:DescribeLoggingConfiguration"
+      ]
+    }
+  },
+  "attributes": {}
+}

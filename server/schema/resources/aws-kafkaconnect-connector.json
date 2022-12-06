@@ -1,0 +1,577 @@
+{
+  "typeName": "AWS::KafkaConnect::Connector",
+  "description": "Resource Type definition for AWS::KafkaConnect::Connector",
+  "additionalProperties": false,
+  "taggable": false,
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-kafkaconnect.git",
+  "properties": {
+    "Capacity": {
+      "$ref": "#/definitions/Capacity"
+    },
+    "ConnectorConfiguration": {
+      "description": "The configuration for the connector.",
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        ".*": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "The configuration for the connector.\n\n---\n\nRequired: Yes  \nUpdate requires: Replacement"
+    },
+    "ConnectorDescription": {
+      "description": "A summary description of the connector.",
+      "type": "string",
+      "maxLength": 1024,
+      "markdownDescription": "A summary description of the connector.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nUpdate requires: Replacement"
+    },
+    "ConnectorName": {
+      "description": "The name of the connector.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "markdownDescription": "The name of the connector.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: Replacement"
+    },
+    "KafkaCluster": {
+      "$ref": "#/definitions/KafkaCluster"
+    },
+    "KafkaClusterClientAuthentication": {
+      "$ref": "#/definitions/KafkaClusterClientAuthentication"
+    },
+    "KafkaClusterEncryptionInTransit": {
+      "$ref": "#/definitions/KafkaClusterEncryptionInTransit"
+    },
+    "KafkaConnectVersion": {
+      "description": "The version of Kafka Connect. It has to be compatible with both the Kafka cluster's version and the plugins.",
+      "type": "string",
+      "markdownDescription": "The version of Kafka Connect. It has to be compatible with both the Kafka cluster's version and the plugins.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
+    },
+    "LogDelivery": {
+      "$ref": "#/definitions/LogDelivery"
+    },
+    "Plugins": {
+      "description": "List of plugins to use with the connector.",
+      "type": "array",
+      "uniqueItems": true,
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/Plugin"
+      },
+      "insertionOrder": false,
+      "markdownDescription": "List of plugins to use with the connector.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: Replacement"
+    },
+    "ServiceExecutionRoleArn": {
+      "description": "The Amazon Resource Name (ARN) of the IAM role used by the connector to access Amazon S3 objects and other external resources.",
+      "type": "string",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the IAM role used by the connector to access Amazon S3 objects and other external resources.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: arn:(aws|aws-us-gov|aws-cn):iam:.*  \nUpdate requires: Replacement"
+    },
+    "WorkerConfiguration": {
+      "$ref": "#/definitions/WorkerConfiguration"
+    }
+  },
+  "definitions": {
+    "ApacheKafkaCluster": {
+      "description": "Details of how to connect to an Apache Kafka cluster.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "BootstrapServers": {
+          "description": "The bootstrap servers string of the Apache Kafka cluster.",
+          "type": "string",
+          "markdownDescription": "The bootstrap servers string of the Apache Kafka cluster.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Vpc": {
+          "$ref": "#/definitions/Vpc"
+        }
+      },
+      "required": [
+        "BootstrapServers",
+        "Vpc"
+      ],
+      "markdownDescription": "Details of how to connect to an Apache Kafka cluster.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AutoScaling": {
+      "description": "Details about auto scaling of a connector. ",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "MaxWorkerCount": {
+          "description": "The maximum number of workers for a connector.",
+          "type": "integer",
+          "markdownDescription": "The maximum number of workers for a connector.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "MinWorkerCount": {
+          "description": "The minimum number of workers for a connector.",
+          "type": "integer",
+          "markdownDescription": "The minimum number of workers for a connector.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "ScaleInPolicy": {
+          "$ref": "#/definitions/ScaleInPolicy"
+        },
+        "ScaleOutPolicy": {
+          "$ref": "#/definitions/ScaleOutPolicy"
+        },
+        "McuCount": {
+          "description": "Specifies how many MSK Connect Units (MCU) as the minimum scaling unit.",
+          "type": "integer",
+          "enum": [
+            1,
+            2,
+            4,
+            8
+          ],
+          "markdownDescription": "Specifies how many MSK Connect Units (MCU) as the minimum scaling unit.\n\n---\n\nRequired: Yes  \nType: Integer  \nAllowed Values: 1 | 2 | 4 | 8  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "MaxWorkerCount",
+        "MinWorkerCount",
+        "ScaleInPolicy",
+        "ScaleOutPolicy",
+        "McuCount"
+      ],
+      "markdownDescription": "Details about auto scaling of a connector. \n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Capacity": {
+      "description": "Information about the capacity allocated to the connector.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "AutoScaling": {
+          "$ref": "#/definitions/AutoScaling"
+        },
+        "ProvisionedCapacity": {
+          "$ref": "#/definitions/ProvisionedCapacity"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "AutoScaling"
+          ]
+        },
+        {
+          "required": [
+            "ProvisionedCapacity"
+          ]
+        }
+      ],
+      "markdownDescription": "Information about the capacity allocated to the connector.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "CloudWatchLogsLogDelivery": {
+      "description": "Details about delivering logs to Amazon CloudWatch Logs.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Enabled": {
+          "description": "Specifies whether the logs get sent to the specified CloudWatch Logs destination.",
+          "type": "boolean",
+          "markdownDescription": "Specifies whether the logs get sent to the specified CloudWatch Logs destination.\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
+        },
+        "LogGroup": {
+          "description": "The CloudWatch log group that is the destination for log delivery.",
+          "type": "string",
+          "markdownDescription": "The CloudWatch log group that is the destination for log delivery.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Enabled"
+      ],
+      "markdownDescription": "Details about delivering logs to Amazon CloudWatch Logs.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "CustomPlugin": {
+      "description": "Details about a custom plugin.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "CustomPluginArn": {
+          "description": "The Amazon Resource Name (ARN) of the custom plugin to use.",
+          "type": "string",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the custom plugin to use.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: arn:(aws|aws-us-gov|aws-cn):kafkaconnect:.*  \nUpdate requires: No interruption"
+        },
+        "Revision": {
+          "description": "The revision of the custom plugin to use.",
+          "type": "integer",
+          "format": "int64",
+          "minimum": 1,
+          "markdownDescription": "The revision of the custom plugin to use.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "CustomPluginArn",
+        "Revision"
+      ],
+      "markdownDescription": "Details about a custom plugin.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "FirehoseLogDelivery": {
+      "description": "Details about delivering logs to Amazon Kinesis Data Firehose.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "DeliveryStream": {
+          "description": "The Kinesis Data Firehose delivery stream that is the destination for log delivery.",
+          "type": "string",
+          "markdownDescription": "The Kinesis Data Firehose delivery stream that is the destination for log delivery.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Enabled": {
+          "description": "Specifies whether the logs get sent to the specified Kinesis Data Firehose delivery stream.",
+          "type": "boolean",
+          "markdownDescription": "Specifies whether the logs get sent to the specified Kinesis Data Firehose delivery stream.\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Enabled"
+      ],
+      "markdownDescription": "Details about delivering logs to Amazon Kinesis Data Firehose.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "KafkaCluster": {
+      "description": "Details of how to connect to the Kafka cluster.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ApacheKafkaCluster": {
+          "$ref": "#/definitions/ApacheKafkaCluster"
+        }
+      },
+      "required": [
+        "ApacheKafkaCluster"
+      ],
+      "markdownDescription": "Details of how to connect to the Kafka cluster.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "KafkaClusterClientAuthentication": {
+      "description": "Details of the client authentication used by the Kafka cluster.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "AuthenticationType": {
+          "$ref": "#/definitions/KafkaClusterClientAuthenticationType"
+        }
+      },
+      "required": [
+        "AuthenticationType"
+      ],
+      "markdownDescription": "Details of the client authentication used by the Kafka cluster.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "KafkaClusterClientAuthenticationType": {
+      "description": "The type of client authentication used to connect to the Kafka cluster. Value NONE means that no client authentication is used.",
+      "type": "string",
+      "enum": [
+        "NONE",
+        "IAM"
+      ],
+      "markdownDescription": "The type of client authentication used to connect to the Kafka cluster. Value NONE means that no client authentication is used.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: NONE | IAM  \nUpdate requires: No interruption"
+    },
+    "KafkaClusterEncryptionInTransit": {
+      "description": "Details of encryption in transit to the Kafka cluster.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "EncryptionType": {
+          "$ref": "#/definitions/KafkaClusterEncryptionInTransitType"
+        }
+      },
+      "required": [
+        "EncryptionType"
+      ],
+      "markdownDescription": "Details of encryption in transit to the Kafka cluster.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "KafkaClusterEncryptionInTransitType": {
+      "description": "The type of encryption in transit to the Kafka cluster.",
+      "type": "string",
+      "enum": [
+        "PLAINTEXT",
+        "TLS"
+      ],
+      "markdownDescription": "The type of encryption in transit to the Kafka cluster.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PLAINTEXT | TLS  \nUpdate requires: No interruption"
+    },
+    "LogDelivery": {
+      "description": "Details of what logs are delivered and where they are delivered.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "WorkerLogDelivery": {
+          "$ref": "#/definitions/WorkerLogDelivery"
+        }
+      },
+      "required": [
+        "WorkerLogDelivery"
+      ],
+      "markdownDescription": "Details of what logs are delivered and where they are delivered.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Plugin": {
+      "description": "Details about a Kafka Connect plugin which will be used with the connector.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "CustomPlugin": {
+          "$ref": "#/definitions/CustomPlugin"
+        }
+      },
+      "required": [
+        "CustomPlugin"
+      ],
+      "markdownDescription": "Details about a Kafka Connect plugin which will be used with the connector.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ProvisionedCapacity": {
+      "description": "Details about a fixed capacity allocated to a connector.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "McuCount": {
+          "description": "Specifies how many MSK Connect Units (MCU) are allocated to the connector.",
+          "type": "integer",
+          "enum": [
+            1,
+            2,
+            4,
+            8
+          ],
+          "markdownDescription": "Specifies how many MSK Connect Units (MCU) are allocated to the connector.\n\n---\n\nRequired: No  \nType: Integer  \nAllowed Values: 1 | 2 | 4 | 8  \nUpdate requires: No interruption"
+        },
+        "WorkerCount": {
+          "description": "Number of workers for a connector.",
+          "type": "integer",
+          "markdownDescription": "Number of workers for a connector.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "WorkerCount"
+      ],
+      "markdownDescription": "Details about a fixed capacity allocated to a connector.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "S3LogDelivery": {
+      "description": "Details about delivering logs to Amazon S3.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Bucket": {
+          "description": "The name of the S3 bucket that is the destination for log delivery.",
+          "type": "string",
+          "markdownDescription": "The name of the S3 bucket that is the destination for log delivery.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Enabled": {
+          "description": "Specifies whether the logs get sent to the specified Amazon S3 destination.",
+          "type": "boolean",
+          "markdownDescription": "Specifies whether the logs get sent to the specified Amazon S3 destination.\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
+        },
+        "Prefix": {
+          "description": "The S3 prefix that is the destination for log delivery.",
+          "type": "string",
+          "markdownDescription": "The S3 prefix that is the destination for log delivery.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Enabled"
+      ],
+      "markdownDescription": "Details about delivering logs to Amazon S3.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ScaleInPolicy": {
+      "description": "Information about the scale in policy of the connector.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "CpuUtilizationPercentage": {
+          "description": "Specifies the CPU utilization percentage threshold at which connector scale in should trigger.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "markdownDescription": "Specifies the CPU utilization percentage threshold at which connector scale in should trigger.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "CpuUtilizationPercentage"
+      ],
+      "markdownDescription": "Information about the scale in policy of the connector.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ScaleOutPolicy": {
+      "description": "Information about the scale out policy of the connector.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "CpuUtilizationPercentage": {
+          "description": "Specifies the CPU utilization percentage threshold at which connector scale out should trigger.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "markdownDescription": "Specifies the CPU utilization percentage threshold at which connector scale out should trigger.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "CpuUtilizationPercentage"
+      ],
+      "markdownDescription": "Information about the scale out policy of the connector.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Vpc": {
+      "description": "Information about a VPC used with the connector.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "SecurityGroups": {
+          "description": "The AWS security groups to associate with the elastic network interfaces in order to specify what the connector has access to.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          },
+          "insertionOrder": false,
+          "markdownDescription": "The AWS security groups to associate with the elastic network interfaces in order to specify what the connector has access to.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Subnets": {
+          "description": "The list of subnets to connect to in the virtual private cloud (VPC). AWS creates elastic network interfaces inside these subnets.",
+          "type": "array",
+          "uniqueItems": true,
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          },
+          "insertionOrder": false,
+          "markdownDescription": "The list of subnets to connect to in the virtual private cloud (VPC). AWS creates elastic network interfaces inside these subnets.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "SecurityGroups",
+        "Subnets"
+      ],
+      "markdownDescription": "Information about a VPC used with the connector.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "WorkerConfiguration": {
+      "description": "Specifies the worker configuration to use with the connector.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Revision": {
+          "description": "The revision of the worker configuration to use.",
+          "type": "integer",
+          "minimum": 1,
+          "format": "int64",
+          "markdownDescription": "The revision of the worker configuration to use.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "WorkerConfigurationArn": {
+          "description": "The Amazon Resource Name (ARN) of the worker configuration to use.",
+          "type": "string",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the worker configuration to use.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: arn:(aws|aws-us-gov|aws-cn):kafkaconnect:.*  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Revision",
+        "WorkerConfigurationArn"
+      ],
+      "markdownDescription": "Specifies the worker configuration to use with the connector.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "WorkerLogDelivery": {
+      "description": "Specifies where worker logs are delivered.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "CloudWatchLogs": {
+          "$ref": "#/definitions/CloudWatchLogsLogDelivery"
+        },
+        "Firehose": {
+          "$ref": "#/definitions/FirehoseLogDelivery"
+        },
+        "S3": {
+          "$ref": "#/definitions/S3LogDelivery"
+        }
+      },
+      "markdownDescription": "Specifies where worker logs are delivered.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "required": [
+    "Capacity",
+    "ConnectorConfiguration",
+    "ConnectorName",
+    "KafkaConnectVersion",
+    "KafkaCluster",
+    "KafkaClusterClientAuthentication",
+    "KafkaClusterEncryptionInTransit",
+    "Plugins",
+    "ServiceExecutionRoleArn"
+  ],
+  "primaryIdentifier": [
+    "/properties/ConnectorArn"
+  ],
+  "readOnlyProperties": [
+    "/properties/ConnectorArn"
+  ],
+  "createOnlyProperties": [
+    "/properties/ConnectorConfiguration",
+    "/properties/ConnectorDescription",
+    "/properties/ConnectorName",
+    "/properties/KafkaCluster",
+    "/properties/KafkaClusterClientAuthentication",
+    "/properties/KafkaClusterEncryptionInTransit",
+    "/properties/KafkaConnectVersion",
+    "/properties/LogDelivery",
+    "/properties/Plugins",
+    "/properties/ServiceExecutionRoleArn",
+    "/properties/WorkerConfiguration"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "kafkaconnect:CreateConnector",
+        "kafkaconnect:DescribeConnector",
+        "iam:CreateServiceLinkedRole",
+        "iam:PassRole",
+        "ec2:CreateNetworkInterface",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeVpcs",
+        "logs:CreateLogDelivery",
+        "logs:GetLogDelivery",
+        "logs:ListLogDeliveries",
+        "logs:PutResourcePolicy",
+        "logs:DescribeResourcePolicies",
+        "logs:DescribeLogGroups",
+        "s3:GetBucketPolicy",
+        "s3:PutBucketPolicy",
+        "firehose:TagDeliveryStream"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "kafkaconnect:DescribeConnector"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "kafkaconnect:DeleteConnector",
+        "kafkaconnect:DescribeConnector",
+        "logs:DeleteLogDelivery",
+        "logs:GetLogDelivery",
+        "logs:ListLogDeliveries"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "kafkaconnect:UpdateConnector",
+        "kafkaconnect:DescribeConnector",
+        "iam:CreateServiceLinkedRole",
+        "logs:UpdateLogDelivery",
+        "logs:GetLogDelivery",
+        "logs:ListLogDeliveries",
+        "logs:PutResourcePolicy",
+        "logs:DescribeResourcePolicies",
+        "logs:DescribeLogGroups",
+        "s3:GetBucketPolicy",
+        "s3:PutBucketPolicy",
+        "firehose:TagDeliveryStream"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "kafkaconnect:ListConnectors"
+      ]
+    }
+  },
+  "attributes": {
+    "ConnectorArn": {
+      "description": "Amazon Resource Name for the created Connector.",
+      "type": "string",
+      "markdownDescription": "Amazon Resource Name for the created Connector.\n\n---\n\nRequired: No  \nType: String  \nPattern: arn:(aws|aws-us-gov|aws-cn):kafkaconnect:.*  \nUpdate requires: No interruption"
+    }
+  }
+}

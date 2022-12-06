@@ -15,8 +15,6 @@ permissions and limitations under the License.
 */
 
 import {
-  getLanguageService as getCustomLanguageService,
-  LanguageService,
   SchemaRequestService,
   WorkspaceContextService,
 } from "yaml-language-server";
@@ -27,16 +25,18 @@ import {
   TextDocumentSyncKind,
 } from "vscode-languageserver";
 import { SettingsState } from "./cfnSettings";
-import { ValidationHandler } from "./handlers/validationHandler";
-import { SettingsHandler } from "./handlers/settingsHandler";
-import { NotificationHandler } from "./handlers/notificationHandler";
-import { LanguageHandlers } from "./handlers/languageHandlers";
+import { ValidationHandler } from "./server/handlers/validationHandler";
+import { SettingsHandler } from "./server/handlers/settingsHandler";
+import { NotificationHandler } from "./server/handlers/notificationHandler";
+import { LanguageHandlers } from "./server/handlers/languageHandlers";
 import { Telemetry } from "yaml-language-server/out/server/src/languageserver/telemetry";
 import { readFile } from "fs";
 import { JSONSchema } from "yaml-language-server/out/server/src/languageservice/jsonSchema";
 import { WorkspaceHandlers } from "yaml-language-server/out/server/src/languageserver/handlers/workspaceHandlers";
 import { commandExecutor } from "yaml-language-server/out/server/src/languageserver/commandExecutor";
 import * as path from "path";
+import { getLanguageService } from "./service/cfnLanguageService";
+import { LanguageService } from "./service/cfnLanguageService";
 
 // code adopted from https://github.com/redhat-developer/yaml-language-server/blob/main/src/yamlServerInit.ts
 export class CfnServerInit {
@@ -80,7 +80,7 @@ export class CfnServerInit {
   connectionInitialized(params: InitializeParams): InitializeResult {
     this.cfnSettings.capabilities = params.capabilities;
 
-    this.languageService = getCustomLanguageService(
+    this.languageService = getLanguageService(
       this.schemaRequestService,
       this.workspaceContext,
       this.connection,
@@ -90,7 +90,7 @@ export class CfnServerInit {
     );
 
     readFile(
-      path.join(__dirname, `../../schema/all-spec.json`),
+      path.join(__dirname, `../../../schema/base.schema.json`),
       "utf8",
       (err, data) => {
         if (err) {
@@ -98,7 +98,10 @@ export class CfnServerInit {
         }
         let schema: JSONSchema;
         schema = data as JSONSchema;
-        this.languageService.addSchema("CLOUDFORMATION", schema);
+        this.languageService.addSchema(
+          "https://aws.amazon.com/cloudformation/template/base",
+          schema
+        );
       }
     );
 

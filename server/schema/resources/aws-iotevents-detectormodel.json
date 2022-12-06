@@ -1,0 +1,809 @@
+{
+  "typeName": "AWS::IoTEvents::DetectorModel",
+  "description": "The AWS::IoTEvents::DetectorModel resource creates a detector model. You create a *detector model* (a model of your equipment or process) using *states*. For each state, you define conditional (Boolean) logic that evaluates the incoming inputs to detect significant events. When an event is detected, it can change the state or trigger custom-built or predefined actions using other AWS services. You can define additional events that trigger actions when entering or exiting a state and, optionally, when a condition is met. For more information, see [How to Use AWS IoT Events](https://docs.aws.amazon.com/iotevents/latest/developerguide/how-to-use-iotevents.html) in the *AWS IoT Events Developer Guide*.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "definitions": {
+    "DetectorModelDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Information that defines how a detector operates.",
+      "properties": {
+        "InitialStateName": {
+          "type": "string",
+          "description": "The state that is entered at the creation of each detector (instance).",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The state that is entered at the creation of each detector (instance).\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        },
+        "States": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "description": "Information about the states of the detector.",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/State"
+          },
+          "markdownDescription": "Information about the states of the detector.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "States",
+        "InitialStateName"
+      ],
+      "markdownDescription": "Information that defines how a detector operates.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "State": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Information that defines a state of a detector.",
+      "properties": {
+        "OnEnter": {
+          "$ref": "#/definitions/OnEnter"
+        },
+        "OnExit": {
+          "$ref": "#/definitions/OnExit"
+        },
+        "OnInput": {
+          "$ref": "#/definitions/OnInput"
+        },
+        "StateName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "description": "The name of the state.",
+          "markdownDescription": "The name of the state.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "StateName"
+      ],
+      "markdownDescription": "Information that defines a state of a detector.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "OnEnter": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "When entering this state, perform these `actions` if the `condition` is `TRUE`.",
+      "properties": {
+        "Events": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "description": "Specifies the `actions` that are performed when the state is entered and the `condition` is `TRUE`.",
+          "items": {
+            "$ref": "#/definitions/Event"
+          },
+          "markdownDescription": "Specifies the `actions` that are performed when the state is entered and the `condition` is `TRUE`.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "When entering this state, perform these `actions` if the `condition` is `TRUE`.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "OnExit": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "When exiting this state, perform these `actions` if the specified `condition` is `TRUE`.",
+      "properties": {
+        "Events": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "description": "Specifies the `actions` that are performed when the state is exited and the `condition` is `TRUE`.",
+          "items": {
+            "$ref": "#/definitions/Event"
+          },
+          "markdownDescription": "Specifies the `actions` that are performed when the state is exited and the `condition` is `TRUE`.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "When exiting this state, perform these `actions` if the specified `condition` is `TRUE`.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "OnInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "When an input is received and the `condition` is `TRUE`, perform the specified `actions`.",
+      "properties": {
+        "Events": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "description": "Specifies the `actions` performed when the `condition` evaluates to `TRUE`.",
+          "items": {
+            "$ref": "#/definitions/Event"
+          },
+          "markdownDescription": "Specifies the `actions` performed when the `condition` evaluates to `TRUE`.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "TransitionEvents": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": true,
+          "description": "Specifies the `actions` performed, and the next `state` entered, when a `condition` evaluates to `TRUE`.",
+          "items": {
+            "$ref": "#/definitions/TransitionEvent"
+          },
+          "markdownDescription": "Specifies the `actions` performed, and the next `state` entered, when a `condition` evaluates to `TRUE`.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "When an input is received and the `condition` is `TRUE`, perform the specified `actions`.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Event": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Specifies the `actions` to be performed when the `condition` evaluates to `TRUE`.",
+      "properties": {
+        "Actions": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "description": "The actions to be performed.",
+          "items": {
+            "$ref": "#/definitions/Action"
+          },
+          "markdownDescription": "The actions to be performed.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Condition": {
+          "type": "string",
+          "description": "The Boolean expression that, when `TRUE`, causes the `actions` to be performed. If not present, the `actions` are performed (=`TRUE`). If the expression result is not a `Boolean` value, the `actions` are not performed (=`FALSE`).",
+          "maxLength": 512,
+          "markdownDescription": "The Boolean expression that, when `TRUE`, causes the `actions` to be performed. If not present, the `actions` are performed (=`TRUE`). If the expression result is not a `Boolean` value, the `actions` are not performed (=`FALSE`).\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 512  \nUpdate requires: No interruption"
+        },
+        "EventName": {
+          "type": "string",
+          "description": "The name of the event.",
+          "maxLength": 128,
+          "markdownDescription": "The name of the event.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "EventName"
+      ],
+      "markdownDescription": "Specifies the `actions` to be performed when the `condition` evaluates to `TRUE`.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "TransitionEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Specifies the `actions `performed and the next `state` entered when a `condition` evaluates to `TRUE`.",
+      "properties": {
+        "Actions": {
+          "type": "array",
+          "description": "The actions to be performed.",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/Action"
+          },
+          "markdownDescription": "The actions to be performed.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Condition": {
+          "type": "string",
+          "description": "A Boolean expression that when `TRUE` causes the `actions` to be performed and the `nextState` to be entered.",
+          "maxLength": 512,
+          "markdownDescription": "A Boolean expression that when `TRUE` causes the `actions` to be performed and the `nextState` to be entered.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 512  \nUpdate requires: No interruption"
+        },
+        "EventName": {
+          "type": "string",
+          "description": "The name of the event.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The name of the event.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        },
+        "NextState": {
+          "type": "string",
+          "description": "The next state to enter.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The next state to enter.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Condition",
+        "EventName",
+        "NextState"
+      ],
+      "markdownDescription": "Specifies the `actions `performed and the next `state` entered when a `condition` evaluates to `TRUE`.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Action": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "The actions to be performed.",
+      "properties": {
+        "ClearTimer": {
+          "$ref": "#/definitions/ClearTimer"
+        },
+        "DynamoDB": {
+          "$ref": "#/definitions/DynamoDB"
+        },
+        "DynamoDBv2": {
+          "$ref": "#/definitions/DynamoDBv2"
+        },
+        "Firehose": {
+          "$ref": "#/definitions/Firehose"
+        },
+        "IotEvents": {
+          "$ref": "#/definitions/IotEvents"
+        },
+        "IotSiteWise": {
+          "$ref": "#/definitions/IotSiteWise"
+        },
+        "IotTopicPublish": {
+          "$ref": "#/definitions/IotTopicPublish"
+        },
+        "Lambda": {
+          "$ref": "#/definitions/Lambda"
+        },
+        "ResetTimer": {
+          "$ref": "#/definitions/ResetTimer"
+        },
+        "SetTimer": {
+          "$ref": "#/definitions/SetTimer"
+        },
+        "SetVariable": {
+          "$ref": "#/definitions/SetVariable"
+        },
+        "Sns": {
+          "$ref": "#/definitions/Sns"
+        },
+        "Sqs": {
+          "$ref": "#/definitions/Sqs"
+        }
+      },
+      "markdownDescription": "The actions to be performed.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ClearTimer": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Information needed to clear the timer.",
+      "properties": {
+        "TimerName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "TimerName"
+      ],
+      "markdownDescription": "Information needed to clear the timer.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "DynamoDB": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Writes to the DynamoDB table that you created. The default action payload contains all attribute-value pairs that have the information about the detector model instance and the event that triggered the action. You can also customize the [payload](https://docs.aws.amazon.com/iotevents/latest/apireference/API_Payload.html). One column of the DynamoDB table receives all attribute-value pairs in the payload that you specify. For more information, see [Actions](https://docs.aws.amazon.com/iotevents/latest/developerguide/iotevents-event-actions.html) in *AWS IoT Events Developer Guide*.",
+      "properties": {
+        "HashKeyField": {
+          "type": "string",
+          "description": "The name of the hash key (also called the partition key).",
+          "markdownDescription": "The name of the hash key (also called the partition key).\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "HashKeyType": {
+          "type": "string",
+          "description": "The data type for the hash key (also called the partition key). You can specify the following values:\n\n* `STRING` - The hash key is a string.\n\n* `NUMBER` - The hash key is a number.\n\nIf you don't specify `hashKeyType`, the default value is `STRING`.",
+          "markdownDescription": "The data type for the hash key (also called the partition key). You can specify the following values:\n\n* `STRING` - The hash key is a string.\n\n* `NUMBER` - The hash key is a number.\n\nIf you don't specify `hashKeyType`, the default value is `STRING`.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "HashKeyValue": {
+          "type": "string",
+          "description": "The value of the hash key (also called the partition key).",
+          "markdownDescription": "The value of the hash key (also called the partition key).\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Operation": {
+          "type": "string",
+          "description": "The type of operation to perform. You can specify the following values:\n\n* `INSERT` - Insert data as a new item into the DynamoDB table. This item uses the specified hash key as a partition key. If you specified a range key, the item uses the range key as a sort key.\n\n* `UPDATE` - Update an existing item of the DynamoDB table with new data. This item's partition key must match the specified hash key. If you specified a range key, the range key must match the item's sort key.\n\n* `DELETE` - Delete an existing item of the DynamoDB table. This item's partition key must match the specified hash key. If you specified a range key, the range key must match the item's sort key.\n\nIf you don't specify this parameter, AWS IoT Events triggers the `INSERT` operation.",
+          "markdownDescription": "The type of operation to perform. You can specify the following values:\n\n* `INSERT` - Insert data as a new item into the DynamoDB table. This item uses the specified hash key as a partition key. If you specified a range key, the item uses the range key as a sort key.\n\n* `UPDATE` - Update an existing item of the DynamoDB table with new data. This item's partition key must match the specified hash key. If you specified a range key, the range key must match the item's sort key.\n\n* `DELETE` - Delete an existing item of the DynamoDB table. This item's partition key must match the specified hash key. If you specified a range key, the range key must match the item's sort key.\n\nIf you don't specify this parameter, AWS IoT Events triggers the `INSERT` operation.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Payload": {
+          "$ref": "#/definitions/Payload"
+        },
+        "PayloadField": {
+          "type": "string",
+          "description": "The name of the DynamoDB column that receives the action payload.\n\nIf you don't specify this parameter, the name of the DynamoDB column is `payload`.",
+          "markdownDescription": "The name of the DynamoDB column that receives the action payload.\n\nIf you don't specify this parameter, the name of the DynamoDB column is `payload`.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "RangeKeyField": {
+          "type": "string",
+          "description": "The name of the range key (also called the sort key).",
+          "markdownDescription": "The name of the range key (also called the sort key).\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "RangeKeyType": {
+          "type": "string",
+          "description": "The data type for the range key (also called the sort key), You can specify the following values:\n\n* `STRING` - The range key is a string.\n\n* `NUMBER` - The range key is number.\n\nIf you don't specify `rangeKeyField`, the default value is `STRING`.",
+          "markdownDescription": "The data type for the range key (also called the sort key), You can specify the following values:\n\n* `STRING` - The range key is a string.\n\n* `NUMBER` - The range key is number.\n\nIf you don't specify `rangeKeyField`, the default value is `STRING`.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "RangeKeyValue": {
+          "type": "string",
+          "description": "The value of the range key (also called the sort key).",
+          "markdownDescription": "The value of the range key (also called the sort key).\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "TableName": {
+          "type": "string",
+          "description": "The name of the DynamoDB table.",
+          "markdownDescription": "The name of the DynamoDB table.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "HashKeyField",
+        "HashKeyValue",
+        "TableName"
+      ],
+      "markdownDescription": "Writes to the DynamoDB table that you created. The default action payload contains all attribute-value pairs that have the information about the detector model instance and the event that triggered the action. You can also customize the [payload](https://docs.aws.amazon.com/iotevents/latest/apireference/API_Payload.html). One column of the DynamoDB table receives all attribute-value pairs in the payload that you specify. For more information, see [Actions](https://docs.aws.amazon.com/iotevents/latest/developerguide/iotevents-event-actions.html) in *AWS IoT Events Developer Guide*.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "DynamoDBv2": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Defines an action to write to the Amazon DynamoDB table that you created. The default action payload contains all attribute-value pairs that have the information about the detector model instance and the event that triggered the action. You can also customize the [payload](https://docs.aws.amazon.com/iotevents/latest/apireference/API_Payload.html). A separate column of the DynamoDB table receives one attribute-value pair in the payload that you specify.\n\nYou can use expressions for parameters that are strings. For more information, see [Expressions](https://docs.aws.amazon.com/iotevents/latest/developerguide/iotevents-expressions.html) in the *AWS IoT Events Developer Guide*.",
+      "properties": {
+        "Payload": {
+          "$ref": "#/definitions/Payload"
+        },
+        "TableName": {
+          "type": "string",
+          "description": "The name of the DynamoDB table.",
+          "markdownDescription": "The name of the DynamoDB table.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "TableName"
+      ],
+      "markdownDescription": "Defines an action to write to the Amazon DynamoDB table that you created. The default action payload contains all attribute-value pairs that have the information about the detector model instance and the event that triggered the action. You can also customize the [payload](https://docs.aws.amazon.com/iotevents/latest/apireference/API_Payload.html). A separate column of the DynamoDB table receives one attribute-value pair in the payload that you specify.\n\nYou can use expressions for parameters that are strings. For more information, see [Expressions](https://docs.aws.amazon.com/iotevents/latest/developerguide/iotevents-expressions.html) in the *AWS IoT Events Developer Guide*.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Firehose": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Sends information about the detector model instance and the event that triggered the action to an Amazon Kinesis Data Firehose delivery stream.",
+      "properties": {
+        "DeliveryStreamName": {
+          "type": "string",
+          "description": "The name of the Kinesis Data Firehose delivery stream where the data is written.",
+          "markdownDescription": "The name of the Kinesis Data Firehose delivery stream where the data is written.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Payload": {
+          "$ref": "#/definitions/Payload"
+        },
+        "Separator": {
+          "type": "string",
+          "description": "A character separator that is used to separate records written to the Kinesis Data Firehose delivery stream. Valid values are: '\\n' (newline), '\\t' (tab), '\\r\\n' (Windows newline), ',' (comma).",
+          "markdownDescription": "A character separator that is used to separate records written to the Kinesis Data Firehose delivery stream. Valid values are: '\\n' (newline), '\\t' (tab), '\\r\\n' (Windows newline), ',' (comma).\n\n---\n\nRequired: No  \nType: String  \nPattern: ([\\n\\t])|(\\r\\n)|(,)  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "DeliveryStreamName"
+      ],
+      "markdownDescription": "Sends information about the detector model instance and the event that triggered the action to an Amazon Kinesis Data Firehose delivery stream.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "IotEvents": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Sends an AWS IoT Events input, passing in information about the detector model instance and the event that triggered the action.",
+      "properties": {
+        "InputName": {
+          "type": "string",
+          "description": "The name of the AWS IoT Events input where the data is sent.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The name of the AWS IoT Events input where the data is sent.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z][a-zA-Z0-9_]*$  \nUpdate requires: No interruption"
+        },
+        "Payload": {
+          "$ref": "#/definitions/Payload"
+        }
+      },
+      "required": [
+        "InputName"
+      ],
+      "markdownDescription": "Sends an AWS IoT Events input, passing in information about the detector model instance and the event that triggered the action.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "IotSiteWise": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Sends information about the detector model instance and the event that triggered the action to a specified asset property in AWS IoT SiteWise.",
+      "properties": {
+        "AssetId": {
+          "type": "string",
+          "description": "The ID of the asset that has the specified property. You can specify an expression.",
+          "markdownDescription": "The ID of the asset that has the specified property. You can specify an expression.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "EntryId": {
+          "type": "string",
+          "description": "A unique identifier for this entry. You can use the entry ID to track which data entry causes an error in case of failure. The default is a new unique identifier. You can also specify an expression.",
+          "markdownDescription": "A unique identifier for this entry. You can use the entry ID to track which data entry causes an error in case of failure. The default is a new unique identifier. You can also specify an expression.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "PropertyAlias": {
+          "type": "string",
+          "description": "The alias of the asset property. You can also specify an expression.",
+          "markdownDescription": "The alias of the asset property. You can also specify an expression.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "PropertyId": {
+          "type": "string",
+          "description": "The ID of the asset property. You can specify an expression.",
+          "markdownDescription": "The ID of the asset property. You can specify an expression.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "PropertyValue": {
+          "$ref": "#/definitions/AssetPropertyValue"
+        }
+      },
+      "required": [
+        "PropertyValue"
+      ],
+      "markdownDescription": "Sends information about the detector model instance and the event that triggered the action to a specified asset property in AWS IoT SiteWise.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "IotTopicPublish": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Information required to publish the MQTT message through the AWS IoT message broker.",
+      "properties": {
+        "MqttTopic": {
+          "type": "string",
+          "description": "The MQTT topic of the message. You can use a string expression that includes variables (`$variable.<variable-name>`) and input values (`$input.<input-name>.<path-to-datum>`) as the topic string.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The MQTT topic of the message. You can use a string expression that includes variables (`$variable.<variable-name>`) and input values (`$input.<input-name>.<path-to-datum>`) as the topic string.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        },
+        "Payload": {
+          "$ref": "#/definitions/Payload"
+        }
+      },
+      "required": [
+        "MqttTopic"
+      ],
+      "markdownDescription": "Information required to publish the MQTT message through the AWS IoT message broker.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Lambda": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "FunctionArn": {
+          "type": "string",
+          "description": "The ARN of the Lambda function that is executed.",
+          "minLength": 1,
+          "maxLength": 2048,
+          "markdownDescription": "The ARN of the Lambda function that is executed.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: No interruption"
+        },
+        "Payload": {
+          "$ref": "#/definitions/Payload"
+        }
+      },
+      "required": [
+        "FunctionArn"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ResetTimer": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Information required to reset the timer. The timer is reset to the previously evaluated result of the duration. The duration expression isn't reevaluated when you reset the timer.",
+      "properties": {
+        "TimerName": {
+          "type": "string",
+          "description": "The name of the timer to reset.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The name of the timer to reset.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "TimerName"
+      ],
+      "markdownDescription": "Information required to reset the timer. The timer is reset to the previously evaluated result of the duration. The duration expression isn't reevaluated when you reset the timer.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "SetTimer": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Information needed to set the timer.",
+      "properties": {
+        "DurationExpression": {
+          "type": "string",
+          "description": "The duration of the timer, in seconds. You can use a string expression that includes numbers, variables (`$variable.<variable-name>`), and input values (`$input.<input-name>.<path-to-datum>`) as the duration. The range of the duration is `1-31622400` seconds. To ensure accuracy, the minimum duration is `60` seconds. The evaluated result of the duration is rounded down to the nearest whole number.",
+          "minLength": 1,
+          "maxLength": 1024,
+          "markdownDescription": "The duration of the timer, in seconds. You can use a string expression that includes numbers, variables (`$variable.<variable-name>`), and input values (`$input.<input-name>.<path-to-datum>`) as the duration. The range of the duration is `1-31622400` seconds. To ensure accuracy, the minimum duration is `60` seconds. The evaluated result of the duration is rounded down to the nearest whole number.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption"
+        },
+        "Seconds": {
+          "type": "integer",
+          "description": "The number of seconds until the timer expires. The minimum value is `60` seconds to ensure accuracy. The maximum value is `31622400` seconds.",
+          "minimum": 60,
+          "maximum": 31622400,
+          "markdownDescription": "The number of seconds until the timer expires. The minimum value is `60` seconds to ensure accuracy. The maximum value is `31622400` seconds.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "TimerName": {
+          "type": "string",
+          "description": "The name of the timer.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The name of the timer.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "TimerName"
+      ],
+      "markdownDescription": "Information needed to set the timer.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "SetVariable": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Information about the variable and its new value.",
+      "properties": {
+        "Value": {
+          "type": "string",
+          "description": "The new value of the variable.",
+          "minLength": 1,
+          "maxLength": 1024,
+          "markdownDescription": "The new value of the variable.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption"
+        },
+        "VariableName": {
+          "type": "string",
+          "description": "The name of the variable.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The name of the variable.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z][a-zA-Z0-9_]*$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Value",
+        "VariableName"
+      ],
+      "markdownDescription": "Information about the variable and its new value.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Sns": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Information required to publish the Amazon SNS message.",
+      "properties": {
+        "Payload": {
+          "$ref": "#/definitions/Payload"
+        },
+        "TargetArn": {
+          "type": "string",
+          "description": "The ARN of the Amazon SNS target where the message is sent.",
+          "minLength": 1,
+          "maxLength": 2048,
+          "markdownDescription": "The ARN of the Amazon SNS target where the message is sent.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "TargetArn"
+      ],
+      "markdownDescription": "Information required to publish the Amazon SNS message.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Sqs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Payload": {
+          "$ref": "#/definitions/Payload"
+        },
+        "QueueUrl": {
+          "type": "string",
+          "description": "The URL of the SQS queue where the data is written.",
+          "markdownDescription": "The URL of the SQS queue where the data is written.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "UseBase64": {
+          "type": "boolean",
+          "description": "Set this to `TRUE` if you want the data to be base-64 encoded before it is written to the queue. Otherwise, set this to `FALSE`.",
+          "markdownDescription": "Set this to `TRUE` if you want the data to be base-64 encoded before it is written to the queue. Otherwise, set this to `FALSE`.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "QueueUrl"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AssetPropertyValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "A structure that contains value information. For more information, see [AssetPropertyValue](https://docs.aws.amazon.com/iot-sitewise/latest/APIReference/API_AssetPropertyValue.html) in the *AWS IoT SiteWise API Reference*.",
+      "properties": {
+        "Quality": {
+          "type": "string",
+          "description": "The quality of the asset property value. The value must be `GOOD`, `BAD`, or `UNCERTAIN`. You can also specify an expression.",
+          "markdownDescription": "The quality of the asset property value. The value must be `GOOD`, `BAD`, or `UNCERTAIN`. You can also specify an expression.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Timestamp": {
+          "$ref": "#/definitions/AssetPropertyTimestamp"
+        },
+        "Value": {
+          "$ref": "#/definitions/AssetPropertyVariant"
+        }
+      },
+      "required": [
+        "Value"
+      ],
+      "markdownDescription": "A structure that contains value information. For more information, see [AssetPropertyValue](https://docs.aws.amazon.com/iot-sitewise/latest/APIReference/API_AssetPropertyValue.html) in the *AWS IoT SiteWise API Reference*.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AssetPropertyTimestamp": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "A structure that contains timestamp information. For more information, see [TimeInNanos](https://docs.aws.amazon.com/iot-sitewise/latest/APIReference/API_TimeInNanos.html) in the *AWS IoT SiteWise API Reference*.",
+      "properties": {
+        "OffsetInNanos": {
+          "type": "string",
+          "description": "The timestamp, in seconds, in the Unix epoch format. The valid range is between `1-31556889864403199`. You can also specify an expression.",
+          "markdownDescription": "The timestamp, in seconds, in the Unix epoch format. The valid range is between `1-31556889864403199`. You can also specify an expression.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "TimeInSeconds": {
+          "type": "string",
+          "description": "The nanosecond offset converted from `timeInSeconds`. The valid range is between `0-999999999`. You can also specify an expression.",
+          "markdownDescription": "The nanosecond offset converted from `timeInSeconds`. The valid range is between `0-999999999`. You can also specify an expression.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "TimeInSeconds"
+      ],
+      "markdownDescription": "A structure that contains timestamp information. For more information, see [TimeInNanos](https://docs.aws.amazon.com/iot-sitewise/latest/APIReference/API_TimeInNanos.html) in the *AWS IoT SiteWise API Reference*.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AssetPropertyVariant": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "A structure that contains an asset property value. For more information, see [Variant](https://docs.aws.amazon.com/iot-sitewise/latest/APIReference/API_Variant.html) in the *AWS IoT SiteWise API Reference*.",
+      "properties": {
+        "BooleanValue": {
+          "type": "string",
+          "description": "The asset property value is a Boolean value that must be `TRUE` or `FALSE`. You can also specify an expression. If you use an expression, the evaluated result should be a Boolean value.",
+          "markdownDescription": "The asset property value is a Boolean value that must be `TRUE` or `FALSE`. You can also specify an expression. If you use an expression, the evaluated result should be a Boolean value.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "DoubleValue": {
+          "type": "string",
+          "description": "The asset property value is a double. You can also specify an expression. If you use an expression, the evaluated result should be a double.",
+          "markdownDescription": "The asset property value is a double. You can also specify an expression. If you use an expression, the evaluated result should be a double.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "IntegerValue": {
+          "type": "string",
+          "description": "The asset property value is an integer. You can also specify an expression. If you use an expression, the evaluated result should be an integer.",
+          "markdownDescription": "The asset property value is an integer. You can also specify an expression. If you use an expression, the evaluated result should be an integer.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "StringValue": {
+          "type": "string",
+          "description": "The asset property value is a string. You can also specify an expression. If you use an expression, the evaluated result should be a string.",
+          "markdownDescription": "The asset property value is a string. You can also specify an expression. If you use an expression, the evaluated result should be a string.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "A structure that contains an asset property value. For more information, see [Variant](https://docs.aws.amazon.com/iot-sitewise/latest/APIReference/API_Variant.html) in the *AWS IoT SiteWise API Reference*.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Information needed to configure the payload.\n\nBy default, AWS IoT Events generates a standard payload in JSON for any action. This action payload contains all attribute-value pairs that have the information about the detector model instance and the event triggered the action. To configure the action payload, you can use `contentExpression`.",
+      "properties": {
+        "ContentExpression": {
+          "type": "string",
+          "description": "The content of the payload. You can use a string expression that includes quoted strings (`'<string>'`), variables (`$variable.<variable-name>`), input values (`$input.<input-name>.<path-to-datum>`), string concatenations, and quoted strings that contain `${}` as the content. The recommended maximum size of a content expression is 1 KB.",
+          "minLength": 1,
+          "markdownDescription": "The content of the payload. You can use a string expression that includes quoted strings (`'<string>'`), variables (`$variable.<variable-name>`), input values (`$input.<input-name>.<path-to-datum>`), string concatenations, and quoted strings that contain `${}` as the content. The recommended maximum size of a content expression is 1 KB.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nUpdate requires: No interruption"
+        },
+        "Type": {
+          "type": "string",
+          "description": "The value of the payload type can be either `STRING` or `JSON`.",
+          "markdownDescription": "The value of the payload type can be either `STRING` or `JSON`.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "ContentExpression",
+        "Type"
+      ],
+      "markdownDescription": "Information needed to configure the payload.\n\nBy default, AWS IoT Events generates a standard payload in JSON for any action. This action payload contains all attribute-value pairs that have the information about the detector model instance and the event triggered the action. To configure the action payload, you can use `contentExpression`.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Tags to be applied to Input.",
+      "properties": {
+        "Key": {
+          "description": "Key of the Tag.",
+          "type": "string",
+          "markdownDescription": "Key of the Tag.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "description": "Value of the Tag.",
+          "type": "string",
+          "markdownDescription": "Value of the Tag.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ],
+      "markdownDescription": "Tags to be applied to Input.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "DetectorModelDefinition": {
+      "$ref": "#/definitions/DetectorModelDefinition"
+    },
+    "DetectorModelDescription": {
+      "type": "string",
+      "description": "A brief description of the detector model.",
+      "maxLength": 128,
+      "markdownDescription": "A brief description of the detector model.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 128  \nUpdate requires: No interruption"
+    },
+    "DetectorModelName": {
+      "type": "string",
+      "description": "The name of the detector model.",
+      "minLength": 1,
+      "maxLength": 128,
+      "markdownDescription": "The name of the detector model.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9_-]+$  \nUpdate requires: Replacement"
+    },
+    "EvaluationMethod": {
+      "type": "string",
+      "description": "Information about the order in which events are evaluated and how actions are executed.",
+      "enum": [
+        "BATCH",
+        "SERIAL"
+      ],
+      "markdownDescription": "Information about the order in which events are evaluated and how actions are executed.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: BATCH | SERIAL  \nUpdate requires: No interruption"
+    },
+    "Key": {
+      "type": "string",
+      "description": "The value used to identify a detector instance. When a device or system sends input, a new detector instance with a unique key value is created. AWS IoT Events can continue to route input to its corresponding detector instance based on this identifying information.\n\nThis parameter uses a JSON-path expression to select the attribute-value pair in the message payload that is used for identification. To route the message to the correct detector instance, the device must send a message payload that contains the same attribute-value.",
+      "minLength": 1,
+      "maxLength": 128,
+      "markdownDescription": "The value used to identify a detector instance. When a device or system sends input, a new detector instance with a unique key value is created. AWS IoT Events can continue to route input to its corresponding detector instance based on this identifying information.\n\nThis parameter uses a JSON-path expression to select the attribute-value pair in the message payload that is used for identification. To route the message to the correct detector instance, the device must send a message payload that contains the same attribute-value.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^((`[\\w\\- ]+`)|([\\w\\-]+))(\\.((`[\\w\\- ]+`)|([\\w\\-]+)))*$  \nUpdate requires: Replacement"
+    },
+    "RoleArn": {
+      "type": "string",
+      "description": "The ARN of the role that grants permission to AWS IoT Events to perform its operations.",
+      "minLength": 1,
+      "maxLength": 2048,
+      "markdownDescription": "The ARN of the role that grants permission to AWS IoT Events to perform its operations.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: No interruption"
+    },
+    "Tags": {
+      "type": "array",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "description": "An array of key-value pairs to apply to this resource.\n\nFor more information, see [Tag](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-resource-tags.html).",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "An array of key-value pairs to apply to this resource.\n\nFor more information, see [Tag](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-resource-tags.html).\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    }
+  },
+  "required": [
+    "DetectorModelDefinition",
+    "RoleArn"
+  ],
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/DetectorModelName"
+  ],
+  "createOnlyProperties": [
+    "/properties/DetectorModelName",
+    "/properties/Key"
+  ],
+  "taggable": true,
+  "handlers": {
+    "create": {
+      "permissions": [
+        "iotevents:CreateDetectorModel",
+        "iotevents:UpdateInputRouting",
+        "iotevents:DescribeDetectorModel",
+        "iotevents:ListTagsForResource",
+        "iotevents:TagResource",
+        "iam:PassRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "iotevents:DescribeDetectorModel",
+        "iotevents:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "iotevents:UpdateDetectorModel",
+        "iotevents:UpdateInputRouting",
+        "iotevents:DescribeDetectorModel",
+        "iotevents:ListTagsForResource",
+        "iotevents:UntagResource",
+        "iotevents:TagResource",
+        "iam:PassRole"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "iotevents:DeleteDetectorModel",
+        "iotevents:DescribeDetectorModel"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "iotevents:ListDetectorModels"
+      ]
+    }
+  },
+  "attributes": {}
+}

@@ -1,0 +1,541 @@
+{
+  "typeName": "AWS::SageMaker::Domain",
+  "description": "Resource Type definition for AWS::SageMaker::Domain",
+  "additionalProperties": false,
+  "properties": {
+    "AppNetworkAccessType": {
+      "type": "string",
+      "description": "Specifies the VPC used for non-EFS traffic. The default value is PublicInternetOnly.",
+      "enum": [
+        "PublicInternetOnly",
+        "VpcOnly"
+      ],
+      "markdownDescription": "Specifies the VPC used for non-EFS traffic. The default value is PublicInternetOnly.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PublicInternetOnly | VpcOnly  \nUpdate requires: Replacement"
+    },
+    "AuthMode": {
+      "type": "string",
+      "description": "The mode of authentication that members use to access the domain.",
+      "enum": [
+        "SSO",
+        "IAM"
+      ],
+      "markdownDescription": "The mode of authentication that members use to access the domain.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: SSO | IAM  \nUpdate requires: Replacement"
+    },
+    "DefaultUserSettings": {
+      "$ref": "#/definitions/UserSettings",
+      "description": "The default user settings.",
+      "markdownDescription": "The default user settings.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption"
+    },
+    "DomainName": {
+      "type": "string",
+      "description": "A name for the domain.",
+      "maxLength": 63,
+      "markdownDescription": "A name for the domain.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 63  \nPattern: ^[a-zA-Z0-9](-*[a-zA-Z0-9]){0,62}  \nUpdate requires: Replacement"
+    },
+    "KmsKeyId": {
+      "type": "string",
+      "description": "SageMaker uses AWS KMS to encrypt the EFS volume attached to the domain with an AWS managed customer master key (CMK) by default.",
+      "maxLength": 2048,
+      "markdownDescription": "SageMaker uses AWS KMS to encrypt the EFS volume attached to the domain with an AWS managed customer master key (CMK) by default.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nPattern: .*  \nUpdate requires: Replacement"
+    },
+    "SubnetIds": {
+      "type": "array",
+      "description": "The VPC subnets that Studio uses for communication.",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "minItems": 1,
+      "maxItems": 16,
+      "items": {
+        "type": "string",
+        "maxLength": 32,
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 32  \nPattern: [-0-9a-zA-Z]+  \nUpdate requires: No interruption"
+      },
+      "markdownDescription": "The VPC subnets that Studio uses for communication.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: Replacement"
+    },
+    "Tags": {
+      "type": "array",
+      "description": "A list of tags to apply to the user profile.",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "minItems": 0,
+      "maxItems": 50,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "A list of tags to apply to the user profile.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement"
+    },
+    "VpcId": {
+      "type": "string",
+      "description": "The ID of the Amazon Virtual Private Cloud (VPC) that Studio uses for communication.",
+      "maxLength": 32,
+      "markdownDescription": "The ID of the Amazon Virtual Private Cloud (VPC) that Studio uses for communication.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 32  \nPattern: [-0-9a-zA-Z]+  \nUpdate requires: Replacement"
+    },
+    "DomainSettings": {
+      "$ref": "#/definitions/DomainSettings"
+    },
+    "AppSecurityGroupManagement": {
+      "type": "string",
+      "description": "The entity that creates and manages the required security groups for inter-app communication in VPCOnly mode. Required when CreateDomain.AppNetworkAccessType is VPCOnly and DomainSettings.RStudioServerProDomainSettings.DomainExecutionRoleArn is provided.",
+      "enum": [
+        "Service",
+        "Customer"
+      ],
+      "markdownDescription": "The entity that creates and manages the required security groups for inter-app communication in VPCOnly mode. Required when CreateDomain.AppNetworkAccessType is VPCOnly and DomainSettings.RStudioServerProDomainSettings.DomainExecutionRoleArn is provided.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Service | Customer  \nUpdate requires: Replacement"
+    }
+  },
+  "definitions": {
+    "UserSettings": {
+      "type": "object",
+      "description": "A collection of settings that apply to users of Amazon SageMaker Studio. These settings are specified when the CreateUserProfile API is called, and as DefaultUserSettings when the CreateDomain API is called.",
+      "additionalProperties": false,
+      "properties": {
+        "ExecutionRole": {
+          "type": "string",
+          "description": "The user profile Amazon Resource Name (ARN).",
+          "minLength": 20,
+          "maxLength": 2048,
+          "markdownDescription": "The user profile Amazon Resource Name (ARN).\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:aws[a-z\\-]*:iam::\\d{12}:role/?[a-zA-Z_0-9+=,.@\\-_/]+$  \nUpdate requires: No interruption"
+        },
+        "JupyterServerAppSettings": {
+          "$ref": "#/definitions/JupyterServerAppSettings",
+          "description": "The Jupyter server's app settings.",
+          "markdownDescription": "The Jupyter server's app settings.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        },
+        "KernelGatewayAppSettings": {
+          "$ref": "#/definitions/KernelGatewayAppSettings",
+          "description": "The kernel gateway app settings.",
+          "markdownDescription": "The kernel gateway app settings.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        },
+        "RStudioServerProAppSettings": {
+          "$ref": "#/definitions/RStudioServerProAppSettings"
+        },
+        "RSessionAppSettings": {
+          "$ref": "#/definitions/RSessionAppSettings"
+        },
+        "SecurityGroups": {
+          "type": "array",
+          "description": "The security groups for the Amazon Virtual Private Cloud (VPC) that Studio uses for communication.",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "minItems": 0,
+          "maxItems": 5,
+          "items": {
+            "type": "string",
+            "maxLength": 32,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 32  \nPattern: [-0-9a-zA-Z]+  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "The security groups for the Amazon Virtual Private Cloud (VPC) that Studio uses for communication.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "SharingSettings": {
+          "$ref": "#/definitions/SharingSettings",
+          "description": "The sharing settings.",
+          "markdownDescription": "The sharing settings.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "A collection of settings that apply to users of Amazon SageMaker Studio. These settings are specified when the CreateUserProfile API is called, and as DefaultUserSettings when the CreateDomain API is called.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "JupyterServerAppSettings": {
+      "type": "object",
+      "description": "The JupyterServer app settings.",
+      "additionalProperties": false,
+      "properties": {
+        "DefaultResourceSpec": {
+          "$ref": "#/definitions/ResourceSpec"
+        }
+      },
+      "markdownDescription": "The JupyterServer app settings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ResourceSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "InstanceType": {
+          "type": "string",
+          "description": "The instance type that the image version runs on.",
+          "enum": [
+            "system",
+            "ml.t3.micro",
+            "ml.t3.small",
+            "ml.t3.medium",
+            "ml.t3.large",
+            "ml.t3.xlarge",
+            "ml.t3.2xlarge",
+            "ml.m5.large",
+            "ml.m5.xlarge",
+            "ml.m5.2xlarge",
+            "ml.m5.4xlarge",
+            "ml.m5.8xlarge",
+            "ml.m5.12xlarge",
+            "ml.m5.16xlarge",
+            "ml.m5.24xlarge",
+            "ml.c5.large",
+            "ml.c5.xlarge",
+            "ml.c5.2xlarge",
+            "ml.c5.4xlarge",
+            "ml.c5.9xlarge",
+            "ml.c5.12xlarge",
+            "ml.c5.18xlarge",
+            "ml.c5.24xlarge",
+            "ml.p3.2xlarge",
+            "ml.p3.8xlarge",
+            "ml.p3.16xlarge",
+            "ml.g4dn.xlarge",
+            "ml.g4dn.2xlarge",
+            "ml.g4dn.4xlarge",
+            "ml.g4dn.8xlarge",
+            "ml.g4dn.12xlarge",
+            "ml.g4dn.16xlarge"
+          ],
+          "markdownDescription": "The instance type that the image version runs on.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: system | ml.t3.micro | ml.t3.small | ml.t3.medium | ml.t3.large | ml.t3.xlarge | ml.t3.2xlarge | ml.m5.large | ml.m5.xlarge | ml.m5.2xlarge | ml.m5.4xlarge | ml.m5.8xlarge | ml.m5.12xlarge | ml.m5.16xlarge | ml.m5.24xlarge | ml.c5.large | ml.c5.xlarge | ml.c5.2xlarge | ml.c5.4xlarge | ml.c5.9xlarge | ml.c5.12xlarge | ml.c5.18xlarge | ml.c5.24xlarge | ml.p3.2xlarge | ml.p3.8xlarge | ml.p3.16xlarge | ml.g4dn.xlarge | ml.g4dn.2xlarge | ml.g4dn.4xlarge | ml.g4dn.8xlarge | ml.g4dn.12xlarge | ml.g4dn.16xlarge  \nUpdate requires: No interruption"
+        },
+        "SageMakerImageArn": {
+          "type": "string",
+          "description": "The Amazon Resource Name (ARN) of the SageMaker image that the image version belongs to.",
+          "maxLength": 256,
+          "markdownDescription": "The Amazon Resource Name (ARN) of the SageMaker image that the image version belongs to.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nPattern: ^arn:aws(-[\\w]+)*:sagemaker:.+:[0-9]{12}:image/[a-z0-9]([-.]?[a-z0-9])*$  \nUpdate requires: No interruption"
+        },
+        "SageMakerImageVersionArn": {
+          "type": "string",
+          "description": "The Amazon Resource Name (ARN) of the image version created on the instance.",
+          "maxLength": 256,
+          "markdownDescription": "The Amazon Resource Name (ARN) of the image version created on the instance.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nPattern: ^arn:aws(-[\\w]+)*:sagemaker:.+:[0-9]{12}:image-version/[a-z0-9]([-.]?[a-z0-9])*/[0-9]+$  \nUpdate requires: No interruption"
+        },
+        "LifecycleConfigArn": {
+          "type": "string",
+          "description": "The Amazon Resource Name (ARN) of the Lifecycle Configuration to attach to the Resource.",
+          "maxLength": 256,
+          "markdownDescription": "The Amazon Resource Name (ARN) of the Lifecycle Configuration to attach to the Resource.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nPattern: ^arn:aws(-[\\w]+)*:sagemaker:.+:[0-9]{12}:image-version/[a-z0-9]([-.]?[a-z0-9])*/[0-9]+$  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "KernelGatewayAppSettings": {
+      "type": "object",
+      "description": "The kernel gateway app settings.",
+      "additionalProperties": false,
+      "properties": {
+        "CustomImages": {
+          "type": "array",
+          "description": "A list of custom SageMaker images that are configured to run as a KernelGateway app.",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "minItems": 0,
+          "maxItems": 30,
+          "items": {
+            "$ref": "#/definitions/CustomImage"
+          },
+          "markdownDescription": "A list of custom SageMaker images that are configured to run as a KernelGateway app.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "DefaultResourceSpec": {
+          "$ref": "#/definitions/ResourceSpec",
+          "description": "The default instance type and the Amazon Resource Name (ARN) of the default SageMaker image used by the KernelGateway app.",
+          "markdownDescription": "The default instance type and the Amazon Resource Name (ARN) of the default SageMaker image used by the KernelGateway app.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "The kernel gateway app settings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "CustomImage": {
+      "type": "object",
+      "description": "A custom SageMaker image.",
+      "additionalProperties": false,
+      "properties": {
+        "AppImageConfigName": {
+          "type": "string",
+          "description": "The Name of the AppImageConfig.",
+          "maxLength": 63,
+          "markdownDescription": "The Name of the AppImageConfig.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 63  \nPattern: ^[a-zA-Z0-9](-*[a-zA-Z0-9]){0,62}  \nUpdate requires: No interruption"
+        },
+        "ImageName": {
+          "type": "string",
+          "description": "The name of the CustomImage. Must be unique to your account.",
+          "maxLength": 63,
+          "markdownDescription": "The name of the CustomImage. Must be unique to your account.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 63  \nPattern: ^[a-zA-Z0-9]([-.]?[a-zA-Z0-9]){0,62}$  \nUpdate requires: No interruption"
+        },
+        "ImageVersionNumber": {
+          "type": "integer",
+          "description": "The version number of the CustomImage.",
+          "minimum": 0,
+          "markdownDescription": "The version number of the CustomImage.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "AppImageConfigName",
+        "ImageName"
+      ],
+      "markdownDescription": "A custom SageMaker image.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "SharingSettings": {
+      "type": "object",
+      "description": "Specifies options when sharing an Amazon SageMaker Studio notebook. These settings are specified as part of DefaultUserSettings when the CreateDomain API is called, and as part of UserSettings when the CreateUserProfile API is called.",
+      "additionalProperties": false,
+      "properties": {
+        "NotebookOutputOption": {
+          "type": "string",
+          "description": "Whether to include the notebook cell output when sharing the notebook. The default is Disabled.",
+          "enum": [
+            "Allowed",
+            "Disabled"
+          ],
+          "markdownDescription": "Whether to include the notebook cell output when sharing the notebook. The default is Disabled.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Allowed | Disabled  \nUpdate requires: No interruption"
+        },
+        "S3KmsKeyId": {
+          "type": "string",
+          "description": "When NotebookOutputOption is Allowed, the AWS Key Management Service (KMS) encryption key ID used to encrypt the notebook cell output in the Amazon S3 bucket.",
+          "maxLength": 2048,
+          "markdownDescription": "When NotebookOutputOption is Allowed, the AWS Key Management Service (KMS) encryption key ID used to encrypt the notebook cell output in the Amazon S3 bucket.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nPattern: .*  \nUpdate requires: No interruption"
+        },
+        "S3OutputPath": {
+          "type": "string",
+          "description": "When NotebookOutputOption is Allowed, the Amazon S3 bucket used to store the shared notebook snapshots.",
+          "maxLength": 1024,
+          "markdownDescription": "When NotebookOutputOption is Allowed, the Amazon S3 bucket used to store the shared notebook snapshots.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nPattern: ^(https|s3)://([^/]+)/?(.*)$  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "Specifies options when sharing an Amazon SageMaker Studio notebook. These settings are specified as part of DefaultUserSettings when the CreateDomain API is called, and as part of UserSettings when the CreateUserProfile API is called.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        },
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "DomainSettings": {
+      "type": "object",
+      "description": "A collection of Domain settings.",
+      "additionalProperties": false,
+      "properties": {
+        "SecurityGroupIds": {
+          "type": "array",
+          "description": "The security groups for the Amazon Virtual Private Cloud that the Domain uses for communication between Domain-level apps and user apps.",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "minItems": 1,
+          "maxItems": 3,
+          "items": {
+            "type": "string",
+            "maxLength": 32,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 32  \nPattern: [-0-9a-zA-Z]+  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "The security groups for the Amazon Virtual Private Cloud that the Domain uses for communication between Domain-level apps and user apps.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "RStudioServerProDomainSettings": {
+          "$ref": "#/definitions/RStudioServerProDomainSettings"
+        }
+      },
+      "markdownDescription": "A collection of Domain settings.\n\n---\n\nRequired: No  \nUpdate requires: Replacement"
+    },
+    "RStudioServerProDomainSettings": {
+      "type": "object",
+      "description": "A collection of settings that update the current configuration for the RStudioServerPro Domain-level app.",
+      "additionalProperties": false,
+      "properties": {
+        "DomainExecutionRoleArn": {
+          "type": "string",
+          "description": "The ARN of the execution role for the RStudioServerPro Domain-level app.",
+          "minLength": 20,
+          "maxLength": 2048,
+          "markdownDescription": "The ARN of the execution role for the RStudioServerPro Domain-level app.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:aws[a-z\\-]*:iam::\\d{12}:role/?[a-zA-Z_0-9+=,.@\\-_/]+$  \nUpdate requires: No interruption"
+        },
+        "RStudioConnectUrl": {
+          "type": "string",
+          "description": "A URL pointing to an RStudio Connect server.",
+          "markdownDescription": "A URL pointing to an RStudio Connect server.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(https:|http:|www\\.)\\S*  \nUpdate requires: No interruption"
+        },
+        "RStudioPackageManagerUrl": {
+          "type": "string",
+          "description": "A URL pointing to an RStudio Package Manager server.",
+          "markdownDescription": "A URL pointing to an RStudio Package Manager server.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(https:|http:|www\\.)\\S*  \nUpdate requires: No interruption"
+        },
+        "DefaultResourceSpec": {
+          "$ref": "#/definitions/ResourceSpec"
+        }
+      },
+      "required": [
+        "DomainExecutionRoleArn"
+      ],
+      "markdownDescription": "A collection of settings that update the current configuration for the RStudioServerPro Domain-level app.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RSessionAppSettings": {
+      "type": "object",
+      "description": "A collection of settings that apply to an RSessionGateway app.",
+      "additionalProperties": false,
+      "properties": {
+        "CustomImages": {
+          "type": "array",
+          "description": "A list of custom SageMaker images that are configured to run as a KernelGateway app.",
+          "insertionOrder": false,
+          "uniqueItems": false,
+          "minItems": 0,
+          "maxItems": 30,
+          "items": {
+            "$ref": "#/definitions/CustomImage"
+          },
+          "markdownDescription": "A list of custom SageMaker images that are configured to run as a KernelGateway app.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "DefaultResourceSpec": {
+          "$ref": "#/definitions/ResourceSpec"
+        }
+      },
+      "markdownDescription": "A collection of settings that apply to an RSessionGateway app.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RStudioServerProAppSettings": {
+      "type": "object",
+      "description": "A collection of settings that configure user interaction with the RStudioServerPro app.",
+      "additionalProperties": false,
+      "properties": {
+        "AccessStatus": {
+          "type": "string",
+          "description": "Indicates whether the current user has access to the RStudioServerPro app.",
+          "enum": [
+            "ENABLED",
+            "DISABLED"
+          ],
+          "markdownDescription": "Indicates whether the current user has access to the RStudioServerPro app.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption"
+        },
+        "UserGroup": {
+          "type": "string",
+          "description": "The level of permissions that the user has within the RStudioServerPro app. This value defaults to User. The Admin value allows the user access to the RStudio Administrative Dashboard.",
+          "enum": [
+            "R_STUDIO_ADMIN",
+            "R_STUDIO_USER"
+          ],
+          "markdownDescription": "The level of permissions that the user has within the RStudioServerPro app. This value defaults to User. The Admin value allows the user access to the RStudio Administrative Dashboard.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: R_STUDIO_ADMIN | R_STUDIO_USER  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "A collection of settings that configure user interaction with the RStudioServerPro app.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "required": [
+    "AuthMode",
+    "DefaultUserSettings",
+    "DomainName",
+    "SubnetIds",
+    "VpcId"
+  ],
+  "createOnlyProperties": [
+    "/properties/AppNetworkAccessType",
+    "/properties/AppSecurityGroupManagement",
+    "/properties/AuthMode",
+    "/properties/DomainName",
+    "/properties/DomainSettings/SecurityGroupIds",
+    "/properties/DomainSettings/RStudioServerProDomainSettings/DomainExecutionRoleArn",
+    "/properties/DomainSettings/RStudioServerProDomainSettings/DefaultResourceSpec",
+    "/properties/KmsKeyId",
+    "/properties/SubnetIds",
+    "/properties/VpcId",
+    "/properties/Tags"
+  ],
+  "writeOnlyProperties": [
+    "/properties/Tags"
+  ],
+  "primaryIdentifier": [
+    "/properties/DomainId"
+  ],
+  "readOnlyProperties": [
+    "/properties/DomainArn",
+    "/properties/Url",
+    "/properties/DomainId",
+    "/properties/HomeEfsFileSystemId",
+    "/properties/SecurityGroupIdForDomainBoundary",
+    "/properties/SingleSignOnManagedApplicationInstanceId"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "sagemaker:CreateApp",
+        "sagemaker:CreateDomain",
+        "sagemaker:DescribeDomain",
+        "sagemaker:DescribeImage",
+        "sagemaker:DescribeImageVersion",
+        "iam:CreateServiceLinkedRole",
+        "iam:PassRole",
+        "efs:CreateFileSystem",
+        "kms:CreateGrant",
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:GenerateDataKeyWithoutPlainText"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "sagemaker:DescribeDomain"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "sagemaker:UpdateDomain",
+        "sagemaker:DescribeDomain",
+        "sagemaker:DescribeImage",
+        "sagemaker:DescribeImageVersion",
+        "iam:PassRole"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "sagemaker:DeleteApp",
+        "sagemaker:DeleteDomain",
+        "sagemaker:DescribeDomain"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "sagemaker:ListDomains"
+      ]
+    }
+  },
+  "attributes": {
+    "DomainArn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the created domain.",
+      "maxLength": 256,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the created domain.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nPattern: arn:aws[a-z\\-]*:sagemaker:[a-z0-9\\-]*:[0-9]{12}:domain/.*  \nUpdate requires: No interruption"
+    },
+    "Url": {
+      "type": "string",
+      "description": "The URL to the created domain.",
+      "maxLength": 1024,
+      "markdownDescription": "The URL to the created domain.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nUpdate requires: No interruption"
+    },
+    "DomainId": {
+      "type": "string",
+      "description": "The domain name.",
+      "maxLength": 63,
+      "markdownDescription": "The domain name.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 63  \nPattern: ^d-(-*[a-z0-9])+  \nUpdate requires: No interruption"
+    },
+    "HomeEfsFileSystemId": {
+      "type": "string",
+      "description": "The ID of the Amazon Elastic File System (EFS) managed by this Domain.",
+      "maxLength": 32,
+      "markdownDescription": "The ID of the Amazon Elastic File System (EFS) managed by this Domain.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 32  \nUpdate requires: No interruption"
+    },
+    "SingleSignOnManagedApplicationInstanceId": {
+      "type": "string",
+      "description": "The SSO managed application instance ID.",
+      "maxLength": 256,
+      "markdownDescription": "The SSO managed application instance ID.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption"
+    },
+    "SecurityGroupIdForDomainBoundary": {
+      "type": "string",
+      "description": "The ID of the security group that authorizes traffic between the RSessionGateway apps and the RStudioServerPro app.",
+      "maxLength": 32,
+      "markdownDescription": "The ID of the security group that authorizes traffic between the RSessionGateway apps and the RStudioServerPro app.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 32  \nPattern: [-0-9a-zA-Z]+  \nUpdate requires: No interruption"
+    }
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "typeName": "AWS::CloudFormation::Publisher",
+  "description": "Register as a publisher in the CloudFormation Registry.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-cloudformation",
+  "properties": {
+    "AcceptTermsAndConditions": {
+      "description": "Whether you accept the terms and conditions for publishing extensions in the CloudFormation registry. You must accept the terms and conditions in order to publish public extensions to the CloudFormation registry. The terms and conditions can be found at https://cloudformation-registry-documents.s3.amazonaws.com/Terms_and_Conditions_for_AWS_CloudFormation_Registry_Publishers.pdf",
+      "type": "boolean",
+      "markdownDescription": "Whether you accept the terms and conditions for publishing extensions in the CloudFormation registry. You must accept the terms and conditions in order to publish public extensions to the CloudFormation registry. The terms and conditions can be found at https://cloudformation-registry-documents.s3.amazonaws.com/Terms_and_Conditions_for_AWS_CloudFormation_Registry_Publishers.pdf\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: Replacement"
+    },
+    "ConnectionArn": {
+      "description": "If you are using a Bitbucket or GitHub account for identity verification, the Amazon Resource Name (ARN) for your connection to that account.",
+      "type": "string",
+      "markdownDescription": "If you are using a Bitbucket or GitHub account for identity verification, the Amazon Resource Name (ARN) for your connection to that account.\n\n---\n\nRequired: No  \nType: String  \nPattern: arn:aws(-[w]+)*:.+:.+:[0-9]{12}:.+  \nUpdate requires: Replacement"
+    }
+  },
+  "required": [
+    "AcceptTermsAndConditions"
+  ],
+  "readOnlyProperties": [
+    "/properties/PublisherId",
+    "/properties/PublisherStatus",
+    "/properties/PublisherProfile",
+    "/properties/IdentityProvider"
+  ],
+  "createOnlyProperties": [
+    "/properties/AcceptTermsAndConditions",
+    "/properties/ConnectionArn"
+  ],
+  "primaryIdentifier": [
+    "/properties/PublisherId"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "cloudformation:RegisterPublisher",
+        "cloudformation:DescribePublisher",
+        "codestar-connections:GetConnection",
+        "codestar-connections:UseConnection"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "cloudformation:DescribePublisher"
+      ]
+    },
+    "delete": {
+      "permissions": []
+    },
+    "list": {
+      "permissions": [
+        "cloudformation:DescribePublisher"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "attributes": {
+    "PublisherId": {
+      "description": "The publisher id assigned by CloudFormation for publishing in this region.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 40,
+      "markdownDescription": "The publisher id assigned by CloudFormation for publishing in this region.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 40  \nPattern: [0-9a-zA-Z]{40}  \nUpdate requires: No interruption"
+    },
+    "PublisherStatus": {
+      "description": "Whether the publisher is verified.",
+      "type": "string",
+      "enum": [
+        "VERIFIED",
+        "UNVERIFIED"
+      ],
+      "markdownDescription": "Whether the publisher is verified.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: VERIFIED | UNVERIFIED  \nUpdate requires: No interruption"
+    },
+    "PublisherProfile": {
+      "description": "The URL to the publisher's profile with the identity provider.",
+      "type": "string",
+      "maxLength": 1024,
+      "markdownDescription": "The URL to the publisher's profile with the identity provider.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nPattern: (http:|https:)+[^s]+[w]  \nUpdate requires: No interruption"
+    },
+    "IdentityProvider": {
+      "description": "The type of account used as the identity provider when registering this publisher with CloudFormation.",
+      "type": "string",
+      "enum": [
+        "AWS_Marketplace",
+        "GitHub",
+        "Bitbucket"
+      ],
+      "markdownDescription": "The type of account used as the identity provider when registering this publisher with CloudFormation.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AWS_Marketplace | GitHub | Bitbucket  \nUpdate requires: No interruption"
+    }
+  }
+}

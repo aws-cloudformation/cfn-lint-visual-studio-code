@@ -1,0 +1,354 @@
+{
+  "documentationUrl": "https://docs.aws.amazon.com/iot/latest/developerguide/job-templates.html",
+  "taggable": true,
+  "typeName": "AWS::IoT::JobTemplate",
+  "readOnlyProperties": [
+    "/properties/Arn"
+  ],
+  "description": "Job templates enable you to preconfigure jobs so that you can deploy them to multiple sets of target devices.",
+  "createOnlyProperties": [
+    "/properties/JobTemplateId",
+    "/properties/JobArn",
+    "/properties/Description",
+    "/properties/Document",
+    "/properties/DocumentSource",
+    "/properties/TimeoutConfig",
+    "/properties/JobExecutionsRolloutConfig",
+    "/properties/AbortConfig",
+    "/properties/PresignedUrlConfig",
+    "/properties/Tags"
+  ],
+  "primaryIdentifier": [
+    "/properties/JobTemplateId"
+  ],
+  "required": [
+    "JobTemplateId",
+    "Description"
+  ],
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-iot.git",
+  "handlers": {
+    "read": {
+      "permissions": [
+        "iot:DescribeJobTemplate"
+      ]
+    },
+    "create": {
+      "permissions": [
+        "iot:CreateJobTemplate",
+        "iam:PassRole",
+        "s3:GetObject"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "iot:ListJobTemplates"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "iot:DeleteJobTemplate"
+      ]
+    }
+  },
+  "writeOnlyProperties": [
+    "/properties/JobArn",
+    "/properties/Tags"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "ExpiresInSec": {
+      "description": "How number (in seconds) pre-signed URLs are valid.",
+      "maximum": 3600,
+      "type": "integer",
+      "minimum": 60,
+      "markdownDescription": "How number (in seconds) pre-signed URLs are valid.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+    },
+    "Action": {
+      "type": "string",
+      "enum": [
+        "CANCEL"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CANCEL  \nUpdate requires: No interruption"
+    },
+    "FailureType": {
+      "type": "string",
+      "enum": [
+        "FAILED",
+        "REJECTED",
+        "TIMED_OUT",
+        "ALL"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: FAILED | REJECTED | TIMED_OUT | ALL  \nUpdate requires: No interruption"
+    },
+    "BaseRatePerMinute": {
+      "type": "integer",
+      "minimum": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+    },
+    "NumberOfNotifiedThings": {
+      "type": "integer",
+      "minimum": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+    },
+    "RoleArn": {
+      "minLength": 20,
+      "description": "The ARN of an IAM role that grants grants permission to download files from the S3 bucket where the job data/updates are stored. The role must also grant permission for IoT to download the files.",
+      "type": "string",
+      "maxLength": 2048,
+      "markdownDescription": "The ARN of an IAM role that grants grants permission to download files from the S3 bucket where the job data/updates are stored. The role must also grant permission for IoT to download the files.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nUpdate requires: No interruption"
+    },
+    "ExponentialRolloutRate": {
+      "description": "Allows you to create an exponential rate of rollout for a job.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "RateIncreaseCriteria": {
+          "description": "The criteria to initiate the increase in rate of rollout for a job.",
+          "type": "object",
+          "$ref": "#/definitions/RateIncreaseCriteria",
+          "markdownDescription": "The criteria to initiate the increase in rate of rollout for a job.\n\n---\n\nRequired: Yes  \nUpdate requires: No interruption"
+        },
+        "BaseRatePerMinute": {
+          "description": "The minimum number of things that will be notified of a pending job, per minute at the start of job rollout. This parameter allows you to define the initial rate of rollout.",
+          "$ref": "#/definitions/BaseRatePerMinute",
+          "markdownDescription": "The minimum number of things that will be notified of a pending job, per minute at the start of job rollout. This parameter allows you to define the initial rate of rollout.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption"
+        },
+        "IncrementFactor": {
+          "description": "The exponential factor to increase the rate of rollout for a job.",
+          "$ref": "#/definitions/IncrementFactor",
+          "markdownDescription": "The exponential factor to increase the rate of rollout for a job.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "BaseRatePerMinute",
+        "IncrementFactor",
+        "RateIncreaseCriteria"
+      ],
+      "markdownDescription": "Allows you to create an exponential rate of rollout for a job.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "IncrementFactor": {
+      "maximum": 5,
+      "type": "number",
+      "minimum": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+    },
+    "InProgressTimeoutInMinutes": {
+      "description": "Specifies the amount of time, in minutes, this device has to finish execution of this job.",
+      "maximum": 10080,
+      "type": "integer",
+      "minimum": 1,
+      "markdownDescription": "Specifies the amount of time, in minutes, this device has to finish execution of this job.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+    },
+    "RateIncreaseCriteria": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "NumberOfSucceededThings": {
+          "$ref": "#/definitions/NumberOfSucceededThings"
+        },
+        "NumberOfNotifiedThings": {
+          "$ref": "#/definitions/NumberOfNotifiedThings"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "MaximumPerMinute": {
+      "type": "integer",
+      "minimum": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+    },
+    "AbortCriteria": {
+      "description": "The criteria that determine when and how a job abort takes place.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Action": {
+          "description": "The type of job action to take to initiate the job abort.",
+          "$ref": "#/definitions/Action",
+          "markdownDescription": "The type of job action to take to initiate the job abort.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption"
+        },
+        "FailureType": {
+          "description": "The type of job execution failures that can initiate a job abort.",
+          "$ref": "#/definitions/FailureType",
+          "markdownDescription": "The type of job execution failures that can initiate a job abort.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption"
+        },
+        "ThresholdPercentage": {
+          "description": "The minimum percentage of job execution failures that must occur to initiate the job abort.",
+          "$ref": "#/definitions/ThresholdPercentage",
+          "markdownDescription": "The minimum percentage of job execution failures that must occur to initiate the job abort.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption"
+        },
+        "MinNumberOfExecutedThings": {
+          "description": "The minimum number of things which must receive job execution notifications before the job can be aborted.",
+          "$ref": "#/definitions/MinNumberOfExecutedThings",
+          "markdownDescription": "The minimum number of things which must receive job execution notifications before the job can be aborted.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Action",
+        "FailureType",
+        "MinNumberOfExecutedThings",
+        "ThresholdPercentage"
+      ],
+      "markdownDescription": "The criteria that determine when and how a job abort takes place.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "NumberOfSucceededThings": {
+      "type": "integer",
+      "minimum": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+    },
+    "ThresholdPercentage": {
+      "maximum": 100,
+      "type": "number",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "minLength": 1,
+          "description": "The tag's value.",
+          "type": "string",
+          "maxLength": 256,
+          "markdownDescription": "The tag's value.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption"
+        },
+        "Key": {
+          "minLength": 1,
+          "description": "The tag's key.",
+          "type": "string",
+          "maxLength": 128,
+          "markdownDescription": "The tag's key.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ],
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "MinNumberOfExecutedThings": {
+      "type": "integer",
+      "minimum": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "JobArn": {
+      "description": "Optional for copying a JobTemplate from a pre-existing Job configuration.",
+      "type": "string",
+      "markdownDescription": "Optional for copying a JobTemplate from a pre-existing Job configuration.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "TimeoutConfig": {
+      "description": "Specifies the amount of time each device has to finish its execution of the job.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "InProgressTimeoutInMinutes": {
+          "$ref": "#/definitions/InProgressTimeoutInMinutes"
+        }
+      },
+      "required": [
+        "InProgressTimeoutInMinutes"
+      ],
+      "markdownDescription": "Specifies the amount of time each device has to finish its execution of the job.\n\n---\n\nRequired: No  \nUpdate requires: Replacement"
+    },
+    "JobExecutionsRolloutConfig": {
+      "description": "Allows you to create a staged rollout of a job.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "MaximumPerMinute": {
+          "description": "The maximum number of things that will be notified of a pending job, per minute. This parameter allows you to create a staged rollout.",
+          "$ref": "#/definitions/MaximumPerMinute",
+          "markdownDescription": "The maximum number of things that will be notified of a pending job, per minute. This parameter allows you to create a staged rollout.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        },
+        "ExponentialRolloutRate": {
+          "description": "The rate of increase for a job rollout. This parameter allows you to define an exponential rate for a job rollout.",
+          "$ref": "#/definitions/ExponentialRolloutRate",
+          "markdownDescription": "The rate of increase for a job rollout. This parameter allows you to define an exponential rate for a job rollout.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "Allows you to create a staged rollout of a job.\n\n---\n\nRequired: No  \nUpdate requires: Replacement"
+    },
+    "Description": {
+      "description": "A description of the Job Template.",
+      "type": "string",
+      "maxLength": 2028,
+      "markdownDescription": "A description of the Job Template.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2028  \nPattern: [^\\p{C}]+  \nUpdate requires: Replacement"
+    },
+    "DocumentSource": {
+      "minLength": 1,
+      "description": "An S3 link to the job document to use in the template. Required if you don't specify a value for document.",
+      "type": "string",
+      "maxLength": 1350,
+      "markdownDescription": "An S3 link to the job document to use in the template. Required if you don't specify a value for document.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1350  \nUpdate requires: Replacement"
+    },
+    "AbortConfig": {
+      "description": "The criteria that determine when and how a job abort takes place.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "CriteriaList": {
+          "minItems": 1,
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AbortCriteria"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "CriteriaList"
+      ],
+      "markdownDescription": "The criteria that determine when and how a job abort takes place.\n\n---\n\nRequired: No  \nUpdate requires: Replacement"
+    },
+    "JobTemplateId": {
+      "minLength": 1,
+      "type": "string",
+      "maxLength": 64,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: [a-zA-Z0-9_-]+  \nUpdate requires: Replacement"
+    },
+    "Document": {
+      "description": "The job document. Required if you don't specify a value for documentSource.",
+      "type": "string",
+      "maxLength": 32768,
+      "markdownDescription": "The job document. Required if you don't specify a value for documentSource.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 32768  \nUpdate requires: Replacement"
+    },
+    "PresignedUrlConfig": {
+      "description": "Configuration for pre-signed S3 URLs.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ExpiresInSec": {
+          "$ref": "#/definitions/ExpiresInSec"
+        },
+        "RoleArn": {
+          "$ref": "#/definitions/RoleArn"
+        }
+      },
+      "required": [
+        "RoleArn"
+      ],
+      "markdownDescription": "Configuration for pre-signed S3 URLs.\n\n---\n\nRequired: No  \nUpdate requires: Replacement"
+    },
+    "Tags": {
+      "maxItems": 50,
+      "uniqueItems": true,
+      "description": "Metadata that can be used to manage the JobTemplate.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "Metadata that can be used to manage the JobTemplate.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement"
+    }
+  },
+  "attributes": {
+    "Arn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    }
+  }
+}
