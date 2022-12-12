@@ -1,0 +1,408 @@
+{
+  "typeName": "AWS::Connect::Rule",
+  "description": "Resource Type definition for AWS:Connect::Rule",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-connect",
+  "definitions": {
+    "UserArn": {
+      "description": "The Amazon Resource Name (ARN) of the user.",
+      "type": "string",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the user.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^$|arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:instance/[-a-zA-Z0-9]*/agent/[-a-zA-Z0-9]*$  \nUpdate requires: No interruption"
+    },
+    "NotificationRecipientType": {
+      "description": "The type of notification recipient.",
+      "type": "object",
+      "properties": {
+        "UserTags": {
+          "description": "The collection of recipients who are identified by user tags",
+          "patternProperties": {
+            "^(?=.{1,128}$).+$": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+            }
+          },
+          "additionalProperties": false,
+          "markdownDescription": "The collection of recipients who are identified by user tags\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        },
+        "UserArns": {
+          "description": "The list of recipients by user arns.",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 5,
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/UserArn"
+          },
+          "markdownDescription": "The list of recipients by user arns.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The type of notification recipient.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Reference": {
+      "description": "A contact reference.",
+      "type": "object",
+      "properties": {
+        "Value": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^(/|https:)  \nUpdate requires: No interruption"
+        },
+        "Type": {
+          "type": "string",
+          "enum": [
+            "URL",
+            "ATTACHMENT",
+            "NUMBER",
+            "STRING",
+            "DATE",
+            "EMAIL"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: URL | ATTACHMENT | NUMBER | STRING | DATE | EMAIL  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Value",
+        "Type"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A contact reference.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "TaskAction": {
+      "description": "The definition of task action.",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "The name which appears in the agent's Contact Control Panel (CCP).",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "markdownDescription": "The name which appears in the agent's Contact Control Panel (CCP).\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nUpdate requires: No interruption"
+        },
+        "Description": {
+          "description": "The description which appears in the agent's Contact Control Panel (CCP).",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 4096,
+          "markdownDescription": "The description which appears in the agent's Contact Control Panel (CCP).\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 4096  \nUpdate requires: No interruption"
+        },
+        "ContactFlowArn": {
+          "description": "The Amazon Resource Name (ARN) of the contact flow.",
+          "type": "string",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the contact flow.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^$|arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:instance/[-a-zA-Z0-9]*/contact-flow/[-a-zA-Z0-9]*$  \nUpdate requires: No interruption"
+        },
+        "References": {
+          "description": "A formatted URL that is shown to an agent in the Contact Control Panel (CCP).",
+          "patternProperties": {
+            "^(?=.{1,4096}$).+$": {
+              "$ref": "#/definitions/Reference"
+            }
+          },
+          "additionalProperties": false,
+          "markdownDescription": "A formatted URL that is shown to an agent in the Contact Control Panel (CCP).\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Name",
+        "ContactFlowArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The definition of task action.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "EventBridgeAction": {
+      "description": "The definition for event bridge action.",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "The name of the event bridge action.",
+          "type": "string",
+          "markdownDescription": "The name of the event bridge action.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z0-9._-]{1,100}$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Name"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The definition for event bridge action.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AssignContactCategoryAction": {
+      "description": "The definition for assigning contact category action.",
+      "type": "object",
+      "markdownDescription": "The definition for assigning contact category action.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "SendNotificationAction": {
+      "description": "The definition for sending notification action.",
+      "type": "object",
+      "properties": {
+        "DeliveryMethod": {
+          "description": "The means of delivery.",
+          "type": "string",
+          "enum": [
+            "EMAIL"
+          ],
+          "markdownDescription": "The means of delivery.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: EMAIL  \nUpdate requires: No interruption"
+        },
+        "Subject": {
+          "description": "The subject of notification.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "markdownDescription": "The subject of notification.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 200  \nUpdate requires: No interruption"
+        },
+        "Content": {
+          "description": "The content of notification.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "markdownDescription": "The content of notification.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption"
+        },
+        "ContentType": {
+          "description": "The type of content.",
+          "type": "string",
+          "enum": [
+            "PLAIN_TEXT"
+          ],
+          "markdownDescription": "The type of content.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: PLAIN_TEXT  \nUpdate requires: No interruption"
+        },
+        "Recipient": {
+          "$ref": "#/definitions/NotificationRecipientType"
+        }
+      },
+      "required": [
+        "DeliveryMethod",
+        "Content",
+        "Recipient",
+        "ContentType"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The definition for sending notification action.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AssignContactCategoryActions": {
+      "description": "This action will assign contact category when a rule is triggered.",
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/AssignContactCategoryAction"
+      },
+      "minItems": 1,
+      "maxItems": 1,
+      "markdownDescription": "This action will assign contact category when a rule is triggered.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "EventBridgeActions": {
+      "description": "This action will send event bridge notification when a rule is triggered.",
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/EventBridgeAction"
+      },
+      "minItems": 1,
+      "maxItems": 1,
+      "markdownDescription": "This action will send event bridge notification when a rule is triggered.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "RuleTriggerEventSource": {
+      "description": "The event source that will trigger the rule.",
+      "type": "object",
+      "properties": {
+        "EventSourceName": {
+          "description": "The name of event source.",
+          "type": "string",
+          "enum": [
+            "OnPostCallAnalysisAvailable",
+            "OnRealTimeCallAnalysisAvailable",
+            "OnPostChatAnalysisAvailable",
+            "OnZendeskTicketCreate",
+            "OnZendeskTicketStatusUpdate",
+            "OnSalesforceCaseCreate"
+          ],
+          "markdownDescription": "The name of event source.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: OnPostCallAnalysisAvailable | OnRealTimeCallAnalysisAvailable | OnPostChatAnalysisAvailable | OnZendeskTicketCreate | OnZendeskTicketStatusUpdate | OnSalesforceCaseCreate  \nUpdate requires: No interruption"
+        },
+        "IntegrationAssociationArn": {
+          "description": "The Amazon Resource Name (ARN) for the AppIntegration association.",
+          "type": "string",
+          "markdownDescription": "The Amazon Resource Name (ARN) for the AppIntegration association.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^$|arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:instance/[-a-zA-Z0-9]*/integration-association/[-a-zA-Z0-9]*$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "EventSourceName"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The event source that will trigger the rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "TaskActions": {
+      "description": "This action will generate a task when a rule is triggered.",
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/TaskAction"
+      },
+      "minItems": 1,
+      "maxItems": 1,
+      "markdownDescription": "This action will generate a task when a rule is triggered.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "SendNotificationActions": {
+      "description": "The action will send notification when a rule is triggered.",
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/SendNotificationAction"
+      },
+      "minItems": 1,
+      "maxItems": 1,
+      "markdownDescription": "The action will send notification when a rule is triggered.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "Actions": {
+      "description": "The list of actions that will be executed when a rule is triggered.",
+      "type": "object",
+      "properties": {
+        "AssignContactCategoryActions": {
+          "$ref": "#/definitions/AssignContactCategoryActions"
+        },
+        "EventBridgeActions": {
+          "$ref": "#/definitions/EventBridgeActions"
+        },
+        "TaskActions": {
+          "$ref": "#/definitions/TaskActions"
+        },
+        "SendNotificationActions": {
+          "$ref": "#/definitions/SendNotificationActions"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The list of actions that will be executed when a rule is triggered.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. \n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^(?!aws:)[a-zA-Z+-=._:/]+$  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that's 1 to 256 characters in length.",
+          "maxLength": 256,
+          "markdownDescription": "The value for the tag. You can specify a value that's 1 to 256 characters in length.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "Name": {
+      "description": "The name of the rule.",
+      "type": "string",
+      "markdownDescription": "The name of the rule.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z0-9._-]{1,200}$  \nUpdate requires: No interruption"
+    },
+    "InstanceArn": {
+      "description": "The Amazon Resource Name (ARN) of the instance.",
+      "type": "string",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the instance.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:instance/[-a-zA-Z0-9]*$  \nUpdate requires: Replacement"
+    },
+    "TriggerEventSource": {
+      "description": "The event source that triggers the rule.",
+      "$ref": "#/definitions/RuleTriggerEventSource",
+      "markdownDescription": "The event source that triggers the rule.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: Replacement"
+    },
+    "Function": {
+      "description": "The conditions of a rule.",
+      "type": "string",
+      "markdownDescription": "The conditions of a rule.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+    },
+    "Actions": {
+      "description": "The list of actions that will be executed when a rule is triggered.",
+      "$ref": "#/definitions/Actions",
+      "markdownDescription": "The list of actions that will be executed when a rule is triggered.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption"
+    },
+    "PublishStatus": {
+      "description": "The publish status of a rule, either draft or published.",
+      "type": "string",
+      "enum": [
+        "DRAFT",
+        "PUBLISHED"
+      ],
+      "markdownDescription": "The publish status of a rule, either draft or published.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: DRAFT | PUBLISHED  \nUpdate requires: No interruption"
+    },
+    "Tags": {
+      "description": "One or more tags.",
+      "type": "array",
+      "maxItems": 50,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "One or more tags.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    }
+  },
+  "required": [
+    "Name",
+    "InstanceArn",
+    "TriggerEventSource",
+    "Function",
+    "Actions",
+    "PublishStatus"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": false,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "connect:CreateRule"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "connect:DescribeRule"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "connect:DeleteRule",
+        "connect:UntagResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "connect:UpdateRule",
+        "connect:TagResource",
+        "connect:UntagResource"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/RuleArn"
+  ],
+  "readOnlyProperties": [
+    "/properties/RuleArn"
+  ],
+  "createOnlyProperties": [
+    "/properties/TriggerEventSource",
+    "/properties/InstanceArn"
+  ],
+  "replacementStrategy": "delete_then_create",
+  "attributes": {
+    "RuleArn": {
+      "description": "The Amazon Resource Name (ARN) of the rule.",
+      "type": "string",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the rule.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:instance/[-a-zA-Z0-9]*/rule/[-a-zA-Z0-9]*$  \nUpdate requires: No interruption"
+    }
+  }
+}
