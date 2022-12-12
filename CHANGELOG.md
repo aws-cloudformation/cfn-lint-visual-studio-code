@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to the "vscode-cfn-lint" extension will be documented in this file.
 
+## 0.24.1
+- Update CloudFormation schema files and clean up `patternProperties` with bad regex patterns (pull #[255](https://github.com/aws-cloudformation/aws-cfn-lint-visual-studio-code/pull/255))
+
 ## 0.24.0
 - Add support for `Ref` in hover and autocomplete (pull #[248](https://github.com/aws-cloudformation/aws-cfn-lint-visual-studio-code/pull/248))
 - Update how we determine what a CloudFormation template is (pull #[250](https://github.com/aws-cloudformation/aws-cfn-lint-visual-studio-code/pull/250))
