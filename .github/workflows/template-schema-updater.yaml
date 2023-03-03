@@ -1,3 +1,4 @@
+name: Update CloudFormation schemas
 on:
   schedule:
     - cron: '*/5 * * * *'
@@ -11,17 +12,17 @@ jobs:
         with:
           repository: aws-cloudformation/aws-cloudformation-template-schema
           path: aws-cloudformation-template-schema
-      - uses: actions/setup-java@v3
+          ref: main
+      - uses: actions/setup-python@v4
         with:
-          java-version: 8
+          python-version: '3.9'
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
       - run: |
           cd aws-cloudformation-template-schema
-          mvn package
-          echo 'settings:
-            regions: [us-east-1]
-            output: out' > cfg.yml
-          java -jar target/aws-cloudformation-template-schema-1.0-SNAPSHOT-jar-with-dependencies.jar --config-file cfg.yml
-          mv out/us-east-1/all-spec.json ../schema/all-spec.json
+          poetry install
+          poetry run cfn-template-schema generate --output-folder specs --type language-server
+          mv specs/* ../server/schema/
           cd ..
           rm -rf aws-cloudformation-template-schema
       - uses: peter-evans/create-pull-request@v4
