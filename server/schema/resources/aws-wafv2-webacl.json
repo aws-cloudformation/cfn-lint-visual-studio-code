@@ -101,6 +101,24 @@
       "additionalProperties": false,
       "markdownDescription": "Excluded Rule in the RuleGroup or ManagedRuleGroup will not be evaluated.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
+    "RuleActionOverride": {
+      "description": "Action override for rules in the rule group.",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "$ref": "#/definitions/EntityName"
+        },
+        "ActionToUse": {
+          "$ref": "#/definitions/RuleAction"
+        }
+      },
+      "required": [
+        "Name",
+        "ActionToUse"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Action override for rules in the rule group.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "ExcludedRules": {
       "type": "array",
       "items": {
@@ -319,8 +337,17 @@
           "items": {
             "$ref": "#/definitions/ManagedRuleGroupConfig"
           },
-          "minItems": 1,
           "markdownDescription": "Collection of ManagedRuleGroupConfig.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "RuleActionOverrides": {
+          "description": "Action overrides for rules in the rule group.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RuleActionOverride"
+          },
+          "minItems": 1,
+          "maxItems": 100,
+          "markdownDescription": "Action overrides for rules in the rule group.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
         }
       },
       "required": [
@@ -548,6 +575,9 @@
         },
         "CaptchaConfig": {
           "$ref": "#/definitions/CaptchaConfig"
+        },
+        "ChallengeConfig": {
+          "$ref": "#/definitions/ChallengeConfig"
         }
       },
       "required": [
@@ -582,6 +612,9 @@
         },
         "Captcha": {
           "$ref": "#/definitions/CaptchaAction"
+        },
+        "Challenge": {
+          "$ref": "#/definitions/ChallengeAction"
         }
       },
       "additionalProperties": false,
@@ -619,6 +652,17 @@
       },
       "additionalProperties": false,
       "markdownDescription": "Checks valid token exists with request.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ChallengeAction": {
+      "description": "Checks that the request has a valid token with an unexpired challenge timestamp and, if not, returns a browser challenge to the client.",
+      "type": "object",
+      "properties": {
+        "CustomRequestHandling": {
+          "$ref": "#/definitions/CustomRequestHandling"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Checks that the request has a valid token with an unexpired challenge timestamp and, if not, returns a browser challenge to the client.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "BlockAction": {
       "description": "Block traffic towards application.",
@@ -777,6 +821,16 @@
             "$ref": "#/definitions/ExcludedRule"
           },
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "RuleActionOverrides": {
+          "description": "Action overrides for rules in the rule group.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RuleActionOverride"
+          },
+          "minItems": 1,
+          "maxItems": 100,
+          "markdownDescription": "Action overrides for rules in the rule group.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
         }
       },
       "required": [
@@ -1161,6 +1215,16 @@
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
+    "ChallengeConfig": {
+      "type": "object",
+      "properties": {
+        "ImmunityTimeProperty": {
+          "$ref": "#/definitions/ImmunityTimeProperty"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "ImmunityTimeProperty": {
       "type": "object",
       "properties": {
@@ -1200,10 +1264,272 @@
         },
         "PasswordField": {
           "$ref": "#/definitions/FieldIdentifier"
+        },
+        "AWSManagedRulesBotControlRuleSet": {
+          "$ref": "#/definitions/AWSManagedRulesBotControlRuleSet"
+        },
+        "AWSManagedRulesATPRuleSet": {
+          "$ref": "#/definitions/AWSManagedRulesATPRuleSet"
         }
       },
       "additionalProperties": false,
       "markdownDescription": "ManagedRuleGroupConfig.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AWSManagedRulesBotControlRuleSet": {
+      "description": "Configures how to use the Bot Control managed rule group in the web ACL",
+      "type": "object",
+      "properties": {
+        "InspectionLevel": {
+          "type": "string",
+          "enum": [
+            "COMMON",
+            "TARGETED"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: COMMON | TARGETED  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "InspectionLevel"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configures how to use the Bot Control managed rule group in the web ACL\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AWSManagedRulesATPRuleSet": {
+      "description": "Configures how to use the Account Takeover Prevention managed rule group in the web ACL",
+      "type": "object",
+      "properties": {
+        "LoginPath": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "RequestInspection": {
+          "$ref": "#/definitions/RequestInspection"
+        },
+        "ResponseInspection": {
+          "$ref": "#/definitions/ResponseInspection"
+        }
+      },
+      "required": [
+        "LoginPath"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configures how to use the Account Takeover Prevention managed rule group in the web ACL\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RequestInspection": {
+      "description": "Configures the inspection of login requests",
+      "type": "object",
+      "properties": {
+        "PayloadType": {
+          "type": "string",
+          "enum": [
+            "JSON",
+            "FORM_ENCODED"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: JSON | FORM_ENCODED  \nUpdate requires: No interruption"
+        },
+        "UsernameField": {
+          "$ref": "#/definitions/FieldIdentifier"
+        },
+        "PasswordField": {
+          "$ref": "#/definitions/FieldIdentifier"
+        }
+      },
+      "required": [
+        "PayloadType",
+        "UsernameField",
+        "PasswordField"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configures the inspection of login requests\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ResponseInspection": {
+      "description": "Configures the inspection of login responses",
+      "type": "object",
+      "properties": {
+        "StatusCode": {
+          "$ref": "#/definitions/ResponseInspectionStatusCode"
+        },
+        "Header": {
+          "$ref": "#/definitions/ResponseInspectionHeader"
+        },
+        "BodyContains": {
+          "$ref": "#/definitions/ResponseInspectionBodyContains"
+        },
+        "Json": {
+          "$ref": "#/definitions/ResponseInspectionJson"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Configures the inspection of login responses\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ResponseInspectionStatusCode": {
+      "description": "Response status codes that indicate success or failure of a login request",
+      "type": "object",
+      "properties": {
+        "SuccessCodes": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minLength": 0,
+            "maxLength": 999,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nMaximum Length: 999  \nUpdate requires: No interruption"
+          },
+          "minItems": 1,
+          "maxItems": 10,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "FailureCodes": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minLength": 0,
+            "maxLength": 999,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nMaximum Length: 999  \nUpdate requires: No interruption"
+          },
+          "minItems": 1,
+          "maxItems": 10,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "SuccessCodes",
+        "FailureCodes"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Response status codes that indicate success or failure of a login request\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ResponseInspectionHeader": {
+      "description": "Response headers that indicate success or failure of a login request",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 200  \nPattern: .*\\S.*  \nUpdate requires: No interruption"
+        },
+        "SuccessValues": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: .*\\S.*  \nUpdate requires: No interruption"
+          },
+          "minItems": 1,
+          "maxItems": 3,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "FailureValues": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: .*\\S.*  \nUpdate requires: No interruption"
+          },
+          "minItems": 1,
+          "maxItems": 3,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Name",
+        "SuccessValues",
+        "FailureValues"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Response headers that indicate success or failure of a login request\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ResponseInspectionBodyContains": {
+      "description": "Response body contents that indicate success or failure of a login request",
+      "type": "object",
+      "properties": {
+        "SuccessStrings": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: .*\\S.*  \nUpdate requires: No interruption"
+          },
+          "minItems": 1,
+          "maxItems": 5,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "FailureStrings": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: .*\\S.*  \nUpdate requires: No interruption"
+          },
+          "minItems": 1,
+          "maxItems": 5,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "SuccessStrings",
+        "FailureStrings"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Response body contents that indicate success or failure of a login request\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ResponseInspectionJson": {
+      "description": "Response JSON that indicate success or failure of a login request",
+      "type": "object",
+      "properties": {
+        "Identifier": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: .*\\S.*  \nUpdate requires: No interruption"
+        },
+        "SuccessValues": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: .*\\S.*  \nUpdate requires: No interruption"
+          },
+          "minItems": 1,
+          "maxItems": 5,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "FailureValues": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: .*\\S.*  \nUpdate requires: No interruption"
+          },
+          "minItems": 1,
+          "maxItems": 5,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Identifier",
+        "SuccessValues",
+        "FailureValues"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Response JSON that indicate success or failure of a login request\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "TokenDomains": {
+      "description": "List of domains to accept in web request tokens, in addition to the domain of the protected resource.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 253,
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 253  \nPattern: ^[\\w\\.\\-/]+$  \nUpdate requires: No interruption"
+      },
+      "markdownDescription": "List of domains to accept in web request tokens, in addition to the domain of the protected resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     },
     "FieldIdentifier": {
       "type": "object",
@@ -1406,6 +1732,12 @@
     },
     "CaptchaConfig": {
       "$ref": "#/definitions/CaptchaConfig"
+    },
+    "ChallengeConfig": {
+      "$ref": "#/definitions/ChallengeConfig"
+    },
+    "TokenDomains": {
+      "$ref": "#/definitions/TokenDomains"
     }
   },
   "required": [

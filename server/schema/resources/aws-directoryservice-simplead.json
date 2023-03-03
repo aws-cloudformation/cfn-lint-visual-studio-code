@@ -1,57 +1,29 @@
 {
   "typeName": "AWS::DirectoryService::SimpleAD",
   "description": "Resource Type definition for AWS::DirectoryService::SimpleAD",
+  "documentationUrl": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-directoryservice-simplead.html",
   "additionalProperties": false,
-  "properties": {
-    "CreateAlias": {
-      "type": "boolean",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: Replacement"
-    },
-    "Description": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
-    },
-    "EnableSso": {
-      "type": "boolean",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
-    },
-    "Name": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
-    },
-    "Password": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
-    },
-    "ShortName": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
-    },
-    "Size": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
-    },
-    "VpcSettings": {
-      "$ref": "#/definitions/VpcSettings"
-    }
-  },
   "definitions": {
     "VpcSettings": {
+      "$comment": "Contains VPC information",
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "SubnetIds": {
+          "description": "The identifiers of the subnets for the directory servers. The two subnets must be in different Availability Zones. AWS Directory Service specifies a directory server and a DNS server in each of these subnets.",
           "type": "array",
           "uniqueItems": true,
+          "insertionOrder": false,
           "items": {
             "type": "string",
             "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
           },
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+          "markdownDescription": "The identifiers of the subnets for the directory servers. The two subnets must be in different Availability Zones. AWS Directory Service specifies a directory server and a DNS server in each of these subnets.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
         },
         "VpcId": {
+          "description": "The identifier of the VPC in which to create the directory.",
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+          "markdownDescription": "The identifier of the VPC in which to create the directory.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
         }
       },
       "required": [
@@ -61,16 +33,63 @@
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     }
   },
+  "properties": {
+    "CreateAlias": {
+      "description": "The name of the configuration set.",
+      "type": "boolean",
+      "markdownDescription": "The name of the configuration set.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: Replacement"
+    },
+    "Description": {
+      "description": "Description for the directory.",
+      "type": "string",
+      "markdownDescription": "Description for the directory.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "EnableSso": {
+      "description": "Whether to enable single sign-on for a Simple Active Directory in AWS.",
+      "type": "boolean",
+      "markdownDescription": "Whether to enable single sign-on for a Simple Active Directory in AWS.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+    },
+    "Name": {
+      "description": "The fully qualified domain name for the AWS Managed Simple AD directory.",
+      "type": "string",
+      "markdownDescription": "The fully qualified domain name for the AWS Managed Simple AD directory.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
+    },
+    "Password": {
+      "description": "The password for the default administrative user named Admin.",
+      "type": "string",
+      "markdownDescription": "The password for the default administrative user named Admin.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "ShortName": {
+      "description": "The NetBIOS name for your domain.",
+      "type": "string",
+      "markdownDescription": "The NetBIOS name for your domain.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "Size": {
+      "description": "The size of the directory.",
+      "type": "string",
+      "markdownDescription": "The size of the directory.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
+    },
+    "VpcSettings": {
+      "description": "VPC settings of the Simple AD directory server in AWS.",
+      "$ref": "#/definitions/VpcSettings",
+      "markdownDescription": "VPC settings of the Simple AD directory server in AWS.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: Replacement"
+    }
+  },
   "required": [
     "VpcSettings",
     "Size",
-    "Name",
-    "Password"
+    "Name"
   ],
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
   "readOnlyProperties": [
     "/properties/Alias",
     "/properties/DnsIpAddresses",
-    "/properties/Id"
+    "/properties/DirectoryId"
   ],
   "createOnlyProperties": [
     "/properties/Size",
@@ -81,26 +100,82 @@
     "/properties/Description",
     "/properties/CreateAlias"
   ],
-  "primaryIdentifier": [
-    "/properties/Id"
+  "writeOnlyProperties": [
+    "/properties/Password"
   ],
+  "primaryIdentifier": [
+    "/properties/DirectoryId"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ds:CreateDirectory",
+        "ds:CreateAlias",
+        "ds:EnableSso",
+        "ds:DescribeDirectories",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeVpcs",
+        "ec2:CreateSecurityGroup",
+        "ec2:CreateNetworkInterface",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:AuthorizeSecurityGroupIngress",
+        "ec2:AuthorizeSecurityGroupEgress",
+        "ec2:CreateTags"
+      ],
+      "timeoutInMinutes": 60
+    },
+    "read": {
+      "permissions": [
+        "ds:DescribeDirectories"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ds:EnableSso",
+        "ds:DisableSso",
+        "ds:DescribeDirectories"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ds:DeleteDirectory",
+        "ds:DescribeDirectories",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DeleteSecurityGroup",
+        "ec2:DeleteNetworkInterface",
+        "ec2:RevokeSecurityGroupIngress",
+        "ec2:RevokeSecurityGroupEgress",
+        "ec2:DeleteTags"
+      ],
+      "timeoutInMinutes": 100
+    },
+    "list": {
+      "permissions": [
+        "ds:DescribeDirectories"
+      ]
+    }
+  },
   "attributes": {
-    "Id": {
+    "DirectoryId": {
+      "description": "The unique identifier for a directory.",
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "markdownDescription": "The unique identifier for a directory.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
     "Alias": {
+      "description": "The alias for a directory.",
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "markdownDescription": "The alias for a directory.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
     "DnsIpAddresses": {
+      "description": "The IP addresses of the DNS servers for the directory, such as [ \"172.31.3.154\", \"172.31.63.203\" ].",
       "type": "array",
       "uniqueItems": false,
+      "insertionOrder": false,
       "items": {
         "type": "string",
         "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
       },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+      "markdownDescription": "The IP addresses of the DNS servers for the directory, such as [ \"172.31.3.154\", \"172.31.63.203\" ].\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     }
   }
 }

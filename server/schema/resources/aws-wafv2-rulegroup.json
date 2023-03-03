@@ -434,6 +434,9 @@
         },
         "CaptchaConfig": {
           "$ref": "#/definitions/CaptchaConfig"
+        },
+        "ChallengeConfig": {
+          "$ref": "#/definitions/ChallengeConfig"
         }
       },
       "required": [
@@ -450,52 +453,78 @@
       "type": "object",
       "properties": {
         "Allow": {
-          "description": "Allow traffic towards application.",
-          "type": "object",
-          "properties": {
-            "CustomRequestHandling": {
-              "$ref": "#/definitions/CustomRequestHandling"
-            }
-          },
-          "additionalProperties": false,
-          "markdownDescription": "Allow traffic towards application.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+          "$ref": "#/definitions/AllowAction"
         },
         "Block": {
-          "description": "Block traffic towards application.",
-          "type": "object",
-          "properties": {
-            "CustomResponse": {
-              "$ref": "#/definitions/CustomResponse"
-            }
-          },
-          "additionalProperties": false,
-          "markdownDescription": "Block traffic towards application.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+          "$ref": "#/definitions/BlockAction"
         },
         "Count": {
-          "description": "Count traffic towards application.",
-          "type": "object",
-          "properties": {
-            "CustomRequestHandling": {
-              "$ref": "#/definitions/CustomRequestHandling"
-            }
-          },
-          "additionalProperties": false,
-          "markdownDescription": "Count traffic towards application.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+          "$ref": "#/definitions/CountAction"
         },
         "Captcha": {
-          "description": "Checks valid token exists with request.",
-          "type": "object",
-          "properties": {
-            "CustomRequestHandling": {
-              "$ref": "#/definitions/CustomRequestHandling"
-            }
-          },
-          "additionalProperties": false,
-          "markdownDescription": "Checks valid token exists with request.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+          "$ref": "#/definitions/CaptchaAction"
+        },
+        "Challenge": {
+          "$ref": "#/definitions/ChallengeAction"
         }
       },
       "additionalProperties": false,
       "markdownDescription": "Action taken when Rule matches its condition.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AllowAction": {
+      "description": "Allow traffic towards application.",
+      "type": "object",
+      "properties": {
+        "CustomRequestHandling": {
+          "$ref": "#/definitions/CustomRequestHandling"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Allow traffic towards application.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "BlockAction": {
+      "description": "Block traffic towards application.",
+      "type": "object",
+      "properties": {
+        "CustomResponse": {
+          "$ref": "#/definitions/CustomResponse"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Block traffic towards application.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "CountAction": {
+      "description": "Count traffic towards application.",
+      "type": "object",
+      "properties": {
+        "CustomRequestHandling": {
+          "$ref": "#/definitions/CustomRequestHandling"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Count traffic towards application.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "CaptchaAction": {
+      "description": "Checks valid token exists with request.",
+      "type": "object",
+      "properties": {
+        "CustomRequestHandling": {
+          "$ref": "#/definitions/CustomRequestHandling"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Checks valid token exists with request.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ChallengeAction": {
+      "description": "Checks that the request has a valid token with an unexpired challenge timestamp and, if not, returns a browser challenge to the client.",
+      "type": "object",
+      "properties": {
+        "CustomRequestHandling": {
+          "$ref": "#/definitions/CustomRequestHandling"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Checks that the request has a valid token with an unexpired challenge timestamp and, if not, returns a browser challenge to the client.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "CustomHTTPHeaderName": {
       "description": "HTTP header name.",
@@ -1020,6 +1049,16 @@
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
+    "ChallengeConfig": {
+      "type": "object",
+      "properties": {
+        "ImmunityTimeProperty": {
+          "$ref": "#/definitions/ImmunityTimeProperty"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "ImmunityTimeProperty": {
       "type": "object",
       "properties": {
@@ -1231,6 +1270,22 @@
     },
     "CustomResponseBodies": {
       "$ref": "#/definitions/CustomResponseBodies"
+    },
+    "AvailableLabels": {
+      "description": "Collection of Available Labels.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/LabelSummary"
+      },
+      "markdownDescription": "Collection of Available Labels.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "ConsumedLabels": {
+      "description": "Collection of Consumed Labels.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/LabelSummary"
+      },
+      "markdownDescription": "Collection of Consumed Labels.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     }
   },
   "required": [
@@ -1251,8 +1306,8 @@
     "/properties/Arn",
     "/properties/Id",
     "/properties/LabelNamespace",
-    "/properties/AvailableLabels",
-    "/properties/ConsumedLabels"
+    "/properties/AvailableLabels/*/Name",
+    "/properties/ConsumedLabels/*/Name"
   ],
   "additionalProperties": false,
   "handlers": {
@@ -1297,22 +1352,6 @@
     },
     "LabelNamespace": {
       "$ref": "#/definitions/LabelName"
-    },
-    "AvailableLabels": {
-      "description": "Collection of Available Labels.",
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/LabelSummary"
-      },
-      "markdownDescription": "Collection of Available Labels.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-    },
-    "ConsumedLabels": {
-      "description": "Collection of Consumed Labels.",
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/LabelSummary"
-      },
-      "markdownDescription": "Collection of Consumed Labels.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     }
   }
 }
