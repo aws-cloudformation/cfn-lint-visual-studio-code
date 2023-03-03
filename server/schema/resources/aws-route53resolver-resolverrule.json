@@ -16,7 +16,7 @@
       "description": "DNS queries for this domain name are forwarded to the IP addresses that are specified in TargetIps",
       "minLength": 1,
       "maxLength": 256,
-      "markdownDescription": "DNS queries for this domain name are forwarded to the IP addresses that are specified in TargetIps\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: Replacement"
+      "markdownDescription": "DNS queries for this domain name are forwarded to the IP addresses that are specified in TargetIps\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: Some interruptions"
     },
     "Name": {
       "type": "string",
@@ -64,7 +64,12 @@
         "Ip": {
           "type": "string",
           "description": "One IP address that you want to forward DNS queries to. You can specify only IPv4 addresses. ",
-          "markdownDescription": "One IP address that you want to forward DNS queries to. You can specify only IPv4 addresses. \n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+          "markdownDescription": "One IP address that you want to forward DNS queries to. You can specify only IPv4 addresses. \n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Ipv6": {
+          "type": "string",
+          "description": "One IPv6 address that you want to forward DNS queries to. You can specify only IPv6 addresses. ",
+          "markdownDescription": "One IPv6 address that you want to forward DNS queries to. You can specify only IPv6 addresses. \n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         },
         "Port": {
           "type": "string",
@@ -74,9 +79,6 @@
           "markdownDescription": "The port at Ip that you want to forward DNS queries to. \n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 65535  \nUpdate requires: No interruption"
         }
       },
-      "required": [
-        "Ip"
-      ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "Tag": {
@@ -105,7 +107,13 @@
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     }
   },
-  "taggable": false,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
   "required": [
     "DomainName",
     "RuleType"
@@ -118,15 +126,21 @@
     "/properties/ResolverRuleId"
   ],
   "createOnlyProperties": [
-    "/properties/DomainName",
     "/properties/RuleType"
   ],
+  "conditionalCreateOnlyProperties": [
+    "/properties/DomainName"
+  ],
+  "propertyTransform": {
+    "/properties/DomainName": "$join([DomainName, \".\"]) $OR DomainName"
+  },
   "handlers": {
     "create": {
       "permissions": [
         "route53resolver:CreateResolverRule",
         "route53resolver:GetResolverRule",
-        "route53resolver:ListTagsForResource"
+        "route53resolver:ListTagsForResource",
+        "route53resolver:TagResource"
       ]
     },
     "read": {
@@ -139,7 +153,9 @@
       "permissions": [
         "route53resolver:UpdateResolverRule",
         "route53resolver:GetResolverRule",
-        "route53resolver:ListTagsForResource"
+        "route53resolver:ListTagsForResource",
+        "route53resolver:TagResource",
+        "route53resolver:UntagResource"
       ]
     },
     "delete": {

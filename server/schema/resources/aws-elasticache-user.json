@@ -2,6 +2,33 @@
   "typeName": "AWS::ElastiCache::User",
   "description": "Resource Type definition for AWS::ElastiCache::User",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-elasticache",
+  "definitions": {
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with 'aws:'. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with 'aws:'. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^(?!aws:)[a-zA-Z0-9 _\\.\\/=+:\\-@]*$  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nPattern: ^[a-zA-Z0-9 _\\.\\/=+:\\-@]*$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Key"
+      ],
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
   "properties": {
     "UserId": {
       "description": "The ID of the user.",
@@ -74,7 +101,25 @@
         "Type"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Tags": {
+      "description": "An array of key-value pairs to apply to this user.",
+      "type": "array",
+      "maxItems": 50,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "An array of key-value pairs to apply to this user.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
   },
   "additionalProperties": false,
   "required": [
@@ -104,18 +149,23 @@
     "create": {
       "permissions": [
         "elasticache:CreateUser",
-        "elasticache:DescribeUsers"
+        "elasticache:DescribeUsers",
+        "elasticache:ListTagsForResource"
       ]
     },
     "read": {
       "permissions": [
-        "elasticache:DescribeUsers"
+        "elasticache:DescribeUsers",
+        "elasticache:ListTagsForResource"
       ]
     },
     "update": {
       "permissions": [
         "elasticache:ModifyUser",
-        "elasticache:DescribeUsers"
+        "elasticache:DescribeUsers",
+        "elasticache:ListTagsForResource",
+        "elasticache:AddTagsToResource",
+        "elasticache:RemoveTagsFromResource"
       ]
     },
     "delete": {
@@ -126,7 +176,8 @@
     },
     "list": {
       "permissions": [
-        "elasticache:DescribeUsers"
+        "elasticache:DescribeUsers",
+        "elasticache:ListTagsForResource"
       ]
     }
   },

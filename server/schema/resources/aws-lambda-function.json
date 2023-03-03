@@ -19,7 +19,9 @@
         "ec2:DescribeVpcs",
         "kms:Decrypt",
         "lambda:GetCodeSigningConfig",
-        "lambda:GetFunctionCodeSigningConfig"
+        "lambda:GetFunctionCodeSigningConfig",
+        "lambda:GetRuntimeManagementConfig",
+        "lambda:PutRuntimeManagementConfig"
       ]
     },
     "update": {
@@ -42,7 +44,9 @@
         "lambda:PutFunctionCodeSigningConfig",
         "lambda:DeleteFunctionCodeSigningConfig",
         "lambda:GetCodeSigningConfig",
-        "lambda:GetFunctionCodeSigningConfig"
+        "lambda:GetFunctionCodeSigningConfig",
+        "lambda:GetRuntimeManagementConfig",
+        "lambda:PutRuntimeManagementConfig"
       ]
     },
     "list": {
@@ -175,90 +179,30 @@
       },
       "markdownDescription": "The dead-letter queue for failed asynchronous invocations.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
-    "Environment": {
-      "description": "A function's environment variable settings.",
+    "RuntimeManagementConfig": {
       "additionalProperties": false,
       "type": "object",
       "properties": {
-        "Variables": {
-          "patternProperties": {
-            "[a-zA-Z][a-zA-Z0-9_]+": {
-              "type": "string",
-              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-            }
-          },
-          "description": "Environment variable key-value pairs.",
-          "additionalProperties": false,
-          "type": "object",
-          "markdownDescription": "Environment variable key-value pairs.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-        }
-      },
-      "markdownDescription": "A function's environment variable settings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "FileSystemConfig": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Arn": {
-          "description": "The Amazon Resource Name (ARN) of the Amazon EFS access point that provides access to the file system.",
+        "UpdateRuntimeOn": {
+          "description": "Trigger for runtime update",
           "type": "string",
-          "maxLength": 200,
-          "markdownDescription": "The Amazon Resource Name (ARN) of the Amazon EFS access point that provides access to the file system.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 200  \nPattern: ^arn:aws[a-zA-Z-]*:elasticfilesystem:[a-z]{2}((-gov)|(-iso(b?)))?-[a-z]+-\\d{1}:\\d{12}:access-point/fsap-[a-f0-9]{17}$  \nUpdate requires: No interruption"
+          "enum": [
+            "Auto",
+            "FunctionUpdate",
+            "Manual"
+          ],
+          "markdownDescription": "Trigger for runtime update\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: Auto | FunctionUpdate | Manual  \nUpdate requires: No interruption"
         },
-        "LocalMountPath": {
-          "description": "The path where the function can access the file system, starting with /mnt/.",
+        "RuntimeVersionArn": {
+          "description": "Unique identifier for a runtime version arn",
           "type": "string",
-          "maxLength": 160,
-          "markdownDescription": "The path where the function can access the file system, starting with /mnt/.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 160  \nPattern: ^/mnt/[a-zA-Z0-9-_.]+$  \nUpdate requires: No interruption"
+          "markdownDescription": "Unique identifier for a runtime version arn\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         }
       },
       "required": [
-        "Arn",
-        "LocalMountPath"
+        "UpdateRuntimeOn"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "Tag": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Value": {
-          "minLength": 0,
-          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
-          "type": "string",
-          "maxLength": 256,
-          "markdownDescription": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption"
-        },
-        "Key": {
-          "minLength": 1,
-          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
-          "type": "string",
-          "maxLength": 128,
-          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "Key"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "EphemeralStorage": {
-      "description": "A function's ephemeral storage settings.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Size": {
-          "description": "The amount of ephemeral storage that your function has access to.",
-          "maximum": 10240,
-          "type": "integer",
-          "minimum": 512,
-          "markdownDescription": "The amount of ephemeral storage that your function has access to.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "Size"
-      ],
-      "markdownDescription": "A function's ephemeral storage settings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "SnapStart": {
       "description": "The function's SnapStart setting. When set to PublishedVersions, Lambda creates a snapshot of the execution environment when you publish a function version.",
@@ -343,6 +287,91 @@
         }
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Environment": {
+      "description": "A function's environment variable settings.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Variables": {
+          "patternProperties": {
+            "[a-zA-Z][a-zA-Z0-9_]+": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+            }
+          },
+          "description": "Environment variable key-value pairs.",
+          "additionalProperties": false,
+          "type": "object",
+          "markdownDescription": "Environment variable key-value pairs.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "A function's environment variable settings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "FileSystemConfig": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Arn": {
+          "description": "The Amazon Resource Name (ARN) of the Amazon EFS access point that provides access to the file system.",
+          "type": "string",
+          "maxLength": 200,
+          "markdownDescription": "The Amazon Resource Name (ARN) of the Amazon EFS access point that provides access to the file system.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 200  \nPattern: ^arn:aws[a-zA-Z-]*:elasticfilesystem:[a-z]{2}((-gov)|(-iso(b?)))?-[a-z]+-\\d{1}:\\d{12}:access-point/fsap-[a-f0-9]{17}$  \nUpdate requires: No interruption"
+        },
+        "LocalMountPath": {
+          "description": "The path where the function can access the file system, starting with /mnt/.",
+          "type": "string",
+          "maxLength": 160,
+          "markdownDescription": "The path where the function can access the file system, starting with /mnt/.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 160  \nPattern: ^/mnt/[a-zA-Z0-9-_.]+$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Arn",
+        "LocalMountPath"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Tag": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "minLength": 0,
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "type": "string",
+          "maxLength": 256,
+          "markdownDescription": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption"
+        },
+        "Key": {
+          "minLength": 1,
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "type": "string",
+          "maxLength": 128,
+          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Key"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "EphemeralStorage": {
+      "description": "A function's ephemeral storage settings.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Size": {
+          "description": "The amount of ephemeral storage that your function has access to.",
+          "maximum": 10240,
+          "type": "integer",
+          "minimum": 512,
+          "markdownDescription": "The amount of ephemeral storage that your function has access to.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Size"
+      ],
+      "markdownDescription": "A function's ephemeral storage settings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     }
   },
   "required": [
@@ -365,6 +394,11 @@
       "description": "For network connectivity to AWS resources in a VPC, specify a list of security groups and subnets in the VPC.",
       "$ref": "#/definitions/VpcConfig",
       "markdownDescription": "For network connectivity to AWS resources in a VPC, specify a list of security groups and subnets in the VPC.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+    },
+    "RuntimeManagementConfig": {
+      "description": "RuntimeManagementConfig",
+      "$ref": "#/definitions/RuntimeManagementConfig",
+      "markdownDescription": "RuntimeManagementConfig\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
     },
     "ReservedConcurrentExecutions": {
       "description": "The number of simultaneous executions to reserve for the function.",

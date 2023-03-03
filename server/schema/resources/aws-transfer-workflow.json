@@ -28,16 +28,38 @@
       "additionalProperties": false,
       "markdownDescription": "Specifies the key-value pair that are assigned to a file during the execution of a Tagging step.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
+    "EfsInputFileLocation": {
+      "description": "Specifies the details for an EFS file.",
+      "type": "object",
+      "properties": {
+        "FileSystemId": {
+          "description": "Specifies the EFS filesystem that contains the file.",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 128,
+          "markdownDescription": "Specifies the EFS filesystem that contains the file.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 128  \nPattern: ^(arn:aws[-a-z]*:elasticfilesystem:[0-9a-z-:]+:(access-point/fsap|file-system/fs)-[0-9a-f]{8,40}|fs(ap)?-[0-9a-f]{8,40})$  \nUpdate requires: No interruption"
+        },
+        "Path": {
+          "description": "The name assigned to the file when it was created in EFS. You use the object path to retrieve the object.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 65536,
+          "markdownDescription": "The name assigned to the file when it was created in EFS. You use the object path to retrieve the object.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 65536  \nPattern: ^[^\\x00]+$  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Specifies the details for an EFS file.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "S3InputFileLocation": {
-      "description": "Specifies the details for the S3 file being copied.",
+      "description": "Specifies the details for a S3 file.",
       "type": "object",
       "properties": {
         "Bucket": {
-          "description": "Specifies the S3 bucket that contains the file being copied.",
+          "description": "Specifies the S3 bucket that contains the file.",
           "type": "string",
           "minLength": 3,
           "maxLength": 63,
-          "markdownDescription": "Specifies the S3 bucket that contains the file being copied.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 63  \nPattern: ^[a-z0-9][\\.\\-a-z0-9]{1,61}[a-z0-9]$  \nUpdate requires: No interruption"
+          "markdownDescription": "Specifies the S3 bucket that contains the file.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 63  \nPattern: ^[a-z0-9][\\.\\-a-z0-9]{1,61}[a-z0-9]$  \nUpdate requires: No interruption"
         },
         "Key": {
           "description": "The name assigned to the file when it was created in S3. You use the object key to retrieve the object.",
@@ -48,9 +70,23 @@
         }
       },
       "additionalProperties": false,
-      "markdownDescription": "Specifies the details for the S3 file being copied.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+      "markdownDescription": "Specifies the details for a S3 file.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "InputFileLocation": {
+      "description": "Specifies the location for the file being decrypted. Only applicable for the Decrypt type of workflow steps.",
+      "type": "object",
+      "properties": {
+        "S3FileLocation": {
+          "$ref": "#/definitions/S3InputFileLocation"
+        },
+        "EfsFileLocation": {
+          "$ref": "#/definitions/EfsInputFileLocation"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Specifies the location for the file being decrypted. Only applicable for the Decrypt type of workflow steps.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "S3FileLocation": {
       "description": "Specifies the location for the file being copied. Only applicable for the Copy type of workflow steps.",
       "type": "object",
       "properties": {
@@ -70,7 +106,7 @@
           "type": "object",
           "properties": {
             "DestinationFileLocation": {
-              "$ref": "#/definitions/InputFileLocation"
+              "$ref": "#/definitions/S3FileLocation"
             },
             "Name": {
               "description": "The name of the step, used as an identifier.",
@@ -135,6 +171,48 @@
           "additionalProperties": false,
           "markdownDescription": "Details for a step that invokes a lambda function.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
         },
+        "DecryptStepDetails": {
+          "description": "Details for a step that performs a file decryption.",
+          "type": "object",
+          "properties": {
+            "DestinationFileLocation": {
+              "$ref": "#/definitions/InputFileLocation"
+            },
+            "Name": {
+              "description": "The name of the step, used as an identifier.",
+              "type": "string",
+              "minLength": 0,
+              "maxLength": 30,
+              "markdownDescription": "The name of the step, used as an identifier.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 30  \nPattern: ^[\\w-]*$  \nUpdate requires: No interruption"
+            },
+            "Type": {
+              "description": "Specifies which encryption method to use.",
+              "type": "string",
+              "enum": [
+                "PGP"
+              ],
+              "markdownDescription": "Specifies which encryption method to use.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PGP  \nUpdate requires: No interruption"
+            },
+            "OverwriteExisting": {
+              "description": "A flag that indicates whether or not to overwrite an existing file of the same name. The default is FALSE.",
+              "type": "string",
+              "enum": [
+                "TRUE",
+                "FALSE"
+              ],
+              "markdownDescription": "A flag that indicates whether or not to overwrite an existing file of the same name. The default is FALSE.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: TRUE | FALSE  \nUpdate requires: No interruption"
+            },
+            "SourceFileLocation": {
+              "description": "Specifies which file to use as input to the workflow step.",
+              "type": "string",
+              "minLength": 0,
+              "maxLength": 256,
+              "markdownDescription": "Specifies which file to use as input to the workflow step.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nPattern: ^\\$\\{(\\w+.)+\\w+\\}$  \nUpdate requires: No interruption"
+            }
+          },
+          "additionalProperties": false,
+          "markdownDescription": "Details for a step that performs a file decryption.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+        },
         "DeleteStepDetails": {
           "description": "Details for a step that deletes the file.",
           "type": "object",
@@ -195,10 +273,11 @@
           "enum": [
             "COPY",
             "CUSTOM",
+            "DECRYPT",
             "DELETE",
             "TAG"
           ],
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: COPY | CUSTOM | DELETE | TAG  \nUpdate requires: No interruption"
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: COPY | CUSTOM | DECRYPT | DELETE | TAG  \nUpdate requires: No interruption"
         }
       },
       "additionalProperties": false,

@@ -76,9 +76,9 @@
     "CreatedBy": {
       "description": "The IAM user or role that performed the action.",
       "type": "string",
-      "maxLength": 100,
-      "minLength": 1,
-      "markdownDescription": "The IAM user or role that performed the action.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: ^[a-zA-Z0-9-_()\\[\\]\\s]+$  \nUpdate requires: No interruption"
+      "maxLength": 2048,
+      "minLength": 20,
+      "markdownDescription": "The IAM user or role that performed the action.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:.*:*:.*  \nUpdate requires: No interruption"
     },
     "IamArn": {
       "description": "The Amazon Resource Name (ARN) of the IAM user or role.",
@@ -297,6 +297,14 @@
       },
       "markdownDescription": "The tags associated with the assessment.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     },
+    "Delegations": {
+      "description": "The list of delegations.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Delegation"
+      },
+      "markdownDescription": "The list of delegations.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
     "Roles": {
       "description": "The list of roles for the specified assessment.",
       "type": "array",
@@ -326,8 +334,7 @@
   "readOnlyProperties": [
     "/properties/AssessmentId",
     "/properties/Arn",
-    "/properties/CreationTime",
-    "/properties/Delegations"
+    "/properties/CreationTime"
   ],
   "createOnlyProperties": [
     "/properties/FrameworkId",
@@ -346,6 +353,7 @@
         "auditmanager:CreateAssessment",
         "auditmanager:TagResource",
         "auditmanager:ListTagsForResource",
+        "auditmanager:BatchCreateDelegationByAssessment",
         "iam:PassRole"
       ]
     },
@@ -357,7 +365,9 @@
     "update": {
       "permissions": [
         "auditmanager:UpdateAssessment",
-        "auditmanager:UpdateAssessmentStatus"
+        "auditmanager:UpdateAssessmentStatus",
+        "auditmanager:BatchCreateDelegationByAssessment",
+        "auditmanager:BatchDeleteDelegationByAssessment"
       ]
     },
     "delete": {
@@ -377,14 +387,6 @@
     },
     "Arn": {
       "$ref": "#/definitions/AssessmentArn"
-    },
-    "Delegations": {
-      "description": "The list of delegations.",
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/Delegation"
-      },
-      "markdownDescription": "The list of delegations.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     },
     "CreationTime": {
       "$ref": "#/definitions/Timestamp"
