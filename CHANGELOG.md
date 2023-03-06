@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to the "vscode-cfn-lint" extension will be documented in this file.
 
+## 0.24.3
+- Update CloudFormation schema files as of `2023-03-06` (pull #[258](https://github.com/aws-cloudformation/aws-cfn-lint-visual-studio-code/pull/258))
+
 ## 0.24.2
 - Update `yaml-language-server` to `1.10.0` (pull #[258](https://github.com/aws-cloudformation/aws-cfn-lint-visual-studio-code/pull/258))
 
