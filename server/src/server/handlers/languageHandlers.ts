@@ -83,13 +83,17 @@ export class LanguageHandlers extends YamlLanguageHandlers {
       return Promise.resolve(result);
     }
 
+    let [node, template] = getNode(textDocument, textDocumentPosition);
+
+    if (!template.isValidTemplate && textDocument.lineCount > 4) {
+      return Promise.resolve(result);
+    }
+
     const results = await this.cfnLanguageService.doComplete(
       textDocument,
       textDocumentPosition.position,
       false
     );
-
-    let [node, template] = getNode(textDocument, textDocumentPosition);
 
     function addResources(prefix: string) {
       template.resources.forEach((value: TypeInfoImpl, key: string) => {
