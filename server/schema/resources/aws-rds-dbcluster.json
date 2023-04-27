@@ -236,6 +236,11 @@
       "type": "string",
       "markdownDescription": "The Amazon Resource Name (ARN) of the source DB instance or DB cluster if this DB cluster is created as a Read Replica.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
+    "RestoreToTime": {
+      "description": "The date and time to restore the DB cluster to. Value must be a time in Universal Coordinated Time (UTC) format. An example: 2015-03-07T23:45:00Z",
+      "type": "string",
+      "markdownDescription": "The date and time to restore the DB cluster to. Value must be a time in Universal Coordinated Time (UTC) format. An example: 2015-03-07T23:45:00Z\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
     "RestoreType": {
       "description": "The type of restore to be performed. You can specify one of the following values:\nfull-copy - The new DB cluster is restored as a full copy of the source DB cluster.\ncopy-on-write - The new DB cluster is restored as a clone of the source DB cluster.",
       "type": "string",
@@ -463,15 +468,17 @@
     "/properties/DBClusterIdentifier": "$lowercase(DBClusterIdentifier)",
     "/properties/DBClusterParameterGroupName": "$lowercase(DBClusterParameterGroupName)",
     "/properties/DBSubnetGroupName": "$lowercase(DBSubnetGroupName)",
-    "/properties/Engine": "$lowercase(Engine)",
     "/properties/EnableHttpEndpoint": "$lowercase($string(EngineMode)) = 'serverless' ? EnableHttpEndpoint : false",
+    "/properties/Engine": "$lowercase(Engine)",
     "/properties/EngineVersion": "$join([$string(EngineVersion), \".*\"])",
     "/properties/KmsKeyId": "$join([\"arn:(aws)[-]{0,1}[a-z]{0,2}[-]{0,1}[a-z]{0,3}:kms:[a-z]{2}[-]{1}[a-z]{3,10}[-]{0,1}[a-z]{0,10}[-]{1}[1-3]{1}:[0-9]{12}[:]{1}key\\/\", KmsKeyId])",
     "/properties/MasterUserSecret/KmsKeyId": "$join([\"arn:(aws)[-]{0,1}[a-z]{0,2}[-]{0,1}[a-z]{0,3}:kms:[a-z]{2}[-]{1}[a-z]{3,10}[-]{0,1}[a-z]{0,10}[-]{1}[1-3]{1}:[0-9]{12}[:]{1}key\\/\", MasterUserSecret.KmsKeyId])",
+    "/properties/NetworkType": "$lowercase(NetworkType)",
     "/properties/PerformanceInsightsKmsKeyId": "$join([\"arn:(aws)[-]{0,1}[a-z]{0,2}[-]{0,1}[a-z]{0,3}:kms:[a-z]{2}[-]{1}[a-z]{3,10}[-]{0,1}[a-z]{0,10}[-]{1}[1-3]{1}:[0-9]{12}[:]{1}key\\/\", PerformanceInsightsKmsKeyId])",
     "/properties/PreferredMaintenanceWindow": "$lowercase(PreferredMaintenanceWindow)",
     "/properties/SnapshotIdentifier": "$lowercase(SnapshotIdentifier)",
-    "/properties/SourceDBClusterIdentifier": "$lowercase(SourceDBClusterIdentifier)"
+    "/properties/SourceDBClusterIdentifier": "$lowercase(SourceDBClusterIdentifier)",
+    "/properties/StorageType": "$lowercase(StorageType)"
   },
   "readOnlyProperties": [
     "/properties/DBClusterArn",
@@ -487,11 +494,12 @@
     "/properties/AvailabilityZones",
     "/properties/DBClusterIdentifier",
     "/properties/DBSubnetGroupName",
-    "/properties/DatabaseName",
     "/properties/DBSystemId",
+    "/properties/DatabaseName",
     "/properties/EngineMode",
     "/properties/KmsKeyId",
     "/properties/PubliclyAccessible",
+    "/properties/RestoreToTime",
     "/properties/RestoreType",
     "/properties/SnapshotIdentifier",
     "/properties/SourceDBClusterIdentifier",
@@ -510,6 +518,7 @@
   "writeOnlyProperties": [
     "/properties/DBInstanceParameterGroupName",
     "/properties/MasterUserPassword",
+    "/properties/RestoreToTime",
     "/properties/RestoreType",
     "/properties/SnapshotIdentifier",
     "/properties/SourceDBClusterIdentifier",
@@ -525,6 +534,7 @@
         "rds:CreateDBCluster",
         "rds:CreateDBInstance",
         "rds:DescribeDBClusters",
+        "rds:DescribeEvents",
         "rds:ModifyDBCluster",
         "rds:RestoreDBClusterFromSnapshot",
         "rds:RestoreDBClusterToPointInTime",
@@ -546,6 +556,7 @@
         "rds:AddTagsToResource",
         "rds:DescribeDBClusters",
         "rds:DescribeDBSubnetGroups",
+        "rds:DescribeEvents",
         "rds:DescribeGlobalClusters",
         "rds:ModifyDBCluster",
         "rds:ModifyDBInstance",

@@ -144,6 +144,44 @@
       "additionalProperties": false,
       "markdownDescription": "SAML configuration data associated with an AMG workspace.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
+    "NetworkAccessControl": {
+      "type": "object",
+      "description": "The configuration settings for Network Access Control.",
+      "properties": {
+        "PrefixListIds": {
+          "type": "array",
+          "insertionOrder": false,
+          "uniqueItems": true,
+          "minItems": 0,
+          "maxItems": 5,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Prefix List Ids",
+            "markdownDescription": "Prefix List Ids\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nUpdate requires: No interruption"
+          },
+          "description": "The list of prefix list IDs. A prefix list is a list of CIDR ranges of IP addresses. The IP addresses specified are allowed to access your workspace. If the list is not included in the configuration then no IP addresses will be allowed to access the workspace.",
+          "markdownDescription": "The list of prefix list IDs. A prefix list is a list of CIDR ranges of IP addresses. The IP addresses specified are allowed to access your workspace. If the list is not included in the configuration then no IP addresses will be allowed to access the workspace.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "VpceIds": {
+          "type": "array",
+          "insertionOrder": false,
+          "uniqueItems": true,
+          "minItems": 0,
+          "maxItems": 5,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "description": "VPCE Ids",
+            "markdownDescription": "VPCE Ids\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nUpdate requires: No interruption"
+          },
+          "description": "The list of Amazon VPC endpoint IDs for the workspace. If a NetworkAccessConfiguration is specified then only VPC endpoints specified here will be allowed to access the workspace.",
+          "markdownDescription": "The list of Amazon VPC endpoint IDs for the workspace. If a NetworkAccessConfiguration is specified then only VPC endpoints specified here will be allowed to access the workspace.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The configuration settings for Network Access Control.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "VpcConfiguration": {
       "type": "object",
       "description": "The configuration settings for an Amazon VPC that contains data sources for your Grafana workspace to connect to.",
@@ -276,10 +314,13 @@
         "$ref": "#/definitions/AuthenticationProviderTypes"
       },
       "description": "List of authentication providers to enable.",
-      "markdownDescription": "List of authentication providers to enable.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+      "markdownDescription": "List of authentication providers to enable.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
     },
     "SamlConfiguration": {
       "$ref": "#/definitions/SamlConfiguration"
+    },
+    "NetworkAccessControl": {
+      "$ref": "#/definitions/NetworkAccessControl"
     },
     "VpcConfiguration": {
       "$ref": "#/definitions/VpcConfiguration"
@@ -356,6 +397,11 @@
       "markdownDescription": "IAM Role that will be used to grant the Grafana workspace access to a customers AWS resources.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: No interruption"
     }
   },
+  "required": [
+    "AuthenticationProviders",
+    "PermissionType",
+    "AccountAccessType"
+  ],
   "readOnlyProperties": [
     "/properties/Id",
     "/properties/SsoClientId",
@@ -392,10 +438,13 @@
         "organizations:DescribeOrganization",
         "sso:GetSharedSsoConfiguration",
         "iam:PassRole",
+        "ec2:GetManagedPrefixListEntries",
         "ec2:DescribeSecurityGroups",
         "ec2:DescribeSubnets",
         "ec2:DescribeVpcs",
-        "iam:CreateServiceLinkedRole"
+        "iam:CreateServiceLinkedRole",
+        "sso:ListApplicationInstances",
+        "sso:GetApplicationInstance"
       ]
     },
     "read": {
@@ -410,11 +459,14 @@
         "grafana:UpdateWorkspaceAuthentication",
         "sso:DescribeRegisteredRegions",
         "sso:CreateManagedApplicationInstance",
+        "ec2:GetManagedPrefixListEntries",
         "iam:PassRole",
         "ec2:DescribeSecurityGroups",
         "ec2:DescribeSubnets",
         "ec2:DescribeVpcs",
-        "iam:CreateServiceLinkedRole"
+        "iam:CreateServiceLinkedRole",
+        "sso:ListApplicationInstances",
+        "sso:GetApplicationInstance"
       ]
     },
     "delete": {

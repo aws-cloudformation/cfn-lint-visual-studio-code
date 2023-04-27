@@ -1,0 +1,148 @@
+{
+  "typeName": "AWS::MSK::VpcConnection",
+  "description": "Resource Type definition for AWS::MSK::VpcConnection",
+  "definitions": {
+    "Authentication": {
+      "type": "string",
+      "description": "The type of private link authentication",
+      "minLength": 3,
+      "maxLength": 10,
+      "enum": [
+        "SASL_IAM",
+        "SASL_SCRAM",
+        "TLS"
+      ],
+      "markdownDescription": "The type of private link authentication\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SASL_IAM | SASL_SCRAM | TLS  \nMinimum Length: 3  \nMaximum Length: 10  \nUpdate requires: No interruption"
+    },
+    "ClientSubnets": {
+      "type": "array",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(subnet-)([a-z0-9]+)\\Z  \nUpdate requires: No interruption"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "SecurityGroups": {
+      "type": "array",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(sg-)([a-z0-9]+)\\Z  \nUpdate requires: No interruption"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "Tags": {
+      "type": "object",
+      "description": "A key-value pair to associate with a resource.",
+      "patternProperties": {
+        ".*": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "VpcId": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(vpc-)([a-z0-9]+)\\Z  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "Authentication": {
+      "$ref": "#/definitions/Authentication"
+    },
+    "ClientSubnets": {
+      "$ref": "#/definitions/ClientSubnets"
+    },
+    "TargetClusterArn": {
+      "description": "The Amazon Resource Name (ARN) of the target cluster",
+      "type": "string",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the target cluster\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:[\\w-]+:kafka:[\\w-]+:\\d+:cluster.*\\Z  \nUpdate requires: Replacement"
+    },
+    "SecurityGroups": {
+      "$ref": "#/definitions/SecurityGroups"
+    },
+    "Tags": {
+      "$ref": "#/definitions/Tags"
+    },
+    "VpcId": {
+      "$ref": "#/definitions/VpcId"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "Authentication",
+    "ClientSubnets",
+    "SecurityGroups",
+    "TargetClusterArn",
+    "VpcId"
+  ],
+  "createOnlyProperties": [
+    "/properties/ClientSubnets",
+    "/properties/Authentication",
+    "/properties/SecurityGroups",
+    "/properties/TargetClusterArn",
+    "/properties/VpcId"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ec2:CreateVpcEndpoint",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeVpcAttribute",
+        "ec2:DescribeVpcs",
+        "ec2:DescribeVpcEndpoints",
+        "ec2:AcceptVpcEndpointConnections",
+        "ec2:RejectVpcEndpointConnections",
+        "ec2:DescribeVpcEndpointConnections",
+        "ec2:CreateTags",
+        "iam:AttachRolePolicy",
+        "iam:CreateServiceLinkedRole",
+        "iam:PutRolePolicy",
+        "kafka:CreateVpcConnection",
+        "kafka:TagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "kafka:DescribeVpcConnection"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ec2:DeleteVpcEndpoint",
+        "ec2:DeleteVpcEndpoints",
+        "kafka:DeleteVpcConnection"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "kafka:ListVpcConnections"
+      ]
+    }
+  },
+  "attributes": {
+    "Arn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    }
+  }
+}
