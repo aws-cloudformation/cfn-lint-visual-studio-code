@@ -1,0 +1,305 @@
+{
+  "typeName": "AWS::Comprehend::Flywheel",
+  "description": "The AWS::Comprehend::Flywheel resource creates an Amazon Comprehend Flywheel that enables customer to train their model.",
+  "additionalProperties": false,
+  "properties": {
+    "ActiveModelArn": {
+      "type": "string",
+      "maxLength": 256,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nPattern: arn:aws(-[^:]+)?:comprehend:[a-zA-Z0-9-]*:[0-9]{12}:(document-classifier|entity-recognizer)/[a-zA-Z0-9](-*[a-zA-Z0-9])*(/version/[a-zA-Z0-9](-*[a-zA-Z0-9])*)?  \nUpdate requires: No interruption"
+    },
+    "DataAccessRoleArn": {
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 2048,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: arn:aws(-[^:]+)?:iam::[0-9]{12}:role/.+  \nUpdate requires: No interruption"
+    },
+    "DataLakeS3Uri": {
+      "type": "string",
+      "maxLength": 512,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 512  \nPattern: s3://[a-z0-9][\\.\\-a-z0-9]{1,61}[a-z0-9](/.*)?  \nUpdate requires: Replacement"
+    },
+    "DataSecurityConfig": {
+      "$ref": "#/definitions/DataSecurityConfig"
+    },
+    "FlywheelName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 63  \nPattern: ^[a-zA-Z0-9](-*[a-zA-Z0-9])*$  \nUpdate requires: Replacement"
+    },
+    "ModelType": {
+      "type": "string",
+      "enum": [
+        "DOCUMENT_CLASSIFIER",
+        "ENTITY_RECOGNIZER"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DOCUMENT_CLASSIFIER | ENTITY_RECOGNIZER  \nUpdate requires: Replacement"
+    },
+    "Tags": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "TaskConfig": {
+      "$ref": "#/definitions/TaskConfig"
+    }
+  },
+  "required": [
+    "FlywheelName",
+    "DataAccessRoleArn",
+    "DataLakeS3Uri"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "createOnlyProperties": [
+    "/properties/FlywheelName",
+    "/properties/ModelType",
+    "/properties/DataLakeS3Uri",
+    "/properties/TaskConfig"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "definitions": {
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "TaskConfig": {
+      "type": "object",
+      "properties": {
+        "LanguageCode": {
+          "type": "string",
+          "enum": [
+            "en",
+            "es",
+            "fr",
+            "it",
+            "de",
+            "pt"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: en | es | fr | it | de | pt  \nUpdate requires: No interruption"
+        },
+        "DocumentClassificationConfig": {
+          "$ref": "#/definitions/DocumentClassificationConfig"
+        },
+        "EntityRecognitionConfig": {
+          "$ref": "#/definitions/EntityRecognitionConfig"
+        }
+      },
+      "required": [
+        "LanguageCode"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "DataSecurityConfig": {
+      "type": "object",
+      "properties": {
+        "ModelKmsKeyId": {
+          "$ref": "#/definitions/KmsKeyId"
+        },
+        "VolumeKmsKeyId": {
+          "$ref": "#/definitions/KmsKeyId"
+        },
+        "DataLakeKmsKeyId": {
+          "$ref": "#/definitions/KmsKeyId"
+        },
+        "VpcConfig": {
+          "$ref": "#/definitions/VpcConfig"
+        }
+      },
+      "required": [],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "VpcConfig": {
+      "type": "object",
+      "properties": {
+        "SecurityGroupIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 32  \nPattern: [-0-9a-zA-Z]+  \nUpdate requires: No interruption"
+          },
+          "insertionOrder": false,
+          "uniqueItems": true,
+          "minItems": 1,
+          "maxItems": 5,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Subnets": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 32  \nPattern: [-0-9a-zA-Z]+  \nUpdate requires: No interruption"
+          },
+          "insertionOrder": false,
+          "uniqueItems": true,
+          "minItems": 1,
+          "maxItems": 16,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "SecurityGroupIds",
+        "Subnets"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "KmsKeyId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: No interruption"
+    },
+    "EntityTypesListItem": {
+      "type": "object",
+      "properties": {
+        "Type": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^(?![^\\n\\r\\t,]*\\\\n|\\\\r|\\\\t)[^\\n\\r\\t,]+$  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Type"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "EntityRecognitionConfig": {
+      "type": "object",
+      "properties": {
+        "EntityTypes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EntityTypesListItem"
+          },
+          "insertionOrder": false,
+          "uniqueItems": true,
+          "minItems": 1,
+          "maxItems": 25,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "DocumentClassificationConfig": {
+      "type": "object",
+      "properties": {
+        "Mode": {
+          "type": "string",
+          "enum": [
+            "MULTI_CLASS",
+            "MULTI_LABEL"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: MULTI_CLASS | MULTI_LABEL  \nUpdate requires: No interruption"
+        },
+        "Labels": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 5000,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 5000  \nUpdate requires: No interruption"
+          },
+          "insertionOrder": false,
+          "uniqueItems": true,
+          "maxItems": 1000,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Mode"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "iam:PassRole",
+        "comprehend:CreateFlywheel",
+        "comprehend:DescribeFlywheel",
+        "comprehend:ListTagsForResource"
+      ],
+      "timeoutInMinutes": 240
+    },
+    "read": {
+      "permissions": [
+        "comprehend:DescribeFlywheel",
+        "comprehend:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "iam:PassRole",
+        "comprehend:UpdateFlywheel",
+        "comprehend:ListTagsForResource",
+        "comprehend:TagResource",
+        "comprehend:UntagResource"
+      ],
+      "timeoutInMinutes": 10
+    },
+    "delete": {
+      "permissions": [
+        "comprehend:DeleteFlywheel",
+        "comprehend:DescribeFlywheel"
+      ],
+      "timeoutInMinutes": 120
+    },
+    "list": {
+      "permissions": [
+        "comprehend:ListFlywheels"
+      ]
+    }
+  },
+  "attributes": {
+    "Arn": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: arn:aws(-[^:]+)?:comprehend:[a-zA-Z0-9-]*:[0-9]{12}:flywheel/[a-zA-Z0-9](-*[a-zA-Z0-9])*  \nUpdate requires: No interruption"
+    }
+  }
+}

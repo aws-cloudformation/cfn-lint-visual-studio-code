@@ -18,6 +18,118 @@
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
+    "AgentStatus": {
+      "description": "The status of AgentEndpoint.",
+      "type": "string",
+      "enum": [
+        "SUCCESS",
+        "FAILED",
+        "ACTIVE",
+        "INACTIVE"
+      ],
+      "markdownDescription": "The status of AgentEndpoint.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SUCCESS | FAILED | ACTIVE | INACTIVE  \nUpdate requires: No interruption"
+    },
+    "AuditResults": {
+      "description": "The results of the audit.",
+      "type": "string",
+      "enum": [
+        "HEALTHY",
+        "UNHEALTHY"
+      ],
+      "markdownDescription": "The results of the audit.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: HEALTHY | UNHEALTHY  \nUpdate requires: No interruption"
+    },
+    "IntegerRange": {
+      "description": "An integer range that has a minimum and maximum value.",
+      "type": "object",
+      "properties": {
+        "Minimum": {
+          "description": "A minimum value.",
+          "type": "integer",
+          "markdownDescription": "A minimum value.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "Maximum": {
+          "description": "A maximum value.",
+          "type": "integer",
+          "markdownDescription": "A maximum value.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "An integer range that has a minimum and maximum value.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RangedSocketAddress": {
+      "description": "A socket address with a port range.",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "IPv4 socket address.",
+          "type": "string",
+          "markdownDescription": "IPv4 socket address.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "PortRange": {
+          "description": "Port range of a socket address.",
+          "$ref": "#/definitions/IntegerRange",
+          "markdownDescription": "Port range of a socket address.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "A socket address with a port range.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ConnectionDetails": {
+      "description": "Egress address of AgentEndpoint with an optional mtu.",
+      "type": "object",
+      "properties": {
+        "SocketAddress": {
+          "$ref": "#/definitions/SocketAddress"
+        },
+        "Mtu": {
+          "description": "Maximum transmission unit (MTU) size in bytes of a dataflow endpoint.",
+          "type": "integer",
+          "markdownDescription": "Maximum transmission unit (MTU) size in bytes of a dataflow endpoint.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Egress address of AgentEndpoint with an optional mtu.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RangedConnectionDetails": {
+      "description": "Ingress address of AgentEndpoint with a port range and an optional mtu.",
+      "type": "object",
+      "properties": {
+        "SocketAddress": {
+          "$ref": "#/definitions/RangedSocketAddress"
+        },
+        "Mtu": {
+          "description": "Maximum transmission unit (MTU) size in bytes of a dataflow endpoint.",
+          "type": "integer",
+          "markdownDescription": "Maximum transmission unit (MTU) size in bytes of a dataflow endpoint.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Ingress address of AgentEndpoint with a port range and an optional mtu.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AwsGroundStationAgentEndpoint": {
+      "description": "Information about AwsGroundStationAgentEndpoint.",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[ a-zA-Z0-9_:-]{1,256}$  \nUpdate requires: No interruption"
+        },
+        "EgressAddress": {
+          "$ref": "#/definitions/ConnectionDetails"
+        },
+        "IngressAddress": {
+          "$ref": "#/definitions/RangedConnectionDetails"
+        },
+        "AgentStatus": {
+          "$ref": "#/definitions/AgentStatus"
+        },
+        "AuditResults": {
+          "$ref": "#/definitions/AuditResults"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Information about AwsGroundStationAgentEndpoint.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "DataflowEndpoint": {
       "type": "object",
       "properties": {
@@ -71,8 +183,24 @@
         },
         "Endpoint": {
           "$ref": "#/definitions/DataflowEndpoint"
+        },
+        "AwsGroundStationAgentEndpoint": {
+          "$ref": "#/definitions/AwsGroundStationAgentEndpoint"
         }
       },
+      "oneOf": [
+        {
+          "required": [
+            "Endpoint",
+            "SecurityDetails"
+          ]
+        },
+        {
+          "required": [
+            "AwsGroundStationAgentEndpoint"
+          ]
+        }
+      ],
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
@@ -107,11 +235,13 @@
     },
     "ContactPrePassDurationSeconds": {
       "type": "integer",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+      "description": "Amount of time, in seconds, before a contact starts that the Ground Station Dataflow Endpoint Group will be in a PREPASS state. A Ground Station Dataflow Endpoint Group State Change event will be emitted when the Dataflow Endpoint Group enters and exits the PREPASS state.",
+      "markdownDescription": "Amount of time, in seconds, before a contact starts that the Ground Station Dataflow Endpoint Group will be in a PREPASS state. A Ground Station Dataflow Endpoint Group State Change event will be emitted when the Dataflow Endpoint Group enters and exits the PREPASS state.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
     },
     "ContactPostPassDurationSeconds": {
       "type": "integer",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+      "description": "Amount of time, in seconds, after a contact ends that the Ground Station Dataflow Endpoint Group will be in a POSTPASS state. A Ground Station Dataflow Endpoint Group State Change event will be emitted when the Dataflow Endpoint Group enters and exits the POSTPASS state.",
+      "markdownDescription": "Amount of time, in seconds, after a contact ends that the Ground Station Dataflow Endpoint Group will be in a POSTPASS state. A Ground Station Dataflow Endpoint Group State Change event will be emitted when the Dataflow Endpoint Group enters and exits the POSTPASS state.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
     },
     "Tags": {
       "type": "array",
@@ -137,7 +267,10 @@
         "groundstation:CreateDataflowEndpointGroup",
         "groundstation:GetDataflowEndpointGroup",
         "groundstation:TagResource",
-        "iam:PassRole"
+        "iam:PassRole",
+        "ec2:describeAddresses",
+        "ec2:describeNetworkInterfaces",
+        "iam:createServiceLinkedRole"
       ]
     },
     "read": {
