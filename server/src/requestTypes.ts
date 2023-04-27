@@ -29,5 +29,7 @@ export namespace PreviewClosed {
 }
 
 export namespace ResultLimitReachedNotification {
-  export const type: NotificationType<string> = new NotificationType('cfn/resultLimitReached');
+  export const type: NotificationType<string> = new NotificationType(
+    "cfn/resultLimitReached"
+  );
 }
