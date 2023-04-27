@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to the "vscode-cfn-lint" extension will be documented in this file.
 
+## 0.24.4
+- Update CloudFormation schema files as of `2023-04-27` (pull #[298](https://github.com/aws-cloudformation/aws-cfn-lint-visual-studio-code/pull/298))
+- Update language server to not try get symbols when not CloudFormation (pull #[307](https://github.com/aws-cloudformation/aws-cfn-lint-visual-studio-code/pull/307))
+- Update language server to not do autocomplete when not CloudFormation (pull #[307](https://github.com/aws-cloudformation/aws-cfn-lint-visual-studio-code/pull/307))
+
 ## 0.24.3
 - Update CloudFormation schema files as of `2023-03-06` (pull #[258](https://github.com/aws-cloudformation/aws-cfn-lint-visual-studio-code/pull/258))
 
