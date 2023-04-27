@@ -29,7 +29,7 @@ import { ValidationHandler } from "./server/handlers/validationHandler";
 import { SettingsHandler } from "./server/handlers/settingsHandler";
 import { NotificationHandler } from "./server/handlers/notificationHandler";
 import { LanguageHandlers } from "./server/handlers/languageHandlers";
-import { Telemetry } from "yaml-language-server/out/server/src/languageserver/telemetry";
+import { TelemetryImpl } from "yaml-language-server/out/server/src/languageserver/telemetry";
 import { readFile } from "fs";
 import { JSONSchema } from "yaml-language-server/out/server/src/languageservice/jsonSchema";
 import { WorkspaceHandlers } from "yaml-language-server/out/server/src/languageserver/handlers/workspaceHandlers";
@@ -50,7 +50,7 @@ export class CfnServerInit {
     private cfnSettings: SettingsState,
     private workspaceContext: WorkspaceContextService,
     private schemaRequestService: SchemaRequestService,
-    private telemetry: Telemetry
+    private telemetry: TelemetryImpl
   ) {
     this.cfnSettings.documents.listen(this.connection);
 

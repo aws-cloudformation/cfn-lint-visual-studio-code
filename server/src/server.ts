@@ -26,7 +26,7 @@ import {
   workspaceContext,
   schemaRequestHandler,
 } from "yaml-language-server/out/server/src/languageservice/services/schemaRequestHandler";
-import { Telemetry } from "yaml-language-server/out/server/src/languageserver/telemetry";
+import { TelemetryImpl } from "yaml-language-server/out/server/src/languageserver/telemetry";
 import { promises as fs } from "fs";
 
 // Create a connection for the server.
@@ -70,7 +70,7 @@ const schemaRequestHandlerWrapper = (
 const schemaRequestService = schemaRequestHandlerWrapper.bind(this, connection);
 
 const cfnSettings = new SettingsState();
-const telemetry = new Telemetry(connection);
+const telemetry = new TelemetryImpl(connection);
 
 new CfnServerInit(
   connection,

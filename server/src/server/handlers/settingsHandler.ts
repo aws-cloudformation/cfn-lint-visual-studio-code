@@ -25,7 +25,7 @@ import {
   SchemaPriority,
 } from "yaml-language-server";
 import { SchemaSelectionRequests } from "yaml-language-server/out/server/src/requestTypes";
-import { Telemetry } from "yaml-language-server/out/server/src/languageserver/telemetry";
+import { TelemetryImpl } from "yaml-language-server/out/server/src/languageserver/telemetry";
 import { checkSchemaURI } from "yaml-language-server/out/server/src/languageservice/utils/schemaUrls";
 import {
   isRelativePath,
@@ -40,7 +40,7 @@ export class SettingsHandler {
     private readonly languageService: LanguageService,
     private readonly cfnSettings: SettingsState,
     private readonly validationHandler: ValidationHandler,
-    private readonly telemetry: Telemetry
+    private readonly telemetry: TelemetryImpl
   ) {}
 
   async registerHandlers(): Promise<void> {
