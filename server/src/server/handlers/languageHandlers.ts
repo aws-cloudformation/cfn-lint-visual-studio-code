@@ -17,6 +17,9 @@ import { Connection } from "vscode-languageserver";
 import {
   TextDocumentPositionParams,
   DocumentFormattingParams,
+  DocumentSymbolParams,
+  DocumentSymbol,
+  SymbolInformation,
 } from "vscode-languageserver-protocol";
 import { CompletionList, TextEdit, Hover } from "vscode-languageserver-types";
 import { SettingsState } from "../../cfnSettings";
@@ -31,11 +34,15 @@ import {
 } from "yaml-language-server/out/server/src/languageservice/parser/jsonParser07";
 import { MarkdownString } from "../../utils/markdownString";
 import { LanguageService } from "../../service/cfnLanguageService";
+import { ResultLimitReachedNotification } from "../../requestTypes";
+import * as path from 'path';
+
 
 // code adopted from https://github.com/redhat-developer/yaml-language-server/blob/main/src/languageserver/handlers/languageHandlers.ts
 export class LanguageHandlers extends YamlLanguageHandlers {
   private cfnLanguageService: LanguageService;
   private cfnSettings: SettingsState;
+  private cfnConnection: Connection;
 
   pendingLimitExceededWarnings: {
     [uri: string]: {
@@ -51,6 +58,7 @@ export class LanguageHandlers extends YamlLanguageHandlers {
     validationHandler: ValidationHandler
   ) {
     super(connection, languageService, cfnSettings, validationHandler);
+    this.cfnConnection = connection;
     this.cfnSettings = cfnSettings;
     this.cfnLanguageService = languageService;
   }
@@ -174,6 +182,47 @@ export class LanguageHandlers extends YamlLanguageHandlers {
   }
 
   /**
+   * Called when the code outline in an editor needs to be populated
+   * Returns a list of symbols that is then shown in the code outline
+   */
+  documentSymbolHandler(documentSymbolParams: DocumentSymbolParams): DocumentSymbol[] | SymbolInformation[] {
+    const document = this.cfnSettings.documents.get(documentSymbolParams.textDocument.uri);
+
+    if (!document) {
+      // @ts-ignore
+      return;
+    }
+
+    let [_, template] = getNode(document, {
+      textDocument: document,
+      position: {
+        line: 0,
+        character: 0,
+      },
+    });
+
+    if (!template.isValidTemplate) {
+      // @ts-ignore
+      return;
+    }
+
+    const onResultLimitExceeded = this.onCfnResultLimitExceeded(
+      document.uri,
+      this.cfnSettings.maxItemsComputed,
+      'document symbols'
+    );
+
+    const context = { resultLimit: this.cfnSettings.maxItemsComputed, onResultLimitExceeded };
+
+    if (this.cfnSettings.hierarchicalDocumentSymbolSupport) {
+      return this.cfnLanguageService.findDocumentSymbols2(document, context);
+    } else {
+      return this.cfnLanguageService.findDocumentSymbols(document, context);
+    }
+  }
+
+
+  /**
    * Called when the user hovers with their mouse over a keyword
    * Returns an informational tooltip
    */
@@ -239,5 +288,31 @@ export class LanguageHandlers extends YamlLanguageHandlers {
     }
 
     return hover;
+  }
+
+  private onCfnResultLimitExceeded(uri: string, resultLimit: number, name: string) {
+    return () => {
+      let warning = this.pendingLimitExceededWarnings[uri];
+      if (warning) {
+        if (!warning.timeout) {
+          // already shown
+          return;
+        }
+        warning.features[name] = name;
+        warning.timeout.refresh();
+      } else {
+        warning = { features: { [name]: name } };
+        warning.timeout = setTimeout(() => {
+          this.cfnConnection.sendNotification(
+            ResultLimitReachedNotification.type,
+            `${path.basename(uri)}: For performance reasons, ${Object.keys(warning.features).join(
+              ' and '
+            )} have been limited to ${resultLimit} items.`
+          );
+          warning.timeout = undefined;
+        }, 2000);
+        this.pendingLimitExceededWarnings[uri] = warning;
+      }
+    };
   }
 }
