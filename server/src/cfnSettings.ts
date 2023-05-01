@@ -49,6 +49,8 @@ export class SettingsState extends YamlSettingsState {
   cfnLintIgnoreRules: Array<string> = [];
   cfnLintOverrideSpecPath: string = "";
 
+  indentation: string = "     ";
+
   pendingValidationRequests: { [uri: string]: NodeJS.Timer } = {};
   validationDelayMs = 200;
 
