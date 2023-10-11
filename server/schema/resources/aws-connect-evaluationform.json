@@ -1,0 +1,614 @@
+{
+  "typeName": "AWS::Connect::EvaluationForm",
+  "description": "Resource Type definition for AWS::Connect::EvaluationForm",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-connect",
+  "definitions": {
+    "RefId": {
+      "description": "The identifier to reference the item.",
+      "type": "string",
+      "markdownDescription": "The identifier to reference the item.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9._-]{1,40}$  \nUpdate requires: No interruption"
+    },
+    "Weight": {
+      "description": "The item weight used for scoring.",
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "markdownDescription": "The item weight used for scoring.\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+    },
+    "Score": {
+      "description": "The score of an answer option.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10,
+      "markdownDescription": "The score of an answer option.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+    },
+    "EvaluationFormBaseItem": {
+      "description": "The evaluation form base item.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Section": {
+          "description": "The evaluation form section item",
+          "$ref": "#/definitions/EvaluationFormSection",
+          "markdownDescription": "The evaluation form section item\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Section"
+      ],
+      "markdownDescription": "The evaluation form base item.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "EvaluationFormItem": {
+      "description": "The evaluation form item.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Section": {
+          "description": "The evaluation form section item",
+          "$ref": "#/definitions/EvaluationFormSection",
+          "markdownDescription": "The evaluation form section item\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        },
+        "Question": {
+          "description": "The evaluation form question item",
+          "$ref": "#/definitions/EvaluationFormQuestion",
+          "markdownDescription": "The evaluation form question item\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "The evaluation form item.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "EvaluationFormSection": {
+      "description": "The evaluation form section.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Title": {
+          "description": "The title of the section.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The title of the section.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        },
+        "Instructions": {
+          "description": "The instructions for the section.",
+          "type": "string",
+          "maxLength": 1024,
+          "markdownDescription": "The instructions for the section.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nUpdate requires: No interruption"
+        },
+        "RefId": {
+          "description": "The identifier to reference the section.",
+          "$ref": "#/definitions/RefId",
+          "markdownDescription": "The identifier to reference the section.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption"
+        },
+        "Items": {
+          "description": "The list of section items.",
+          "type": "array",
+          "insertionOrder": true,
+          "minItems": 1,
+          "maxItems": 200,
+          "items": {
+            "$ref": "#/definitions/EvaluationFormItem"
+          },
+          "markdownDescription": "The list of section items.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Weight": {
+          "description": "The item weight used for scoring.",
+          "$ref": "#/definitions/Weight",
+          "markdownDescription": "The item weight used for scoring.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "RefId",
+        "Title"
+      ],
+      "markdownDescription": "The evaluation form section.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "EvaluationFormNumericQuestionOption": {
+      "description": "The option ranges used for scoring in numeric questions.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "MinValue": {
+          "description": "The minimum value of the option range.",
+          "type": "integer",
+          "markdownDescription": "The minimum value of the option range.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "MaxValue": {
+          "description": "The maximum value of the option range.",
+          "type": "integer",
+          "markdownDescription": "The maximum value of the option range.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "Score": {
+          "description": "The score of the option range.",
+          "$ref": "#/definitions/Score",
+          "markdownDescription": "The score of the option range.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        },
+        "AutomaticFail": {
+          "description": "The flag to mark the option as automatic fail.",
+          "type": "boolean",
+          "markdownDescription": "The flag to mark the option as automatic fail.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "MinValue",
+        "MaxValue"
+      ],
+      "markdownDescription": "The option ranges used for scoring in numeric questions.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "NumericQuestionPropertyValueAutomation": {
+      "description": "The automation property name of the question.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Label": {
+          "description": "The automation property label.",
+          "type": "string",
+          "enum": [
+            "OVERALL_CUSTOMER_SENTIMENT_SCORE",
+            "OVERALL_AGENT_SENTIMENT_SCORE",
+            "NON_TALK_TIME",
+            "NON_TALK_TIME_PERCENTAGE",
+            "NUMBER_OF_INTERRUPTIONS",
+            "CONTACT_DURATION",
+            "AGENT_INTERACTION_DURATION",
+            "CUSTOMER_HOLD_TIME"
+          ],
+          "markdownDescription": "The automation property label.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: OVERALL_CUSTOMER_SENTIMENT_SCORE | OVERALL_AGENT_SENTIMENT_SCORE | NON_TALK_TIME | NON_TALK_TIME_PERCENTAGE | NUMBER_OF_INTERRUPTIONS | CONTACT_DURATION | AGENT_INTERACTION_DURATION | CUSTOMER_HOLD_TIME  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Label"
+      ],
+      "markdownDescription": "The automation property name of the question.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "EvaluationFormNumericQuestionAutomation": {
+      "description": "The automation properties for the numeric question.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "PropertyValue": {
+          "description": "The automation property name of the question.",
+          "$ref": "#/definitions/NumericQuestionPropertyValueAutomation",
+          "markdownDescription": "The automation property name of the question.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "PropertyValue"
+      ],
+      "markdownDescription": "The automation properties for the numeric question.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "EvaluationFormNumericQuestionProperties": {
+      "description": "The properties of the numeric question.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "MinValue": {
+          "description": "The minimum value for answers of the question.",
+          "type": "integer",
+          "markdownDescription": "The minimum value for answers of the question.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "MaxValue": {
+          "description": "The maximum value for answers of the question.",
+          "type": "integer",
+          "markdownDescription": "The maximum value for answers of the question.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "Options": {
+          "description": "The list of option ranges used for scoring.",
+          "type": "array",
+          "insertionOrder": true,
+          "minItems": 1,
+          "maxItems": 10,
+          "items": {
+            "$ref": "#/definitions/EvaluationFormNumericQuestionOption"
+          },
+          "markdownDescription": "The list of option ranges used for scoring.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Automation": {
+          "description": "The automation properties for the numeric question.",
+          "$ref": "#/definitions/EvaluationFormNumericQuestionAutomation",
+          "markdownDescription": "The automation properties for the numeric question.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "MinValue",
+        "MaxValue"
+      ],
+      "markdownDescription": "The properties of the numeric question.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "EvaluationFormSingleSelectQuestionAutomationOption": {
+      "description": "The automation option for the single-select question.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "RuleCategory": {
+          "description": "The automation option based on Rules categories.",
+          "$ref": "#/definitions/SingleSelectQuestionRuleCategoryAutomation",
+          "markdownDescription": "The automation option based on Rules categories.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "RuleCategory"
+      ],
+      "markdownDescription": "The automation option for the single-select question.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "SingleSelectQuestionRuleCategoryAutomation": {
+      "description": "The automation option based on Rules categories.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Category": {
+          "description": "The category name as defined in Rules.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50,
+          "markdownDescription": "The category name as defined in Rules.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 50  \nUpdate requires: No interruption"
+        },
+        "Condition": {
+          "description": "The automation condition applied on contact categories.",
+          "type": "string",
+          "enum": [
+            "PRESENT",
+            "NOT_PRESENT"
+          ],
+          "markdownDescription": "The automation condition applied on contact categories.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: PRESENT | NOT_PRESENT  \nUpdate requires: No interruption"
+        },
+        "OptionRefId": {
+          "description": "The option identifier referencing the option to be selected when the automation option is triggered.",
+          "$ref": "#/definitions/RefId",
+          "markdownDescription": "The option identifier referencing the option to be selected when the automation option is triggered.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Category",
+        "Condition",
+        "OptionRefId"
+      ],
+      "markdownDescription": "The automation option based on Rules categories.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "EvaluationFormSingleSelectQuestionAutomation": {
+      "description": "The automation properties for the single-select question.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Options": {
+          "description": "The answer options for the automation.",
+          "type": "array",
+          "insertionOrder": true,
+          "minItems": 1,
+          "maxItems": 20,
+          "items": {
+            "$ref": "#/definitions/EvaluationFormSingleSelectQuestionAutomationOption"
+          },
+          "markdownDescription": "The answer options for the automation.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "DefaultOptionRefId": {
+          "description": "The option reference identifier of the default answer.",
+          "$ref": "#/definitions/RefId",
+          "markdownDescription": "The option reference identifier of the default answer.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Options"
+      ],
+      "markdownDescription": "The automation properties for the single-select question.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "EvaluationFormSingleSelectQuestionOption": {
+      "description": "The option for a question.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "RefId": {
+          "description": "The identifier used to reference the option.",
+          "$ref": "#/definitions/RefId",
+          "markdownDescription": "The identifier used to reference the option.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption"
+        },
+        "Text": {
+          "description": "The title of the option.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The title of the option.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        },
+        "Score": {
+          "description": "The score of the option.",
+          "$ref": "#/definitions/Score",
+          "markdownDescription": "The score of the option.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        },
+        "AutomaticFail": {
+          "description": "The flag to mark the option as automatic fail.",
+          "type": "boolean",
+          "markdownDescription": "The flag to mark the option as automatic fail.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "RefId",
+        "Text"
+      ],
+      "markdownDescription": "The option for a question.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "EvaluationFormSingleSelectQuestionProperties": {
+      "description": "The properties of the single-select question.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Options": {
+          "description": "The list of options for the question.",
+          "type": "array",
+          "insertionOrder": true,
+          "minItems": 2,
+          "maxItems": 256,
+          "items": {
+            "$ref": "#/definitions/EvaluationFormSingleSelectQuestionOption"
+          },
+          "markdownDescription": "The list of options for the question.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "DisplayAs": {
+          "description": "The display mode of the single-select question.",
+          "type": "string",
+          "enum": [
+            "DROPDOWN",
+            "RADIO"
+          ],
+          "markdownDescription": "The display mode of the single-select question.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DROPDOWN | RADIO  \nUpdate requires: No interruption"
+        },
+        "Automation": {
+          "description": "The automation properties for the single-select question.",
+          "$ref": "#/definitions/EvaluationFormSingleSelectQuestionAutomation",
+          "markdownDescription": "The automation properties for the single-select question.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Options"
+      ],
+      "markdownDescription": "The properties of the single-select question.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "EvaluationFormQuestionTypeProperties": {
+      "description": "The properties of the question.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Numeric": {
+          "description": "The properties of the numeric question.",
+          "$ref": "#/definitions/EvaluationFormNumericQuestionProperties",
+          "markdownDescription": "The properties of the numeric question.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        },
+        "SingleSelect": {
+          "description": "The properties of the single-select question.",
+          "$ref": "#/definitions/EvaluationFormSingleSelectQuestionProperties",
+          "markdownDescription": "The properties of the single-select question.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "The properties of the question.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "EvaluationFormQuestion": {
+      "description": "The evaluation form question.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Title": {
+          "description": "The title of the question.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 350,
+          "markdownDescription": "The title of the question.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 350  \nUpdate requires: No interruption"
+        },
+        "Instructions": {
+          "description": "The instructions for the question.",
+          "type": "string",
+          "maxLength": 1024,
+          "markdownDescription": "The instructions for the question.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nUpdate requires: No interruption"
+        },
+        "RefId": {
+          "description": "The identifier used to reference the question.",
+          "$ref": "#/definitions/RefId",
+          "markdownDescription": "The identifier used to reference the question.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption"
+        },
+        "NotApplicableEnabled": {
+          "description": "The flag to enable not applicable answers to the question.",
+          "type": "boolean",
+          "markdownDescription": "The flag to enable not applicable answers to the question.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        },
+        "QuestionType": {
+          "description": "The type of the question.",
+          "type": "string",
+          "enum": [
+            "NUMERIC",
+            "SINGLESELECT",
+            "TEXT"
+          ],
+          "markdownDescription": "The type of the question.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: NUMERIC | SINGLESELECT | TEXT  \nUpdate requires: No interruption"
+        },
+        "QuestionTypeProperties": {
+          "description": "The properties of the question",
+          "$ref": "#/definitions/EvaluationFormQuestionTypeProperties",
+          "markdownDescription": "The properties of the question\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        },
+        "Weight": {
+          "description": "The question weight used for scoring.",
+          "$ref": "#/definitions/Weight",
+          "markdownDescription": "The question weight used for scoring.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "RefId",
+        "Title",
+        "QuestionType"
+      ],
+      "markdownDescription": "The evaluation form question.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ScoringStrategy": {
+      "description": "The scoring strategy.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Mode": {
+          "description": "The scoring mode.",
+          "type": "string",
+          "enum": [
+            "QUESTION_ONLY",
+            "SECTION_ONLY"
+          ],
+          "markdownDescription": "The scoring mode.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: QUESTION_ONLY | SECTION_ONLY  \nUpdate requires: No interruption"
+        },
+        "Status": {
+          "description": "The scoring status.",
+          "type": "string",
+          "enum": [
+            "ENABLED",
+            "DISABLED"
+          ],
+          "markdownDescription": "The scoring status.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Mode",
+        "Status"
+      ],
+      "markdownDescription": "The scoring strategy.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. \n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^(?!aws:)[a-zA-Z+-=._:/]+$  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that's 1 to 256 characters in length.",
+          "maxLength": 256,
+          "markdownDescription": "The value for the tag. You can specify a value that's 1 to 256 characters in length.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "Title": {
+      "description": "The title of the evaluation form.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "markdownDescription": "The title of the evaluation form.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+    },
+    "Description": {
+      "description": "The description of the evaluation form.",
+      "type": "string",
+      "maxLength": 1024,
+      "markdownDescription": "The description of the evaluation form.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nUpdate requires: No interruption"
+    },
+    "InstanceArn": {
+      "description": "The Amazon Resource Name (ARN) of the instance.",
+      "type": "string",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the instance.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:instance/[-a-zA-Z0-9]*$  \nUpdate requires: No interruption"
+    },
+    "Items": {
+      "description": "The list of evaluation form items.",
+      "type": "array",
+      "insertionOrder": true,
+      "minItems": 1,
+      "maxItems": 200,
+      "items": {
+        "$ref": "#/definitions/EvaluationFormBaseItem"
+      },
+      "markdownDescription": "The list of evaluation form items.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "ScoringStrategy": {
+      "description": "The scoring strategy.",
+      "$ref": "#/definitions/ScoringStrategy",
+      "markdownDescription": "The scoring strategy.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+    },
+    "Status": {
+      "description": "The status of the evaluation form.",
+      "type": "string",
+      "default": "DRAFT",
+      "enum": [
+        "DRAFT",
+        "ACTIVE"
+      ],
+      "markdownDescription": "The status of the evaluation form.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: DRAFT | ACTIVE  \nUpdate requires: No interruption"
+    },
+    "Tags": {
+      "description": "One or more tags.",
+      "type": "array",
+      "maxItems": 50,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "One or more tags.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "Title",
+    "InstanceArn",
+    "Items",
+    "Status"
+  ],
+  "readOnlyProperties": [
+    "/properties/EvaluationFormArn"
+  ],
+  "primaryIdentifier": [
+    "/properties/EvaluationFormArn"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": false,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "connect:CreateEvaluationForm",
+        "connect:ActivateEvaluationForm",
+        "connect:TagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "connect:DescribeEvaluationForm",
+        "connect:ListEvaluationFormVersions"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "connect:ListEvaluationForms"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "connect:UpdateEvaluationForm",
+        "connect:ListEvaluationFormVersions",
+        "connect:ActivateEvaluationForm",
+        "connect:DeactivateEvaluationForm",
+        "connect:TagResource",
+        "connect:UntagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "connect:DeleteEvaluationForm",
+        "connect:UntagResource"
+      ]
+    }
+  },
+  "attributes": {
+    "EvaluationFormArn": {
+      "description": "The Amazon Resource Name (ARN) for the evaluation form.",
+      "type": "string",
+      "markdownDescription": "The Amazon Resource Name (ARN) for the evaluation form.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:instance/[-a-zA-Z0-9]*/evaluation-form/[-a-zA-Z0-9]*$  \nUpdate requires: No interruption"
+    }
+  }
+}

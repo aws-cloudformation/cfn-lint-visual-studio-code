@@ -96,12 +96,32 @@
         },
         "StatefulEngineOptions": {
           "$ref": "#/definitions/StatefulEngineOptions"
+        },
+        "PolicyVariables": {
+          "type": "object",
+          "properties": {
+            "RuleVariables": {
+              "$ref": "#/definitions/RuleVariables"
+            }
+          },
+          "additionalProperties": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
         }
       },
       "required": [
         "StatelessDefaultActions",
         "StatelessFragmentDefaultActions"
       ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RuleVariables": {
+      "type": "object",
+      "patternProperties": {
+        "^[A-Za-z0-9_]{1,32}$": {
+          "$ref": "#/definitions/IPSet"
+        }
+      },
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
@@ -212,6 +232,27 @@
       "maximum": 65535,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
     },
+    "VariableDefinition": {
+      "type": "string",
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nPattern: ^.*$  \nUpdate requires: No interruption"
+    },
+    "IPSet": {
+      "type": "object",
+      "properties": {
+        "Definition": {
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": false,
+          "items": {
+            "$ref": "#/definitions/VariableDefinition"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "StatefulRuleGroupOverride": {
       "type": "object",
       "properties": {
@@ -254,9 +295,10 @@
       "type": "string",
       "enum": [
         "DROP",
-        "CONTINUE"
+        "CONTINUE",
+        "REJECT"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DROP | CONTINUE  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DROP | CONTINUE | REJECT  \nUpdate requires: No interruption"
     }
   },
   "properties": {
@@ -285,6 +327,9 @@
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     }
   },
+  "tagging": {
+    "taggable": true
+  },
   "required": [
     "FirewallPolicyName",
     "FirewallPolicy"
@@ -304,7 +349,8 @@
       "permissions": [
         "network-firewall:CreateFirewallPolicy",
         "network-firewall:DescribeFirewallPolicy",
-        "network-firewall:TagResource"
+        "network-firewall:TagResource",
+        "network-firewall:ListRuleGroups"
       ]
     },
     "read": {
@@ -318,7 +364,8 @@
         "network-firewall:UpdateFirewallPolicy",
         "network-firewall:DescribeFirewallPolicy",
         "network-firewall:TagResource",
-        "network-firewall:UntagResource"
+        "network-firewall:UntagResource",
+        "network-firewall:ListRuleGroups"
       ]
     },
     "delete": {

@@ -86,7 +86,7 @@
         "Environment": {
           "description": "The environment variables to pass to a container",
           "type": "array",
-          "insertionOrder": true,
+          "insertionOrder": false,
           "uniqueItems": true,
           "items": {
             "$ref": "#/definitions/KeyValuePair"
@@ -1044,12 +1044,14 @@
     "/properties/TaskDefinitionArn"
   ],
   "propertyTransform": {
-    "/properties/TaskRoleArn": "$split(TaskRoleArn, \"role/\")[-1]"
+    "/properties/TaskRoleArn": "TaskRoleArn $OR $split(TaskRoleArn, \"role/\")[-1]"
   },
   "handlers": {
     "create": {
       "permissions": [
         "ecs:RegisterTaskDefinition",
+        "ecs:DescribeTaskDefinition",
+        "ecs:TagResource",
         "iam:GetRole",
         "iam:PassRole"
       ]
@@ -1064,6 +1066,7 @@
         "ecs:TagResource",
         "ecs:UntagResource",
         "ecs:ListTagsForResource",
+        "ecs:DescribeTaskDefinition",
         "iam:GetRole",
         "iam:PassRole"
       ]
@@ -1071,6 +1074,7 @@
     "delete": {
       "permissions": [
         "ecs:DeregisterTaskDefinition",
+        "ecs:DescribeTaskDefinition",
         "iam:GetRole",
         "iam:PassRole"
       ]

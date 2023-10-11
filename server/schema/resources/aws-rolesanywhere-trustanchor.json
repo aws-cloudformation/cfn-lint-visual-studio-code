@@ -2,6 +2,48 @@
   "typeName": "AWS::RolesAnywhere::TrustAnchor",
   "description": "Definition of AWS::RolesAnywhere::TrustAnchor Resource Type.",
   "definitions": {
+    "NotificationChannel": {
+      "type": "string",
+      "enum": [
+        "ALL"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ALL  \nUpdate requires: No interruption"
+    },
+    "NotificationEvent": {
+      "type": "string",
+      "enum": [
+        "CA_CERTIFICATE_EXPIRY",
+        "END_ENTITY_CERTIFICATE_EXPIRY"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CA_CERTIFICATE_EXPIRY | END_ENTITY_CERTIFICATE_EXPIRY  \nUpdate requires: No interruption"
+    },
+    "NotificationSetting": {
+      "type": "object",
+      "properties": {
+        "Enabled": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
+        },
+        "Event": {
+          "$ref": "#/definitions/NotificationEvent"
+        },
+        "Threshold": {
+          "type": "number",
+          "maximum": 360,
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+        },
+        "Channel": {
+          "$ref": "#/definitions/NotificationChannel"
+        }
+      },
+      "required": [
+        "Enabled",
+        "Event"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "Source": {
       "type": "object",
       "properties": {
@@ -87,6 +129,15 @@
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
     },
+    "NotificationSettings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/NotificationSetting"
+      },
+      "maxItems": 50,
+      "minItems": 0,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
     "Source": {
       "$ref": "#/definitions/Source"
     },
@@ -123,6 +174,7 @@
       "permissions": [
         "iam:CreateServiceLinkedRole",
         "rolesanywhere:CreateTrustAnchor",
+        "rolesanywhere:TagResource",
         "rolesanywhere:ListTagsForResource"
       ]
     },
@@ -140,7 +192,10 @@
         "rolesanywhere:UntagResource",
         "rolesanywhere:EnableTrustAnchor",
         "rolesanywhere:DisableTrustAnchor",
-        "rolesanywhere:UpdateTrustAnchor"
+        "rolesanywhere:UpdateTrustAnchor",
+        "rolesanywhere:GetTrustAnchor",
+        "rolesanywhere:PutNotificationSettings",
+        "rolesanywhere:ResetNotificationSettings"
       ]
     },
     "delete": {

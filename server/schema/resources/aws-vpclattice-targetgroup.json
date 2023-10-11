@@ -23,9 +23,10 @@
           "type": "string",
           "enum": [
             "HTTP1",
-            "HTTP2"
+            "HTTP2",
+            "GRPC"
           ],
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: HTTP1 | HTTP2  \nUpdate requires: No interruption"
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: HTTP1 | HTTP2 | GRPC  \nUpdate requires: No interruption"
         },
         "Port": {
           "type": "integer",
@@ -93,7 +94,7 @@
           "type": "integer",
           "maximum": 65535,
           "minimum": 1,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
         },
         "Protocol": {
           "type": "string",
@@ -101,7 +102,7 @@
             "HTTP",
             "HTTPS"
           ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: HTTP | HTTPS  \nUpdate requires: No interruption"
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: HTTP | HTTPS  \nUpdate requires: No interruption"
         },
         "ProtocolVersion": {
           "type": "string",
@@ -122,21 +123,25 @@
           ],
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: IPV4 | IPV6  \nUpdate requires: No interruption"
         },
+        "LambdaEventStructureVersion": {
+          "type": "string",
+          "enum": [
+            "V1",
+            "V2"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: V1 | V2  \nUpdate requires: No interruption"
+        },
         "VpcIdentifier": {
           "type": "string",
           "maxLength": 2048,
           "minLength": 5,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 5  \nMaximum Length: 2048  \nPattern: ^vpc-(([0-9a-z]{8})|([0-9a-z]{17}))$  \nUpdate requires: No interruption"
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 5  \nMaximum Length: 2048  \nPattern: ^vpc-(([0-9a-z]{8})|([0-9a-z]{17}))$  \nUpdate requires: No interruption"
         },
         "HealthCheck": {
           "$ref": "#/definitions/HealthCheckConfig"
         }
       },
-      "required": [
-        "Port",
-        "Protocol",
-        "VpcIdentifier"
-      ],
+      "required": [],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: Replacement"
     },
     "Target": {
@@ -243,7 +248,8 @@
     "/properties/Config/IpAddressType",
     "/properties/Config/Protocol",
     "/properties/Config/ProtocolVersion",
-    "/properties/Config/VpcIdentifier"
+    "/properties/Config/VpcIdentifier",
+    "/properties/Config/LambdaEventStructureVersion"
   ],
   "primaryIdentifier": [
     "/properties/Arn"
@@ -251,6 +257,9 @@
   "additionalIdentifiers": [
     [
       "/properties/Id"
+    ],
+    [
+      "/properties/Name"
     ]
   ],
   "handlers": {
@@ -269,7 +278,8 @@
         "ec2:DescribeAvailabilityZoneMappings",
         "lambda:Invoke",
         "lambda:AddPermission",
-        "elasticloadbalancing:DescribeLoadBalancers"
+        "elasticloadbalancing:DescribeLoadBalancers",
+        "iam:CreateServiceLinkedRole"
       ]
     },
     "read": {
@@ -286,6 +296,7 @@
         "vpc-lattice:ListTargets",
         "vpc-lattice:RegisterTargets",
         "vpc-lattice:DeregisterTargets",
+        "ec2:DescribeVpcs",
         "ec2:DescribeInstances",
         "ec2:DescribeSubnets",
         "ec2:DescribeAvailabilityZoneMappings",
@@ -303,6 +314,7 @@
         "vpc-lattice:DeleteTargetGroup",
         "vpc-lattice:GetTargetGroup",
         "vpc-lattice:DeregisterTargets",
+        "vpc-lattice:ListTargets",
         "lambda:RemovePermission"
       ]
     },

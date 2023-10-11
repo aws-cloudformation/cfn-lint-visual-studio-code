@@ -2,6 +2,12 @@
   "typeName": "AWS::GuardDuty::Detector",
   "description": "Resource Type definition for AWS::GuardDuty::Detector",
   "additionalProperties": false,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
   "properties": {
     "FindingPublishingFrequency": {
       "type": "string",
@@ -16,56 +22,96 @@
     },
     "Features": {
       "type": "array",
-      "uniqueItems": false,
       "items": {
-        "$ref": "#/definitions/FeatureConfigurations"
+        "$ref": "#/definitions/CFNFeatureConfiguration"
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     },
     "Tags": {
       "type": "array",
-      "uniqueItems": false,
       "items": {
-        "$ref": "#/definitions/Tag"
+        "$ref": "#/definitions/TagItem"
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     }
   },
   "definitions": {
-    "FeatureAdditionalConfiguration": {
+    "TagItem": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "Status": {
+        "Key": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
         },
-        "Name": {
+        "Value": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption"
         }
       },
+      "required": [
+        "Key",
+        "Value"
+      ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
-    "FeatureConfigurations": {
+    "CFNS3LogsConfiguration": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "Status": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        "Enable": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Enable"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "CFNKubernetesAuditLogsConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Enable": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Enable"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "CFNKubernetesConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "AuditLogs": {
+          "$ref": "#/definitions/CFNKubernetesAuditLogsConfiguration"
+        }
+      },
+      "required": [
+        "AuditLogs"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "CFNDataSourceConfigurations": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "S3Logs": {
+          "$ref": "#/definitions/CFNS3LogsConfiguration"
         },
-        "AdditionalConfiguration": {
-          "type": "array",
-          "uniqueItems": false,
-          "items": {
-            "$ref": "#/definitions/FeatureAdditionalConfiguration"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        "Kubernetes": {
+          "$ref": "#/definitions/CFNKubernetesConfiguration"
         },
-        "Name": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        "MalwareProtection": {
+          "$ref": "#/definitions/CFNMalwareProtectionConfiguration"
         }
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
@@ -76,17 +122,6 @@
       "properties": {
         "ScanEc2InstanceWithFindings": {
           "$ref": "#/definitions/CFNScanEc2InstanceWithFindingsConfiguration"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "CFNS3LogsConfiguration": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "Enable": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
         }
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
@@ -102,58 +137,62 @@
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
-    "CFNKubernetesAuditLogsConfiguration": {
+    "CFNFeatureConfiguration": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "Enable": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "Tag": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "Value": {
+        "Name": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+          "enum": [
+            "FLOW_LOGS",
+            "CLOUD_TRAIL",
+            "DNS_LOGS",
+            "S3_DATA_EVENTS",
+            "EKS_AUDIT_LOGS",
+            "EBS_MALWARE_PROTECTION",
+            "RDS_LOGIN_EVENTS",
+            "LAMBDA_NETWORK_LOGS",
+            "EKS_RUNTIME_MONITORING"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: FLOW_LOGS | CLOUD_TRAIL | DNS_LOGS | S3_DATA_EVENTS | EKS_AUDIT_LOGS | EBS_MALWARE_PROTECTION | RDS_LOGIN_EVENTS | LAMBDA_NETWORK_LOGS | EKS_RUNTIME_MONITORING  \nUpdate requires: No interruption"
         },
-        "Key": {
+        "Status": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+          "enum": [
+            "ENABLED",
+            "DISABLED"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption"
+        },
+        "AdditionalConfiguration": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CFNFeatureAdditionalConfiguration"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
         }
       },
       "required": [
-        "Value",
-        "Key"
+        "Name",
+        "Status"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
-    "CFNKubernetesConfiguration": {
+    "CFNFeatureAdditionalConfiguration": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "AuditLogs": {
-          "$ref": "#/definitions/CFNKubernetesAuditLogsConfiguration"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "CFNDataSourceConfigurations": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "MalwareProtection": {
-          "$ref": "#/definitions/CFNMalwareProtectionConfiguration"
+        "Name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption"
         },
-        "S3Logs": {
-          "$ref": "#/definitions/CFNS3LogsConfiguration"
-        },
-        "Kubernetes": {
-          "$ref": "#/definitions/CFNKubernetesConfiguration"
+        "Status": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
         }
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
@@ -162,6 +201,43 @@
   "required": [
     "Enable"
   ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "guardduty:CreateDetector",
+        "guardduty:GetDetector",
+        "guardduty:TagResource",
+        "iam:CreateServiceLinkedRole",
+        "iam:GetRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "guardduty:GetDetector"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "guardduty:ListDetectors",
+        "guardduty:DeleteDetector",
+        "guardduty:GetDetector"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "guardduty:UpdateDetector",
+        "guardduty:GetDetector",
+        "guardduty:ListDetectors",
+        "iam:CreateServiceLinkedRole",
+        "iam:GetRole"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "guardduty:ListDetectors"
+      ]
+    }
+  },
   "primaryIdentifier": [
     "/properties/Id"
   ],

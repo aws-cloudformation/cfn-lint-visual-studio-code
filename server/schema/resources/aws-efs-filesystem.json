@@ -3,6 +3,10 @@
   "description": "Resource Type definition for AWS::EFS::FileSystem",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
   "definitions": {
+    "Arn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
     "ElasticFileSystemTag": {
       "type": "object",
       "additionalProperties": false,
@@ -49,6 +53,46 @@
       "required": [
         "Status"
       ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ReplicationDestination": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "FileSystemId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Region": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "AvailabilityZoneName": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "KmsKeyId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ReplicationConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Destinations": {
+          "type": "array",
+          "uniqueItems": true,
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "$ref": "#/definitions/ReplicationDestination"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     }
   },
@@ -104,36 +148,54 @@
     "AvailabilityZoneName": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "ReplicationConfiguration": {
+      "$ref": "#/definitions/ReplicationConfiguration"
     }
   },
   "additionalProperties": false,
   "readOnlyProperties": [
-    "/properties/FileSystemId",
-    "/properties/Arn"
+    "/properties/Arn",
+    "/properties/FileSystemId"
   ],
   "primaryIdentifier": [
     "/properties/FileSystemId"
   ],
   "writeOnlyProperties": [
-    "/properties/BypassPolicyLockoutSafetyCheck"
+    "/properties/BypassPolicyLockoutSafetyCheck",
+    "/properties/ReplicationConfiguration/Destinations/0/AvailabilityZoneName",
+    "/properties/ReplicationConfiguration/Destinations/0/KmsKeyId"
   ],
   "createOnlyProperties": [
-    "/properties/KmsKeyId",
+    "/properties/AvailabilityZoneName",
     "/properties/Encrypted",
-    "/properties/PerformanceMode",
-    "/properties/AvailabilityZoneName"
+    "/properties/KmsKeyId",
+    "/properties/PerformanceMode"
   ],
   "propertyTransform": {
-    "/properties/KmsKeyId": "$join([\"arn:(aws)[-]{0,1}[a-z]{0,2}[-]{0,1}[a-z]{0,3}:kms:[a-z]{2}[-]{1}[a-z]{3,10}[-]{0,1}[a-z]{0,10}[-]{1}[1-3]{1}:[0-9]{12}[:]key\\/\", KmsKeyId]) $OR arn:(aws)[-]{0,1}[a-z]{0,2}[-]{0,1}[a-z]{0,3}:kms:[a-z]{2}[-]{1}[a-z]{3,10}[-]{0,1}[a-z]{0,10}[-]{1}[1-3]{1}:[0-9]{12}[:]key/alias/[a-zA-Z0-9/_-]+"
+    "/properties/KmsKeyId": "\"arn:aws[-a-z]*:kms:[a-z0-9-]+:[0-9]{12}:key/[a-zA-Z0-9-]+\""
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/FileSystemTags"
   },
   "handlers": {
     "create": {
       "permissions": [
         "elasticfilesystem:CreateFileSystem",
+        "elasticfilesystem:DescribeReplicationConfigurations",
+        "elasticfilesystem:TagResource",
+        "elasticfilesystem:CreateReplicationConfiguration",
         "elasticfilesystem:DescribeFileSystems",
         "elasticfilesystem:PutBackupPolicy",
         "elasticfilesystem:PutFileSystemPolicy",
-        "elasticfilesystem:PutLifecycleConfiguration"
+        "elasticfilesystem:PutLifecycleConfiguration",
+        "kms:DescribeKey",
+        "kms:GenerateDataKeyWithoutPlaintext",
+        "kms:CreateGrant"
       ]
     },
     "read": {
@@ -141,30 +203,39 @@
         "elasticfilesystem:DescribeBackupPolicy",
         "elasticfilesystem:DescribeFileSystemPolicy",
         "elasticfilesystem:DescribeFileSystems",
-        "elasticfilesystem:DescribeLifecycleConfiguration"
+        "elasticfilesystem:DescribeLifecycleConfiguration",
+        "elasticfilesystem:DescribeReplicationConfigurations"
       ]
     },
     "update": {
       "permissions": [
+        "elasticfilesystem:CreateReplicationConfiguration",
         "elasticfilesystem:DeleteFileSystemPolicy",
         "elasticfilesystem:DescribeBackupPolicy",
         "elasticfilesystem:DescribeFileSystemPolicy",
         "elasticfilesystem:DescribeFileSystems",
         "elasticfilesystem:DescribeLifecycleConfiguration",
+        "elasticfilesystem:DescribeReplicationConfigurations",
         "elasticfilesystem:DeleteTags",
+        "elasticfilesystem:DeleteReplicationConfiguration",
         "elasticfilesystem:ListTagsForResource",
         "elasticfilesystem:PutBackupPolicy",
         "elasticfilesystem:PutFileSystemPolicy",
         "elasticfilesystem:PutLifecycleConfiguration",
         "elasticfilesystem:TagResource",
         "elasticfilesystem:UntagResource",
-        "elasticfilesystem:UpdateFileSystem"
+        "elasticfilesystem:UpdateFileSystem",
+        "kms:DescribeKey",
+        "kms:GenerateDataKeyWithoutPlaintext",
+        "kms:CreateGrant"
       ]
     },
     "delete": {
       "permissions": [
         "elasticfilesystem:DescribeFileSystems",
-        "elasticfilesystem:DeleteFileSystem"
+        "elasticfilesystem:DeleteFileSystem",
+        "elasticfilesystem:DeleteReplicationConfiguration",
+        "elasticfilesystem:DescribeReplicationConfigurations"
       ]
     },
     "list": {
@@ -172,7 +243,8 @@
         "elasticfilesystem:DescribeBackupPolicy",
         "elasticfilesystem:DescribeFileSystemPolicy",
         "elasticfilesystem:DescribeFileSystems",
-        "elasticfilesystem:DescribeLifecycleConfiguration"
+        "elasticfilesystem:DescribeLifecycleConfiguration",
+        "elasticfilesystem:DescribeReplicationConfigurations"
       ]
     }
   },
@@ -182,8 +254,7 @@
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
     "Arn": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "$ref": "#/definitions/Arn"
     }
   }
 }

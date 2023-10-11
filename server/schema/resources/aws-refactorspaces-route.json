@@ -1,5 +1,6 @@
 {
   "typeName": "AWS::RefactorSpaces::Route",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-refactor-spaces",
   "description": "Definition of AWS::RefactorSpaces::Route Resource Type",
   "definitions": {
     "RouteActivationState": {
@@ -51,7 +52,7 @@
           "type": "string",
           "maxLength": 2048,
           "minLength": 1,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^(/[a-zA-Z0-9._-]+)+$  \nUpdate requires: No interruption"
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^(/([a-zA-Z0-9._:-]+|\\{[a-zA-Z0-9._:-]+\\}))+$  \nUpdate requires: No interruption"
         },
         "ActivationState": {
           "$ref": "#/definitions/RouteActivationState"
@@ -65,6 +66,10 @@
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
         },
         "IncludeChildPaths": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        },
+        "AppendSourcePath": {
           "type": "boolean",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
         }
@@ -164,7 +169,8 @@
     "/properties/ServiceIdentifier",
     "/properties/UriPathRoute/SourcePath",
     "/properties/UriPathRoute/Methods",
-    "/properties/UriPathRoute/IncludeChildPaths"
+    "/properties/UriPathRoute/IncludeChildPaths",
+    "/properties/UriPathRoute/AppendSourcePath"
   ],
   "primaryIdentifier": [
     "/properties/EnvironmentIdentifier",
@@ -176,7 +182,27 @@
     "create": {
       "permissions": [
         "refactor-spaces:CreateRoute",
-        "refactor-spaces:TagResource"
+        "refactor-spaces:GetRoute",
+        "refactor-spaces:TagResource",
+        "iam:CreateServiceLinkedRole",
+        "apigateway:GET",
+        "apigateway:PATCH",
+        "apigateway:POST",
+        "apigateway:PUT",
+        "apigateway:DELETE",
+        "apigateway:UpdateRestApiPolicy",
+        "lambda:GetFunctionConfiguration",
+        "lambda:AddPermission",
+        "elasticloadbalancing:DescribeListeners",
+        "elasticloadbalancing:DescribeTargetGroups",
+        "elasticloadbalancing:CreateListener",
+        "elasticloadbalancing:CreateTargetGroup",
+        "elasticloadbalancing:DescribeTags",
+        "elasticloadbalancing:AddTags",
+        "elasticloadbalancing:RegisterTargets",
+        "elasticloadbalancing:DescribeTargetHealth",
+        "ec2:DescribeSubnets",
+        "tag:GetResources"
       ]
     },
     "read": {
@@ -188,10 +214,45 @@
     "delete": {
       "permissions": [
         "refactor-spaces:DeleteRoute",
-        "refactor-spaces:UntagResource"
+        "refactor-spaces:GetRoute",
+        "refactor-spaces:UntagResource",
+        "apigateway:GET",
+        "apigateway:PATCH",
+        "apigateway:POST",
+        "apigateway:PUT",
+        "apigateway:DELETE",
+        "apigateway:UpdateRestApiPolicy",
+        "lambda:GetFunctionConfiguration",
+        "lambda:AddPermission",
+        "elasticloadbalancing:DescribeListeners",
+        "elasticloadbalancing:DescribeTargetGroups",
+        "elasticloadbalancing:CreateListener",
+        "elasticloadbalancing:CreateTargetGroup",
+        "elasticloadbalancing:DeleteListener",
+        "elasticloadbalancing:DeleteTargetGroup",
+        "elasticloadbalancing:DescribeTags",
+        "elasticloadbalancing:AddTags",
+        "elasticloadbalancing:RegisterTargets",
+        "elasticloadbalancing:DescribeTargetHealth",
+        "ec2:DescribeSubnets",
+        "tag:GetResources"
       ]
     },
     "list": {
+      "handlerSchema": {
+        "properties": {
+          "EnvironmentIdentifier": {
+            "$ref": "resource-schema.json#/properties/EnvironmentIdentifier"
+          },
+          "ApplicationIdentifier": {
+            "$ref": "resource-schema.json#/properties/ApplicationIdentifier"
+          }
+        },
+        "required": [
+          "EnvironmentIdentifier",
+          "ApplicationIdentifier"
+        ]
+      },
       "permissions": [
         "refactor-spaces:ListRoutes",
         "refactor-spaces:ListTagsForResource"
@@ -199,7 +260,31 @@
     },
     "update": {
       "permissions": [
-        "refactor-spaces:UpdateRoute"
+        "refactor-spaces:UpdateRoute",
+        "refactor-spaces:GetRoute",
+        "refactor-spaces:TagResource",
+        "iam:CreateServiceLinkedRole",
+        "apigateway:GET",
+        "apigateway:PATCH",
+        "apigateway:POST",
+        "apigateway:PUT",
+        "apigateway:DELETE",
+        "apigateway:UpdateRestApiPolicy",
+        "lambda:GetFunctionConfiguration",
+        "lambda:AddPermission",
+        "elasticloadbalancing:DescribeListeners",
+        "elasticloadbalancing:DescribeTargetGroups",
+        "elasticloadbalancing:CreateListener",
+        "elasticloadbalancing:CreateTargetGroup",
+        "elasticloadbalancing:DeleteListener",
+        "elasticloadbalancing:DeleteTargetGroup",
+        "elasticloadbalancing:DescribeTags",
+        "elasticloadbalancing:AddTags",
+        "elasticloadbalancing:RegisterTargets",
+        "elasticloadbalancing:DescribeTargetHealth",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeSubnets",
+        "tag:GetResources"
       ]
     }
   },

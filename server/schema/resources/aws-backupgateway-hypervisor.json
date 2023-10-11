@@ -1,0 +1,168 @@
+{
+  "typeName": "AWS::BackupGateway::Hypervisor",
+  "description": "Definition of AWS::BackupGateway::Hypervisor Resource Type",
+  "definitions": {
+    "HypervisorState": {
+      "type": "string",
+      "enum": [
+        "PENDING",
+        "ONLINE",
+        "OFFLINE",
+        "ERROR"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PENDING | ONLINE | OFFLINE | ERROR  \nUpdate requires: No interruption"
+    },
+    "SyncMetadataStatus": {
+      "type": "string",
+      "enum": [
+        "PENDING",
+        "IN_PROGRESS",
+        "FAILED",
+        "SUCCEEDED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PENDING | IN_PROGRESS | FAILED | SUCCEEDED  \nUpdate requires: No interruption"
+    },
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 0,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: ^[^\\x00]*$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "Host": {
+      "type": "string",
+      "maxLength": 128,
+      "minLength": 3,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 128  \nPattern: ^.+$  \nUpdate requires: No interruption"
+    },
+    "KmsKeyArn": {
+      "type": "string",
+      "maxLength": 500,
+      "minLength": 50,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 50  \nMaximum Length: 500  \nPattern: ^(^arn:(aws|aws-cn|aws-us-gov):kms:([a-zA-Z0-9-]+):([0-9]+):(key|alias)/(\\S+)$)|(^alias/(\\S+)$)$  \nUpdate requires: Replacement"
+    },
+    "LogGroupArn": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 0,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nPattern: ^$|^arn:(aws|aws-cn|aws-us-gov):logs:([a-zA-Z0-9-]+):([0-9]+):log-group:[a-zA-Z0-9_\\-\\/\\.]+:\\*$  \nUpdate requires: No interruption"
+    },
+    "Name": {
+      "type": "string",
+      "maxLength": 100,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: ^[a-zA-Z0-9-]*$  \nUpdate requires: No interruption"
+    },
+    "Password": {
+      "type": "string",
+      "maxLength": 100,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: ^[ -~]+$  \nUpdate requires: No interruption"
+    },
+    "Tags": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement"
+    },
+    "Username": {
+      "type": "string",
+      "maxLength": 100,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: ^[ -\\.0-\\[\\]-~]*[!-\\.0-\\[\\]-~][ -\\.0-\\[\\]-~]*$  \nUpdate requires: No interruption"
+    }
+  },
+  "readOnlyProperties": [
+    "/properties/HypervisorArn"
+  ],
+  "writeOnlyProperties": [
+    "/properties/KmsKeyArn",
+    "/properties/LogGroupArn",
+    "/properties/Name",
+    "/properties/Password",
+    "/properties/Tags",
+    "/properties/Username"
+  ],
+  "createOnlyProperties": [
+    "/properties/KmsKeyArn",
+    "/properties/Tags"
+  ],
+  "primaryIdentifier": [
+    "/properties/HypervisorArn"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "backup-gateway:ImportHypervisorConfiguration",
+        "backup-gateway:GetHypervisor",
+        "backup-gateway:ListHypervisors",
+        "backup-gateway:TagResource",
+        "kms:CreateGrant",
+        "kms:Encrypt",
+        "kms:Decrypt"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "backup-gateway:GetHypervisor",
+        "backup-gateway:ListHypervisors"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "backup-gateway:UpdateHypervisor",
+        "backup-gateway:GetHypervisor",
+        "backup-gateway:ListHypervisors",
+        "backup-gateway:ImportHypervisorConfiguration",
+        "backup-gateway:DeleteHypervisor"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "backup-gateway:DeleteHypervisor",
+        "backup-gateway:GetHypervisor",
+        "backup-gateway:ListHypervisors"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "backup-gateway:ListHypervisors"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "attributes": {
+    "HypervisorArn": {
+      "type": "string",
+      "maxLength": 500,
+      "minLength": 50,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 50  \nMaximum Length: 500  \nPattern: ^arn:(aws|aws-cn|aws-us-gov):backup-gateway(:[a-zA-Z-0-9]+){3}\\/[a-zA-Z-0-9]+$  \nUpdate requires: No interruption"
+    }
+  }
+}

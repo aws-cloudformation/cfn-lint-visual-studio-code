@@ -1,0 +1,830 @@
+{
+  "typeName": "AWS::SecurityHub::AutomationRule",
+  "description": "The AWS::SecurityHub::AutomationRule resource represents the Automation Rule in your account. One rule resource is created for each Automation Rule in which you configure rule criteria and actions.\n\n",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-securityhub",
+  "definitions": {
+    "Tags": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-zA-Z0-9]{1,128}$": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "NonEmptyString": {
+      "type": "string",
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nUpdate requires: No interruption"
+    },
+    "DateFilter": {
+      "properties": {
+        "DateRange": {
+          "$ref": "#/definitions/DateRange"
+        },
+        "End": {
+          "$ref": "#/definitions/ISO8601DateString"
+        },
+        "Start": {
+          "$ref": "#/definitions/ISO8601DateString"
+        }
+      },
+      "type": "object",
+      "oneOf": [
+        {
+          "required": [
+            "DateRange"
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "required": [
+                "Start"
+              ]
+            },
+            {
+              "required": [
+                "End"
+              ]
+            }
+          ]
+        }
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "DateRange": {
+      "properties": {
+        "Unit": {
+          "enum": [
+            "DAYS"
+          ],
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: DAYS  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Unit",
+        "Value"
+      ],
+      "type": "object",
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "BooleanFilter": {
+      "properties": {
+        "Value": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Value"
+      ],
+      "type": "object",
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "MapFilter": {
+      "properties": {
+        "Comparison": {
+          "enum": [
+            "EQUALS",
+            "NOT_EQUALS",
+            "CONTAINS",
+            "NOT_CONTAINS"
+          ],
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: EQUALS | NOT_EQUALS | CONTAINS | NOT_CONTAINS  \nUpdate requires: No interruption"
+        },
+        "Key": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Comparison",
+        "Key",
+        "Value"
+      ],
+      "type": "object",
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "NumberFilter": {
+      "properties": {
+        "Eq": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: Number  \nUpdate requires: No interruption"
+        },
+        "Gte": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: Number  \nUpdate requires: No interruption"
+        },
+        "Lte": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: Number  \nUpdate requires: No interruption"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "Eq"
+          ]
+        },
+        {
+          "anyOf": [
+            {
+              "required": [
+                "Gte"
+              ]
+            },
+            {
+              "required": [
+                "Lte"
+              ]
+            }
+          ]
+        }
+      ],
+      "type": "object",
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "StringFilter": {
+      "properties": {
+        "Comparison": {
+          "$ref": "#/definitions/StringFilterComparison"
+        },
+        "Value": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Comparison",
+        "Value"
+      ],
+      "type": "object",
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "StringFilterComparison": {
+      "enum": [
+        "EQUALS",
+        "PREFIX",
+        "NOT_EQUALS",
+        "PREFIX_NOT_EQUALS",
+        "CONTAINS",
+        "NOT_CONTAINS"
+      ],
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: EQUALS | PREFIX | NOT_EQUALS | PREFIX_NOT_EQUALS | CONTAINS | NOT_CONTAINS  \nUpdate requires: No interruption"
+    },
+    "ISO8601DateString": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(\\d\\d\\d\\d)-([0][1-9]|[1][0-2])-([0][1-9]|[1-2](\\d)|[3][0-1])[T](?:([0-1](\\d)|[2][0-3]):[0-5](\\d):[0-5](\\d)|23:59:60)(?:\\.(\\d)+)?([Z]|[+-](\\d\\d)(:?(\\d\\d))?)$  \nUpdate requires: No interruption"
+    },
+    "arn": {
+      "type": "string",
+      "minLength": 12,
+      "maxLength": 2048,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 12  \nMaximum Length: 2048  \nPattern: ^arn:(aws|aws-cn|aws-us-gov|aws-iso-?[a-z]{0,2}):[A-Za-z0-9]{1,63}:[a-z]+-([a-z]{1,10}-)?[a-z]+-[0-9]+:([0-9]{12})?:.+$  \nUpdate requires: No interruption"
+    },
+    "arnOrId": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        {
+          "$ref": "#/definitions/arn"
+        }
+      ]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: (\\d\\d\\d\\d)-[0-1](\\d)-[0-3](\\d)[Tt](?:[0-2](\\d):[0-5](\\d):[0-5](\\d)|23:59:60)(?:\\.(\\d)+)?(?:[Zz]|[+-](\\d\\d)(?::?(\\d\\d))?)$  \nUpdate requires: No interruption"
+    },
+    "int100": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+    },
+    "map": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 50,
+      "patternProperties": {
+        "^[-_+=.:/@\\w\\s]{1,128}$": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 1024,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RelatedFinding": {
+      "type": "object",
+      "properties": {
+        "ProductArn": {
+          "$ref": "#/definitions/arn"
+        },
+        "Id": {
+          "$ref": "#/definitions/arnOrId"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "ProductArn",
+        "Id"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "NoteUpdate": {
+      "type": "object",
+      "properties": {
+        "Text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nUpdate requires: No interruption"
+        },
+        "UpdatedBy": {
+          "$ref": "#/definitions/arnOrId"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Text",
+        "UpdatedBy"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "WorkflowUpdate": {
+      "type": "object",
+      "properties": {
+        "Status": {
+          "type": "string",
+          "enum": [
+            "NEW",
+            "NOTIFIED",
+            "RESOLVED",
+            "SUPPRESSED"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: NEW | NOTIFIED | RESOLVED | SUPPRESSED  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Status"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "SeverityUpdate": {
+      "type": "object",
+      "properties": {
+        "Product": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+        },
+        "Label": {
+          "type": "string",
+          "enum": [
+            "INFORMATIONAL",
+            "LOW",
+            "MEDIUM",
+            "HIGH",
+            "CRITICAL"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: INFORMATIONAL | LOW | MEDIUM | HIGH | CRITICAL  \nUpdate requires: No interruption"
+        },
+        "Normalized": {
+          "$ref": "#/definitions/int100"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AutomationRulesFindingFieldsUpdate": {
+      "type": "object",
+      "properties": {
+        "Types": {
+          "type": "array",
+          "maxItems": 50,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^([^/]+)(/[^/]+){0,2}$  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Severity": {
+          "type": "object",
+          "description": "Severity of the finding",
+          "$ref": "#/definitions/SeverityUpdate",
+          "markdownDescription": "Severity of the finding\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+        },
+        "Confidence": {
+          "$ref": "#/definitions/int100"
+        },
+        "Criticality": {
+          "$ref": "#/definitions/int100"
+        },
+        "UserDefinedFields": {
+          "$ref": "#/definitions/map"
+        },
+        "VerificationState": {
+          "type": "string",
+          "enum": [
+            "UNKNOWN",
+            "TRUE_POSITIVE",
+            "FALSE_POSITIVE",
+            "BENIGN_POSITIVE"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: UNKNOWN | TRUE_POSITIVE | FALSE_POSITIVE | BENIGN_POSITIVE  \nUpdate requires: No interruption"
+        },
+        "RelatedFindings": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10,
+          "items": {
+            "$ref": "#/definitions/RelatedFinding"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Note": {
+          "type": "object",
+          "description": "Note added to the finding",
+          "$ref": "#/definitions/NoteUpdate",
+          "markdownDescription": "Note added to the finding\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+        },
+        "Workflow": {
+          "type": "object",
+          "description": "Workflow status set for the finding",
+          "$ref": "#/definitions/WorkflowUpdate",
+          "markdownDescription": "Workflow status set for the finding\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AutomationRulesAction": {
+      "type": "object",
+      "properties": {
+        "Type": {
+          "type": "string",
+          "enum": [
+            "FINDING_FIELDS_UPDATE"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: FINDING_FIELDS_UPDATE  \nUpdate requires: No interruption"
+        },
+        "FindingFieldsUpdate": {
+          "$ref": "#/definitions/AutomationRulesFindingFieldsUpdate"
+        }
+      },
+      "required": [
+        "Type",
+        "FindingFieldsUpdate"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AutomationRulesFindingFilters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ProductArn": {
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "AwsAccountId": {
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "maxItems": 100,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Id": {
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "GeneratorId": {
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "maxItems": 100,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Type": {
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "FirstObservedAt": {
+          "items": {
+            "$ref": "#/definitions/DateFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "LastObservedAt": {
+          "items": {
+            "$ref": "#/definitions/DateFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "CreatedAt": {
+          "items": {
+            "$ref": "#/definitions/DateFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "UpdatedAt": {
+          "items": {
+            "$ref": "#/definitions/DateFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Confidence": {
+          "items": {
+            "$ref": "#/definitions/NumberFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Criticality": {
+          "items": {
+            "$ref": "#/definitions/NumberFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Title": {
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "maxItems": 100,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Description": {
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "SourceUrl": {
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ProductName": {
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "CompanyName": {
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "SeverityLabel": {
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceType": {
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceId": {
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "maxItems": 100,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourcePartition": {
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceRegion": {
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceTags": {
+          "items": {
+            "$ref": "#/definitions/MapFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceDetailsOther": {
+          "items": {
+            "$ref": "#/definitions/MapFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ComplianceStatus": {
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ComplianceSecurityControlId": {
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ComplianceAssociatedStandardsId": {
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "VerificationState": {
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "WorkflowStatus": {
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "RecordState": {
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "RelatedFindingsProductArn": {
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "RelatedFindingsId": {
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "NoteText": {
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "NoteUpdatedAt": {
+          "items": {
+            "$ref": "#/definitions/DateFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "NoteUpdatedBy": {
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "UserDefinedFields": {
+          "items": {
+            "$ref": "#/definitions/MapFilter"
+          },
+          "type": "array",
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "RuleStatus": {
+      "description": "Status of the Rule upon creation",
+      "type": "string",
+      "enum": [
+        "ENABLED",
+        "DISABLED"
+      ],
+      "markdownDescription": "Status of the Rule upon creation\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption"
+    },
+    "RuleOrder": {
+      "description": "Rule order value",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1000,
+      "markdownDescription": "Rule order value\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+    },
+    "Description": {
+      "description": "Rule description",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "markdownDescription": "Rule description\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption"
+    },
+    "RuleName": {
+      "description": "Rule name",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "markdownDescription": "Rule name\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption"
+    },
+    "IsTerminal": {
+      "description": "If Rule is a terminal rule",
+      "type": "boolean",
+      "markdownDescription": "If Rule is a terminal rule\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+    },
+    "Actions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/AutomationRulesAction"
+      },
+      "minItems": 1,
+      "maxItems": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "Criteria": {
+      "description": "The rule criteria for evaluating findings",
+      "$ref": "#/definitions/AutomationRulesFindingFilters",
+      "markdownDescription": "The rule criteria for evaluating findings\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+    },
+    "Tags": {
+      "$ref": "#/definitions/Tags"
+    }
+  },
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/RuleArn"
+  ],
+  "readOnlyProperties": [
+    "/properties/RuleArn",
+    "/properties/CreatedAt",
+    "/properties/UpdatedAt",
+    "/properties/CreatedBy"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "securityhub:CreateAutomationRule",
+        "securityhub:TagResource",
+        "securityhub:ListTagsForResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "securityhub:ListAutomationRules",
+        "securityhub:BatchGetAutomationRules",
+        "securityhub:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "securityhub:BatchUpdateAutomationRules",
+        "securityhub:TagResource",
+        "securityhub:UntagResource",
+        "securityhub:ListTagsForResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "securityhub:BatchDeleteAutomationRules",
+        "securityhub:BatchGetAutomationRules"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "securityhub:ListAutomationRules",
+        "securityhub:ListTagsForResource"
+      ]
+    }
+  },
+  "attributes": {
+    "RuleArn": {
+      "description": "An Automation Rule Arn is automatically created",
+      "type": "string",
+      "markdownDescription": "An Automation Rule Arn is automatically created\n\n---\n\nRequired: No  \nType: String  \nPattern: arn:aws\\S*:securityhub:\\S*  \nUpdate requires: No interruption"
+    },
+    "CreatedAt": {
+      "description": "The date and time when Automation Rule was created",
+      "$ref": "#/definitions/ISO8601DateString",
+      "markdownDescription": "The date and time when Automation Rule was created\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+    },
+    "UpdatedAt": {
+      "description": "The date and time when Automation Rule was last updated",
+      "$ref": "#/definitions/ISO8601DateString",
+      "markdownDescription": "The date and time when Automation Rule was last updated\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+    },
+    "CreatedBy": {
+      "description": "The identifier by which created the rule",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "markdownDescription": "The identifier by which created the rule\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption"
+    }
+  }
+}

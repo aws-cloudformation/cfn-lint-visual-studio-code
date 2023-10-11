@@ -1,58 +1,94 @@
 {
-  "typeName": "AWS::ECS::Service",
-  "description": "Resource Type definition for AWS::ECS::Service",
-  "definitions": {
-    "AwsVpcConfiguration": {
-      "type": "object",
-      "properties": {
-        "AssignPublicIp": {
-          "type": "string",
-          "enum": [
-            "DISABLED",
-            "ENABLED"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DISABLED | ENABLED  \nUpdate requires: No interruption"
-        },
-        "SecurityGroups": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-        },
-        "Subnets": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "tagProperty": "/properties/Tags",
+    "cloudFormationSystemTags": true
+  },
+  "handlers": {
+    "read": {
+      "permissions": [
+        "ecs:DescribeServices"
+      ]
     },
+    "create": {
+      "permissions": [
+        "ecs:CreateService",
+        "ecs:DescribeServices",
+        "iam:PassRole"
+      ],
+      "timeoutInMinutes": 180
+    },
+    "update": {
+      "permissions": [
+        "ecs:DescribeServices",
+        "ecs:ListTagsForResource",
+        "ecs:TagResource",
+        "ecs:UntagResource",
+        "ecs:UpdateService"
+      ],
+      "timeoutInMinutes": 180
+    },
+    "list": {
+      "permissions": [
+        "ecs:DescribeServices",
+        "ecs:ListClusters",
+        "ecs:ListServices"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ecs:DeleteService",
+        "ecs:DescribeServices"
+      ],
+      "timeoutInMinutes": 30
+    }
+  },
+  "typeName": "AWS::ECS::Service",
+  "readOnlyProperties": [
+    "/properties/ServiceArn",
+    "/properties/Name"
+  ],
+  "description": "Resource Type definition for AWS::ECS::Service",
+  "writeOnlyProperties": [
+    "/properties/ServiceConnectConfiguration"
+  ],
+  "createOnlyProperties": [
+    "/properties/Cluster",
+    "/properties/DeploymentController",
+    "/properties/LaunchType",
+    "/properties/Role",
+    "/properties/SchedulingStrategy",
+    "/properties/ServiceName"
+  ],
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/ServiceArn",
+    "/properties/Cluster"
+  ],
+  "definitions": {
     "CapacityProviderStrategyItem": {
+      "additionalProperties": false,
       "type": "object",
       "properties": {
-        "Base": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-        },
         "CapacityProvider": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Base": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
         },
         "Weight": {
           "type": "integer",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
         }
       },
-      "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "DeploymentAlarms": {
+      "additionalProperties": false,
       "type": "object",
       "properties": {
         "AlarmNames": {
@@ -63,11 +99,11 @@
           },
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
         },
-        "Rollback": {
+        "Enable": {
           "type": "boolean",
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
         },
-        "Enable": {
+        "Rollback": {
           "type": "boolean",
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
         }
@@ -77,68 +113,20 @@
         "Rollback",
         "Enable"
       ],
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "DeploymentCircuitBreaker": {
-      "type": "object",
-      "properties": {
-        "Enable": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
-        },
-        "Rollback": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "Enable",
-        "Rollback"
-      ],
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "DeploymentConfiguration": {
-      "type": "object",
-      "properties": {
-        "DeploymentCircuitBreaker": {
-          "$ref": "#/definitions/DeploymentCircuitBreaker"
-        },
-        "MaximumPercent": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-        },
-        "MinimumHealthyPercent": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-        },
-        "Alarms": {
-          "$ref": "#/definitions/DeploymentAlarms"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "DeploymentController": {
-      "type": "object",
-      "properties": {
-        "Type": {
-          "type": "string",
-          "enum": [
-            "CODE_DEPLOY",
-            "ECS",
-            "EXTERNAL"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CODE_DEPLOY | ECS | EXTERNAL  \nUpdate requires: No interruption"
-        }
-      },
-      "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "LoadBalancer": {
+      "additionalProperties": false,
       "type": "object",
       "properties": {
+        "TargetGroupArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "LoadBalancerName": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
         "ContainerName": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
@@ -146,82 +134,12 @@
         "ContainerPort": {
           "type": "integer",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-        },
-        "LoadBalancerName": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "TargetGroupArn": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         }
       },
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "LogConfiguration": {
-      "type": "object",
-      "properties": {
-        "LogDriver": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "Options": {
-          "type": "object",
-          "patternProperties": {
-            ".{1,}": {
-              "type": "string",
-              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-            }
-          },
-          "additionalProperties": false,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-        },
-        "SecretOptions": {
-          "type": "array",
-          "insertionOrder": false,
-          "items": {
-            "$ref": "#/definitions/Secret"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "NetworkConfiguration": {
-      "type": "object",
-      "properties": {
-        "AwsvpcConfiguration": {
-          "$ref": "#/definitions/AwsVpcConfiguration"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "PlacementConstraint": {
-      "type": "object",
-      "properties": {
-        "Expression": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "Type": {
-          "type": "string",
-          "enum": [
-            "distinctInstance",
-            "memberOf"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: distinctInstance | memberOf  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "Type"
-      ],
-      "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "PlacementStrategy": {
+      "additionalProperties": false,
       "type": "object",
       "properties": {
         "Field": {
@@ -241,57 +159,12 @@
       "required": [
         "Type"
       ],
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "Secret": {
-      "type": "object",
-      "required": [
-        "Name",
-        "ValueFrom"
-      ],
-      "properties": {
-        "Name": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
-        },
-        "ValueFrom": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "ServiceConnectClientAlias": {
-      "type": "object",
-      "properties": {
-        "Port": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
-        },
-        "DnsName": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "Port"
-      ],
-      "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "ServiceConnectConfiguration": {
+      "additionalProperties": false,
       "type": "object",
       "properties": {
-        "Enabled": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
-        },
-        "Namespace": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
         "Services": {
           "type": "array",
           "items": {
@@ -299,57 +172,182 @@
           },
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
         },
+        "Enabled": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
+        },
         "LogConfiguration": {
           "$ref": "#/definitions/LogConfiguration"
+        },
+        "Namespace": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         }
       },
       "required": [
         "Enabled"
       ],
-      "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
-    "ServiceConnectService": {
+    "DeploymentController": {
+      "additionalProperties": false,
       "type": "object",
       "properties": {
-        "PortName": {
+        "Type": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
-        },
-        "DiscoveryName": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "ClientAliases": {
+          "enum": [
+            "CODE_DEPLOY",
+            "ECS",
+            "EXTERNAL"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CODE_DEPLOY | ECS | EXTERNAL  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "LogConfiguration": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "SecretOptions": {
+          "insertionOrder": false,
           "type": "array",
           "items": {
-            "$ref": "#/definitions/ServiceConnectClientAlias"
+            "$ref": "#/definitions/Secret"
           },
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
         },
-        "IngressPortOverride": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        "Options": {
+          "patternProperties": {
+            ".{1,}": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+        },
+        "LogDriver": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Secret": {
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "Name",
+        "ValueFrom"
+      ],
+      "properties": {
+        "ValueFrom": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Name": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AwsVpcConfiguration": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "SecurityGroups": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Subnets": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "AssignPublicIp": {
+          "type": "string",
+          "enum": [
+            "DISABLED",
+            "ENABLED"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DISABLED | ENABLED  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PlacementConstraint": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Type": {
+          "type": "string",
+          "enum": [
+            "distinctInstance",
+            "memberOf"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: distinctInstance | memberOf  \nUpdate requires: No interruption"
+        },
+        "Expression": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         }
       },
       "required": [
-        "PortName"
+        "Type"
       ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ServiceConnectClientAlias": {
       "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "DnsName": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Port": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Port"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "NetworkConfiguration": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "AwsvpcConfiguration": {
+          "$ref": "#/definitions/AwsVpcConfiguration"
+        }
+      },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "ServiceRegistry": {
+      "additionalProperties": false,
       "type": "object",
       "properties": {
         "ContainerName": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         },
-        "ContainerPort": {
+        "Port": {
           "type": "integer",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
         },
-        "Port": {
+        "ContainerPort": {
           "type": "integer",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
         },
@@ -358,44 +356,100 @@
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         }
       },
-      "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "Tag": {
+      "additionalProperties": false,
       "type": "object",
       "properties": {
-        "Key": {
+        "Value": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         },
-        "Value": {
+        "Key": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         }
       },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "DeploymentCircuitBreaker": {
       "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Enable": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
+        },
+        "Rollback": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Enable",
+        "Rollback"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "DeploymentConfiguration": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Alarms": {
+          "$ref": "#/definitions/DeploymentAlarms"
+        },
+        "DeploymentCircuitBreaker": {
+          "$ref": "#/definitions/DeploymentCircuitBreaker"
+        },
+        "MaximumPercent": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "MinimumHealthyPercent": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ServiceConnectService": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "IngressPortOverride": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "ClientAliases": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ServiceConnectClientAlias"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "DiscoveryName": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "PortName": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "PortName"
+      ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     }
   },
   "properties": {
-    "CapacityProviderStrategy": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/CapacityProviderStrategyItem"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-    },
-    "Cluster": {
+    "PlatformVersion": {
+      "default": "LATEST",
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
-    "DeploymentConfiguration": {
-      "$ref": "#/definitions/DeploymentConfiguration"
-    },
-    "DeploymentController": {
-      "$ref": "#/definitions/DeploymentController"
-    },
-    "DesiredCount": {
+    "HealthCheckGracePeriodSeconds": {
       "type": "integer",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
     },
@@ -407,9 +461,62 @@
       "type": "boolean",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
     },
-    "HealthCheckGracePeriodSeconds": {
+    "PlacementConstraints": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PlacementConstraint"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "PropagateTags": {
+      "type": "string",
+      "enum": [
+        "SERVICE",
+        "TASK_DEFINITION"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SERVICE | TASK_DEFINITION  \nUpdate requires: No interruption"
+    },
+    "Cluster": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "LoadBalancers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/LoadBalancer"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "ServiceConnectConfiguration": {
+      "$ref": "#/definitions/ServiceConnectConfiguration"
+    },
+    "DesiredCount": {
       "type": "integer",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+    },
+    "PlacementStrategies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PlacementStrategy"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "DeploymentController": {
+      "$ref": "#/definitions/DeploymentController"
+    },
+    "ServiceRegistries": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ServiceRegistry"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "CapacityProviderStrategy": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/CapacityProviderStrategyItem"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     },
     "LaunchType": {
       "type": "string",
@@ -419,43 +526,6 @@
         "EXTERNAL"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: EC2 | FARGATE | EXTERNAL  \nUpdate requires: Replacement"
-    },
-    "LoadBalancers": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/LoadBalancer"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-    },
-    "NetworkConfiguration": {
-      "$ref": "#/definitions/NetworkConfiguration"
-    },
-    "PlacementConstraints": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/PlacementConstraint"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-    },
-    "PlacementStrategies": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/PlacementStrategy"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-    },
-    "PlatformVersion": {
-      "type": "string",
-      "default": "LATEST",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-    },
-    "PropagateTags": {
-      "type": "string",
-      "enum": [
-        "SERVICE",
-        "TASK_DEFINITION"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SERVICE | TASK_DEFINITION  \nUpdate requires: No interruption"
     },
     "Role": {
       "type": "string",
@@ -469,19 +539,19 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DAEMON | REPLICA  \nUpdate requires: Replacement"
     },
-    "ServiceConnectConfiguration": {
-      "$ref": "#/definitions/ServiceConnectConfiguration"
+    "TaskDefinition": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
     "ServiceName": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
     },
-    "ServiceRegistries": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/ServiceRegistry"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    "NetworkConfiguration": {
+      "$ref": "#/definitions/NetworkConfiguration"
+    },
+    "DeploymentConfiguration": {
+      "$ref": "#/definitions/DeploymentConfiguration"
     },
     "Tags": {
       "type": "array",
@@ -489,71 +559,8 @@
         "$ref": "#/definitions/Tag"
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-    },
-    "TaskDefinition": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     }
   },
-  "primaryIdentifier": [
-    "/properties/ServiceArn",
-    "/properties/Cluster"
-  ],
-  "handlers": {
-    "create": {
-      "permissions": [
-        "ecs:CreateService",
-        "ecs:DescribeServices",
-        "iam:PassRole"
-      ],
-      "timeoutInMinutes": 180
-    },
-    "read": {
-      "permissions": [
-        "ecs:DescribeServices"
-      ]
-    },
-    "update": {
-      "permissions": [
-        "ecs:DescribeServices",
-        "ecs:ListTagsForResource",
-        "ecs:TagResource",
-        "ecs:UntagResource",
-        "ecs:UpdateService"
-      ],
-      "timeoutInMinutes": 180
-    },
-    "delete": {
-      "permissions": [
-        "ecs:DeleteService",
-        "ecs:DescribeServices"
-      ],
-      "timeoutInMinutes": 30
-    },
-    "list": {
-      "permissions": [
-        "ecs:DescribeServices",
-        "ecs:ListClusters",
-        "ecs:ListServices"
-      ]
-    }
-  },
-  "readOnlyProperties": [
-    "/properties/ServiceArn",
-    "/properties/Name"
-  ],
-  "createOnlyProperties": [
-    "/properties/Cluster",
-    "/properties/DeploymentController",
-    "/properties/LaunchType",
-    "/properties/Role",
-    "/properties/SchedulingStrategy",
-    "/properties/ServiceName"
-  ],
-  "writeOnlyProperties": [
-    "/properties/ServiceConnectConfiguration"
-  ],
-  "additionalProperties": false,
   "attributes": {
     "ServiceArn": {
       "type": "string",

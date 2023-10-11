@@ -1,0 +1,251 @@
+{
+  "typeName": "AWS::OSIS::Pipeline",
+  "description": "An OpenSearch Ingestion Service Data Prepper pipeline running Data Prepper.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-osis.git",
+  "definitions": {
+    "LogPublishingOptions": {
+      "description": "Key-value pairs to configure log publishing.",
+      "type": "object",
+      "properties": {
+        "IsLoggingEnabled": {
+          "type": "boolean",
+          "description": "Whether logs should be published.",
+          "markdownDescription": "Whether logs should be published.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        },
+        "CloudWatchLogDestination": {
+          "type": "object",
+          "description": "The destination for OpenSearch Ingestion Service logs sent to Amazon CloudWatch.",
+          "properties": {
+            "LogGroup": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: \\/aws\\/vendedlogs\\/[\\.\\-_/#A-Za-z0-9]+  \nUpdate requires: No interruption"
+            }
+          },
+          "additionalProperties": false,
+          "markdownDescription": "The destination for OpenSearch Ingestion Service logs sent to Amazon CloudWatch.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Key-value pairs to configure log publishing.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "VpcOptions": {
+      "description": "Container for the values required to configure VPC access for the pipeline. If you don't specify these values, OpenSearch Ingestion Service creates the pipeline with a public endpoint.",
+      "type": "object",
+      "properties": {
+        "SecurityGroupIds": {
+          "type": "array",
+          "insertionOrder": false,
+          "description": "A list of security groups associated with the VPC endpoint.",
+          "items": {
+            "type": "string",
+            "minLength": 11,
+            "maxLength": 20,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 11  \nMaximum Length: 20  \nPattern: sg-\\w{8}(\\w{9})?  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "A list of security groups associated with the VPC endpoint.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "SubnetIds": {
+          "type": "array",
+          "insertionOrder": false,
+          "description": "A list of subnet IDs associated with the VPC endpoint.",
+          "items": {
+            "type": "string",
+            "minLength": 15,
+            "maxLength": 24,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 15  \nMaximum Length: 24  \nPattern: subnet-\\w{8}(\\w{9})?  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "A list of subnet IDs associated with the VPC endpoint.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Container for the values required to configure VPC access for the pipeline. If you don't specify these values, OpenSearch Ingestion Service creates the pipeline with a public endpoint.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "VpcEndpoint": {
+      "description": "An OpenSearch Ingestion Service-managed VPC endpoint that will access one or more pipelines.",
+      "type": "object",
+      "properties": {
+        "VpcEndpointId": {
+          "type": "string",
+          "description": "The unique identifier of the endpoint.",
+          "markdownDescription": "The unique identifier of the endpoint.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "VpcId": {
+          "type": "string",
+          "description": "The ID for your VPC. AWS Privatelink generates this value when you create a VPC.",
+          "markdownDescription": "The ID for your VPC. AWS Privatelink generates this value when you create a VPC.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "VpcOptions": {
+          "$ref": "#/definitions/VpcOptions"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "An OpenSearch Ingestion Service-managed VPC endpoint that will access one or more pipelines.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "LogPublishingOptions": {
+      "$ref": "#/definitions/LogPublishingOptions"
+    },
+    "MaxUnits": {
+      "description": "The maximum pipeline capacity, in Ingestion Compute Units (ICUs).",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 24,
+      "markdownDescription": "The maximum pipeline capacity, in Ingestion Compute Units (ICUs).\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+    },
+    "MinUnits": {
+      "description": "The minimum pipeline capacity, in Ingestion Compute Units (ICUs).",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 24,
+      "markdownDescription": "The minimum pipeline capacity, in Ingestion Compute Units (ICUs).\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+    },
+    "PipelineConfigurationBody": {
+      "description": "The Data Prepper pipeline configuration in YAML format.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 12000,
+      "markdownDescription": "The Data Prepper pipeline configuration in YAML format.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 12000  \nUpdate requires: No interruption"
+    },
+    "PipelineName": {
+      "description": "Name of the OpenSearch Ingestion Service pipeline to create. Pipeline names are unique across the pipelines owned by an account within an AWS Region.",
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 28,
+      "markdownDescription": "Name of the OpenSearch Ingestion Service pipeline to create. Pipeline names are unique across the pipelines owned by an account within an AWS Region.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 3  \nMaximum Length: 28  \nPattern: [a-z][a-z0-9\\-]+  \nUpdate requires: Replacement"
+    },
+    "Tags": {
+      "description": "An array of key-value pairs to apply to this resource.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "An array of key-value pairs to apply to this resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "VpcOptions": {
+      "$ref": "#/definitions/VpcOptions"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "MaxUnits",
+    "MinUnits",
+    "PipelineConfigurationBody",
+    "PipelineName"
+  ],
+  "readOnlyProperties": [
+    "/properties/PipelineArn",
+    "/properties/IngestEndpointUrls",
+    "/properties/VpcEndpoints"
+  ],
+  "writeOnlyProperties": [
+    "/properties/VpcOptions"
+  ],
+  "createOnlyProperties": [
+    "/properties/PipelineName"
+  ],
+  "primaryIdentifier": [
+    "/properties/PipelineArn"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "osis:CreatePipeline",
+        "osis:GetPipeline",
+        "osis:ListTagsForResource",
+        "iam:PassRole",
+        "iam:CreateServiceLinkedRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "osis:GetPipeline",
+        "osis:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "osis:UpdatePipeline",
+        "osis:ListTagsForResource",
+        "osis:TagResource",
+        "osis:UntagResource",
+        "iam:PassRole"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "osis:DeletePipeline"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "osis:ListPipelines"
+      ]
+    }
+  },
+  "attributes": {
+    "VpcEndpoints": {
+      "type": "array",
+      "insertionOrder": false,
+      "description": "The VPC interface endpoints that have access to the pipeline.",
+      "items": {
+        "$ref": "#/definitions/VpcEndpoint"
+      },
+      "markdownDescription": "The VPC interface endpoints that have access to the pipeline.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "PipelineArn": {
+      "description": "The Amazon Resource Name (ARN) of the pipeline.",
+      "type": "string",
+      "minLength": 46,
+      "maxLength": 76,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the pipeline.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 46  \nMaximum Length: 76  \nPattern: ^arn:(aws|aws\\-cn|aws\\-us\\-gov|aws\\-iso|aws\\-iso\\-b):osis:.+:pipeline\\/.+$  \nUpdate requires: No interruption"
+    },
+    "IngestEndpointUrls": {
+      "type": "array",
+      "insertionOrder": false,
+      "description": "A list of endpoints that can be used for ingesting data into a pipeline",
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      },
+      "markdownDescription": "A list of endpoints that can be used for ingesting data into a pipeline\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    }
+  }
+}

@@ -37,8 +37,8 @@
     "ResourceIdentifier": {
       "type": "string",
       "maxLength": 2048,
-      "minLength": 21,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 21  \nMaximum Length: 2048  \nPattern: ^((((sn)|(svc))-[0-9a-z]{17})|(arn(:[a-z0-9]+([.-][a-z0-9]+)*){2}(:([a-z0-9]+([.-][a-z0-9]+)*)?){2}:((servicenetwork/sn)|(service/svc))-[0-9a-z]{17}))$  \nUpdate requires: Replacement"
+      "minLength": 20,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^((((sn)|(svc))-[0-9a-z]{17})|(arn(:[a-z0-9]+([.-][a-z0-9]+)*){2}(:([a-z0-9]+([.-][a-z0-9]+)*)?){2}:((servicenetwork/sn)|(service/svc))-[0-9a-z]{17}))$  \nUpdate requires: Replacement"
     },
     "Tags": {
       "type": "array",
@@ -73,6 +73,9 @@
   "additionalIdentifiers": [
     [
       "/properties/Id"
+    ],
+    [
+      "/properties/ResourceIdentifier"
     ]
   ],
   "handlers": {
@@ -103,17 +106,33 @@
     "read": {
       "permissions": [
         "vpc-lattice:GetAccessLogSubscription",
-        "vpc-lattice:ListTagsForResource"
+        "vpc-lattice:ListTagsForResource",
+        "logs:GetLogDelivery"
       ]
     },
     "update": {
       "permissions": [
         "vpc-lattice:GetAccessLogSubscription",
         "vpc-lattice:UpdateAccessLogSubscription",
+        "vpc-lattice:TagResource",
+        "vpc-lattice:UntagResource",
         "logs:UpdateLogDelivery",
         "firehose:UpdateDestination",
-        "vpc-lattice:TagResource",
-        "vpc-lattice:UntagResource"
+        "logs:CreateLogDelivery",
+        "logs:CreateLogStream",
+        "logs:PutDestination",
+        "logs:PutDestinationPolicy",
+        "logs:PutResourcePolicy",
+        "logs:DescribeResourcePolicies",
+        "logs:DescribeLogGroups",
+        "logs:GetLogDelivery",
+        "s3:PutBucketLogging",
+        "s3:GetBucketLogging",
+        "s3:GetBucketPolicy",
+        "s3:PutBucketPolicy",
+        "firehose:TagDeliveryStream",
+        "firehose:CreateDeliveryStream",
+        "firehose:DescribeDeliveryStream"
       ]
     },
     "delete": {
@@ -134,7 +153,20 @@
     "list": {
       "permissions": [
         "vpc-lattice:ListAccessLogSubscriptions"
-      ]
+      ],
+      "handlerSchema": {
+        "properties": {
+          "ResourceIdentifier": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 20,
+            "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^((((sn)|(svc))-[0-9a-z]{17})|(arn(:[a-z0-9]+([.-][a-z0-9]+)*){2}(:([a-z0-9]+([.-][a-z0-9]+)*)?){2}:((servicenetwork/sn)|(service/svc))-[0-9a-z]{17}))$  \nUpdate requires: No interruption"
+          }
+        },
+        "required": [
+          "ResourceIdentifier"
+        ]
+      }
     }
   },
   "tagging": {
