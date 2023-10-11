@@ -25,15 +25,14 @@ export function getLanguageService(
     schemaRequestService,
     workspaceContext
   );
-
-  const service = getYamlLanguageService(
-    schemaRequestService,
-    workspaceContext,
-    connection,
-    telemetry,
-    yamlSettings,
-    clientCapabilities
-  );
+  const service = getYamlLanguageService({
+    schemaRequestService: schemaRequestService,
+    workspaceContext: workspaceContext,
+    connection: connection,
+    telemetry: telemetry,
+    yamlSettings: yamlSettings,
+    clientCapabilities: clientCapabilities,
+  });
 
   return {
     ...service,
