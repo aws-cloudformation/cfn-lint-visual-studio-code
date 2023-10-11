@@ -1,13 +1,14 @@
 {
   "typeName": "AWS::GreengrassV2::ComponentVersion",
   "description": "Resource for Greengrass component version.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-greengrassv2",
   "definitions": {
     "LambdaFunctionRecipeSource": {
       "type": "object",
       "properties": {
         "LambdaArn": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws(-(cn|us-gov))?:lambda:(([a-z]+-)+[0-9])?:([0-9]{12})?:[^.]+$  \nUpdate requires: No interruption"
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:[^:]*:lambda:(([a-z]+-)+[0-9])?:([0-9]{12})?:[^.]+$  \nUpdate requires: No interruption"
         },
         "ComponentName": {
           "type": "string",
@@ -323,6 +324,8 @@
       "permissions": [
         "greengrass:CreateComponentVersion",
         "greengrass:DescribeComponent",
+        "greengrass:ListTagsForResource",
+        "greengrass:TagResource",
         "lambda:GetFunction",
         "s3:GetObject"
       ]
@@ -335,6 +338,8 @@
     },
     "update": {
       "permissions": [
+        "greengrass:DescribeComponent",
+        "greengrass:ListTagsForResource",
         "greengrass:TagResource",
         "greengrass:UntagResource"
       ]
@@ -345,10 +350,28 @@
       ]
     },
     "list": {
+      "handlerSchema": {
+        "properties": {
+          "Arn": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+          }
+        },
+        "required": [
+          "Arn"
+        ]
+      },
       "permissions": [
         "greengrass:ListComponentVersions"
       ]
     }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
   },
   "attributes": {
     "Arn": {

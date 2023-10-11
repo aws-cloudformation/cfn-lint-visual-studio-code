@@ -27,7 +27,17 @@
     "TriggerConfig": {
       "description": "Trigger settings of the flow.",
       "$ref": "#/definitions/TriggerConfig",
-      "markdownDescription": "Trigger settings of the flow.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: Replacement"
+      "markdownDescription": "Trigger settings of the flow.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption"
+    },
+    "FlowStatus": {
+      "description": "Flow activation status for Scheduled- and Event-triggered flows",
+      "type": "string",
+      "enum": [
+        "Active",
+        "Suspended",
+        "Draft"
+      ],
+      "markdownDescription": "Flow activation status for Scheduled- and Event-triggered flows\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Active | Suspended | Draft  \nUpdate requires: No interruption"
     },
     "SourceFlowConfig": {
       "description": "Configurations of Source connector of the flow.",
@@ -78,18 +88,13 @@
           "description": "Details required based on the type of trigger",
           "$ref": "#/definitions/ScheduledTriggerProperties",
           "markdownDescription": "Details required based on the type of trigger\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
-        },
-        "ActivateFlowOnCreate": {
-          "description": "Active 'Scheduled' or 'Event' flow after creation. Without activation the default state of such flows upon creation is DRAFT.",
-          "type": "boolean",
-          "markdownDescription": "Active 'Scheduled' or 'Event' flow after creation. Without activation the default state of such flows upon creation is DRAFT.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
         }
       },
       "required": [
         "TriggerType"
       ],
       "additionalProperties": false,
-      "markdownDescription": "Trigger settings of the flow.\n\n---\n\nRequired: No  \nUpdate requires: Replacement"
+      "markdownDescription": "Trigger settings of the flow.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "SourceFlowConfig": {
       "description": "Configurations of Source connector of the flow.",
@@ -194,7 +199,6 @@
           "items": {
             "$ref": "#/definitions/TaskPropertiesObject"
           },
-          "additionalProperties": false,
           "markdownDescription": "A Map used to store task related info\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
         }
       },
@@ -903,6 +907,12 @@
       "properties": {
         "ObjectPath": {
           "$ref": "#/definitions/Object"
+        },
+        "parallelismConfig": {
+          "$ref": "#/definitions/SAPODataParallelismConfig"
+        },
+        "paginationConfig": {
+          "$ref": "#/definitions/SAPODataPaginationConfig"
         }
       },
       "required": [
@@ -1044,6 +1054,31 @@
         },
         "CustomProperties": {
           "$ref": "#/definitions/CustomProperties"
+        },
+        "DataTransferApi": {
+          "type": "object",
+          "properties": {
+            "Name": {
+              "type": "string",
+              "maxLength": 64,
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 64  \nPattern: [\\w/-]+  \nUpdate requires: No interruption"
+            },
+            "Type": {
+              "type": "string",
+              "enum": [
+                "SYNC",
+                "ASYNC",
+                "AUTOMATIC"
+              ],
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: SYNC | ASYNC | AUTOMATIC  \nUpdate requires: No interruption"
+            }
+          },
+          "required": [
+            "Name",
+            "Type"
+          ],
+          "additionalProperties": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
         }
       },
       "required": [
@@ -1744,6 +1779,46 @@
         "REST_SYNC"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AUTOMATIC | BULKV2 | REST_SYNC  \nUpdate requires: No interruption"
+    },
+    "SAPODataParallelismConfig": {
+      "description": "SAP Source connector parallelism factor",
+      "type": "object",
+      "properties": {
+        "maxParallelism": {
+          "$ref": "#/definitions/SAPODataMaxParallelism"
+        }
+      },
+      "required": [
+        "maxParallelism"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "SAP Source connector parallelism factor\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "SAPODataPaginationConfig": {
+      "description": "SAP Source connector page size",
+      "type": "object",
+      "properties": {
+        "maxPageSize": {
+          "$ref": "#/definitions/SAPODataMaxPageSize"
+        }
+      },
+      "required": [
+        "maxPageSize"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "SAP Source connector page size\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "SAPODataMaxParallelism": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+    },
+    "SAPODataMaxPageSize": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10000,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
     }
   },
   "required": [
@@ -1755,8 +1830,7 @@
   ],
   "createOnlyProperties": [
     "/properties/FlowName",
-    "/properties/KMSArn",
-    "/properties/TriggerConfig/ActivateFlowOnCreate"
+    "/properties/KMSArn"
   ],
   "readOnlyProperties": [
     "/properties/FlowArn"
@@ -1794,9 +1868,12 @@
     "update": {
       "permissions": [
         "appflow:UpdateFlow",
+        "appflow:StartFlow",
+        "appflow:StopFlow",
         "appflow:TagResource",
         "appflow:UntagResource",
         "appflow:ListTagsForResource",
+        "appflow:UseConnectorProfile",
         "iam:PassRole",
         "s3:ListAllMyBuckets",
         "s3:GetBucketLocation",
@@ -1816,6 +1893,12 @@
         "appflow:ListFlows"
       ]
     }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
   },
   "attributes": {
     "FlowArn": {

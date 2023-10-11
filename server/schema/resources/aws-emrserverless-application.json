@@ -297,7 +297,7 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 64,
-      "markdownDescription": "EMR release label.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[A-Za-z0-9._/-]+$  \nUpdate requires: Replacement"
+      "markdownDescription": "EMR release label.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[A-Za-z0-9._/-]+$  \nUpdate requires: Some interruptions"
     },
     "Type": {
       "description": "The type of the application",
@@ -307,12 +307,12 @@
     "InitialCapacity": {
       "description": "Initial capacity initialized when an Application is started.",
       "$ref": "#/definitions/InitialCapacityConfigMap",
-      "markdownDescription": "Initial capacity initialized when an Application is started.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+      "markdownDescription": "Initial capacity initialized when an Application is started.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Some interruptions"
     },
     "MaximumCapacity": {
       "description": "Maximum allowed cumulative resources for an Application. No new resources will be created once the limit is hit.",
       "$ref": "#/definitions/MaximumAllowedResources",
-      "markdownDescription": "Maximum allowed cumulative resources for an Application. No new resources will be created once the limit is hit.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+      "markdownDescription": "Maximum allowed cumulative resources for an Application. No new resources will be created once the limit is hit.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Some interruptions"
     },
     "Tags": {
       "description": "Tag map with key and value",
@@ -327,12 +327,12 @@
     "AutoStartConfiguration": {
       "description": "Configuration for Auto Start of Application.",
       "$ref": "#/definitions/AutoStartConfiguration",
-      "markdownDescription": "Configuration for Auto Start of Application.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+      "markdownDescription": "Configuration for Auto Start of Application.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Some interruptions"
     },
     "AutoStopConfiguration": {
       "description": "Configuration for Auto Stop of Application.",
       "$ref": "#/definitions/AutoStopConfiguration",
-      "markdownDescription": "Configuration for Auto Stop of Application.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+      "markdownDescription": "Configuration for Auto Stop of Application.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Some interruptions"
     },
     "ImageConfiguration": {
       "$ref": "#/definitions/ImageConfigurationInput"
@@ -340,10 +340,12 @@
     "NetworkConfiguration": {
       "description": "Network Configuration for customer VPC connectivity.",
       "$ref": "#/definitions/NetworkConfiguration",
-      "markdownDescription": "Network Configuration for customer VPC connectivity.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+      "markdownDescription": "Network Configuration for customer VPC connectivity.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Some interruptions"
     },
     "WorkerTypeSpecifications": {
-      "$ref": "#/definitions/WorkerTypeSpecificationInputMap"
+      "description": "The key-value pairs that specify worker type to WorkerTypeSpecificationInput. This parameter must contain all valid worker types for a Spark or Hive application. Valid worker types include Driver and Executor for Spark applications and HiveDriver and TezTask for Hive applications. You can either set image details in this parameter for each worker type, or in imageConfiguration for all worker types.",
+      "$ref": "#/definitions/WorkerTypeSpecificationInputMap",
+      "markdownDescription": "The key-value pairs that specify worker type to WorkerTypeSpecificationInput. This parameter must contain all valid worker types for a Spark or Hive application. Valid worker types include Driver and Executor for Spark applications and HiveDriver and TezTask for Hive applications. You can either set image details in this parameter for each worker type, or in imageConfiguration for all worker types.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Some interruptions"
     }
   },
   "additionalProperties": false,
@@ -353,8 +355,18 @@
   ],
   "createOnlyProperties": [
     "/properties/Name",
-    "/properties/ReleaseLabel",
     "/properties/Type"
+  ],
+  "conditionalCreateOnlyProperties": [
+    "/properties/Architecture",
+    "/properties/ReleaseLabel",
+    "/properties/WorkerTypeSpecifications",
+    "/properties/MaximumCapacity",
+    "/properties/InitialCapacity",
+    "/properties/AutoStartConfiguration",
+    "/properties/AutoStopConfiguration",
+    "/properties/NetworkConfiguration",
+    "/properties/ImageConfiguration"
   ],
   "readOnlyProperties": [
     "/properties/Arn",
@@ -374,7 +386,11 @@
         "emr-serverless:CreateApplication",
         "emr-serverless:TagResource",
         "emr-serverless:GetApplication",
-        "iam:CreateServiceLinkedRole"
+        "iam:CreateServiceLinkedRole",
+        "ec2:CreateNetworkInterface",
+        "ecr:BatchGetImage",
+        "ecr:DescribeImages",
+        "ecr:GetDownloadUrlForLayer"
       ]
     },
     "read": {
@@ -387,7 +403,11 @@
         "emr-serverless:UpdateApplication",
         "emr-serverless:TagResource",
         "emr-serverless:UntagResource",
-        "emr-serverless:GetApplication"
+        "emr-serverless:GetApplication",
+        "ec2:CreateNetworkInterface",
+        "ecr:BatchGetImage",
+        "ecr:DescribeImages",
+        "ecr:GetDownloadUrlForLayer"
       ]
     },
     "delete": {

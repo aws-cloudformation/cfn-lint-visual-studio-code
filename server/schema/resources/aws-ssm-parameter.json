@@ -5,58 +5,128 @@
   "properties": {
     "Type": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
-    },
-    "Description": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-    },
-    "Policies": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-    },
-    "AllowedPattern": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-    },
-    "Tier": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "description": "The type of the parameter.",
+      "enum": [
+        "String",
+        "StringList",
+        "SecureString"
+      ],
+      "markdownDescription": "The type of the parameter.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: String | StringList | SecureString  \nUpdate requires: No interruption"
     },
     "Value": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+      "description": "The value associated with the parameter.",
+      "markdownDescription": "The value associated with the parameter.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
     },
-    "DataType": {
+    "Description": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "description": "The information about the parameter.",
+      "markdownDescription": "The information about the parameter.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "Policies": {
+      "type": "string",
+      "description": "The policies attached to the parameter.",
+      "markdownDescription": "The policies attached to the parameter.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "AllowedPattern": {
+      "type": "string",
+      "description": "The regular expression used to validate the parameter value.",
+      "markdownDescription": "The regular expression used to validate the parameter value.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "Tier": {
+      "type": "string",
+      "description": "The corresponding tier of the parameter.",
+      "enum": [
+        "Standard",
+        "Advanced",
+        "Intelligent-Tiering"
+      ],
+      "markdownDescription": "The corresponding tier of the parameter.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Standard | Advanced | Intelligent-Tiering  \nUpdate requires: No interruption"
     },
     "Tags": {
       "type": "object",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+      "description": "A key-value pair to associate with a resource.",
+      "patternProperties": {
+        ".*": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "DataType": {
+      "type": "string",
+      "description": "The corresponding DataType of the parameter.",
+      "enum": [
+        "text",
+        "aws:ec2:image"
+      ],
+      "markdownDescription": "The corresponding DataType of the parameter.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: text | aws:ec2:image  \nUpdate requires: No interruption"
     },
     "Name": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+      "description": "The name of the parameter.",
+      "markdownDescription": "The name of the parameter.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
     }
   },
   "required": [
-    "Type",
-    "Value"
+    "Value",
+    "Type"
   ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
   "createOnlyProperties": [
     "/properties/Name"
   ],
   "primaryIdentifier": [
-    "/properties/Id"
+    "/properties/Name"
   ],
-  "readOnlyProperties": [
-    "/properties/Id"
+  "writeOnlyProperties": [
+    "/properties/Tags",
+    "/properties/Description",
+    "/properties/Tier",
+    "/properties/AllowedPattern",
+    "/properties/Policies"
   ],
-  "attributes": {
-    "Id": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ssm:PutParameter",
+        "ssm:AddTagsToResource",
+        "ssm:GetParameters"
+      ],
+      "timeoutInMinutes": 5
+    },
+    "read": {
+      "permissions": [
+        "ssm:GetParameters"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ssm:PutParameter",
+        "ssm:AddTagsToResource",
+        "ssm:RemoveTagsFromResource",
+        "ssm:GetParameters"
+      ],
+      "timeoutInMinutes": 5
+    },
+    "delete": {
+      "permissions": [
+        "ssm:DeleteParameter"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ssm:DescribeParameters"
+      ]
     }
-  }
+  },
+  "attributes": {}
 }

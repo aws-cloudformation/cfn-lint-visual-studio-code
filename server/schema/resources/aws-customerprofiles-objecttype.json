@@ -122,9 +122,12 @@
               "UNIQUE",
               "SECONDARY",
               "LOOKUP_ONLY",
-              "NEW_ONLY"
+              "NEW_ONLY",
+              "ASSET",
+              "CASE",
+              "ORDER"
             ],
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PROFILE | UNIQUE | SECONDARY | LOOKUP_ONLY | NEW_ONLY  \nUpdate requires: No interruption"
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PROFILE | UNIQUE | SECONDARY | LOOKUP_ONLY | NEW_ONLY | ASSET | CASE | ORDER  \nUpdate requires: No interruption"
           },
           "markdownDescription": "The types of keys that a ProfileObject can have. Each ProfileObject can have only 1 UNIQUE key but multiple PROFILE keys. PROFILE means that this key can be used to tie an object to a PROFILE. UNIQUE means that it can be used to uniquely identify an object. If a key a is marked as SECONDARY, it will be used to search for profiles after all other PROFILE keys have been searched. A LOOKUP_ONLY key is only used to match a profile but is not persisted to be used for searching of the profile. A NEW_ONLY key is only used if the profile does not already exist before the object is ingested, otherwise it is only used for matching objects to profiles.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
         }
@@ -192,6 +195,13 @@
       },
       "markdownDescription": "A list of unique keys that can be used to map data to the profile.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     },
+    "SourceLastUpdatedTimestampFormat": {
+      "description": "The format of your sourceLastUpdatedTimestamp that was previously set up.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "markdownDescription": "The format of your sourceLastUpdatedTimestamp that was previously set up.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption"
+    },
     "Tags": {
       "description": "The tags (keys and values) associated with the integration.",
       "type": "array",
@@ -214,6 +224,13 @@
   "required": [
     "DomainName"
   ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
   "createOnlyProperties": [
     "/properties/DomainName",
     "/properties/ObjectTypeName"
@@ -230,7 +247,8 @@
     "create": {
       "permissions": [
         "profile:GetProfileObjectType",
-        "profile:PutProfileObjectType"
+        "profile:PutProfileObjectType",
+        "profile:TagResource"
       ]
     },
     "read": {
@@ -252,6 +270,16 @@
       ]
     },
     "list": {
+      "handlerSchema": {
+        "properties": {
+          "DomainName": {
+            "$ref": "resource-schema.json#/properties/DomainName"
+          }
+        },
+        "required": [
+          "DomainName"
+        ]
+      },
       "permissions": [
         "profile:ListProfileObjectTypes"
       ]

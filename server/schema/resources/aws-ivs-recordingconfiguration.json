@@ -35,9 +35,7 @@
           "$ref": "#/definitions/S3DestinationConfiguration"
         }
       },
-      "required": [
-        "S3"
-      ],
+      "required": [],
       "markdownDescription": "Recording Destination Configuration.\n\n---\n\nRequired: No  \nUpdate requires: Replacement"
     },
     "S3DestinationConfiguration": {
@@ -69,20 +67,87 @@
             "INTERVAL",
             "DISABLED"
           ],
-          "markdownDescription": "Thumbnail Recording Mode, which determines whether thumbnails are recorded at an interval or are disabled.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: INTERVAL | DISABLED  \nUpdate requires: No interruption"
+          "default": "INTERVAL",
+          "markdownDescription": "Thumbnail Recording Mode, which determines whether thumbnails are recorded at an interval or are disabled.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: INTERVAL | DISABLED  \nUpdate requires: No interruption"
         },
         "TargetIntervalSeconds": {
-          "description": "Thumbnail recording Target Interval Seconds defines the interval at which thumbnails are recorded. This field is required if RecordingMode is INTERVAL.",
+          "description": "Target Interval Seconds defines the interval at which thumbnails are recorded. This field is required if RecordingMode is INTERVAL.",
           "type": "integer",
-          "minimum": 5,
+          "minimum": 1,
           "maximum": 60,
-          "markdownDescription": "Thumbnail recording Target Interval Seconds defines the interval at which thumbnails are recorded. This field is required if RecordingMode is INTERVAL.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+          "default": 60,
+          "markdownDescription": "Target Interval Seconds defines the interval at which thumbnails are recorded. This field is required if RecordingMode is INTERVAL.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "Resolution": {
+          "description": "Resolution indicates the desired resolution of recorded thumbnails.",
+          "type": "string",
+          "enum": [
+            "FULL_HD",
+            "HD",
+            "SD",
+            "LOWEST_RESOLUTION"
+          ],
+          "markdownDescription": "Resolution indicates the desired resolution of recorded thumbnails.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: FULL_HD | HD | SD | LOWEST_RESOLUTION  \nUpdate requires: No interruption"
+        },
+        "Storage": {
+          "description": "Storage indicates the format in which thumbnails are recorded.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "minItems": 0,
+          "maxItems": 2,
+          "items": {
+            "type": "string",
+            "enum": [
+              "SEQUENTIAL",
+              "LATEST"
+            ],
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SEQUENTIAL | LATEST  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "Storage indicates the format in which thumbnails are recorded.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
         }
       },
-      "required": [
-        "RecordingMode"
-      ],
+      "required": [],
       "markdownDescription": "Recording Thumbnail Configuration.\n\n---\n\nRequired: No  \nUpdate requires: Replacement"
+    },
+    "RenditionConfiguration": {
+      "description": "Rendition Configuration describes which renditions should be recorded for a stream.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "RenditionSelection": {
+          "description": "Resolution Selection indicates which set of renditions are recorded for a stream.",
+          "type": "string",
+          "enum": [
+            "ALL",
+            "NONE",
+            "CUSTOM"
+          ],
+          "default": "ALL",
+          "markdownDescription": "Resolution Selection indicates which set of renditions are recorded for a stream.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ALL | NONE | CUSTOM  \nUpdate requires: No interruption"
+        },
+        "Renditions": {
+          "description": "Renditions indicates which renditions are recorded for a stream.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "minItems": 0,
+          "maxItems": 4,
+          "items": {
+            "type": "string",
+            "enum": [
+              "FULL_HD",
+              "HD",
+              "SD",
+              "LOWEST_RESOLUTION"
+            ],
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: FULL_HD | HD | SD | LOWEST_RESOLUTION  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "Renditions indicates which renditions are recorded for a stream.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [],
+      "markdownDescription": "Rendition Configuration describes which renditions should be recorded for a stream.\n\n---\n\nRequired: No  \nUpdate requires: Replacement"
     }
   },
   "properties": {
@@ -117,6 +182,9 @@
     },
     "ThumbnailConfiguration": {
       "$ref": "#/definitions/ThumbnailConfiguration"
+    },
+    "RenditionConfiguration": {
+      "$ref": "#/definitions/RenditionConfiguration"
     }
   },
   "additionalProperties": false,
@@ -138,12 +206,19 @@
     "/properties/RecordingReconnectWindowSeconds",
     "/properties/ThumbnailConfiguration",
     "/properties/ThumbnailConfiguration/RecordingMode",
-    "/properties/ThumbnailConfiguration/TargetIntervalSeconds"
+    "/properties/ThumbnailConfiguration/TargetIntervalSeconds",
+    "/properties/ThumbnailConfiguration/Storage",
+    "/properties/ThumbnailConfiguration/Resolution",
+    "/properties/RenditionConfiguration",
+    "/properties/RenditionConfiguration/RenditionSelection",
+    "/properties/RenditionConfiguration/Renditions"
   ],
   "handlers": {
     "create": {
       "permissions": [
         "ivs:CreateRecordingConfiguration",
+        "ivs:GetRecordingConfiguration",
+        "ivs:TagResource",
         "iam:CreateServiceLinkedRole",
         "iam:PutRolePolicy",
         "iam:AttachRolePolicy",
@@ -154,13 +229,19 @@
     },
     "read": {
       "permissions": [
-        "ivs:GetRecordingConfiguration"
+        "ivs:GetRecordingConfiguration",
+        "s3:GetBucketLocation",
+        "ivs:ListTagsForResource"
       ]
     },
     "update": {
       "permissions": [
+        "ivs:GetRecordingConfiguration",
         "sts:AssumeRole",
         "iam:CreateServiceLinkedRole",
+        "iam:PutRolePolicy",
+        "iam:AttachRolePolicy",
+        "s3:ListBucket",
         "ivs:TagResource",
         "ivs:UntagResource",
         "ivs:ListTagsForResource"
@@ -169,12 +250,15 @@
     "delete": {
       "permissions": [
         "ivs:DeleteRecordingConfiguration",
+        "ivs:UntagResource",
         "iam:CreateServiceLinkedRole"
       ]
     },
     "list": {
       "permissions": [
-        "ivs:ListRecordingConfigurations"
+        "ivs:ListRecordingConfigurations",
+        "s3:GetBucketLocation",
+        "ivs:ListTagsForResource"
       ]
     }
   },
@@ -182,9 +266,9 @@
     "Arn": {
       "description": "Recording Configuration ARN is automatically generated on creation and assigned as the unique identifier.",
       "type": "string",
-      "minLength": 1,
+      "minLength": 0,
       "maxLength": 128,
-      "markdownDescription": "Recording Configuration ARN is automatically generated on creation and assigned as the unique identifier.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^arn:aws[-a-z]*:ivs:[a-z0-9-]+:[0-9]+:recording-configuration/[a-zA-Z0-9-]+$  \nUpdate requires: No interruption"
+      "markdownDescription": "Recording Configuration ARN is automatically generated on creation and assigned as the unique identifier.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 128  \nPattern: ^arn:aws[-a-z]*:ivs:[a-z0-9-]+:[0-9]+:recording-configuration/[a-zA-Z0-9-]+$  \nUpdate requires: No interruption"
     },
     "State": {
       "description": "Recording Configuration State.",

@@ -1,86 +1,37 @@
 {
-  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-ec2-ni.git",
-  "handlers": {
-    "read": {
-      "permissions": [
-        "ec2:DescribeNetworkInsightsPaths"
-      ]
-    },
-    "create": {
-      "permissions": [
-        "ec2:CreateNetworkInsightsPath"
-      ]
-    },
-    "update": {
-      "permissions": [
-        "ec2:DescribeNetworkInsightsPaths",
-        "ec2:CreateTags",
-        "ec2:DeleteTags"
-      ]
-    },
-    "list": {
-      "permissions": [
-        "ec2:DescribeNetworkInsightsPaths"
-      ]
-    },
-    "delete": {
-      "permissions": [
-        "ec2:DeleteNetworkInsightsPath"
-      ]
-    }
-  },
   "typeName": "AWS::EC2::NetworkInsightsPath",
-  "readOnlyProperties": [
-    "/properties/NetworkInsightsPathId",
-    "/properties/NetworkInsightsPathArn",
-    "/properties/CreatedDate",
-    "/properties/SourceArn",
-    "/properties/DestinationArn"
-  ],
   "description": "Resource schema for AWS::EC2::NetworkInsightsPath",
-  "additionalIdentifiers": [
-    [
-      "/properties/NetworkInsightsPathArn"
-    ]
-  ],
-  "createOnlyProperties": [
-    "/properties/SourceIp",
-    "/properties/DestinationIp",
-    "/properties/Source",
-    "/properties/Destination",
-    "/properties/Protocol",
-    "/properties/DestinationPort"
-  ],
-  "additionalProperties": false,
-  "primaryIdentifier": [
-    "/properties/NetworkInsightsPathId"
-  ],
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-ec2-ni.git",
   "definitions": {
-    "Port": {
-      "type": "integer",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-    },
-    "IpAddress": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    "Tags": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     },
     "Tag": {
-      "additionalProperties": false,
       "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "Value": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
         "Key": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         }
       },
       "required": [
         "Key"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "IpAddress": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
     "Protocol": {
       "type": "string",
@@ -90,47 +41,140 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: tcp | udp  \nUpdate requires: No interruption"
     },
+    "Port": {
+      "type": "integer",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+    },
+    "FilterPortRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "FromPort": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "ToPort": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PathFilter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "SourceAddress": {
+          "$ref": "#/definitions/IpAddress"
+        },
+        "SourcePortRange": {
+          "$ref": "#/definitions/FilterPortRange"
+        },
+        "DestinationAddress": {
+          "$ref": "#/definitions/IpAddress"
+        },
+        "DestinationPortRange": {
+          "$ref": "#/definitions/FilterPortRange"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "SourceIp": {
+      "$ref": "#/definitions/IpAddress"
+    },
+    "FilterAtSource": {
+      "$ref": "#/definitions/PathFilter"
+    },
+    "FilterAtDestination": {
+      "$ref": "#/definitions/PathFilter"
+    },
+    "DestinationIp": {
+      "$ref": "#/definitions/IpAddress"
+    },
+    "Source": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
+    },
+    "Destination": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "Protocol": {
+      "$ref": "#/definitions/Protocol"
+    },
+    "DestinationPort": {
+      "$ref": "#/definitions/Port"
+    },
     "Tags": {
-      "uniqueItems": true,
       "type": "array",
+      "insertionOrder": false,
       "items": {
         "$ref": "#/definitions/Tag"
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     }
   },
+  "additionalProperties": false,
   "required": [
     "Protocol",
     "Source"
   ],
-  "properties": {
-    "Destination": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+  "readOnlyProperties": [
+    "/properties/NetworkInsightsPathId",
+    "/properties/NetworkInsightsPathArn",
+    "/properties/CreatedDate",
+    "/properties/SourceArn",
+    "/properties/DestinationArn"
+  ],
+  "primaryIdentifier": [
+    "/properties/NetworkInsightsPathId"
+  ],
+  "createOnlyProperties": [
+    "/properties/SourceIp",
+    "/properties/DestinationIp",
+    "/properties/Source",
+    "/properties/Destination",
+    "/properties/Protocol",
+    "/properties/DestinationPort",
+    "/properties/FilterAtSource",
+    "/properties/FilterAtDestination"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/NetworkInsightsPathArn"
+    ]
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ec2:CreateNetworkInsightsPath",
+        "ec2:CreateTags"
+      ]
     },
-    "DestinationPort": {
-      "$ref": "#/definitions/Port"
+    "delete": {
+      "permissions": [
+        "ec2:DeleteNetworkInsightsPath",
+        "ec2:DeleteTags"
+      ]
     },
-    "Source": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
+    "read": {
+      "permissions": [
+        "ec2:DescribeNetworkInsightsPaths"
+      ]
     },
-    "DestinationIp": {
-      "$ref": "#/definitions/IpAddress"
+    "list": {
+      "permissions": [
+        "ec2:DescribeNetworkInsightsPaths"
+      ]
     },
-    "SourceIp": {
-      "$ref": "#/definitions/IpAddress"
-    },
-    "Protocol": {
-      "$ref": "#/definitions/Protocol"
-    },
-    "Tags": {
-      "insertionOrder": false,
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/Tag"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    "update": {
+      "permissions": [
+        "ec2:DescribeNetworkInsightsPaths",
+        "ec2:CreateTags",
+        "ec2:DeleteTags"
+      ]
     }
   },
   "attributes": {
@@ -142,11 +186,11 @@
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
-    "SourceArn": {
+    "CreatedDate": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
-    "CreatedDate": {
+    "SourceArn": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },

@@ -9,13 +9,19 @@
       "properties": {
         "Key": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
         },
         "Value": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "markdownDescription": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
         }
       },
+      "required": [
+        "Key",
+        "Value"
+      ],
       "additionalProperties": false,
       "markdownDescription": "A key-value pair to associate with a device resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
@@ -41,6 +47,24 @@
       },
       "additionalProperties": false,
       "markdownDescription": "The site location.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AWSLocation": {
+      "description": "The Amazon Web Services location of the device, if applicable.",
+      "type": "object",
+      "properties": {
+        "Zone": {
+          "description": "The Zone that the device is located in. Specify the ID of an Availability Zone, Local Zone, Wavelength Zone, or an Outpost.",
+          "type": "string",
+          "markdownDescription": "The Zone that the device is located in. Specify the ID of an Availability Zone, Local Zone, Wavelength Zone, or an Outpost.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "SubnetArn": {
+          "description": "The Amazon Resource Name (ARN) of the subnet that the device is located in.",
+          "type": "string",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the subnet that the device is located in.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The Amazon Web Services location of the device, if applicable.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     }
   },
   "properties": {
@@ -52,6 +76,8 @@
     "Tags": {
       "description": "The tags for the device.",
       "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
       "items": {
         "$ref": "#/definitions/Tag"
       },
@@ -61,6 +87,11 @@
       "description": "The ID of the global network.",
       "type": "string",
       "markdownDescription": "The ID of the global network.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
+    },
+    "AWSLocation": {
+      "description": "The Amazon Web Services location of the device, if applicable.",
+      "$ref": "#/definitions/AWSLocation",
+      "markdownDescription": "The Amazon Web Services location of the device, if applicable.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
     },
     "Location": {
       "description": "The site location.",
@@ -93,13 +124,21 @@
       "markdownDescription": "The device vendor.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     }
   },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
   "additionalProperties": false,
   "required": [
     "GlobalNetworkId"
   ],
   "readOnlyProperties": [
     "/properties/DeviceId",
-    "/properties/DeviceArn"
+    "/properties/DeviceArn",
+    "/properties/CreatedAt"
   ],
   "createOnlyProperties": [
     "/properties/GlobalNetworkId"
@@ -116,7 +155,9 @@
   "handlers": {
     "create": {
       "permissions": [
-        "networkmanager:CreateDevice"
+        "networkmanager:CreateDevice",
+        "networkmanager:GetDevices",
+        "networkmanager:TagResource"
       ]
     },
     "read": {
@@ -128,6 +169,7 @@
       "permissions": [
         "networkmanager:UpdateDevice",
         "networkmanager:ListTagsForResource",
+        "networkmanager:GetDevices",
         "networkmanager:TagResource",
         "networkmanager:UntagResource"
       ]
@@ -138,6 +180,16 @@
       ]
     },
     "list": {
+      "handlerSchema": {
+        "properties": {
+          "GlobalNetworkId": {
+            "$ref": "resource-schema.json#/properties/GlobalNetworkId"
+          }
+        },
+        "required": [
+          "GlobalNetworkId"
+        ]
+      },
       "permissions": [
         "networkmanager:GetDevices"
       ]
@@ -153,6 +205,11 @@
       "description": "The ID of the device.",
       "type": "string",
       "markdownDescription": "The ID of the device.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "CreatedAt": {
+      "description": "The date and time that the device was created.",
+      "type": "string",
+      "markdownDescription": "The date and time that the device was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     }
   }
 }

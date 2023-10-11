@@ -1,17 +1,17 @@
 {
   "typeName": "AWS::ImageBuilder::Component",
   "description": "Resource schema for AWS::ImageBuilder::Component",
-  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-imagebuilder.git",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-imagebuilder",
   "properties": {
     "Name": {
       "description": "The name of the component.",
       "type": "string",
-      "markdownDescription": "The name of the component.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
+      "markdownDescription": "The name of the component.\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: Replacement"
     },
     "Version": {
       "description": "The version of the component.",
       "type": "string",
-      "markdownDescription": "The version of the component.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
+      "markdownDescription": "The version of the component.\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: Replacement"
     },
     "Description": {
       "description": "The description of the component.",
@@ -30,14 +30,14 @@
         "Windows",
         "Linux"
       ],
-      "markdownDescription": "The platform of the component.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: Windows | Linux  \nUpdate requires: Replacement"
+      "markdownDescription": "The platform of the component.\n\n---\n\nRequired: Conditional  \nType: String  \nAllowed Values: Windows | Linux  \nUpdate requires: Replacement"
     },
     "Data": {
       "description": "The data of the component.",
       "type": "string",
       "minLength": 1,
       "maxLength": 16000,
-      "markdownDescription": "The data of the component.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 16000  \nUpdate requires: Replacement"
+      "markdownDescription": "The data of the component.\n\n---\n\nRequired: Conditional  \nType: String  \nMinimum Length: 1  \nMaximum Length: 16000  \nUpdate requires: Replacement"
     },
     "KmsKeyId": {
       "description": "The KMS key identifier used to encrypt the component.",
@@ -59,7 +59,7 @@
     "Uri": {
       "description": "The uri of the component.",
       "type": "string",
-      "markdownDescription": "The uri of the component.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+      "markdownDescription": "The uri of the component.\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: Replacement"
     },
     "SupportedOsVersions": {
       "description": "The operating system (OS) version supported by the component.",
@@ -77,6 +77,18 @@
     "Name",
     "Platform",
     "Version"
+  ],
+  "oneOf": [
+    {
+      "required": [
+        "Data"
+      ]
+    },
+    {
+      "required": [
+        "Uri"
+      ]
+    }
   ],
   "primaryIdentifier": [
     "/properties/Arn"
@@ -103,6 +115,9 @@
     "/properties/SupportedOsVersions",
     "/properties/Tags"
   ],
+  "tagging": {
+    "taggable": false
+  },
   "handlers": {
     "create": {
       "permissions": [
@@ -134,7 +149,17 @@
     "list": {
       "permissions": [
         "imagebuilder:ListComponents"
-      ]
+      ],
+      "handlerSchema": {
+        "properties": {
+          "Arn": {
+            "$ref": "resource-schema.json#/properties/Arn"
+          }
+        },
+        "required": [
+          "Arn"
+        ]
+      }
     }
   },
   "attributes": {

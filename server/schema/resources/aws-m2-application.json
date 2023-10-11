@@ -82,6 +82,10 @@
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[A-Za-z0-9][A-Za-z0-9_\\-]{1,59}$  \nUpdate requires: Replacement"
     },
+    "RoleArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws|aws-cn|aws-iso|aws-iso-[a-z]{1}|aws-us-gov):[A-Za-z0-9][A-Za-z0-9_/.-]{0,62}:([a-z]{2}-((iso[a-z]{0,1}-)|(gov-)){0,1}[a-z]+-[0-9]|):[0-9]{12}:[A-Za-z0-9/][A-Za-z0-9:_/+=,@.-]{0,1023}$  \nUpdate requires: Replacement"
+    },
     "Tags": {
       "$ref": "#/definitions/TagMap"
     }
@@ -107,7 +111,8 @@
   "createOnlyProperties": [
     "/properties/EngineType",
     "/properties/Name",
-    "/properties/KmsKeyId"
+    "/properties/KmsKeyId",
+    "/properties/RoleArn"
   ],
   "primaryIdentifier": [
     "/properties/ApplicationArn"
@@ -116,9 +121,14 @@
     "create": {
       "permissions": [
         "m2:CreateApplication",
+        "m2:GetApplication",
         "m2:ListTagsForResource",
+        "m2:TagResource",
         "s3:GetObject",
-        "s3:ListBucket"
+        "s3:ListBucket",
+        "kms:DescribeKey",
+        "kms:CreateGrant",
+        "iam:PassRole"
       ]
     },
     "read": {
@@ -130,6 +140,7 @@
     "update": {
       "permissions": [
         "m2:UpdateApplication",
+        "m2:GetApplication",
         "m2:ListTagsForResource",
         "m2:TagResource",
         "m2:UntagResource",
@@ -141,6 +152,8 @@
       "permissions": [
         "elasticloadbalancing:DeleteListener",
         "elasticloadbalancing:DeleteTargetGroup",
+        "logs:DeleteLogDelivery",
+        "m2:GetApplication",
         "m2:DeleteApplication"
       ]
     },

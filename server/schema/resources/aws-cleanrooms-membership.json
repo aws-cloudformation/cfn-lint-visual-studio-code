@@ -1,0 +1,249 @@
+{
+  "typeName": "AWS::CleanRooms::Membership",
+  "description": "Represents an AWS account that is a part of a collaboration",
+  "definitions": {
+    "MembershipQueryLogStatus": {
+      "type": "string",
+      "enum": [
+        "ENABLED",
+        "DISABLED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption"
+    },
+    "MembershipStatus": {
+      "type": "string",
+      "enum": [
+        "ACTIVE",
+        "REMOVED",
+        "COLLABORATION_DELETED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ACTIVE | REMOVED | COLLABORATION_DELETED  \nUpdate requires: No interruption"
+    },
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ResultFormat": {
+      "type": "string",
+      "enum": [
+        "CSV",
+        "PARQUET"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CSV | PARQUET  \nUpdate requires: No interruption"
+    },
+    "ProtectedQueryS3OutputConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ResultFormat": {
+          "$ref": "#/definitions/ResultFormat"
+        },
+        "Bucket": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 63,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 3  \nMaximum Length: 63  \nUpdate requires: No interruption"
+        },
+        "KeyPrefix": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "ResultFormat",
+        "Bucket"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "MembershipProtectedQueryOutputConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "S3": {
+          "$ref": "#/definitions/ProtectedQueryS3OutputConfiguration"
+        }
+      },
+      "required": [
+        "S3"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "MembershipProtectedQueryResultConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "OutputConfiguration": {
+          "$ref": "#/definitions/MembershipProtectedQueryOutputConfiguration"
+        },
+        "RoleArn": {
+          "type": "string",
+          "minLength": 32,
+          "maxLength": 512,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 32  \nMaximum Length: 512  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "OutputConfiguration"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "Tags": {
+      "description": "An arbitrary set of tags (key-value pairs) for this cleanrooms membership.",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "uniqueItems": true,
+      "type": "array",
+      "markdownDescription": "An arbitrary set of tags (key-value pairs) for this cleanrooms membership.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "CollaborationIdentifier": {
+      "type": "string",
+      "maxLength": 36,
+      "minLength": 36,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 36  \nMaximum Length: 36  \nPattern: [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}  \nUpdate requires: Replacement"
+    },
+    "QueryLogStatus": {
+      "$ref": "#/definitions/MembershipQueryLogStatus"
+    },
+    "DefaultResultConfiguration": {
+      "$ref": "#/definitions/MembershipProtectedQueryResultConfiguration"
+    }
+  },
+  "required": [
+    "CollaborationIdentifier",
+    "QueryLogStatus"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/CollaborationArn",
+    "/properties/CollaborationCreatorAccountId",
+    "/properties/MembershipIdentifier"
+  ],
+  "createOnlyProperties": [
+    "/properties/CollaborationIdentifier"
+  ],
+  "primaryIdentifier": [
+    "/properties/MembershipIdentifier"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "cleanrooms:CreateMembership",
+        "logs:CreateLogDelivery",
+        "logs:GetLogDelivery",
+        "logs:UpdateLogDelivery",
+        "logs:DeleteLogDelivery",
+        "logs:ListLogDeliveries",
+        "logs:DescribeLogGroups",
+        "logs:DescribeResourcePolicies",
+        "logs:PutResourcePolicy",
+        "logs:CreateLogGroup",
+        "cleanrooms:GetMembership",
+        "cleanrooms:ListTagsForResource",
+        "cleanrooms:TagResource",
+        "cleanrooms:ListMemberships",
+        "iam:PassRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "cleanrooms:GetMembership",
+        "cleanrooms:ListTagsForResource",
+        "logs:ListLogDeliveries",
+        "logs:DescribeLogGroups",
+        "logs:DescribeResourcePolicies",
+        "logs:GetLogDelivery"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "cleanrooms:UpdateMembership",
+        "cleanrooms:GetMembership",
+        "logs:CreateLogDelivery",
+        "logs:GetLogDelivery",
+        "logs:UpdateLogDelivery",
+        "logs:DeleteLogDelivery",
+        "logs:ListLogDeliveries",
+        "logs:DescribeLogGroups",
+        "logs:DescribeResourcePolicies",
+        "logs:PutResourcePolicy",
+        "logs:CreateLogGroup",
+        "cleanrooms:ListTagsForResource",
+        "cleanrooms:TagResource",
+        "cleanrooms:UntagResource",
+        "iam:PassRole"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "cleanrooms:DeleteMembership",
+        "cleanrooms:GetMembership",
+        "cleanrooms:ListMemberships",
+        "cleanrooms:ListTagsForResource",
+        "logs:ListLogDeliveries",
+        "logs:DescribeLogGroups",
+        "logs:DescribeResourcePolicies",
+        "logs:GetLogDelivery"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "cleanrooms:ListMemberships"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "attributes": {
+    "Arn": {
+      "type": "string",
+      "maxLength": 100,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 100  \nUpdate requires: No interruption"
+    },
+    "CollaborationArn": {
+      "type": "string",
+      "maxLength": 100,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 100  \nUpdate requires: No interruption"
+    },
+    "CollaborationCreatorAccountId": {
+      "type": "string",
+      "maxLength": 12,
+      "minLength": 12,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 12  \nMaximum Length: 12  \nPattern: ^\\d+$  \nUpdate requires: No interruption"
+    },
+    "MembershipIdentifier": {
+      "type": "string",
+      "maxLength": 36,
+      "minLength": 36,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 36  \nMaximum Length: 36  \nPattern: [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}  \nUpdate requires: No interruption"
+    }
+  }
+}

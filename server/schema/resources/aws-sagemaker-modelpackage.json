@@ -1,6 +1,7 @@
 {
   "typeName": "AWS::SageMaker::ModelPackage",
   "description": "Resource Type definition for AWS::SageMaker::ModelPackage",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-sagemaker",
   "definitions": {
     "Tag": {
       "description": "A key-value pair to associate with a resource.",
@@ -435,12 +436,6 @@
           "maxLength": 1024,
           "markdownDescription": "A structure with Model Input details.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nPattern: ^(https|s3)://([^/]+)/?(.*)$  \nUpdate requires: No interruption"
         },
-        "ProductId": {
-          "type": "string",
-          "description": "The AWS Marketplace product ID of the model package.",
-          "maxLength": 256,
-          "markdownDescription": "The AWS Marketplace product ID of the model package.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nPattern: ^[a-zA-Z0-9](-*[a-zA-Z0-9])*$  \nUpdate requires: No interruption"
-        },
         "Framework": {
           "type": "string",
           "description": "The machine learning framework of the model package container image.",
@@ -505,6 +500,15 @@
         "PendingManualApproval"
       ],
       "markdownDescription": "The approval status of the model package.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Approved | Rejected | PendingManualApproval  \nUpdate requires: No interruption"
+    },
+    "SkipModelValidation": {
+      "type": "string",
+      "description": "Indicates if you want to skip model validation.",
+      "enum": [
+        "None",
+        "All"
+      ],
+      "markdownDescription": "Indicates if you want to skip model validation.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: None | All  \nUpdate requires: No interruption"
     },
     "ModelMetrics": {
       "description": "A structure that contains model metrics reports.",
@@ -913,39 +917,10 @@
       "maxLength": 1024,
       "markdownDescription": "A description provided for the model approval.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nPattern: .*  \nUpdate requires: No interruption"
     },
-    "CreatedBy": {
-      "$ref": "#/definitions/UserContext"
-    },
     "CreationTime": {
       "description": "The time at which the model package was created.",
       "type": "string",
       "markdownDescription": "The time at which the model package was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-    },
-    "UserContext": {
-      "type": "object",
-      "additionalProperties": false,
-      "description": "Information about the user who created or modified an experiment, trial, trial component, lineage group, or project.",
-      "properties": {
-        "DomainId": {
-          "type": "string",
-          "description": "The domain associated with the user.",
-          "markdownDescription": "The domain associated with the user.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "UserProfileArn": {
-          "type": "string",
-          "description": "The Amazon Resource Name (ARN) of the user's profile.",
-          "markdownDescription": "The Amazon Resource Name (ARN) of the user's profile.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "UserProfileName": {
-          "type": "string",
-          "description": "The name of the user's profile.",
-          "markdownDescription": "The name of the user's profile.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "markdownDescription": "Information about the user who created or modified an experiment, trial, trial component, lineage group, or project.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "LastModifiedBy": {
-      "$ref": "#/definitions/UserContext"
     },
     "LastModifiedTime": {
       "description": "The time at which the model package was last modified.",
@@ -968,26 +943,15 @@
       "description": "Details about the current status of the model package.",
       "type": "object",
       "properties": {
-        "ImageScanStatuses": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ModelPackageStatusItem"
-          },
-          "insertionOrder": true,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-        },
         "ValidationStatuses": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/ModelPackageStatusItem"
           },
           "insertionOrder": true,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
         }
       },
-      "required": [
-        "ValidationStatuses"
-      ],
       "additionalProperties": false,
       "markdownDescription": "Details about the current status of the model package.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
@@ -1051,9 +1015,6 @@
     "AdditionalInferenceSpecifications": {
       "$ref": "#/definitions/AdditionalInferenceSpecifications"
     },
-    "AdditionalInferenceSpecificationDefinition": {
-      "$ref": "#/definitions/AdditionalInferenceSpecificationDefinition"
-    },
     "CertifyForMarketplace": {
       "$ref": "#/definitions/CertifyForMarketplace"
     },
@@ -1093,6 +1054,9 @@
     "SamplePayloadUrl": {
       "$ref": "#/definitions/SamplePayloadUrl"
     },
+    "SkipModelValidation": {
+      "$ref": "#/definitions/SkipModelValidation"
+    },
     "SourceAlgorithmSpecification": {
       "$ref": "#/definitions/SourceAlgorithmSpecification"
     },
@@ -1105,9 +1069,6 @@
     "ApprovalDescription": {
       "$ref": "#/definitions/ApprovalDescription"
     },
-    "LastModifiedBy": {
-      "$ref": "#/definitions/LastModifiedBy"
-    },
     "LastModifiedTime": {
       "$ref": "#/definitions/LastModifiedTime"
     },
@@ -1119,15 +1080,6 @@
     },
     "ModelPackageStatusDetails": {
       "$ref": "#/definitions/ModelPackageStatusDetails"
-    },
-    "ModelPackageStatusItem": {
-      "$ref": "#/definitions/ModelPackageStatusItem"
-    },
-    "CreatedBy": {
-      "$ref": "#/definitions/CreatedBy"
-    },
-    "Environment": {
-      "$ref": "#/definitions/Environment"
     }
   },
   "additionalProperties": false,
@@ -1157,6 +1109,10 @@
     "/properties/Task",
     "/properties/SamplePayloadUrl"
   ],
+  "writeOnlyProperties": [
+    "/properties/ClientToken",
+    "/properties/AdditionalInferenceSpecificationsToAdd"
+  ],
   "primaryIdentifier": [
     "/properties/ModelPackageArn"
   ],
@@ -1173,6 +1129,8 @@
         "sagemaker:CreateTrainingJob",
         "sagemaker:CreateTransformJob",
         "sagemaker:DescribeTransformJob",
+        "sagemaker:DescribeModelPackage",
+        "sagemaker:ListTags",
         "iam:PassRole",
         "s3:GetObject"
       ]
@@ -1199,6 +1157,13 @@
       ]
     },
     "list": {
+      "handlerSchema": {
+        "properties": {
+          "ModelPackageGroupName": {
+            "$ref": "resource-schema.json#/properties/ModelPackageGroupName"
+          }
+        }
+      },
       "permissions": [
         "sagemaker:ListModelPackages"
       ]

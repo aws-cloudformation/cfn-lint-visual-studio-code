@@ -63,10 +63,12 @@
       "type": "string",
       "enum": [
         "STANDARD",
-        "BASIC"
+        "BASIC",
+        "ADVANCED_SD",
+        "ADVANCED_HD"
       ],
       "default": "STANDARD",
-      "markdownDescription": "Channel type, which determines the allowable resolution and bitrate. If you exceed the allowable resolution or bitrate, the stream probably will disconnect immediately.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: STANDARD | BASIC  \nUpdate requires: No interruption"
+      "markdownDescription": "Channel type, which determines the allowable resolution and bitrate. If you exceed the allowable resolution or bitrate, the stream probably will disconnect immediately.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: STANDARD | BASIC | ADVANCED_SD | ADVANCED_HD  \nUpdate requires: No interruption"
     },
     "Tags": {
       "description": "A list of key-value pairs that contain metadata for the asset model.",
@@ -86,6 +88,15 @@
       "minLength": 0,
       "maxLength": 128,
       "markdownDescription": "Recording Configuration ARN. A value other than an empty string indicates that recording is enabled. Default: \"\" (recording is disabled).\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 128  \nPattern: ^$|arn:aws:ivs:[a-z0-9-]+:[0-9]+:recording-configuration/[a-zA-Z0-9-]+$  \nUpdate requires: No interruption"
+    },
+    "Preset": {
+      "description": "Optional transcode preset for the channel. This is selectable only for ADVANCED_HD and ADVANCED_SD channel types. For those channel types, the default preset is HIGHER_BANDWIDTH_DELIVERY. For other channel types (BASIC and STANDARD), preset is the empty string (\"\").",
+      "type": "string",
+      "enum": [
+        "HIGHER_BANDWIDTH_DELIVERY",
+        "CONSTRAINED_BANDWIDTH_DELIVERY"
+      ],
+      "markdownDescription": "Optional transcode preset for the channel. This is selectable only for ADVANCED_HD and ADVANCED_SD channel types. For those channel types, the default preset is HIGHER_BANDWIDTH_DELIVERY. For other channel types (BASIC and STANDARD), preset is the empty string (\"\").\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: HIGHER_BANDWIDTH_DELIVERY | CONSTRAINED_BANDWIDTH_DELIVERY  \nUpdate requires: No interruption"
     }
   },
   "additionalProperties": false,
@@ -101,16 +112,19 @@
   "handlers": {
     "create": {
       "permissions": [
-        "ivs:CreateChannel"
+        "ivs:CreateChannel",
+        "ivs:TagResource"
       ]
     },
     "read": {
       "permissions": [
-        "ivs:GetChannel"
+        "ivs:GetChannel",
+        "ivs:ListTagsForResource"
       ]
     },
     "update": {
       "permissions": [
+        "ivs:GetChannel",
         "ivs:UpdateChannel",
         "ivs:TagResource",
         "ivs:UnTagResource",
@@ -119,12 +133,14 @@
     },
     "delete": {
       "permissions": [
-        "ivs:DeleteChannel"
+        "ivs:DeleteChannel",
+        "ivs:UnTagResource"
       ]
     },
     "list": {
       "permissions": [
-        "ivs:ListChannels"
+        "ivs:ListChannels",
+        "ivs:ListTagsForResource"
       ]
     }
   },

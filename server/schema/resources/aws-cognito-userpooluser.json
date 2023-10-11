@@ -1,35 +1,33 @@
 {
   "typeName": "AWS::Cognito::UserPoolUser",
   "description": "Resource Type definition for AWS::Cognito::UserPoolUser",
-  "additionalProperties": false,
-  "properties": {
-    "ValidationData": {
-      "type": "array",
-      "uniqueItems": false,
-      "items": {
-        "$ref": "#/definitions/AttributeType"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement"
-    },
-    "UserPoolId": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
-    },
-    "Username": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
-    },
-    "MessageAction": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
-    },
-    "ClientMetadata": {
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "definitions": {
+    "AttributeType": {
       "type": "object",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: Replacement"
-    },
+      "properties": {
+        "Name": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
     "DesiredDeliveryMediums": {
       "type": "array",
-      "uniqueItems": false,
       "items": {
         "type": "string",
         "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
@@ -42,53 +40,101 @@
     },
     "UserAttributes": {
       "type": "array",
-      "uniqueItems": false,
       "items": {
         "$ref": "#/definitions/AttributeType"
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement"
-    }
-  },
-  "definitions": {
-    "AttributeType": {
+    },
+    "MessageAction": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "Username": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "UserPoolId": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
+    },
+    "ValidationData": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/AttributeType"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement"
+    },
+    "ClientMetadata": {
       "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "Value": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "Name": {
+      "patternProperties": {
+        ".*": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         }
       },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: Replacement"
     }
   },
+  "additionalProperties": false,
   "required": [
     "UserPoolId"
   ],
-  "createOnlyProperties": [
-    "/properties/ClientMetadata",
-    "/properties/ValidationData",
+  "primaryIdentifier": [
     "/properties/UserPoolId",
-    "/properties/MessageAction",
-    "/properties/ForceAliasCreation",
-    "/properties/DesiredDeliveryMediums",
-    "/properties/UserAttributes",
     "/properties/Username"
   ],
-  "primaryIdentifier": [
-    "/properties/Id"
+  "createOnlyProperties": [
+    "/properties/DesiredDeliveryMediums",
+    "/properties/ForceAliasCreation",
+    "/properties/UserAttributes",
+    "/properties/Username",
+    "/properties/UserPoolId",
+    "/properties/ValidationData",
+    "/properties/ClientMetadata",
+    "/properties/MessageAction"
   ],
-  "readOnlyProperties": [
-    "/properties/Id"
+  "writeOnlyProperties": [
+    "/properties/DesiredDeliveryMediums",
+    "/properties/ForceAliasCreation",
+    "/properties/ValidationData",
+    "/properties/ClientMetadata",
+    "/properties/MessageAction"
   ],
-  "attributes": {
-    "Id": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+  "handlers": {
+    "create": {
+      "permissions": [
+        "cognito-idp:AdminCreateUser",
+        "iam:PassRole"
+      ],
+      "timeoutInMinutes": 2
+    },
+    "read": {
+      "permissions": [
+        "cognito-idp:AdminGetUser"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "cognito-idp:AdminDeleteUser"
+      ],
+      "timeoutInMinutes": 2
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "UserPoolId": {
+            "$ref": "resource-schema.json#/properties/UserPoolId"
+          }
+        },
+        "required": [
+          "UserPoolId"
+        ]
+      },
+      "permissions": [
+        "cognito-idp:ListUsers"
+      ]
     }
-  }
+  },
+  "attributes": {}
 }

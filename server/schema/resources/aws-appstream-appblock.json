@@ -12,13 +12,12 @@
         },
         "S3Key": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         }
       },
       "additionalProperties": false,
       "required": [
-        "S3Bucket",
-        "S3Key"
+        "S3Bucket"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
@@ -54,23 +53,44 @@
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
     "Tag": {
-      "type": "object",
-      "properties": {
-        "TagKey": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "Key": {
+              "type": "string"
+            },
+            "Value": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "Key",
+            "Value"
+          ],
+          "additionalProperties": false
         },
-        "TagValue": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        {
+          "type": "object",
+          "properties": {
+            "TagKey": {
+              "type": "string"
+            },
+            "TagValue": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "TagKey",
+            "TagValue"
+          ],
+          "additionalProperties": false
         }
-      },
-      "required": [
-        "TagKey",
-        "TagValue"
-      ],
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+      ]
+    },
+    "PackagingType": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     }
   },
   "properties": {
@@ -100,12 +120,17 @@
         "$ref": "#/definitions/Tag"
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "PackagingType": {
+      "$ref": "#/definitions/PackagingType"
+    },
+    "PostSetupScriptDetails": {
+      "$ref": "#/definitions/ScriptDetails"
     }
   },
   "required": [
     "Name",
-    "SourceS3Location",
-    "SetupScriptDetails"
+    "SourceS3Location"
   ],
   "additionalProperties": false,
   "primaryIdentifier": [
@@ -116,7 +141,9 @@
     "/properties/DisplayName",
     "/properties/Description",
     "/properties/SourceS3Location",
-    "/properties/SetupScriptDetails"
+    "/properties/SetupScriptDetails",
+    "/properties/PackagingType",
+    "/properties/PostSetupScriptDetails"
   ],
   "readOnlyProperties": [
     "/properties/Arn",
@@ -125,11 +152,18 @@
   "writeOnlyProperties": [
     "/properties/Tags"
   ],
+  "deprecatedProperties": [
+    "/properties/Tags/TagKey",
+    "/properties/Tags/TagValue"
+  ],
   "handlers": {
     "create": {
       "permissions": [
         "appstream:CreateAppBlock",
-        "s3:GetObject"
+        "appstream:TagResource",
+        "s3:GetObject",
+        "s3:ListBucket",
+        "s3:GetBucketOwnershipControls"
       ]
     },
     "read": {

@@ -1,58 +1,26 @@
 {
   "typeName": "AWS::Lambda::LayerVersion",
   "description": "Resource Type definition for AWS::Lambda::LayerVersion",
-  "additionalProperties": false,
-  "properties": {
-    "CompatibleRuntimes": {
-      "type": "array",
-      "uniqueItems": false,
-      "items": {
-        "type": "string",
-        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement"
-    },
-    "LicenseInfo": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
-    },
-    "Description": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
-    },
-    "LayerName": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
-    },
-    "Content": {
-      "$ref": "#/definitions/Content"
-    },
-    "CompatibleArchitectures": {
-      "type": "array",
-      "uniqueItems": false,
-      "items": {
-        "type": "string",
-        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement"
-    }
-  },
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-lambda.git",
   "definitions": {
     "Content": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "S3ObjectVersion": {
+          "description": "For versioned objects, the version of the layer archive object to use.",
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          "markdownDescription": "For versioned objects, the version of the layer archive object to use.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         },
         "S3Bucket": {
+          "description": "The Amazon S3 bucket of the layer archive.",
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+          "markdownDescription": "The Amazon S3 bucket of the layer archive.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
         },
         "S3Key": {
+          "description": "The Amazon S3 key of the layer archive.",
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+          "markdownDescription": "The Amazon S3 key of the layer archive.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
         }
       },
       "required": [
@@ -62,6 +30,51 @@
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     }
   },
+  "properties": {
+    "CompatibleRuntimes": {
+      "description": "A list of compatible function runtimes. Used for filtering with ListLayers and ListLayerVersions.",
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": false,
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      },
+      "markdownDescription": "A list of compatible function runtimes. Used for filtering with ListLayers and ListLayerVersions.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement"
+    },
+    "LicenseInfo": {
+      "description": "The layer's software license.",
+      "type": "string",
+      "markdownDescription": "The layer's software license.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "Description": {
+      "description": "The description of the version.",
+      "type": "string",
+      "markdownDescription": "The description of the version.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "LayerName": {
+      "description": "The name or Amazon Resource Name (ARN) of the layer.",
+      "type": "string",
+      "markdownDescription": "The name or Amazon Resource Name (ARN) of the layer.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "Content": {
+      "description": "The function layer archive.",
+      "$ref": "#/definitions/Content",
+      "markdownDescription": "The function layer archive.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: Replacement"
+    },
+    "CompatibleArchitectures": {
+      "description": "A list of compatible instruction set architectures.",
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": false,
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      },
+      "markdownDescription": "A list of compatible instruction set architectures.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement"
+    }
+  },
+  "additionalProperties": false,
   "required": [
     "Content"
   ],
@@ -73,14 +86,48 @@
     "/properties/Description",
     "/properties/Content"
   ],
-  "primaryIdentifier": [
-    "/properties/Id"
-  ],
   "readOnlyProperties": [
-    "/properties/Id"
+    "/properties/LayerVersionArn"
   ],
+  "writeOnlyProperties": [
+    "/properties/Content"
+  ],
+  "primaryIdentifier": [
+    "/properties/LayerVersionArn"
+  ],
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "lambda:PublishLayerVersion",
+        "s3:GetObject",
+        "s3:GetObjectVersion"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "lambda:GetLayerVersion"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "lambda:GetLayerVersion",
+        "lambda:DeleteLayerVersion"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "lambda:ListLayerVersions"
+      ]
+    }
+  },
   "attributes": {
-    "Id": {
+    "LayerVersionArn": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     }

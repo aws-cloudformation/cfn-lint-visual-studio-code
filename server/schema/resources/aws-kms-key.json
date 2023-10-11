@@ -54,7 +54,8 @@
         "object",
         "string"
       ],
-      "markdownDescription": "The key policy that authorizes use of the AWS KMS key. The key policy must observe the following rules.\n\n---\n\nRequired: Yes  \nType: ['object', 'string']  \nUpdate requires: No interruption"
+      "default": "{\n    \"Version\": \"2012-10-17\",\n    \"Id\": \"key-default\",\n    \"Statement\": [\n        {\n            \"Sid\": \"Enable IAM User Permissions\",\n            \"Effect\": \"Allow\",\n            \"Principal\": {\n                \"AWS\": \"arn:<partition>:iam::<account-id>:root\"\n            },\n            \"Action\": \"kms:*\",\n            \"Resource\": \"*\"\n        }\n    ]\n}",
+      "markdownDescription": "The key policy that authorizes use of the AWS KMS key. The key policy must observe the following rules.\n\n---\n\nRequired: No  \nType: ['object', 'string']  \nUpdate requires: No interruption"
     },
     "KeyUsage": {
       "description": "Determines the cryptographic operations for which you can use the AWS KMS key. The default value is ENCRYPT_DECRYPT. This property is required only for asymmetric AWS KMS keys. You can't change the KeyUsage value after the AWS KMS key is created.",
@@ -66,6 +67,16 @@
         "GENERATE_VERIFY_MAC"
       ],
       "markdownDescription": "Determines the cryptographic operations for which you can use the AWS KMS key. The default value is ENCRYPT_DECRYPT. This property is required only for asymmetric AWS KMS keys. You can't change the KeyUsage value after the AWS KMS key is created.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENCRYPT_DECRYPT | SIGN_VERIFY | GENERATE_VERIFY_MAC  \nUpdate requires: No interruption"
+    },
+    "Origin": {
+      "description": "The source of the key material for the KMS key. You cannot change the origin after you create the KMS key. The default is AWS_KMS, which means that AWS KMS creates the key material.",
+      "type": "string",
+      "default": "AWS_KMS",
+      "enum": [
+        "AWS_KMS",
+        "EXTERNAL"
+      ],
+      "markdownDescription": "The source of the key material for the KMS key. You cannot change the origin after you create the KMS key. The default is AWS_KMS, which means that AWS KMS creates the key material.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AWS_KMS | EXTERNAL  \nUpdate requires: No interruption"
     },
     "KeySpec": {
       "description": "Specifies the type of AWS KMS key to create. The default value is SYMMETRIC_DEFAULT. This property is required only for asymmetric AWS KMS keys. You can't change the KeySpec value after the AWS KMS key is created.",
@@ -110,12 +121,15 @@
         "$ref": "#/definitions/Tag"
       },
       "markdownDescription": "An array of key-value pairs to apply to this resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "BypassPolicyLockoutSafetyCheck": {
+      "description": "Skips (\"bypasses\") the key policy lockout safety check. The default value is false.",
+      "type": "boolean",
+      "default": false,
+      "markdownDescription": "Skips (\"bypasses\") the key policy lockout safety check. The default value is false.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
     }
   },
   "additionalProperties": false,
-  "required": [
-    "KeyPolicy"
-  ],
   "readOnlyProperties": [
     "/properties/Arn",
     "/properties/KeyId"
@@ -124,7 +138,8 @@
     "/properties/KeyId"
   ],
   "writeOnlyProperties": [
-    "/properties/PendingWindowInDays"
+    "/properties/PendingWindowInDays",
+    "/properties/BypassPolicyLockoutSafetyCheck"
   ],
   "tagging": {
     "taggable": true,
@@ -138,7 +153,8 @@
         "kms:CreateKey",
         "kms:EnableKeyRotation",
         "kms:DisableKey",
-        "kms:TagResource"
+        "kms:TagResource",
+        "kms:PutKeyPolicy"
       ]
     },
     "read": {
@@ -159,7 +175,8 @@
         "kms:PutKeyPolicy",
         "kms:TagResource",
         "kms:UntagResource",
-        "kms:UpdateKeyDescription"
+        "kms:UpdateKeyDescription",
+        "kms:ListResourceTags"
       ]
     },
     "delete": {

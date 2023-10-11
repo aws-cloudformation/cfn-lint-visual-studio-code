@@ -1,0 +1,201 @@
+{
+  "typeName": "AWS::StepFunctions::StateMachineAlias",
+  "description": "Resource schema for StateMachineAlias",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-stepfunctions.git",
+  "definitions": {
+    "RoutingConfigurationVersion": {
+      "type": "object",
+      "properties": {
+        "StateMachineVersionArn": {
+          "type": "string",
+          "description": "The Amazon Resource Name (ARN) that identifies one or two state machine versions defined in the routing configuration.",
+          "minLength": 1,
+          "maxLength": 2048,
+          "markdownDescription": "The Amazon Resource Name (ARN) that identifies one or two state machine versions defined in the routing configuration.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: No interruption"
+        },
+        "Weight": {
+          "type": "integer",
+          "description": "The percentage of traffic you want to route to the state machine version. The sum of the weights in the routing configuration must be equal to 100.",
+          "minimum": 0,
+          "maximum": 100,
+          "markdownDescription": "The percentage of traffic you want to route to the state machine version. The sum of the weights in the routing configuration must be equal to 100.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "StateMachineVersionArn",
+        "Weight"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RoutingConfiguration": {
+      "type": "array",
+      "description": "The routing configuration of the alias. One or two versions can be mapped to an alias to split StartExecution requests of the same state machine.",
+      "minItems": 1,
+      "maxItems": 2,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/RoutingConfigurationVersion"
+      },
+      "markdownDescription": "The routing configuration of the alias. One or two versions can be mapped to an alias to split StartExecution requests of the same state machine.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "DeploymentPreference": {
+      "type": "object",
+      "description": "The settings to enable gradual state machine deployments.",
+      "properties": {
+        "StateMachineVersionArn": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: No interruption"
+        },
+        "Type": {
+          "type": "string",
+          "description": "The type of deployment to perform.",
+          "enum": [
+            "LINEAR",
+            "ALL_AT_ONCE",
+            "CANARY"
+          ],
+          "markdownDescription": "The type of deployment to perform.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: LINEAR | ALL_AT_ONCE | CANARY  \nUpdate requires: No interruption"
+        },
+        "Percentage": {
+          "type": "integer",
+          "description": "The percentage of traffic to shift to the new version in each increment.",
+          "minimum": 1,
+          "maximum": 99,
+          "markdownDescription": "The percentage of traffic to shift to the new version in each increment.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "Interval": {
+          "type": "integer",
+          "description": "The time in minutes between each traffic shifting increment.",
+          "minimum": 1,
+          "maximum": 2100,
+          "markdownDescription": "The time in minutes between each traffic shifting increment.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "Alarms": {
+          "type": "array",
+          "description": "A list of CloudWatch alarm names that will be monitored during the deployment. The deployment will fail and rollback if any alarms go into ALARM state.",
+          "minItems": 1,
+          "maxItems": 100,
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "A list of CloudWatch alarm names that will be monitored during the deployment. The deployment will fail and rollback if any alarms go into ALARM state.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "StateMachineVersionArn",
+        "Type"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The settings to enable gradual state machine deployments.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "Name": {
+      "type": "string",
+      "description": "The alias name.",
+      "minLength": 1,
+      "maxLength": 80,
+      "markdownDescription": "The alias name.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 80  \nUpdate requires: Replacement"
+    },
+    "Description": {
+      "type": "string",
+      "description": "An optional description of the alias.",
+      "minLength": 1,
+      "maxLength": 256,
+      "markdownDescription": "An optional description of the alias.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption"
+    },
+    "RoutingConfiguration": {
+      "$ref": "#/definitions/RoutingConfiguration"
+    },
+    "DeploymentPreference": {
+      "$ref": "#/definitions/DeploymentPreference"
+    }
+  },
+  "additionalProperties": false,
+  "tagging": {
+    "taggable": false
+  },
+  "oneOf": [
+    {
+      "required": [
+        "RoutingConfiguration"
+      ]
+    },
+    {
+      "required": [
+        "DeploymentPreference"
+      ]
+    }
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn"
+  ],
+  "createOnlyProperties": [
+    "/properties/Name"
+  ],
+  "writeOnlyProperties": [
+    "/properties/DeploymentPreference"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "states:CreateStateMachineAlias",
+        "states:DescribeStateMachineAlias"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "states:DescribeStateMachineAlias"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "cloudwatch:DescribeAlarms",
+        "states:UpdateStateMachineAlias",
+        "states:DescribeStateMachineAlias"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "states:DescribeStateMachineAlias",
+        "states:DeleteStateMachineAlias"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "states:ListStateMachineAliases"
+      ],
+      "handlerSchema": {
+        "properties": {
+          "RoutingConfiguration": {
+            "$ref": "resource-schema.json#/properties/RoutingConfiguration"
+          }
+        },
+        "required": [
+          "RoutingConfiguration"
+        ]
+      }
+    }
+  },
+  "attributes": {
+    "Arn": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048,
+      "description": "The ARN of the alias.",
+      "markdownDescription": "The ARN of the alias.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: No interruption"
+    }
+  }
+}

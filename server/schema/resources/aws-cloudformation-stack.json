@@ -1,19 +1,53 @@
 {
   "typeName": "AWS::CloudFormation::Stack",
-  "description": "Resource Type definition for AWS::CloudFormation::Stack",
+  "description": "The AWS::CloudFormation::Stack resource nests a stack as a resource in a top-level template.",
   "additionalProperties": false,
   "properties": {
+    "Capabilities": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string",
+        "enum": [
+          "CAPABILITY_IAM",
+          "CAPABILITY_NAMED_IAM",
+          "CAPABILITY_AUTO_EXPAND"
+        ],
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CAPABILITY_IAM | CAPABILITY_NAMED_IAM | CAPABILITY_AUTO_EXPAND  \nUpdate requires: No interruption"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "RoleARN": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "Description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption"
+    },
+    "DisableRollback": {
+      "type": "boolean",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+    },
+    "EnableTerminationProtection": {
+      "type": "boolean",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+    },
     "NotificationARNs": {
       "type": "array",
-      "uniqueItems": true,
+      "uniqueItems": false,
       "items": {
         "type": "string",
         "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
       },
+      "maxItems": 5,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     },
     "Parameters": {
       "type": "object",
+      "additionalProperties": false,
       "patternProperties": {
         "[a-zA-Z0-9]+": {
           "type": "string",
@@ -22,20 +56,45 @@
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
+    "StackName": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
+    },
+    "StackPolicyBody": {
+      "type": "object",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "StackPolicyURL": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "StackStatusReason": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
     "Tags": {
       "type": "array",
       "uniqueItems": false,
+      "insertionOrder": false,
       "items": {
         "$ref": "#/definitions/Tag"
       },
+      "maxItems": 50,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "TemplateBody": {
+      "type": "object",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "TemplateURL": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+      "minLength": 1,
+      "maxLength": 1024,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption"
     },
     "TimeoutInMinutes": {
       "type": "integer",
+      "minimum": 1,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
     }
   },
@@ -58,19 +117,161 @@
         "Key"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Output": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Description": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "ExportName": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "OutputKey": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "OutputValue": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     }
   },
   "required": [
-    "TemplateURL"
-  ],
-  "primaryIdentifier": [
-    "/properties/Id"
+    "StackName"
   ],
   "readOnlyProperties": [
-    "/properties/Id"
+    "/properties/StackId",
+    "/properties/StackStatus",
+    "/properties/CreationTime",
+    "/properties/RootId",
+    "/properties/ParentId",
+    "/properties/ChangeSetId",
+    "/properties/Outputs",
+    "/properties/LastUpdateTime"
   ],
+  "writeOnlyProperties": [
+    "/properties/TemplateURL",
+    "/properties/StackPolicyURL"
+  ],
+  "createOnlyProperties": [
+    "/properties/StackName"
+  ],
+  "primaryIdentifier": [
+    "/properties/StackId"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/StackName"
+    ]
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "cloudformation:DescribeStacks",
+        "cloudformation:CreateStack",
+        "iam:PassRole"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "cloudformation:DescribeStacks",
+        "cloudformation:UpdateStack",
+        "cloudformation:UpdateTerminationProtection",
+        "cloudformation:SetStackPolicy",
+        "iam:PassRole"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "cloudformation:DescribeStacks",
+        "cloudformation:DeleteStack"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "cloudformation:DescribeStacks",
+        "cloudformation:GetStackPolicy",
+        "cloudformation:GetTemplate"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "cloudformation:ListStacks"
+      ]
+    }
+  },
   "attributes": {
-    "Id": {
+    "Outputs": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "$ref": "#/definitions/Output"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "ParentId": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "RootId": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "ChangeSetId": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "StackId": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "StackStatus": {
+      "type": "string",
+      "enum": [
+        "CREATE_IN_PROGRESS",
+        "CREATE_FAILED",
+        "CREATE_COMPLETE",
+        "ROLLBACK_IN_PROGRESS",
+        "ROLLBACK_FAILED",
+        "ROLLBACK_COMPLETE",
+        "DELETE_IN_PROGRESS",
+        "DELETE_FAILED",
+        "DELETE_COMPLETE",
+        "UPDATE_IN_PROGRESS",
+        "UPDATE_COMPLETE_CLEANUP_IN_PROGRESS",
+        "UPDATE_COMPLETE",
+        "UPDATE_FAILED",
+        "UPDATE_ROLLBACK_IN_PROGRESS",
+        "UPDATE_ROLLBACK_FAILED",
+        "UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS",
+        "UPDATE_ROLLBACK_COMPLETE",
+        "REVIEW_IN_PROGRESS",
+        "IMPORT_IN_PROGRESS",
+        "IMPORT_COMPLETE",
+        "IMPORT_ROLLBACK_IN_PROGRESS",
+        "IMPORT_ROLLBACK_FAILED",
+        "IMPORT_ROLLBACK_COMPLETE"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATE_IN_PROGRESS | CREATE_FAILED | CREATE_COMPLETE | ROLLBACK_IN_PROGRESS | ROLLBACK_FAILED | ROLLBACK_COMPLETE | DELETE_IN_PROGRESS | DELETE_FAILED | DELETE_COMPLETE | UPDATE_IN_PROGRESS | UPDATE_COMPLETE_CLEANUP_IN_PROGRESS | UPDATE_COMPLETE | UPDATE_FAILED | UPDATE_ROLLBACK_IN_PROGRESS | UPDATE_ROLLBACK_FAILED | UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS | UPDATE_ROLLBACK_COMPLETE | REVIEW_IN_PROGRESS | IMPORT_IN_PROGRESS | IMPORT_COMPLETE | IMPORT_ROLLBACK_IN_PROGRESS | IMPORT_ROLLBACK_FAILED | IMPORT_ROLLBACK_COMPLETE  \nUpdate requires: No interruption"
+    },
+    "LastUpdateTime": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "CreationTime": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     }

@@ -11,6 +11,87 @@
       "default": "OFF",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: OFF | SNAPPY  \nUpdate requires: No interruption"
     },
+    "DataDestinationConfig": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "type": "object",
+          "title": "S3Config",
+          "properties": {
+            "S3Config": {
+              "$ref": "#/definitions/S3Config"
+            }
+          },
+          "required": [
+            "S3Config"
+          ]
+        },
+        {
+          "additionalProperties": false,
+          "type": "object",
+          "title": "TimestreamConfig",
+          "properties": {
+            "TimestreamConfig": {
+              "$ref": "#/definitions/TimestreamConfig"
+            }
+          },
+          "required": [
+            "TimestreamConfig"
+          ]
+        }
+      ]
+    },
+    "S3Config": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "BucketArn": {
+          "maxLength": 100,
+          "type": "string",
+          "minLength": 16,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 16  \nMaximum Length: 100  \nPattern: ^arn:(aws[a-zA-Z0-9-]*):s3:::.+$  \nUpdate requires: No interruption"
+        },
+        "DataFormat": {
+          "$ref": "#/definitions/DataFormat"
+        },
+        "StorageCompressionFormat": {
+          "$ref": "#/definitions/StorageCompressionFormat"
+        },
+        "Prefix": {
+          "maxLength": 512,
+          "type": "string",
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^[a-zA-Z0-9-_:./!*'()]+$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "BucketArn"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "TimestreamConfig": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "TimestreamTableArn": {
+          "maxLength": 2048,
+          "type": "string",
+          "minLength": 20,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:(aws[a-zA-Z0-9-]*):timestream:[a-zA-Z0-9-]+:[0-9]{12}:database\\/[a-zA-Z0-9_.-]+\\/table\\/[a-zA-Z0-9_.-]+$  \nUpdate requires: No interruption"
+        },
+        "ExecutionRoleArn": {
+          "maxLength": 2048,
+          "type": "string",
+          "minLength": 20,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:(aws[a-zA-Z0-9-]*):iam::(\\d{12})?:(role((\\u002F)|(\\u002F[\\u0021-\\u007F]+\\u002F))[\\w+=,.@-]+)$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "TimestreamTableArn",
+        "ExecutionRoleArn"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "UpdateCampaignAction": {
       "type": "string",
       "enum": [
@@ -100,6 +181,22 @@
         "RISING_EDGE"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ALWAYS | RISING_EDGE  \nUpdate requires: No interruption"
+    },
+    "DataFormat": {
+      "type": "string",
+      "enum": [
+        "JSON",
+        "PARQUET"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: JSON | PARQUET  \nUpdate requires: No interruption"
+    },
+    "StorageCompressionFormat": {
+      "type": "string",
+      "enum": [
+        "NONE",
+        "GZIP"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: NONE | GZIP  \nUpdate requires: No interruption"
     },
     "CollectionScheme": {
       "oneOf": [
@@ -211,6 +308,16 @@
       "type": "array",
       "items": {
         "$ref": "#/definitions/SignalInformation"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "DataDestinationConfigs": {
+      "minItems": 1,
+      "maxItems": 1,
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/DataDestinationConfig"
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     },
@@ -331,11 +438,18 @@
     "create": {
       "permissions": [
         "iotfleetwise:CreateCampaign",
-        "iotfleetwise:GetCampaign"
+        "iotfleetwise:GetCampaign",
+        "iotfleetwise:ListTagsForResource",
+        "iotfleetwise:TagResource",
+        "iam:PassRole",
+        "timestream:DescribeEndpoints",
+        "timestream:DescribeTable"
       ]
     },
     "update": {
       "permissions": [
+        "iotfleetwise:GetCampaign",
+        "iotfleetwise:ListTagsForResource",
         "iotfleetwise:UpdateCampaign",
         "iotfleetwise:TagResource",
         "iotfleetwise:UntagResource"

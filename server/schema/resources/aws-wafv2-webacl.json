@@ -345,7 +345,6 @@
           "items": {
             "$ref": "#/definitions/RuleActionOverride"
           },
-          "minItems": 1,
           "maxItems": 100,
           "markdownDescription": "Action overrides for rules in the rule group.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
         }
@@ -431,9 +430,19 @@
           "type": "string",
           "enum": [
             "IP",
-            "FORWARDED_IP"
+            "FORWARDED_IP",
+            "CUSTOM_KEYS"
           ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: IP | FORWARDED_IP  \nUpdate requires: No interruption"
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: IP | FORWARDED_IP | CUSTOM_KEYS  \nUpdate requires: No interruption"
+        },
+        "CustomKeys": {
+          "description": "Specifies the aggregate keys to use in a rate-base rule.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RateBasedStatementCustomKey"
+          },
+          "maxItems": 5,
+          "markdownDescription": "Specifies the aggregate keys to use in a rate-base rule.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
         },
         "ScopeDownStatement": {
           "$ref": "#/definitions/Statement"
@@ -448,6 +457,186 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RateBasedStatementCustomKey": {
+      "description": "Specifies a single custom aggregate key for a rate-base rule.",
+      "type": "object",
+      "properties": {
+        "Cookie": {
+          "$ref": "#/definitions/RateLimitCookie"
+        },
+        "ForwardedIP": {
+          "$ref": "#/definitions/RateLimitForwardedIP"
+        },
+        "Header": {
+          "$ref": "#/definitions/RateLimitHeader"
+        },
+        "HTTPMethod": {
+          "$ref": "#/definitions/RateLimitHTTPMethod"
+        },
+        "IP": {
+          "$ref": "#/definitions/RateLimitIP"
+        },
+        "LabelNamespace": {
+          "$ref": "#/definitions/RateLimitLabelNamespace"
+        },
+        "QueryArgument": {
+          "$ref": "#/definitions/RateLimitQueryArgument"
+        },
+        "QueryString": {
+          "$ref": "#/definitions/RateLimitQueryString"
+        },
+        "UriPath": {
+          "$ref": "#/definitions/RateLimitUriPath"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Specifies a single custom aggregate key for a rate-base rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RateLimitCookie": {
+      "description": "Specifies a cookie as an aggregate key for a rate-based rule.",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "The name of the cookie to use.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "markdownDescription": "The name of the cookie to use.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: .*\\S.*  \nUpdate requires: No interruption"
+        },
+        "TextTransformations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TextTransformation"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Name",
+        "TextTransformations"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Specifies a cookie as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RateLimitForwardedIP": {
+      "description": "Specifies the first IP address in an HTTP header as an aggregate key for a rate-based rule.",
+      "type": "object",
+      "markdownDescription": "Specifies the first IP address in an HTTP header as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RateLimitHeader": {
+      "description": "Specifies a header as an aggregate key for a rate-based rule.",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "The name of the header to use.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "markdownDescription": "The name of the header to use.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: .*\\S.*  \nUpdate requires: No interruption"
+        },
+        "TextTransformations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TextTransformation"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Name",
+        "TextTransformations"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Specifies a header as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RateLimitHTTPMethod": {
+      "description": "Specifies the request's HTTP method as an aggregate key for a rate-based rule.",
+      "type": "object",
+      "markdownDescription": "Specifies the request's HTTP method as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RateLimitIP": {
+      "description": "Specifies the IP address in the web request as an aggregate key for a rate-based rule.",
+      "type": "object",
+      "markdownDescription": "Specifies the IP address in the web request as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RateLimitLabelNamespace": {
+      "description": "Specifies a label namespace to use as an aggregate key for a rate-based rule.",
+      "type": "object",
+      "properties": {
+        "Namespace": {
+          "description": "The namespace to use for aggregation.",
+          "type": "string",
+          "markdownDescription": "The namespace to use for aggregation.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[0-9A-Za-z_:-]{1,1024}$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Namespace"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Specifies a label namespace to use as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RateLimitQueryArgument": {
+      "description": "Specifies a query argument in the request as an aggregate key for a rate-based rule.",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "The name of the query argument to use.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "markdownDescription": "The name of the query argument to use.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: .*\\S.*  \nUpdate requires: No interruption"
+        },
+        "TextTransformations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TextTransformation"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Name",
+        "TextTransformations"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Specifies a query argument in the request as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RateLimitQueryString": {
+      "description": "Specifies the request's query string as an aggregate key for a rate-based rule.",
+      "type": "object",
+      "properties": {
+        "TextTransformations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TextTransformation"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "TextTransformations"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Specifies the request's query string as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RateLimitUriPath": {
+      "description": "Specifies the request's URI Path as an aggregate key for a rate-based rule.",
+      "type": "object",
+      "properties": {
+        "TextTransformations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TextTransformation"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "TextTransformations"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Specifies the request's URI Path as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "RateLimit": {
       "type": "integer",
@@ -828,7 +1017,6 @@
           "items": {
             "$ref": "#/definitions/RuleActionOverride"
           },
-          "minItems": 1,
           "maxItems": 100,
           "markdownDescription": "Action overrides for rules in the rule group.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
         }
@@ -1270,6 +1458,9 @@
         },
         "AWSManagedRulesATPRuleSet": {
           "$ref": "#/definitions/AWSManagedRulesATPRuleSet"
+        },
+        "AWSManagedRulesACFPRuleSet": {
+          "$ref": "#/definitions/AWSManagedRulesACFPRuleSet"
         }
       },
       "additionalProperties": false,
@@ -1302,6 +1493,10 @@
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
         },
+        "EnableRegexInPath": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        },
         "RequestInspection": {
           "$ref": "#/definitions/RequestInspection"
         },
@@ -1314,6 +1509,37 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "Configures how to use the Account Takeover Prevention managed rule group in the web ACL\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AWSManagedRulesACFPRuleSet": {
+      "description": "Configures how to use the Account creation fraud prevention managed rule group in the web ACL",
+      "type": "object",
+      "properties": {
+        "CreationPath": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "RegistrationPagePath": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "RequestInspection": {
+          "$ref": "#/definitions/RequestInspectionACFP"
+        },
+        "ResponseInspection": {
+          "$ref": "#/definitions/ResponseInspection"
+        },
+        "EnableRegexInPath": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "CreationPath",
+        "RegistrationPagePath",
+        "RequestInspection"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configures how to use the Account creation fraud prevention managed rule group in the web ACL\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "RequestInspection": {
       "description": "Configures the inspection of login requests",
@@ -1341,6 +1567,48 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "Configures the inspection of login requests\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RequestInspectionACFP": {
+      "description": "Configures the inspection of sign-up requests",
+      "type": "object",
+      "properties": {
+        "PayloadType": {
+          "type": "string",
+          "enum": [
+            "JSON",
+            "FORM_ENCODED"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: JSON | FORM_ENCODED  \nUpdate requires: No interruption"
+        },
+        "UsernameField": {
+          "$ref": "#/definitions/FieldIdentifier"
+        },
+        "PasswordField": {
+          "$ref": "#/definitions/FieldIdentifier"
+        },
+        "EmailField": {
+          "$ref": "#/definitions/FieldIdentifier"
+        },
+        "PhoneNumberFields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PhoneNumberField"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "AddressFields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AddressField"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "PayloadType"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configures the inspection of sign-up requests\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "ResponseInspection": {
       "description": "Configures the inspection of login responses",
@@ -1530,6 +1798,58 @@
         "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 253  \nPattern: ^[\\w\\.\\-/]+$  \nUpdate requires: No interruption"
       },
       "markdownDescription": "List of domains to accept in web request tokens, in addition to the domain of the protected resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "AssociationConfig": {
+      "description": "AssociationConfig for body inspection",
+      "type": "object",
+      "properties": {
+        "RequestBody": {
+          "$ref": "#/definitions/RequestBody"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "AssociationConfig for body inspection\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RequestBody": {
+      "type": "object",
+      "description": "Map of AssociatedResourceType and RequestBodyAssociatedResourceTypeConfig",
+      "patternProperties": {
+        "^(CLOUDFRONT)$": {
+          "$ref": "#/definitions/RequestBodyAssociatedResourceTypeConfig"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Map of AssociatedResourceType and RequestBodyAssociatedResourceTypeConfig\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RequestBodyAssociatedResourceTypeConfig": {
+      "description": "Configures the inspection size in the request body.",
+      "type": "object",
+      "properties": {
+        "DefaultSizeInspectionLimit": {
+          "$ref": "#/definitions/SizeInspectionLimit"
+        }
+      },
+      "required": [
+        "DefaultSizeInspectionLimit"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configures the inspection size in the request body.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "SizeInspectionLimit": {
+      "type": "string",
+      "enum": [
+        "KB_16",
+        "KB_32",
+        "KB_48",
+        "KB_64"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: KB_16 | KB_32 | KB_48 | KB_64  \nUpdate requires: No interruption"
+    },
+    "PhoneNumberField": {
+      "$ref": "#/definitions/FieldIdentifier"
+    },
+    "AddressField": {
+      "$ref": "#/definitions/FieldIdentifier"
     },
     "FieldIdentifier": {
       "type": "object",
@@ -1738,6 +2058,9 @@
     },
     "TokenDomains": {
       "$ref": "#/definitions/TokenDomains"
+    },
+    "AssociationConfig": {
+      "$ref": "#/definitions/AssociationConfig"
     }
   },
   "required": [
@@ -1791,7 +2114,17 @@
     "list": {
       "permissions": [
         "wafv2:listWebACLs"
-      ]
+      ],
+      "handlerSchema": {
+        "properties": {
+          "Scope": {
+            "$ref": "resource-schema.json#/properties/Scope"
+          }
+        },
+        "required": [
+          "Scope"
+        ]
+      }
     }
   },
   "attributes": {

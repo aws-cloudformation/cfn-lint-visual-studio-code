@@ -1,12 +1,196 @@
 {
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "tagProperty": "/properties/Tags",
+    "cloudFormationSystemTags": false
+  },
   "typeName": "AWS::NetworkManager::ConnectPeer",
+  "readOnlyProperties": [
+    "/properties/ConnectPeerId",
+    "/properties/State",
+    "/properties/CreatedAt",
+    "/properties/Configuration",
+    "/properties/CoreNetworkId",
+    "/properties/EdgeLocation"
+  ],
   "description": "AWS::NetworkManager::ConnectPeer Resource Type Definition.",
+  "createOnlyProperties": [
+    "/properties/PeerAddress",
+    "/properties/CoreNetworkAddress",
+    "/properties/BgpOptions",
+    "/properties/InsideCidrBlocks",
+    "/properties/ConnectAttachmentId"
+  ],
+  "primaryIdentifier": [
+    "/properties/ConnectPeerId"
+  ],
+  "required": [
+    "ConnectAttachmentId",
+    "PeerAddress"
+  ],
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-networkmanager/aws-networkmanager-connectpeer",
-  "properties": {
-    "PeerAddress": {
-      "description": "The IP address of the Connect peer.",
+  "handlers": {
+    "read": {
+      "permissions": [
+        "networkmanager:GetConnectPeer"
+      ]
+    },
+    "create": {
+      "permissions": [
+        "networkmanager:GetConnectPeer",
+        "networkmanager:CreateConnectPeer",
+        "networkmanager:TagResource",
+        "ec2:DescribeRegions"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "networkmanager:GetConnectPeer",
+        "networkmanager:ListTagsForResource",
+        "networkmanager:TagResource",
+        "networkmanager:UntagResource",
+        "ec2:DescribeRegions"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "networkmanager:ListConnectPeers"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "networkmanager:GetConnectPeer",
+        "networkmanager:DeleteConnectPeer",
+        "ec2:DescribeRegions"
+      ]
+    }
+  },
+  "writeOnlyProperties": [
+    "/properties/CoreNetworkAddress",
+    "/properties/BgpOptions"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/ConnectAttachmentId",
+      "/properties/CoreNetworkAddress",
+      "/properties/InsideCidrBlocks"
+    ]
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "ConnectPeerConfiguration": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "BgpConfigurations": {
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ConnectPeerBgpConfiguration"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "PeerAddress": {
+          "description": "The IP address of the Connect peer.",
+          "type": "string",
+          "markdownDescription": "The IP address of the Connect peer.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "CoreNetworkAddress": {
+          "description": "The IP address of a core network.",
+          "type": "string",
+          "markdownDescription": "The IP address of a core network.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "InsideCidrBlocks": {
+          "description": "The inside IP addresses used for a Connect peer configuration.",
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "The inside IP addresses used for a Connect peer configuration.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Protocol": {
+          "$ref": "#/definitions/TunnelProtocol"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ConnectPeerBgpConfiguration": {
+      "description": "Bgp configuration for connect peer",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "PeerAddress": {
+          "description": "The address of a core network Connect peer.",
+          "type": "string",
+          "markdownDescription": "The address of a core network Connect peer.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "CoreNetworkAddress": {
+          "description": "The address of a core network.",
+          "type": "string",
+          "markdownDescription": "The address of a core network.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "PeerAsn": {
+          "description": "The ASN of the Connect peer.",
+          "type": "number",
+          "markdownDescription": "The ASN of the Connect peer.\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+        },
+        "CoreNetworkAsn": {
+          "description": "The ASN of the Coret Network.",
+          "type": "number",
+          "markdownDescription": "The ASN of the Coret Network.\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "Bgp configuration for connect peer\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "BgpOptions": {
+      "description": "Bgp options",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "PeerAsn": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "Bgp options\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "type": "string",
+          "markdownDescription": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Key": {
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "type": "string",
+          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "TunnelProtocol": {
+      "description": "Tunnel protocol type (Only support GRE for now)",
       "type": "string",
-      "markdownDescription": "The IP address of the Connect peer.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
+      "markdownDescription": "Tunnel protocol type (Only support GRE for now)\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "ConnectAttachmentId": {
+      "description": "The ID of the attachment to connect.",
+      "type": "string",
+      "markdownDescription": "The ID of the attachment to connect.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
     },
     "CoreNetworkAddress": {
       "description": "The IP address of a core network.",
@@ -18,199 +202,30 @@
       "$ref": "#/definitions/BgpOptions",
       "markdownDescription": "Bgp options for connect peer.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement"
     },
+    "PeerAddress": {
+      "description": "The IP address of the Connect peer.",
+      "type": "string",
+      "markdownDescription": "The IP address of the Connect peer.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
+    },
     "InsideCidrBlocks": {
       "description": "The inside IP addresses used for a Connect peer configuration.",
-      "type": "array",
       "insertionOrder": false,
+      "type": "array",
       "items": {
         "type": "string",
         "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
       },
-      "markdownDescription": "The inside IP addresses used for a Connect peer configuration.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: Replacement"
-    },
-    "ConnectAttachmentId": {
-      "description": "The ID of the attachment to connect.",
-      "type": "string",
-      "markdownDescription": "The ID of the attachment to connect.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
+      "markdownDescription": "The inside IP addresses used for a Connect peer configuration.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement"
     },
     "Tags": {
+      "uniqueItems": true,
       "description": "An array of key-value pairs to apply to this resource.",
-      "type": "array",
       "insertionOrder": false,
+      "type": "array",
       "items": {
         "$ref": "#/definitions/Tag"
       },
       "markdownDescription": "An array of key-value pairs to apply to this resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-    }
-  },
-  "definitions": {
-    "ConnectPeerConfiguration": {
-      "type": "object",
-      "properties": {
-        "CoreNetworkAddress": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "PeerAddress": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "InsideCidrBlocks": {
-          "type": "array",
-          "insertionOrder": false,
-          "items": {
-            "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-        },
-        "Protocol": {
-          "$ref": "#/definitions/TunnelProtocol"
-        },
-        "BgpConfigurations": {
-          "type": "array",
-          "insertionOrder": false,
-          "items": {
-            "$ref": "#/definitions/ConnectPeerBgpConfiguration"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "TunnelProtocol": {
-      "description": "Tunnel protocol type (Only support GRE for now)",
-      "type": "string",
-      "markdownDescription": "Tunnel protocol type (Only support GRE for now)\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-    },
-    "BgpOptions": {
-      "description": "Bgp options",
-      "type": "object",
-      "properties": {
-        "PeerAsn": {
-          "type": "number",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "Bgp options\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "ConnectPeerBgpConfiguration": {
-      "description": "Bgp configuration for connect peer",
-      "type": "object",
-      "properties": {
-        "CoreNetworkAsn": {
-          "type": "number",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
-        },
-        "PeerAsn": {
-          "type": "number",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
-        },
-        "CoreNetworkAddress": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "PeerAddress": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "Bgp configuration for connect peer\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "Tag": {
-      "description": "A key-value pair to associate with a resource.",
-      "type": "object",
-      "properties": {
-        "Key": {
-          "type": "string",
-          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
-          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
-        },
-        "Value": {
-          "type": "string",
-          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
-          "markdownDescription": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "Key",
-        "Value"
-      ],
-      "additionalProperties": false,
-      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    }
-  },
-  "tagging": {
-    "taggable": true,
-    "tagOnCreate": true,
-    "tagUpdatable": true,
-    "cloudFormationSystemTags": false
-  },
-  "required": [
-    "ConnectAttachmentId",
-    "PeerAddress",
-    "InsideCidrBlocks"
-  ],
-  "additionalProperties": false,
-  "createOnlyProperties": [
-    "/properties/PeerAddress",
-    "/properties/CoreNetworkAddress",
-    "/properties/BgpOptions",
-    "/properties/InsideCidrBlocks",
-    "/properties/ConnectAttachmentId"
-  ],
-  "writeOnlyProperties": [
-    "/properties/PeerAddress",
-    "/properties/CoreNetworkAddress",
-    "/properties/BgpOptions",
-    "/properties/InsideCidrBlocks"
-  ],
-  "readOnlyProperties": [
-    "/properties/ConnectPeerId",
-    "/properties/State",
-    "/properties/CreatedAt",
-    "/properties/Configuration",
-    "/properties/CoreNetworkId",
-    "/properties/EdgeLocation"
-  ],
-  "primaryIdentifier": [
-    "/properties/ConnectPeerId"
-  ],
-  "handlers": {
-    "create": {
-      "permissions": [
-        "networkmanager:GetConnectPeer",
-        "networkmanager:CreateConnectPeer",
-        "ec2:DescribeRegions"
-      ]
-    },
-    "read": {
-      "permissions": [
-        "networkmanager:GetConnectPeer"
-      ]
-    },
-    "update": {
-      "permissions": [
-        "networkmanager:ListTagsForResource",
-        "networkmanager:TagResource",
-        "networkmanager:UntagResource",
-        "ec2:DescribeRegions"
-      ]
-    },
-    "delete": {
-      "permissions": [
-        "networkmanager:GetConnectPeer",
-        "networkmanager:DeleteConnectPeer",
-        "ec2:DescribeRegions"
-      ]
-    },
-    "list": {
-      "permissions": [
-        "networkmanager:ListConnectPeers"
-      ]
     }
   },
   "attributes": {
@@ -219,30 +234,30 @@
       "type": "string",
       "markdownDescription": "The ID of the core network.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
-    "ConnectPeerId": {
-      "description": "The ID of the Connect peer.",
-      "type": "string",
-      "markdownDescription": "The ID of the Connect peer.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-    },
-    "EdgeLocation": {
-      "description": "The Connect peer Regions where edges are located.",
-      "type": "string",
-      "markdownDescription": "The Connect peer Regions where edges are located.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-    },
-    "State": {
-      "description": "State of the connect peer.",
-      "type": "string",
-      "markdownDescription": "State of the connect peer.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    "Configuration": {
+      "description": "Configuration of the connect peer.",
+      "$ref": "#/definitions/ConnectPeerConfiguration",
+      "markdownDescription": "Configuration of the connect peer.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
     },
     "CreatedAt": {
       "description": "Connect peer creation time.",
       "type": "string",
       "markdownDescription": "Connect peer creation time.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
-    "Configuration": {
-      "description": "Configuration of the connect peer.",
-      "$ref": "#/definitions/ConnectPeerConfiguration",
-      "markdownDescription": "Configuration of the connect peer.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+    "ConnectPeerId": {
+      "description": "The ID of the Connect peer.",
+      "type": "string",
+      "markdownDescription": "The ID of the Connect peer.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "State": {
+      "description": "State of the connect peer.",
+      "type": "string",
+      "markdownDescription": "State of the connect peer.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "EdgeLocation": {
+      "description": "The Connect peer Regions where edges are located.",
+      "type": "string",
+      "markdownDescription": "The Connect peer Regions where edges are located.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     }
   }
 }

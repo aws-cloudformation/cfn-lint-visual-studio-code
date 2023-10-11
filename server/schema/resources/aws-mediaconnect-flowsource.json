@@ -15,7 +15,7 @@
             "aes256"
           ],
           "description": "The type of algorithm that is used for the encryption (such as aes128, aes192, or aes256).",
-          "markdownDescription": "The type of algorithm that is used for the encryption (such as aes128, aes192, or aes256).\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: aes128 | aes192 | aes256  \nUpdate requires: No interruption"
+          "markdownDescription": "The type of algorithm that is used for the encryption (such as aes128, aes192, or aes256).\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: aes128 | aes192 | aes256  \nUpdate requires: No interruption"
         },
         "ConstantInitializationVector": {
           "type": "string",
@@ -31,11 +31,12 @@
           "type": "string",
           "enum": [
             "speke",
-            "static-key"
+            "static-key",
+            "srt-password"
           ],
           "description": "The type of key that is used for the encryption. If no keyType is provided, the service will use the default setting (static-key).",
           "default": "static-key",
-          "markdownDescription": "The type of key that is used for the encryption. If no keyType is provided, the service will use the default setting (static-key).\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: speke | static-key  \nUpdate requires: No interruption"
+          "markdownDescription": "The type of key that is used for the encryption. If no keyType is provided, the service will use the default setting (static-key).\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: speke | static-key | srt-password  \nUpdate requires: No interruption"
         },
         "Region": {
           "type": "string",
@@ -65,10 +66,43 @@
       },
       "additionalProperties": false,
       "required": [
-        "Algorithm",
         "RoleArn"
       ],
       "markdownDescription": "Information about the encryption of the flow.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "GatewayBridgeSource": {
+      "type": "object",
+      "description": "The source configuration for cloud flows receiving a stream from a bridge.",
+      "properties": {
+        "BridgeArn": {
+          "type": "string",
+          "description": "The ARN of the bridge feeding this flow.",
+          "markdownDescription": "The ARN of the bridge feeding this flow.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "VpcInterfaceAttachment": {
+          "$ref": "#/definitions/VpcInterfaceAttachment",
+          "description": "The name of the VPC interface attachment to use for this bridge source.",
+          "markdownDescription": "The name of the VPC interface attachment to use for this bridge source.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "BridgeArn"
+      ],
+      "markdownDescription": "The source configuration for cloud flows receiving a stream from a bridge.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "VpcInterfaceAttachment": {
+      "type": "object",
+      "description": "The settings for attaching a VPC interface to an resource.",
+      "properties": {
+        "VpcInterfaceName": {
+          "type": "string",
+          "description": "The name of the VPC interface to use for this resource.",
+          "markdownDescription": "The name of the VPC interface to use for this resource.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The settings for attaching a VPC interface to an resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     }
   },
   "properties": {
@@ -92,6 +126,11 @@
       "description": "The ARN of the entitlement that allows you to subscribe to content that comes from another AWS account. The entitlement is set by the content originator and the ARN is generated as part of the originator's flow.",
       "markdownDescription": "The ARN of the entitlement that allows you to subscribe to content that comes from another AWS account. The entitlement is set by the content originator and the ARN is generated as part of the originator's flow.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
+    "GatewayBridgeSource": {
+      "$ref": "#/definitions/GatewayBridgeSource",
+      "description": "The source configuration for cloud flows receiving a stream from a bridge.",
+      "markdownDescription": "The source configuration for cloud flows receiving a stream from a bridge.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+    },
     "IngestPort": {
       "type": "integer",
       "description": "The port that the flow will be listening on for incoming content.",
@@ -108,6 +147,12 @@
       "default": 2000,
       "markdownDescription": "The maximum latency in milliseconds. This parameter applies only to RIST-based and Zixi-based streams.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
     },
+    "MinLatency": {
+      "type": "integer",
+      "description": "The minimum latency in milliseconds.",
+      "default": 2000,
+      "markdownDescription": "The minimum latency in milliseconds.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+    },
     "Name": {
       "type": "string",
       "description": "The name of the source.",
@@ -119,15 +164,37 @@
         "zixi-push",
         "rtp-fec",
         "rtp",
-        "rist"
+        "rist",
+        "srt-listener",
+        "srt-caller"
       ],
       "description": "The protocol that is used by the source.",
-      "markdownDescription": "The protocol that is used by the source.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: zixi-push | rtp-fec | rtp | rist  \nUpdate requires: No interruption"
+      "markdownDescription": "The protocol that is used by the source.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: zixi-push | rtp-fec | rtp | rist | srt-listener | srt-caller  \nUpdate requires: No interruption"
+    },
+    "SenderIpAddress": {
+      "type": "string",
+      "description": "The IP address that the flow communicates with to initiate connection with the sender for fujitsu-qos protocol.",
+      "markdownDescription": "The IP address that the flow communicates with to initiate connection with the sender for fujitsu-qos protocol.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "SenderControlPort": {
+      "type": "integer",
+      "description": "The port that the flow uses to send outbound requests to initiate connection with the sender for fujitsu-qos protocol.",
+      "markdownDescription": "The port that the flow uses to send outbound requests to initiate connection with the sender for fujitsu-qos protocol.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
     },
     "StreamId": {
       "type": "string",
       "description": "The stream ID that you want to use for this transport. This parameter applies only to Zixi-based streams.",
       "markdownDescription": "The stream ID that you want to use for this transport. This parameter applies only to Zixi-based streams.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "SourceListenerAddress": {
+      "type": "string",
+      "description": "Source IP or domain name for SRT-caller protocol.",
+      "markdownDescription": "Source IP or domain name for SRT-caller protocol.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "SourceListenerPort": {
+      "type": "integer",
+      "description": "Source port for SRT-caller protocol.",
+      "markdownDescription": "Source port for SRT-caller protocol.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
     },
     "VpcInterfaceName": {
       "type": "string",

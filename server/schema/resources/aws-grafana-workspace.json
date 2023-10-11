@@ -286,13 +286,15 @@
         "FAILED",
         "UPDATING",
         "UPGRADING",
+        "VERSION_UPDATING",
         "DELETION_FAILED",
         "CREATION_FAILED",
         "UPDATE_FAILED",
         "UPGRADE_FAILED",
-        "LICENSE_REMOVAL_FAILED"
+        "LICENSE_REMOVAL_FAILED",
+        "VERSION_UPDATE_FAILED"
       ],
-      "markdownDescription": "These enums represent the status of a workspace.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ACTIVE | CREATING | DELETING | FAILED | UPDATING | UPGRADING | DELETION_FAILED | CREATION_FAILED | UPDATE_FAILED | UPGRADE_FAILED | LICENSE_REMOVAL_FAILED  \nUpdate requires: No interruption"
+      "markdownDescription": "These enums represent the status of a workspace.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ACTIVE | CREATING | DELETING | FAILED | UPDATING | UPGRADING | VERSION_UPDATING | DELETION_FAILED | CREATION_FAILED | UPDATE_FAILED | UPGRADE_FAILED | LICENSE_REMOVAL_FAILED | VERSION_UPDATE_FAILED  \nUpdate requires: No interruption"
     },
     "SamlConfigurationStatus": {
       "type": "string",
@@ -329,6 +331,13 @@
       "type": "string",
       "description": "A unique, case-sensitive, user-provided identifier to ensure the idempotency of the request.",
       "markdownDescription": "A unique, case-sensitive, user-provided identifier to ensure the idempotency of the request.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[!-~]{1,64}$  \nUpdate requires: Replacement"
+    },
+    "GrafanaVersion": {
+      "type": "string",
+      "maxLength": 255,
+      "minLength": 1,
+      "description": "The version of Grafana to support in your workspace.",
+      "markdownDescription": "The version of Grafana to support in your workspace.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption"
     },
     "AccountAccessType": {
       "$ref": "#/definitions/AccountAccessType"
@@ -408,7 +417,6 @@
     "/properties/SamlConfigurationStatus",
     "/properties/Endpoint",
     "/properties/Status",
-    "/properties/GrafanaVersion",
     "/properties/CreationTimestamp",
     "/properties/ModificationTimestamp"
   ],
@@ -432,6 +440,9 @@
     "create": {
       "permissions": [
         "grafana:CreateWorkspace",
+        "grafana:DescribeWorkspace",
+        "grafana:DescribeWorkspaceAuthentication",
+        "grafana:DescribeWorkspaceConfiguration",
         "grafana:UpdateWorkspaceAuthentication",
         "sso:DescribeRegisteredRegions",
         "sso:CreateManagedApplicationInstance",
@@ -450,13 +461,18 @@
     "read": {
       "permissions": [
         "grafana:DescribeWorkspace",
-        "grafana:DescribeWorkspaceAuthentication"
+        "grafana:DescribeWorkspaceAuthentication",
+        "grafana:DescribeWorkspaceConfiguration"
       ]
     },
     "update": {
       "permissions": [
+        "grafana:DescribeWorkspace",
+        "grafana:DescribeWorkspaceAuthentication",
+        "grafana:DescribeWorkspaceConfiguration",
         "grafana:UpdateWorkspace",
         "grafana:UpdateWorkspaceAuthentication",
+        "grafana:UpdateWorkspaceConfiguration",
         "sso:DescribeRegisteredRegions",
         "sso:CreateManagedApplicationInstance",
         "ec2:GetManagedPrefixListEntries",
@@ -472,6 +488,9 @@
     "delete": {
       "permissions": [
         "grafana:DeleteWorkspace",
+        "grafana:DescribeWorkspace",
+        "grafana:DescribeWorkspaceAuthentication",
+        "grafana:DescribeWorkspaceConfiguration",
         "sso:DeleteManagedApplicationInstance",
         "sso:DescribeRegisteredRegions"
       ]
@@ -479,7 +498,8 @@
     "list": {
       "permissions": [
         "grafana:ListWorkspaces",
-        "grafana:DescribeWorkspaceAuthentication"
+        "grafana:DescribeWorkspaceAuthentication",
+        "grafana:DescribeWorkspaceConfiguration"
       ]
     }
   },
@@ -506,13 +526,6 @@
       "description": "Timestamp when the workspace was last modified",
       "format": "date-time",
       "markdownDescription": "Timestamp when the workspace was last modified\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-    },
-    "GrafanaVersion": {
-      "type": "string",
-      "maxLength": 255,
-      "minLength": 1,
-      "description": "Version of Grafana the workspace is currently using.",
-      "markdownDescription": "Version of Grafana the workspace is currently using.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption"
     },
     "Endpoint": {
       "type": "string",

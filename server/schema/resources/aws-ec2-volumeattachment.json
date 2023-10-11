@@ -1,41 +1,83 @@
 {
   "typeName": "AWS::EC2::VolumeAttachment",
   "description": "Resource Type definition for AWS::EC2::VolumeAttachment",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
   "additionalProperties": false,
-  "properties": {
+  "definitions": {
     "VolumeId": {
+      "description": "The ID of the Amazon EBS volume",
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
+      "markdownDescription": "The ID of the Amazon EBS volume\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "Id": {
+      "description": "",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
     "InstanceId": {
+      "description": "The ID of the instance to which the volume attaches",
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
+      "markdownDescription": "The ID of the instance to which the volume attaches\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
     "Device": {
+      "description": "The device name",
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
+      "markdownDescription": "The device name\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "VolumeId": {
+      "$ref": "#/definitions/VolumeId"
+    },
+    "InstanceId": {
+      "$ref": "#/definitions/InstanceId"
+    },
+    "Device": {
+      "$ref": "#/definitions/Device"
     }
   },
   "required": [
     "VolumeId",
-    "InstanceId",
-    "Device"
+    "InstanceId"
   ],
+  "primaryIdentifier": [
+    "/properties/VolumeId",
+    "/properties/InstanceId"
+  ],
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
   "createOnlyProperties": [
     "/properties/Device",
     "/properties/InstanceId",
     "/properties/VolumeId"
   ],
-  "primaryIdentifier": [
-    "/properties/Id"
-  ],
-  "readOnlyProperties": [
-    "/properties/Id"
-  ],
-  "attributes": {
-    "Id": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ec2:AttachVolume",
+        "ec2:DescribeVolumes"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "ec2:DescribeVolumes"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ec2:DetachVolume",
+        "ec2:DescribeVolumes"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ec2:DescribeVolumes"
+      ]
     }
-  }
+  },
+  "attributes": {}
 }
