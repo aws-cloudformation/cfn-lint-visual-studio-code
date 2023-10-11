@@ -51,7 +51,7 @@ export class SettingsState extends YamlSettingsState {
 
   indentation: string = "     ";
 
-  pendingValidationRequests: { [uri: string]: NodeJS.Timer } = {};
+  pendingValidationRequests: { [uri: string]: NodeJS.Timeout } = {};
   validationDelayMs = 200;
 
   isPreviewing: { [index: string]: boolean } = {};
