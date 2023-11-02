@@ -9,13 +9,19 @@
       "properties": {
         "Key": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
         },
         "Value": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "markdownDescription": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
         }
       },
+      "required": [
+        "Key",
+        "Value"
+      ],
       "additionalProperties": false,
       "markdownDescription": "A key-value pair to associate with a link resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
@@ -67,6 +73,8 @@
     "Tags": {
       "description": "The tags for the link.",
       "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
       "items": {
         "$ref": "#/definitions/Tag"
       },
@@ -78,6 +86,13 @@
       "markdownDescription": "The type of the link.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     }
   },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
   "additionalProperties": false,
   "required": [
     "GlobalNetworkId",
@@ -86,7 +101,9 @@
   ],
   "readOnlyProperties": [
     "/properties/LinkId",
-    "/properties/LinkArn"
+    "/properties/LinkArn",
+    "/properties/CreatedAt",
+    "/properties/State"
   ],
   "createOnlyProperties": [
     "/properties/GlobalNetworkId",
@@ -104,7 +121,9 @@
   "handlers": {
     "create": {
       "permissions": [
-        "networkmanager:CreateLink"
+        "networkmanager:CreateLink",
+        "networkmanager:GetLinks",
+        "networkmanager:TagResource"
       ]
     },
     "read": {
@@ -116,16 +135,28 @@
       "permissions": [
         "networkmanager:ListTagsForResource",
         "networkmanager:TagResource",
+        "networkmanager:GetLinks",
         "networkmanager:UntagResource",
         "networkmanager:UpdateLink"
       ]
     },
     "delete": {
       "permissions": [
+        "networkmanager:GetLinks",
         "networkmanager:DeleteLink"
       ]
     },
     "list": {
+      "handlerSchema": {
+        "properties": {
+          "GlobalNetworkId": {
+            "$ref": "resource-schema.json#/properties/GlobalNetworkId"
+          }
+        },
+        "required": [
+          "GlobalNetworkId"
+        ]
+      },
       "permissions": [
         "networkmanager:GetLinks"
       ]
@@ -141,6 +172,16 @@
       "description": "The ID of the link.",
       "type": "string",
       "markdownDescription": "The ID of the link.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "CreatedAt": {
+      "description": "The date and time that the device was created.",
+      "type": "string",
+      "markdownDescription": "The date and time that the device was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "State": {
+      "description": "The state of the link.",
+      "type": "string",
+      "markdownDescription": "The state of the link.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     }
   }
 }
