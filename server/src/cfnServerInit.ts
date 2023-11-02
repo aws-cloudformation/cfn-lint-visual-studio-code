@@ -90,7 +90,7 @@ export class CfnServerInit {
     );
 
     readFile(
-      path.join(__dirname, `../../../schema/base.schema.json`),
+      path.join(__dirname, `../schema/base.schema.json`),
       "utf8",
       (err, data) => {
         if (err) {
