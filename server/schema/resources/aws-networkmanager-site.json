@@ -9,13 +9,19 @@
       "properties": {
         "Key": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
         },
         "Value": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "markdownDescription": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
         }
       },
+      "required": [
+        "Key",
+        "Value"
+      ],
       "additionalProperties": false,
       "markdownDescription": "A key-value pair to associate with a site resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
@@ -52,6 +58,8 @@
     "Tags": {
       "description": "The tags for the site.",
       "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
       "items": {
         "$ref": "#/definitions/Tag"
       },
@@ -68,13 +76,22 @@
       "markdownDescription": "The location of the site.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
     }
   },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
   "additionalProperties": false,
   "required": [
     "GlobalNetworkId"
   ],
   "readOnlyProperties": [
     "/properties/SiteId",
-    "/properties/SiteArn"
+    "/properties/SiteArn",
+    "/properties/State",
+    "/properties/CreatedAt"
   ],
   "createOnlyProperties": [
     "/properties/GlobalNetworkId"
@@ -91,7 +108,9 @@
   "handlers": {
     "create": {
       "permissions": [
-        "networkmanager:CreateSite"
+        "networkmanager:CreateSite",
+        "networkmanager:GetSites",
+        "networkmanager:TagResource"
       ]
     },
     "read": {
@@ -101,6 +120,7 @@
     },
     "update": {
       "permissions": [
+        "networkmanager:GetSites",
         "networkmanager:ListTagsForResource",
         "networkmanager:TagResource",
         "networkmanager:UntagResource",
@@ -109,10 +129,21 @@
     },
     "delete": {
       "permissions": [
+        "networkmanager:GetSites",
         "networkmanager:DeleteSite"
       ]
     },
     "list": {
+      "handlerSchema": {
+        "properties": {
+          "GlobalNetworkId": {
+            "$ref": "resource-schema.json#/properties/GlobalNetworkId"
+          }
+        },
+        "required": [
+          "GlobalNetworkId"
+        ]
+      },
       "permissions": [
         "networkmanager:GetSites"
       ]
@@ -128,6 +159,16 @@
       "description": "The ID of the site.",
       "type": "string",
       "markdownDescription": "The ID of the site.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "CreatedAt": {
+      "description": "The date and time that the device was created.",
+      "type": "string",
+      "markdownDescription": "The date and time that the device was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "State": {
+      "description": "The state of the site.",
+      "type": "string",
+      "markdownDescription": "The state of the site.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     }
   }
 }

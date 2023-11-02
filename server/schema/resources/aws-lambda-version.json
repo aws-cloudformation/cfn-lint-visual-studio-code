@@ -3,59 +3,161 @@
   "description": "Resource Type definition for AWS::Lambda::Version",
   "additionalProperties": false,
   "properties": {
-    "FunctionName": {
+    "CodeSha256": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
-    },
-    "ProvisionedConcurrencyConfig": {
-      "$ref": "#/definitions/ProvisionedConcurrencyConfiguration"
+      "description": "Only publish a version if the hash value matches the value that's specified. Use this option to avoid publishing a version if the function code has changed since you last updated it. Updates are not supported for this property.",
+      "markdownDescription": "Only publish a version if the hash value matches the value that's specified. Use this option to avoid publishing a version if the function code has changed since you last updated it. Updates are not supported for this property.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
     },
     "Description": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "description": "A description for the version to override the description in the function configuration. Updates are not supported for this property.",
+      "minLength": 0,
+      "maxLength": 256,
+      "markdownDescription": "A description for the version to override the description in the function configuration. Updates are not supported for this property.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: Replacement"
     },
-    "CodeSha256": {
+    "FunctionName": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "description": "The name of the Lambda function.",
+      "minLength": 1,
+      "maxLength": 140,
+      "markdownDescription": "The name of the Lambda function.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 140  \nPattern: ^(arn:(aws[a-zA-Z-]*)?:lambda:)?([a-z]{2}(-gov)?-[a-z]+-\\d{1}:)?(\\d{12}:)?(function:)?([a-zA-Z0-9-_]+)(:(\\$LATEST|[a-zA-Z0-9-_]+))?$  \nUpdate requires: Replacement"
+    },
+    "ProvisionedConcurrencyConfig": {
+      "description": "Specifies a provisioned concurrency configuration for a function's version. Updates are not supported for this property.",
+      "$ref": "#/definitions/ProvisionedConcurrencyConfiguration",
+      "markdownDescription": "Specifies a provisioned concurrency configuration for a function's version. Updates are not supported for this property.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement"
+    },
+    "RuntimePolicy": {
+      "description": "Specifies the runtime management configuration of a function. Displays runtimeVersionArn only for Manual.",
+      "$ref": "#/definitions/RuntimePolicy",
+      "markdownDescription": "Specifies the runtime management configuration of a function. Displays runtimeVersionArn only for Manual.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement"
     }
   },
   "definitions": {
     "ProvisionedConcurrencyConfiguration": {
       "type": "object",
+      "description": "A provisioned concurrency configuration for a function's version.",
       "additionalProperties": false,
       "properties": {
         "ProvisionedConcurrentExecutions": {
           "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+          "description": "The amount of provisioned concurrency to allocate for the version.",
+          "markdownDescription": "The amount of provisioned concurrency to allocate for the version.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
         }
       },
       "required": [
         "ProvisionedConcurrentExecutions"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+      "markdownDescription": "A provisioned concurrency configuration for a function's version.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RuntimePolicy": {
+      "type": "object",
+      "description": "Runtime Management Config of a function.",
+      "additionalProperties": false,
+      "properties": {
+        "RuntimeVersionArn": {
+          "type": "string",
+          "description": "The ARN of the runtime the function is configured to use. If the runtime update mode is manual, the ARN is returned, otherwise null is returned.",
+          "minLength": 26,
+          "maxLength": 2048,
+          "markdownDescription": "The ARN of the runtime the function is configured to use. If the runtime update mode is manual, the ARN is returned, otherwise null is returned.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 26  \nMaximum Length: 2048  \nPattern: ^arn:(aws[a-zA-Z-]*):lambda:[a-z]{2}((-gov)|(-iso(b?)))?-[a-z]+-\\d{1}::runtime:.+$  \nUpdate requires: No interruption"
+        },
+        "UpdateRuntimeOn": {
+          "type": "string",
+          "description": "The runtime update mode.",
+          "markdownDescription": "The runtime update mode.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "UpdateRuntimeOn"
+      ],
+      "markdownDescription": "Runtime Management Config of a function.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     }
   },
   "required": [
     "FunctionName"
   ],
+  "readOnlyProperties": [
+    "/properties/Version",
+    "/properties/FunctionArn"
+  ],
   "createOnlyProperties": [
-    "/properties/FunctionName"
+    "/properties/FunctionName",
+    "/properties/Description",
+    "/properties/CodeSha256",
+    "/properties/ProvisionedConcurrencyConfig",
+    "/properties/RuntimePolicy"
   ],
   "primaryIdentifier": [
-    "/properties/Id"
+    "/properties/FunctionArn"
   ],
-  "readOnlyProperties": [
-    "/properties/Id",
-    "/properties/Version"
-  ],
+  "propertyTransform": {
+    "/properties/FunctionName": "$split(FunctionName, \":\")[-1] $OR FunctionName"
+  },
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "lambda:PublishVersion",
+        "lambda:GetFunctionConfiguration",
+        "lambda:PutProvisionedConcurrencyConfig",
+        "lambda:GetProvisionedConcurrencyConfig",
+        "lambda:PutRuntimeManagementConfig",
+        "lambda:GetRuntimeManagementConfig"
+      ],
+      "timeoutInMinutes": 180
+    },
+    "read": {
+      "permissions": [
+        "lambda:GetFunctionConfiguration",
+        "lambda:GetProvisionedConcurrencyConfig",
+        "lambda:GetRuntimeManagementConfig"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "lambda:GetFunctionConfiguration",
+        "lambda:DeleteFunction"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "FunctionName": {
+            "description": "The name of the Lambda function, version, or alias.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 140,
+            "markdownDescription": "The name of the Lambda function, version, or alias.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 140  \nPattern: ^(arn:(aws[a-zA-Z-]*)?:lambda:)?([a-z]{2}(-gov)?-[a-z]+-\\d{1}:)?(\\d{12}:)?(function:)?([a-zA-Z0-9-_]+)(:(\\$LATEST|[a-zA-Z0-9-_]+))?$  \nUpdate requires: No interruption"
+          }
+        },
+        "required": [
+          "FunctionName"
+        ]
+      },
+      "permissions": [
+        "lambda:ListVersionsByFunction"
+      ]
+    },
+    "update": {
+      "permissions": []
+    }
+  },
   "attributes": {
-    "Id": {
+    "FunctionArn": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "description": "The ARN of the version.",
+      "markdownDescription": "The ARN of the version.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
     "Version": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "description": "The version number.",
+      "markdownDescription": "The version number.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     }
   }
 }
