@@ -14,6 +14,14 @@
     "DataCaptureConfig": {
       "$ref": "#/definitions/DataCaptureConfig"
     },
+    "ExecutionRoleArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "EnableNetworkIsolation": {
+      "type": "boolean",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: Replacement"
+    },
     "ProductionVariants": {
       "type": "array",
       "uniqueItems": false,
@@ -28,6 +36,9 @@
     },
     "AsyncInferenceConfig": {
       "$ref": "#/definitions/AsyncInferenceConfig"
+    },
+    "VpcConfig": {
+      "$ref": "#/definitions/VpcConfig"
     },
     "EndpointConfigName": {
       "type": "string",
@@ -46,6 +57,25 @@
     }
   },
   "definitions": {
+    "ManagedInstanceScaling": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Status": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "MaxInstanceCount": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "MinInstanceCount": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "AsyncInferenceNotificationConfig": {
       "type": "object",
       "additionalProperties": false,
@@ -79,13 +109,12 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "ModelDataDownloadTimeoutInSeconds": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        "ManagedInstanceScaling": {
+          "$ref": "#/definitions/ManagedInstanceScaling"
         },
         "ModelName": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         },
         "VolumeSizeInGB": {
           "type": "integer",
@@ -99,11 +128,26 @@
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
         },
-        "ContainerStartupHealthCheckTimeoutInSeconds": {
+        "InitialInstanceCount": {
           "type": "integer",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
         },
-        "InitialInstanceCount": {
+        "RoutingConfig": {
+          "$ref": "#/definitions/RoutingConfig"
+        },
+        "AcceleratorType": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "InitialVariantWeight": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+        },
+        "ModelDataDownloadTimeoutInSeconds": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "ContainerStartupHealthCheckTimeoutInSeconds": {
           "type": "integer",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
         },
@@ -113,20 +157,39 @@
         "InstanceType": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "AcceleratorType": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "InitialVariantWeight": {
-          "type": "number",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
         }
       },
       "required": [
-        "ModelName",
-        "VariantName",
-        "InitialVariantWeight"
+        "VariantName"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "VpcConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "SecurityGroupIds": {
+          "type": "array",
+          "uniqueItems": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Subnets": {
+          "type": "array",
+          "uniqueItems": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Subnets",
+        "SecurityGroupIds"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
@@ -229,6 +292,17 @@
             "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
           },
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RoutingConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "RoutingStrategy": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         }
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
@@ -470,11 +544,14 @@
   "createOnlyProperties": [
     "/properties/KmsKeyId",
     "/properties/AsyncInferenceConfig",
+    "/properties/ExecutionRoleArn",
     "/properties/ShadowProductionVariants",
+    "/properties/EnableNetworkIsolation",
     "/properties/ProductionVariants",
     "/properties/DataCaptureConfig",
     "/properties/ExplainerConfig",
-    "/properties/EndpointConfigName"
+    "/properties/EndpointConfigName",
+    "/properties/VpcConfig"
   ],
   "primaryIdentifier": [
     "/properties/Id"

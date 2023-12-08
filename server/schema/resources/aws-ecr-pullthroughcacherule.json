@@ -5,7 +5,7 @@
   "definitions": {
     "PullThroughCacheRule": {
       "minItems": 0,
-      "maxItems": 25,
+      "maxItems": 50,
       "type": "object",
       "properties": {
         "RegistryId": {
@@ -16,6 +16,12 @@
         },
         "UpstreamRegistryUrl": {
           "$ref": "#/definitions/UpstreamRegistryUrl"
+        },
+        "CredentialArn": {
+          "$ref": "#/definitions/CredentialArn"
+        },
+        "UpstreamRegistry": {
+          "$ref": "#/definitions/UpstreamRegistry"
         }
       },
       "required": [
@@ -32,15 +38,27 @@
     },
     "EcrRepositoryPrefix": {
       "type": "string",
-      "minLength": 2,
-      "maxLength": 20,
       "description": "The ECRRepositoryPrefix is a custom alias for upstream registry url.",
-      "markdownDescription": "The ECRRepositoryPrefix is a custom alias for upstream registry url.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 2  \nMaximum Length: 20  \nPattern: ^([a-z0-9]+(?:[._-][a-z0-9]+)*)$  \nUpdate requires: No interruption"
+      "minLength": 2,
+      "maxLength": 30,
+      "markdownDescription": "The ECRRepositoryPrefix is a custom alias for upstream registry url.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 2  \nMaximum Length: 30  \nPattern: (?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*  \nUpdate requires: No interruption"
     },
     "UpstreamRegistryUrl": {
       "type": "string",
       "description": "The upstreamRegistryUrl is the endpoint of upstream registry url of the public repository to be cached",
       "markdownDescription": "The upstreamRegistryUrl is the endpoint of upstream registry url of the public repository to be cached\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "CredentialArn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the AWS Secrets Manager secret that identifies the credentials to authenticate to the upstream registry.",
+      "minLength": 50,
+      "maxLength": 612,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the AWS Secrets Manager secret that identifies the credentials to authenticate to the upstream registry.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 50  \nMaximum Length: 612  \nPattern: ^arn:aws:secretsmanager:[a-zA-Z0-9-:]+:secret:ecr\\-pullthroughcache\\/[a-zA-Z0-9\\/_+=.@-]+$  \nUpdate requires: No interruption"
+    },
+    "UpstreamRegistry": {
+      "type": "string",
+      "description": "The name of the upstream registry.",
+      "markdownDescription": "The name of the upstream registry.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     }
   },
   "properties": {
@@ -48,13 +66,25 @@
       "type": "string",
       "description": "The ECRRepositoryPrefix is a custom alias for upstream registry url.",
       "minLength": 2,
-      "maxLength": 20,
-      "markdownDescription": "The ECRRepositoryPrefix is a custom alias for upstream registry url.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 2  \nMaximum Length: 20  \nPattern: ^([a-z0-9]+(?:[._-][a-z0-9]+)*)$  \nUpdate requires: Replacement"
+      "maxLength": 30,
+      "markdownDescription": "The ECRRepositoryPrefix is a custom alias for upstream registry url.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 2  \nMaximum Length: 30  \nPattern: (?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*  \nUpdate requires: Replacement"
     },
     "UpstreamRegistryUrl": {
       "type": "string",
       "description": "The upstreamRegistryUrl is the endpoint of upstream registry url of the public repository to be cached",
       "markdownDescription": "The upstreamRegistryUrl is the endpoint of upstream registry url of the public repository to be cached\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "CredentialArn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the AWS Secrets Manager secret that identifies the credentials to authenticate to the upstream registry.",
+      "minLength": 50,
+      "maxLength": 612,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the AWS Secrets Manager secret that identifies the credentials to authenticate to the upstream registry.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 50  \nMaximum Length: 612  \nPattern: ^arn:aws:secretsmanager:[a-zA-Z0-9-:]+:secret:ecr\\-pullthroughcache\\/[a-zA-Z0-9\\/_+=.@-]+$  \nUpdate requires: Replacement"
+    },
+    "UpstreamRegistry": {
+      "type": "string",
+      "description": "The name of the upstream registry.",
+      "markdownDescription": "The name of the upstream registry.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
     }
   },
   "taggable": false,
@@ -63,14 +93,22 @@
   ],
   "createOnlyProperties": [
     "/properties/EcrRepositoryPrefix",
-    "/properties/UpstreamRegistryUrl"
+    "/properties/UpstreamRegistryUrl",
+    "/properties/CredentialArn",
+    "/properties/UpstreamRegistry"
+  ],
+  "writeOnlyProperties": [
+    "/properties/CredentialArn",
+    "/properties/UpstreamRegistry"
   ],
   "handlers": {
     "create": {
       "permissions": [
         "ecr:DescribePullThroughCacheRules",
         "ecr:CreatePullThroughCacheRule",
-        "ecr:DeletePullThroughCacheRule"
+        "ecr:DeletePullThroughCacheRule",
+        "iam:CreateServiceLinkedRole",
+        "secretsmanager:GetSecretValue"
       ]
     },
     "read": {
@@ -82,7 +120,9 @@
       "permissions": [
         "ecr:DescribePullThroughCacheRules",
         "ecr:CreatePullThroughCacheRule",
-        "ecr:DeletePullThroughCacheRule"
+        "ecr:DeletePullThroughCacheRule",
+        "iam:CreateServiceLinkedRole",
+        "secretsmanager:GetSecretValue"
       ]
     },
     "delete": {
