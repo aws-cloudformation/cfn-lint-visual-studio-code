@@ -816,10 +816,61 @@
         "LogFilePrefix": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "TargetObjectKeyFormat": {
+          "$ref": "#/definitions/TargetObjectKeyFormat"
         }
       },
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "TargetObjectKeyFormat": {
+      "type": "object",
+      "description": "Describes the key format for server access log file in the target bucket. You can choose between SimplePrefix and PartitionedPrefix.",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "SimplePrefix": {
+              "description": "This format defaults the prefix to the given log file prefix for delivering server access log file.",
+              "type": "object",
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "SimplePrefix"
+          ]
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "PartitionedPrefix": {
+              "$ref": "#/definitions/PartitionedPrefix"
+            }
+          },
+          "required": [
+            "PartitionedPrefix"
+          ]
+        }
+      ],
+      "markdownDescription": "Describes the key format for server access log file in the target bucket. You can choose between SimplePrefix and PartitionedPrefix.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PartitionedPrefix": {
+      "type": "object",
+      "description": "This format appends a time based prefix to the given log file prefix for delivering server access log file.",
+      "properties": {
+        "PartitionDateSource": {
+          "type": "string",
+          "description": "Date Source for creating a partitioned prefix. This can be event time or delivery time.",
+          "enum": [
+            "EventTime",
+            "DeliveryTime"
+          ],
+          "markdownDescription": "Date Source for creating a partitioned prefix. This can be event time or delivery time.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: EventTime | DeliveryTime  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "This format appends a time based prefix to the given log file prefix for delivering server access log file.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "MetricsConfiguration": {
       "type": "object",
@@ -1491,9 +1542,8 @@
         },
         "Value": {
           "type": "string",
-          "minLength": 1,
           "maxLength": 256,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption"
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption"
         }
       },
       "required": [
@@ -1679,7 +1729,12 @@
     "/properties/WebsiteURL"
   ],
   "writeOnlyProperties": [
-    "/properties/AccessControl"
+    "/properties/AccessControl",
+    "/properties/LifecycleConfiguration/Rules/*/NoncurrentVersionExpirationInDays",
+    "/properties/LifecycleConfiguration/Rules/*/NoncurrentVersionTransition",
+    "/properties/LifecycleConfiguration/Rules/*/Transition",
+    "/properties/ReplicationConfiguration/Rules/*/Prefix",
+    "/properties/LifecycleConfiguration/Rules/*/ExpiredObjectDeleteMarker"
   ],
   "handlers": {
     "create": {
@@ -1756,6 +1811,7 @@
         "s3:PutBucketLogging",
         "s3:PutBucketVersioning",
         "s3:PutObjectLockConfiguration",
+        "s3:PutBucketObjectLockConfiguration",
         "s3:DeleteBucketAnalyticsConfiguration",
         "s3:DeleteBucketCors",
         "s3:DeleteBucketMetricsConfiguration",

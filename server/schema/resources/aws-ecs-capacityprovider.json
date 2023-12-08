@@ -1,126 +1,22 @@
 {
-  "typeName": "AWS::ECS::CapacityProvider",
-  "description": "Resource Type definition for AWS::ECS::CapacityProvider.",
-  "definitions": {
-    "ManagedScaling": {
-      "description": "The managed scaling settings for the Auto Scaling group capacity provider.",
-      "type": "object",
-      "properties": {
-        "MinimumScalingStepSize": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-        },
-        "MaximumScalingStepSize": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-        },
-        "Status": {
-          "type": "string",
-          "enum": [
-            "DISABLED",
-            "ENABLED"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DISABLED | ENABLED  \nUpdate requires: No interruption"
-        },
-        "TargetCapacity": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-        },
-        "InstanceWarmupPeriod": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "The managed scaling settings for the Auto Scaling group capacity provider.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "AutoScalingGroupProvider": {
-      "type": "object",
-      "properties": {
-        "AutoScalingGroupArn": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
-        },
-        "ManagedScaling": {
-          "$ref": "#/definitions/ManagedScaling"
-        },
-        "ManagedTerminationProtection": {
-          "type": "string",
-          "enum": [
-            "DISABLED",
-            "ENABLED"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DISABLED | ENABLED  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "AutoScalingGroupArn"
-      ],
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: Replacement"
-    },
-    "Tag": {
-      "type": "object",
-      "properties": {
-        "Key": {
-          "type": "string",
-          "minLength": 1,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nUpdate requires: No interruption"
-        },
-        "Value": {
-          "type": "string",
-          "minLength": 1,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nUpdate requires: No interruption"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    }
-  },
-  "properties": {
-    "AutoScalingGroupProvider": {
-      "$ref": "#/definitions/AutoScalingGroupProvider"
-    },
-    "Name": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
-    },
-    "Tags": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/Tag"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-    }
-  },
-  "additionalProperties": false,
-  "primaryIdentifier": [
-    "/properties/Name"
-  ],
-  "createOnlyProperties": [
-    "/properties/AutoScalingGroupProvider/AutoScalingGroupArn",
-    "/properties/Name"
-  ],
   "propertyTransform": {
-    "/properties/AutoScalingGroupProvider/AutoScalingGroupArn": "$split(AutoScalingGroupProvider.AutoScalingGroupArn, \"autoScalingGroupName/\")[-1]"
+    "/properties/AutoScalingGroupProvider/AutoScalingGroupArn": "$split(AutoScalingGroupProvider.AutoScalingGroupArn, \"autoScalingGroupName/\")[-1] $OR $split(AutoScalingGroupArn, \"autoScalingGroupName/\")[-1]"
+  },
+  "tagging": {
+    "taggable": true
   },
   "handlers": {
+    "read": {
+      "permissions": [
+        "ecs:DescribeCapacityProviders"
+      ]
+    },
     "create": {
       "permissions": [
         "autoscaling:CreateOrUpdateTags",
         "ecs:CreateCapacityProvider",
-        "ecs:DescribeCapacityProviders"
-      ]
-    },
-    "delete": {
-      "permissions": [
         "ecs:DescribeCapacityProviders",
-        "ecs:DeleteCapacityProvider"
-      ]
-    },
-    "read": {
-      "permissions": [
-        "ecs:DescribeCapacityProviders"
+        "ecs:TagResource"
       ]
     },
     "update": {
@@ -136,6 +32,122 @@
       "permissions": [
         "ecs:DescribeCapacityProviders"
       ]
+    },
+    "delete": {
+      "permissions": [
+        "ecs:DescribeCapacityProviders",
+        "ecs:DeleteCapacityProvider"
+      ]
+    }
+  },
+  "typeName": "AWS::ECS::CapacityProvider",
+  "description": "Resource Type definition for AWS::ECS::CapacityProvider.",
+  "createOnlyProperties": [
+    "/properties/AutoScalingGroupProvider/AutoScalingGroupArn",
+    "/properties/Name"
+  ],
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/Name"
+  ],
+  "definitions": {
+    "ManagedScaling": {
+      "description": "The managed scaling settings for the Auto Scaling group capacity provider.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Status": {
+          "type": "string",
+          "enum": [
+            "DISABLED",
+            "ENABLED"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DISABLED | ENABLED  \nUpdate requires: No interruption"
+        },
+        "MinimumScalingStepSize": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "InstanceWarmupPeriod": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "TargetCapacity": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "MaximumScalingStepSize": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "The managed scaling settings for the Auto Scaling group capacity provider.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AutoScalingGroupProvider": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ManagedScaling": {
+          "$ref": "#/definitions/ManagedScaling"
+        },
+        "AutoScalingGroupArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "ManagedTerminationProtection": {
+          "type": "string",
+          "enum": [
+            "DISABLED",
+            "ENABLED"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DISABLED | ENABLED  \nUpdate requires: No interruption"
+        },
+        "ManagedDraining": {
+          "type": "string",
+          "enum": [
+            "DISABLED",
+            "ENABLED"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DISABLED | ENABLED  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "AutoScalingGroupArn"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: Replacement"
+    },
+    "Tag": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "minLength": 1,
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nUpdate requires: No interruption"
+        },
+        "Key": {
+          "minLength": 1,
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "AutoScalingGroupProvider": {
+      "$ref": "#/definitions/AutoScalingGroupProvider"
+    },
+    "Tags": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "Name": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
     }
   },
   "required": [

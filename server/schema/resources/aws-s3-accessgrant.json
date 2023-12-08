@@ -1,0 +1,203 @@
+{
+  "typeName": "AWS::S3::AccessGrant",
+  "description": "The AWS::S3::AccessGrant resource is an Amazon S3 resource type representing permissions to a specific S3 bucket or prefix hosted in an S3 Access Grants instance.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-s3",
+  "definitions": {
+    "Grantee": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "GranteeType": {
+          "description": "Configures the transfer acceleration state for an Amazon S3 bucket.",
+          "type": "string",
+          "enum": [
+            "IAM",
+            "DIRECTORY_USER",
+            "DIRECTORY_GROUP"
+          ],
+          "markdownDescription": "Configures the transfer acceleration state for an Amazon S3 bucket.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: IAM | DIRECTORY_USER | DIRECTORY_GROUP  \nUpdate requires: No interruption"
+        },
+        "GranteeIdentifier": {
+          "description": "The unique identifier of the Grantee",
+          "type": "string",
+          "markdownDescription": "The unique identifier of the Grantee\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "GranteeType",
+        "GranteeIdentifier"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AccessGrantsLocationConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "S3SubPrefix": {
+          "description": "The S3 sub prefix of a registered location in your S3 Access Grants instance",
+          "type": "string",
+          "markdownDescription": "The S3 sub prefix of a registered location in your S3 Access Grants instance\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "S3SubPrefix"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AccessGrantArn": {
+      "description": "the Amazon Resource Name (ARN) of the specified access grant.",
+      "type": "string",
+      "markdownDescription": "the Amazon Resource Name (ARN) of the specified access grant.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "AccessGrantsLocationId": {
+      "description": "The custom S3 location to be accessed by the grantee",
+      "type": "string",
+      "examples": [
+        "125f332b-a499-4eb6-806f-8a6a1aa4cb96"
+      ],
+      "markdownDescription": "The custom S3 location to be accessed by the grantee\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+    },
+    "Tags": {
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement"
+    },
+    "Permission": {
+      "description": "The level of access to be afforded to the grantee",
+      "type": "string",
+      "enum": [
+        "READ",
+        "WRITE",
+        "READWRITE"
+      ],
+      "markdownDescription": "The level of access to be afforded to the grantee\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: READ | WRITE | READWRITE  \nUpdate requires: No interruption"
+    },
+    "ApplicationArn": {
+      "description": "The ARN of the application grantees will use to access the location",
+      "type": "string",
+      "markdownDescription": "The ARN of the application grantees will use to access the location\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "S3PrefixType": {
+      "description": "The type of S3SubPrefix.",
+      "type": "string",
+      "enum": [
+        "Object"
+      ],
+      "markdownDescription": "The type of S3SubPrefix.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Object  \nUpdate requires: Replacement"
+    },
+    "Grantee": {
+      "$ref": "#/definitions/Grantee",
+      "description": "The principal who will be granted permission to access S3.",
+      "markdownDescription": "The principal who will be granted permission to access S3.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption"
+    },
+    "AccessGrantsLocationConfiguration": {
+      "$ref": "#/definitions/AccessGrantsLocationConfiguration",
+      "description": "The configuration options of the grant location, which is the S3 path to the data to which you are granting access.",
+      "markdownDescription": "The configuration options of the grant location, which is the S3 path to the data to which you are granting access.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+    }
+  },
+  "required": [
+    "Grantee",
+    "Permission",
+    "AccessGrantsLocationId"
+  ],
+  "createOnlyProperties": [
+    "/properties/S3PrefixType",
+    "/properties/Tags"
+  ],
+  "writeOnlyProperties": [
+    "/properties/Tags",
+    "/properties/S3PrefixType"
+  ],
+  "readOnlyProperties": [
+    "/properties/AccessGrantId",
+    "/properties/AccessGrantArn",
+    "/properties/GrantScope"
+  ],
+  "primaryIdentifier": [
+    "/properties/AccessGrantId"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "s3:CreateAccessGrant",
+        "s3:TagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "s3:GetAccessGrant"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "s3:DeleteAccessGrant"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "s3:ListAccessGrants"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "s3:TagResource"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "attributes": {
+    "AccessGrantId": {
+      "description": "The ID assigned to this access grant.",
+      "type": "string",
+      "examples": [
+        "7c89cbd1-0f4e-40e3-861d-afb906952b77"
+      ],
+      "markdownDescription": "The ID assigned to this access grant.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "GrantScope": {
+      "description": "The S3 path of the data to which you are granting access. It is a combination of the S3 path of the registered location and the subprefix.",
+      "type": "string",
+      "markdownDescription": "The S3 path of the data to which you are granting access. It is a combination of the S3 path of the registered location and the subprefix.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "AccessGrantArn": {
+      "$ref": "#/definitions/AccessGrantArn",
+      "description": "The Amazon Resource Name (ARN) of the specified access grant.",
+      "examples": [
+        "arn:aws:s3:us-east-2:111122223333:access-grants/default/grant/7c89cbd1-0f4e-40e3-861d-afb906952b77"
+      ],
+      "markdownDescription": "The Amazon Resource Name (ARN) of the specified access grant.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+    }
+  }
+}

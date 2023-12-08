@@ -213,6 +213,19 @@
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
+    "CloudwatchLogsLogDestination": {
+      "type": "object",
+      "properties": {
+        "LogGroupArn": {
+          "type": "string",
+          "maxLength": 1600,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1600  \nPattern: ^(^arn:aws([a-z]|\\-)*:logs:([a-z]{2}((-gov)|(-iso(b?)))?-[a-z]+-\\d{1}):(\\d{12}):log-group:.+)$  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "DeadLetterConfig": {
       "type": "object",
       "properties": {
@@ -457,6 +470,19 @@
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
+    "FirehoseLogDestination": {
+      "type": "object",
+      "properties": {
+        "DeliveryStreamArn": {
+          "type": "string",
+          "maxLength": 1600,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1600  \nPattern: ^(^arn:aws([a-z]|\\-)*:firehose:([a-z]{2}((-gov)|(-iso(b?)))?-[a-z]+-\\d{1}):(\\d{12}):deliverystream/.+)$  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "HeaderParametersMap": {
       "type": "object",
       "patternProperties": {
@@ -469,6 +495,13 @@
       },
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "IncludeExecutionDataOption": {
+      "type": "string",
+      "enum": [
+        "ALL"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ALL  \nUpdate requires: No interruption"
     },
     "KinesisStreamStartPosition": {
       "type": "string",
@@ -487,6 +520,16 @@
         "EXTERNAL"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: EC2 | FARGATE | EXTERNAL  \nUpdate requires: No interruption"
+    },
+    "LogLevel": {
+      "type": "string",
+      "enum": [
+        "OFF",
+        "ERROR",
+        "INFO",
+        "TRACE"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: OFF | ERROR | INFO | TRACE  \nUpdate requires: No interruption"
     },
     "MQBrokerAccessCredentials": {
       "oneOf": [
@@ -604,6 +647,33 @@
         },
         "HttpParameters": {
           "$ref": "#/definitions/PipeEnrichmentHttpParameters"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PipeLogConfiguration": {
+      "type": "object",
+      "properties": {
+        "S3LogDestination": {
+          "$ref": "#/definitions/S3LogDestination"
+        },
+        "FirehoseLogDestination": {
+          "$ref": "#/definitions/FirehoseLogDestination"
+        },
+        "CloudwatchLogsLogDestination": {
+          "$ref": "#/definitions/CloudwatchLogsLogDestination"
+        },
+        "Level": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "IncludeExecutionData": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/IncludeExecutionDataOption"
+          },
+          "uniqueItems": true,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
         }
       },
       "additionalProperties": false,
@@ -947,9 +1017,13 @@
         "CREATE_FAILED",
         "UPDATE_FAILED",
         "START_FAILED",
-        "STOP_FAILED"
+        "STOP_FAILED",
+        "DELETE_FAILED",
+        "CREATE_ROLLBACK_FAILED",
+        "DELETE_ROLLBACK_FAILED",
+        "UPDATE_ROLLBACK_FAILED"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: RUNNING | STOPPED | CREATING | UPDATING | DELETING | STARTING | STOPPING | CREATE_FAILED | UPDATE_FAILED | START_FAILED | STOP_FAILED  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: RUNNING | STOPPED | CREATING | UPDATING | DELETING | STARTING | STOPPING | CREATE_FAILED | UPDATE_FAILED | START_FAILED | STOP_FAILED | DELETE_FAILED | CREATE_ROLLBACK_FAILED | DELETE_ROLLBACK_FAILED | UPDATE_ROLLBACK_FAILED  \nUpdate requires: No interruption"
     },
     "PipeTargetBatchJobParameters": {
       "type": "object",
@@ -1425,6 +1499,37 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: RUNNING | STOPPED  \nUpdate requires: No interruption"
     },
+    "S3LogDestination": {
+      "type": "object",
+      "properties": {
+        "BucketName": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Prefix": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "BucketOwner": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "OutputFormat": {
+          "$ref": "#/definitions/S3OutputFormat"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "S3OutputFormat": {
+      "type": "string",
+      "enum": [
+        "json",
+        "plain",
+        "w3c"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: json | plain | w3c  \nUpdate requires: No interruption"
+    },
     "SageMakerPipelineParameter": {
       "type": "object",
       "properties": {
@@ -1619,6 +1724,9 @@
     "EnrichmentParameters": {
       "$ref": "#/definitions/PipeEnrichmentParameters"
     },
+    "LogConfiguration": {
+      "$ref": "#/definitions/PipeLogConfiguration"
+    },
     "Name": {
       "type": "string",
       "maxLength": 64,
@@ -1707,7 +1815,17 @@
         "pipes:CreatePipe",
         "pipes:DescribePipe",
         "pipes:TagResource",
-        "iam:PassRole"
+        "iam:PassRole",
+        "logs:PutResourcePolicy",
+        "logs:DescribeResourcePolicies",
+        "logs:DescribeLogGroups",
+        "iam:CreateServiceLinkedRole",
+        "logs:CreateLogDelivery",
+        "logs:GetLogDelivery",
+        "logs:ListLogDeliveries",
+        "s3:PutBucketPolicy",
+        "s3:GetBucketPolicy",
+        "firehose:TagDeliveryStream"
       ]
     },
     "read": {
@@ -1721,13 +1839,30 @@
         "pipes:TagResource",
         "pipes:UntagResource",
         "pipes:DescribePipe",
-        "iam:PassRole"
+        "iam:PassRole",
+        "logs:PutResourcePolicy",
+        "logs:DescribeResourcePolicies",
+        "logs:DescribeLogGroups",
+        "iam:CreateServiceLinkedRole",
+        "logs:CreateLogDelivery",
+        "logs:UpdateLogDelivery",
+        "logs:DeleteLogDelivery",
+        "logs:GetLogDelivery",
+        "logs:ListLogDeliveries",
+        "s3:PutBucketPolicy",
+        "s3:GetBucketPolicy",
+        "firehose:TagDeliveryStream"
       ]
     },
     "delete": {
       "permissions": [
         "pipes:DeletePipe",
-        "pipes:DescribePipe"
+        "pipes:DescribePipe",
+        "logs:CreateLogDelivery",
+        "logs:UpdateLogDelivery",
+        "logs:DeleteLogDelivery",
+        "logs:GetLogDelivery",
+        "logs:ListLogDeliveries"
       ]
     },
     "list": {
