@@ -14,9 +14,16 @@ express or implied. See the License for the specific language governing
 permissions and limitations under the License.
 */
 import { Connection } from "vscode-languageserver";
-import { RequestPreview, PreviewClosed } from "../../requestTypes";
+import {
+  RequestPreview,
+  PreviewClosed,
+  ValidateCfnLintVersion,
+} from "../../requestTypes";
 import { SettingsState } from "../../cfnSettings";
 import { ValidationHandler } from "./validationHandler";
+import { CfnVersion } from "../../service/services/cfnVersion";
+import { gt } from "semver";
+import fetch from "node-fetch";
 
 // code adopted from https://github.com/redhat-developer/yaml-language-server/blob/main/src/languageserver/handlers/notificationHandlers.ts
 export class NotificationHandler {
@@ -39,6 +46,9 @@ export class NotificationHandler {
     this.connection.onNotification(PreviewClosed.type, (uri: string) =>
       this.previewClosed(uri)
     );
+    this.connection.onNotification(ValidateCfnLintVersion.type, () =>
+      this.validateCfnLintVersion()
+    );
   }
 
   private requestPreview(uri: string): void {
@@ -52,5 +62,41 @@ export class NotificationHandler {
   private previewClosed(uri: string): void {
     this.connection.console.log("preview closed: " + uri);
     this.cfnSettings.isPreviewing[uri] = false;
+  }
+
+  private validateCfnLintVersion(): void {
+    const cfnLint = new CfnVersion(this.cfnSettings.cfnLintPath);
+    const cfnLintExec = cfnLint.exec();
+    cfnLintExec.then((cli_version) => {
+      this.getLatestVersion()
+        .then((latest_version) => {
+          try {
+            if (gt(latest_version, cli_version)) {
+              this.connection.sendNotification("cfn/cfnLintUpgradeNeeded", {
+                cli_version: cli_version,
+                latest_version: latest_version,
+              });
+            }
+          } catch (error) {
+            console.debug(error);
+          }
+        })
+        .catch((error) => {
+          console.debug(error);
+        });
+    });
+  }
+
+  public async getLatestVersion(): Promise<string> {
+    const url =
+      "https://api.github.com/repos/aws-cloudformation/cfn-lint/releases/latest";
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+
+      return data["tag_name"].replace("v", "");
+    } catch (error) {
+      return Promise.reject(error);
+    }
   }
 }

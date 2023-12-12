@@ -33,3 +33,9 @@ export namespace ResultLimitReachedNotification {
     "cfn/resultLimitReached"
   );
 }
+
+export namespace ValidateCfnLintVersion {
+  export const type: NotificationType<{}> = new NotificationType(
+    "cfn/validateCfnLintVersion"
+  );
+}
