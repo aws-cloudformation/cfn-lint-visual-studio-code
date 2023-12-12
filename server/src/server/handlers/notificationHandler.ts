@@ -67,14 +67,14 @@ export class NotificationHandler {
   private validateCfnLintVersion(): void {
     const cfnLint = new CfnVersion(this.cfnSettings.cfnLintPath);
     const cfnLintExec = cfnLint.exec();
-    cfnLintExec.then((cli_version) => {
+    cfnLintExec.then((cliVersion) => {
       this.getLatestVersion()
-        .then((latest_version) => {
+        .then((latestVersion) => {
           try {
-            if (gt(latest_version, cli_version)) {
+            if (gt(latestVersion, cliVersion)) {
               this.connection.sendNotification("cfn/cfnLintUpgradeNeeded", {
-                cli_version: cli_version,
-                latest_version: latest_version,
+                cli_version: cliVersion,
+                latest_version: latestVersion,
               });
             }
           } catch (error) {
