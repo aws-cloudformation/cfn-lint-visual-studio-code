@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License").
 You may not use this file except in compliance with the License.
 A copy of the License is located at
 
-	http://www.apache.org/licenses/LICENSE-2.0
+  http://www.apache.org/licenses/LICENSE-2.0
 
 or in the "license" file accompanying this file. This file is distributed
 on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
@@ -31,6 +31,12 @@ import {
   LanguageClientOptions,
   ServerOptions,
   TransportKind,
+  ErrorHandler,
+  Message,
+  ErrorAction,
+  CloseAction,
+  CloseHandlerResult,
+  ErrorHandlerResult,
 } from "vscode-languageclient/node";
 
 let previews: { [index: string]: WebviewPanel } = {};
@@ -63,7 +69,6 @@ export async function activate(context: ExtensionContext) {
       { scheme: "file", language: "json" },
     ],
     synchronize: {
-      // Synchronize the setting section 'languageServerExample' to the server
       configurationSection: "cfnLint",
       // Notify the server about file changes to '.clientrc files contain in the workspace
       fileEvents: [
@@ -71,6 +76,7 @@ export async function activate(context: ExtensionContext) {
         workspace.createFileSystemWatcher("**/*.?(e)y?(a)ml"),
       ],
     },
+    errorHandler: new ClientErrorHandler(4),
   };
 
   // Create the language client and start the client.
@@ -99,6 +105,14 @@ export async function activate(context: ExtensionContext) {
       previews[uri].dispose();
     }
   });
+
+  languageClient.onNotification("cfn/cfnLintUpgradeNeeded", (params) => {
+    window.showInformationMessage(
+      `You are using an outdated version of cfn-lint (${params["cli_version"]}). The latest version is ${params["latest_version"]}.`
+    );
+  });
+
+  languageClient.sendNotification("cfn/validateCfnLintVersion");
 
   let previewDisposable = commands.registerCommand(
     "extension.sidePreview",
@@ -176,4 +190,53 @@ export function deactivate(): Thenable<void> | undefined {
     return undefined;
   }
   return languageClient.stop();
+}
+
+export class ClientErrorHandler implements ErrorHandler {
+  private restarts: number[] = [];
+  constructor(private readonly maxRestartCount: number) {}
+
+  //@ts-ignore
+  error(error: Error, message: Message, count: number): ErrorHandlerResult {
+    if (count && count <= 3) {
+      return {
+        action: ErrorAction.Continue,
+        message: error.message,
+        handled: true,
+      };
+    }
+    return {
+      action: ErrorAction.Shutdown,
+      message: error.message,
+      handled: true,
+    };
+  }
+
+  closed(): CloseHandlerResult {
+    this.restarts.push(Date.now());
+    if (this.restarts.length <= this.maxRestartCount) {
+      return {
+        action: CloseAction.Restart,
+        message: "Restarting cfn-lint extension",
+      };
+    } else {
+      const diff = this.restarts[this.restarts.length - 1] - this.restarts[0];
+      if (diff <= 3 * 60 * 1000) {
+        const message = `The cfn-lint server crashed ${
+          this.maxRestartCount + 1
+        } times in the last 3 minutes. The server will not be restarted.`;
+        window.showErrorMessage(message);
+        return {
+          action: CloseAction.DoNotRestart,
+          message: message,
+        };
+      } else {
+        this.restarts.shift();
+        return {
+          action: CloseAction.Restart,
+          message: "Restart cfn-lint extension",
+        };
+      }
+    }
+  }
 }
