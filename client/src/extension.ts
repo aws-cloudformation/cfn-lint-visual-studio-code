@@ -108,7 +108,7 @@ export async function activate(context: ExtensionContext) {
 
   languageClient.onNotification("cfn/cfnLintUpgradeNeeded", (params) => {
     window.showInformationMessage(
-      `You are using an outdated version of cfn-lint (${params["cli_version"]}). The latest version is ${params["latest_version"]}.`
+      `You are using an outdated version of cfn-lint (${params["cliVersion"]}). The latest version is ${params["latestVersion"]}.`
     );
   });
 

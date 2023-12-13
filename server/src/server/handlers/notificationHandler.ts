@@ -73,8 +73,8 @@ export class NotificationHandler {
           try {
             if (gt(latestVersion, cliVersion)) {
               this.connection.sendNotification("cfn/cfnLintUpgradeNeeded", {
-                cli_version: cliVersion,
-                latest_version: latestVersion,
+                cliVersion: cliVersion,
+                latestVersion: latestVersion,
               });
             }
           } catch (error) {
