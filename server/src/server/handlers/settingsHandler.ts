@@ -133,6 +133,11 @@ export class SettingsHandler {
         .overrideSpecPath
         ? settings.cfnLint.overrideSpecPath
         : "";
+      if (
+        Object.prototype.hasOwnProperty.call(settings.cfnLint, "completion")
+      ) {
+        this.cfnSettings.yamlShouldCompletion = settings.cfnLint.completion;
+      }
     }
 
     this.updateConfiguration();
