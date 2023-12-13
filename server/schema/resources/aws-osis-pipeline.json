@@ -3,6 +3,38 @@
   "description": "An OpenSearch Ingestion Service Data Prepper pipeline running Data Prepper.",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-osis.git",
   "definitions": {
+    "BufferOptions": {
+      "description": "Key-value pairs to configure buffering.",
+      "type": "object",
+      "properties": {
+        "PersistentBufferEnabled": {
+          "type": "boolean",
+          "description": "Whether persistent buffering should be enabled.",
+          "markdownDescription": "Whether persistent buffering should be enabled.\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "PersistentBufferEnabled"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Key-value pairs to configure buffering.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "EncryptionAtRestOptions": {
+      "description": "Key-value pairs to configure encryption at rest.",
+      "type": "object",
+      "properties": {
+        "KmsKeyArn": {
+          "type": "string",
+          "description": "The KMS key to use for encrypting data. By default an AWS owned key is used",
+          "markdownDescription": "The KMS key to use for encrypting data. By default an AWS owned key is used\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "KmsKeyArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Key-value pairs to configure encryption at rest.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "LogPublishingOptions": {
       "description": "Key-value pairs to configure log publishing.",
       "type": "object",
@@ -20,9 +52,12 @@
               "type": "string",
               "minLength": 1,
               "maxLength": 512,
-              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: \\/aws\\/vendedlogs\\/[\\.\\-_/#A-Za-z0-9]+  \nUpdate requires: No interruption"
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: \\/aws\\/vendedlogs\\/[\\.\\-_/#A-Za-z0-9]+  \nUpdate requires: No interruption"
             }
           },
+          "required": [
+            "LogGroup"
+          ],
           "additionalProperties": false,
           "markdownDescription": "The destination for OpenSearch Ingestion Service logs sent to Amazon CloudWatch.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
         }
@@ -82,9 +117,12 @@
             "maxLength": 24,
             "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 15  \nMaximum Length: 24  \nPattern: subnet-\\w{8}(\\w{9})?  \nUpdate requires: No interruption"
           },
-          "markdownDescription": "A list of subnet IDs associated with the VPC endpoint.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+          "markdownDescription": "A list of subnet IDs associated with the VPC endpoint.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
         }
       },
+      "required": [
+        "SubnetIds"
+      ],
       "additionalProperties": false,
       "markdownDescription": "Container for the values required to configure VPC access for the pipeline. If you don't specify these values, OpenSearch Ingestion Service creates the pipeline with a public endpoint.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
@@ -111,6 +149,12 @@
     }
   },
   "properties": {
+    "BufferOptions": {
+      "$ref": "#/definitions/BufferOptions"
+    },
+    "EncryptionAtRestOptions": {
+      "$ref": "#/definitions/EncryptionAtRestOptions"
+    },
     "LogPublishingOptions": {
       "$ref": "#/definitions/LogPublishingOptions"
     },
@@ -189,9 +233,12 @@
       "permissions": [
         "osis:CreatePipeline",
         "osis:GetPipeline",
+        "osis:TagResource",
         "osis:ListTagsForResource",
         "iam:PassRole",
-        "iam:CreateServiceLinkedRole"
+        "iam:CreateServiceLinkedRole",
+        "logs:CreateLogDelivery",
+        "kms:DescribeKey"
       ]
     },
     "read": {
@@ -203,15 +250,24 @@
     "update": {
       "permissions": [
         "osis:UpdatePipeline",
+        "osis:GetPipeline",
         "osis:ListTagsForResource",
         "osis:TagResource",
         "osis:UntagResource",
-        "iam:PassRole"
+        "iam:PassRole",
+        "logs:GetLogDelivery",
+        "logs:UpdateLogDelivery",
+        "logs:ListLogDeliveries",
+        "kms:DescribeKey"
       ]
     },
     "delete": {
       "permissions": [
-        "osis:DeletePipeline"
+        "osis:DeletePipeline",
+        "osis:GetPipeline",
+        "logs:GetLogDelivery",
+        "logs:DeleteLogDelivery",
+        "logs:ListLogDeliveries"
       ]
     },
     "list": {
