@@ -118,39 +118,41 @@ export class LanguageHandlers extends YamlLanguageHandlers {
       });
     }
 
-    try {
-      if (node !== null && template !== null) {
-        if (isNode(node.internalNode)) {
-          if (node.internalNode.tag === undefined) {
-            if (node.parent !== undefined) {
-              if (isPair(node.parent.internalNode)) {
-                if (isScalar(node.parent.internalNode.key)) {
-                  if (node.parent.internalNode.key.value === "Ref") {
-                    addResources("");
-                    addParameters("");
+    if (this.cfnSettings.yamlShouldCompletion) {
+      try {
+        if (node !== null && template !== null) {
+          if (isNode(node.internalNode)) {
+            if (node.internalNode.tag === undefined) {
+              if (node.parent !== undefined) {
+                if (isPair(node.parent.internalNode)) {
+                  if (isScalar(node.parent.internalNode.key)) {
+                    if (node.parent.internalNode.key.value === "Ref") {
+                      addResources("");
+                      addParameters("");
+                    }
                   }
                 }
               }
-            }
-          } else if (node.internalNode.tag !== undefined) {
-            if (node.internalNode.tag === "!Ref") {
-              results.items = results.items.filter(
-                (item) => item.insertText !== "!Ref "
-              );
-              addResources("");
-              addParameters("");
-            } else if ("!Ref".startsWith(node.internalNode.tag)) {
-              results.items = results.items.filter(
-                (item) => item.insertText !== "!Ref "
-              );
-              addResources("!Ref ");
-              addParameters("!Ref ");
+            } else if (node.internalNode.tag !== undefined) {
+              if (node.internalNode.tag === "!Ref") {
+                results.items = results.items.filter(
+                  (item) => item.insertText !== "!Ref "
+                );
+                addResources("");
+                addParameters("");
+              } else if ("!Ref".startsWith(node.internalNode.tag)) {
+                results.items = results.items.filter(
+                  (item) => item.insertText !== "!Ref "
+                );
+                addResources("!Ref ");
+                addParameters("!Ref ");
+              }
             }
           }
         }
+      } catch (error) {
+        console.debug(error);
       }
-    } catch (error) {
-      console.debug(error);
     }
 
     return results;
