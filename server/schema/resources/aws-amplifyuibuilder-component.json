@@ -1,7 +1,6 @@
 {
   "typeName": "AWS::AmplifyUIBuilder::Component",
   "description": "Definition of AWS::AmplifyUIBuilder::Component Resource Type",
-  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-amplifyuibuilder",
   "definitions": {
     "ActionParameters": {
       "type": "object",
@@ -99,6 +98,10 @@
         "DefaultValue": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "SlotName": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         }
       },
       "additionalProperties": false,
@@ -127,6 +130,10 @@
         },
         "Events": {
           "$ref": "#/definitions/ComponentEvents"
+        },
+        "SourceId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         }
       },
       "required": [
@@ -221,6 +228,10 @@
         },
         "Parameters": {
           "$ref": "#/definitions/ActionParameters"
+        },
+        "BindingEvent": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         }
       },
       "additionalProperties": false,
@@ -455,6 +466,10 @@
         "Operand": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "OperandType": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^boolean|string|number$  \nUpdate requires: No interruption"
         }
       },
       "additionalProperties": false,
@@ -503,7 +518,7 @@
   "properties": {
     "AppId": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
     },
     "BindingProperties": {
       "$ref": "#/definitions/ComponentBindingProperties"
@@ -522,11 +537,11 @@
       "type": "string",
       "maxLength": 255,
       "minLength": 1,
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption"
     },
     "EnvironmentName": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
     },
     "Events": {
       "$ref": "#/definitions/ComponentEvents"
@@ -535,7 +550,7 @@
       "type": "string",
       "maxLength": 255,
       "minLength": 1,
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption"
     },
     "Overrides": {
       "$ref": "#/definitions/ComponentOverrides"
@@ -559,22 +574,17 @@
       "items": {
         "$ref": "#/definitions/ComponentVariant"
       },
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     }
   },
-  "required": [
-    "BindingProperties",
-    "ComponentType",
-    "Name",
-    "Overrides",
-    "Properties",
-    "Variants"
+  "createOnlyProperties": [
+    "/properties/AppId",
+    "/properties/EnvironmentName"
   ],
   "readOnlyProperties": [
-    "/properties/Id"
-  ],
-  "createOnlyProperties": [
-    "/properties/Tags"
+    "/properties/CreatedAt",
+    "/properties/Id",
+    "/properties/ModifiedAt"
   ],
   "primaryIdentifier": [
     "/properties/AppId",
@@ -585,8 +595,8 @@
     "create": {
       "permissions": [
         "amplify:GetApp",
-        "amplifyuibuilder:GetComponent",
         "amplifyuibuilder:CreateComponent",
+        "amplifyuibuilder:GetComponent",
         "amplifyuibuilder:TagResource"
       ]
     },
@@ -600,22 +610,22 @@
       "permissions": [
         "amplify:GetApp",
         "amplifyuibuilder:GetComponent",
-        "amplifyuibuilder:UpdateComponent",
-        "amplifyuibuilder:TagResource"
+        "amplifyuibuilder:TagResource",
+        "amplifyuibuilder:UntagResource",
+        "amplifyuibuilder:UpdateComponent"
       ]
     },
     "delete": {
       "permissions": [
         "amplify:GetApp",
-        "amplifyuibuilder:GetComponent",
         "amplifyuibuilder:DeleteComponent",
+        "amplifyuibuilder:GetComponent",
         "amplifyuibuilder:UntagResource"
       ]
     },
     "list": {
       "permissions": [
         "amplify:GetApp",
-        "amplifyuibuilder:GetComponent",
         "amplifyuibuilder:ListComponents"
       ],
       "handlerSchema": {
@@ -637,14 +647,25 @@
   "tagging": {
     "taggable": true,
     "tagOnCreate": true,
-    "tagUpdatable": false,
-    "cloudFormationSystemTags": false,
-    "tagProperty": "#/properties/Tags"
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
   },
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-amplifyuibuilder",
   "additionalProperties": false,
   "attributes": {
+    "CreatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
     "Id": {
       "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "ModifiedAt": {
+      "type": "string",
+      "format": "date-time",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     }
   }

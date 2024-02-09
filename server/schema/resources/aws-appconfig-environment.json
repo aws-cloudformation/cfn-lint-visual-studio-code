@@ -1,86 +1,175 @@
 {
   "typeName": "AWS::AppConfig::Environment",
   "description": "Resource Type definition for AWS::AppConfig::Environment",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-appconfig.git",
   "additionalProperties": false,
   "properties": {
-    "Monitors": {
-      "type": "array",
-      "uniqueItems": false,
-      "items": {
-        "$ref": "#/definitions/Monitors"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-    },
-    "Description": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-    },
     "ApplicationId": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
-    },
-    "Tags": {
-      "type": "array",
-      "uniqueItems": false,
-      "items": {
-        "$ref": "#/definitions/Tags"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+      "description": "The application ID.",
+      "markdownDescription": "The application ID.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: [a-z0-9]{4,7}  \nUpdate requires: Replacement"
     },
     "Name": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+      "description": "A name for the environment.",
+      "minLength": 1,
+      "maxLength": 64,
+      "markdownDescription": "A name for the environment.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nUpdate requires: No interruption"
+    },
+    "Description": {
+      "type": "string",
+      "description": "A description of the environment.",
+      "minLength": 0,
+      "maxLength": 1024,
+      "markdownDescription": "A description of the environment.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nUpdate requires: No interruption"
+    },
+    "Monitors": {
+      "type": "array",
+      "description": "Amazon CloudWatch alarms to monitor during the deployment process.",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Monitor"
+      },
+      "minItems": 0,
+      "maxItems": 5,
+      "markdownDescription": "Amazon CloudWatch alarms to monitor during the deployment process.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "Tags": {
+      "type": "array",
+      "description": "Metadata to assign to the environment. Tags help organize and categorize your AWS AppConfig resources. Each tag consists of a key and an optional value, both of which you define.",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "insertionOrder": false,
+      "markdownDescription": "Metadata to assign to the environment. Tags help organize and categorize your AWS AppConfig resources. Each tag consists of a key and an optional value, both of which you define.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     }
   },
   "definitions": {
-    "Monitors": {
+    "Monitor": {
       "type": "object",
+      "description": "Amazon CloudWatch alarm to monitor during the deployment process.",
       "additionalProperties": false,
       "properties": {
         "AlarmArn": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          "description": "Amazon Resource Name (ARN) of the Amazon CloudWatch alarm.",
+          "minLength": 1,
+          "maxLength": 2048,
+          "markdownDescription": "Amazon Resource Name (ARN) of the Amazon CloudWatch alarm.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: No interruption"
         },
         "AlarmRoleArn": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          "description": "ARN of an AWS Identity and Access Management (IAM) role for AWS AppConfig to monitor AlarmArn.",
+          "minLength": 20,
+          "maxLength": 2048,
+          "markdownDescription": "ARN of an AWS Identity and Access Management (IAM) role for AWS AppConfig to monitor AlarmArn.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^((arn):(aws|aws-cn|aws-iso|aws-iso-[a-z]{1}|aws-us-gov):(iam)::\\d{12}:role[/].*)$  \nUpdate requires: No interruption"
         }
       },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+      "required": [
+        "AlarmArn"
+      ],
+      "markdownDescription": "Amazon CloudWatch alarm to monitor during the deployment process.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
-    "Tags": {
+    "Tag": {
+      "description": "Metadata to assign to the environment. Tags help organize and categorize your AWS AppConfig resources. Each tag consists of a key and an optional value, both of which you define.",
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "Value": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
         "Key": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          "description": "The key-value string map. The valid character set is [a-zA-Z1-9+-=._:/]. The tag key can be up to 128 characters and must not start with aws:.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The key-value string map. The valid character set is [a-zA-Z1-9+-=._:/]. The tag key can be up to 128 characters and must not start with aws:.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^(?!aws:.)[a-zA-Z1-9+=._:/-]*$  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The tag value can be up to 256 characters.",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The tag value can be up to 256 characters.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption"
         }
       },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "Metadata to assign to the environment. Tags help organize and categorize your AWS AppConfig resources. Each tag consists of a key and an optional value, both of which you define.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     }
   },
   "required": [
-    "ApplicationId",
-    "Name"
+    "Name",
+    "ApplicationId"
+  ],
+  "readOnlyProperties": [
+    "/properties/EnvironmentId"
   ],
   "createOnlyProperties": [
     "/properties/ApplicationId"
   ],
   "primaryIdentifier": [
-    "/properties/Id"
+    "/properties/ApplicationId",
+    "/properties/EnvironmentId"
   ],
-  "readOnlyProperties": [
-    "/properties/Id"
-  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "appconfig:CreateEnvironment",
+        "appconfig:GetEnvironment",
+        "appconfig:ListTagsForResource",
+        "appconfig:TagResource",
+        "iam:PassRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "appconfig:GetEnvironment",
+        "appconfig:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "appconfig:UpdateEnvironment",
+        "appconfig:TagResource",
+        "appconfig:UntagResource",
+        "iam:PassRole"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "appconfig:GetEnvironment",
+        "appconfig:DeleteEnvironment"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "ApplicationId": {
+            "$ref": "resource-schema.json#/properties/ApplicationId"
+          }
+        },
+        "required": [
+          "ApplicationId"
+        ]
+      },
+      "permissions": [
+        "appconfig:ListEnvironments"
+      ]
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
   "attributes": {
-    "Id": {
+    "EnvironmentId": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "description": "The environment ID.",
+      "markdownDescription": "The environment ID.\n\n---\n\nRequired: No  \nType: String  \nPattern: [a-z0-9]{4,7}  \nUpdate requires: No interruption"
     }
   }
 }

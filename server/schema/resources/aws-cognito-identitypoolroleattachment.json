@@ -1,19 +1,110 @@
 {
   "typeName": "AWS::Cognito::IdentityPoolRoleAttachment",
   "description": "Resource Type definition for AWS::Cognito::IdentityPoolRoleAttachment",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
   "additionalProperties": false,
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "definitions": {
+    "MappingRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Claim": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "MatchType": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "RoleARN": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Claim",
+        "MatchType",
+        "RoleARN",
+        "Value"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RulesConfigurationType": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Rules": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/MappingRule"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Rules"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RoleMapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Type": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "AmbiguousRoleResolution": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "RulesConfiguration": {
+          "$ref": "#/definitions/RulesConfigurationType"
+        },
+        "IdentityProvider": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
   "properties": {
     "IdentityPoolId": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
     },
     "Roles": {
-      "type": "object",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+      "patternProperties": {
+        "^.+$": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false
     },
     "RoleMappings": {
-      "type": "object",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+      "patternProperties": {
+        "^.+$": {
+          "$ref": "#/definitions/RoleMapping"
+        }
+      },
+      "additionalProperties": false
     }
   },
   "required": [
@@ -28,6 +119,53 @@
   "readOnlyProperties": [
     "/properties/Id"
   ],
+  "additionalIdentifiers": [
+    [
+      "/properties/IdentityPoolId"
+    ]
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "cognito-identity:GetIdentityPoolRoles",
+        "cognito-identity:SetIdentityPoolRoles",
+        "iam:PassRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "cognito-identity:GetIdentityPoolRoles"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "cognito-identity:GetIdentityPoolRoles",
+        "cognito-identity:SetIdentityPoolRoles",
+        "iam:PassRole"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "cognito-identity:GetIdentityPoolRoles",
+        "cognito-identity:SetIdentityPoolRoles"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "IdentityPoolId": {
+            "$ref": "resource-schema.json#/properties/IdentityPoolId"
+          }
+        },
+        "required": [
+          "IdentityPoolId"
+        ]
+      },
+      "permissions": [
+        "cognito-identity:GetIdentityPoolRoles"
+      ]
+    }
+  },
   "attributes": {
     "Id": {
       "type": "string",

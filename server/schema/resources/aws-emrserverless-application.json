@@ -51,6 +51,11 @@
           "description": "Managed log persistence configurations for a JobRun.",
           "$ref": "#/definitions/ManagedPersistenceMonitoringConfiguration",
           "markdownDescription": "Managed log persistence configurations for a JobRun.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        },
+        "CloudWatchLoggingConfiguration": {
+          "description": "CloudWatch logging configurations for a JobRun.",
+          "$ref": "#/definitions/CloudWatchLoggingConfiguration",
+          "markdownDescription": "CloudWatch logging configurations for a JobRun.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
         }
       },
       "markdownDescription": "Monitoring configuration for batch and interactive JobRun.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
@@ -83,6 +88,71 @@
           "markdownDescription": "KMS key ARN to encrypt the logs stored in managed persistence\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
         }
       }
+    },
+    "CloudWatchLoggingConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "Enabled": {
+          "description": "If set to false, CloudWatch logging will be turned off. Defaults to false.",
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "If set to false, CloudWatch logging will be turned off. Defaults to false.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        },
+        "LogGroupName": {
+          "description": "Log-group name to produce log-streams on CloudWatch. If undefined, logs will be produced in a default log-group /aws/emr-serverless",
+          "$ref": "#/definitions/LogGroupName",
+          "markdownDescription": "Log-group name to produce log-streams on CloudWatch. If undefined, logs will be produced in a default log-group /aws/emr-serverless\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        },
+        "LogStreamNamePrefix": {
+          "description": "Log-stream name prefix by which log-stream names will start in the CloudWatch Log-group.",
+          "$ref": "#/definitions/LogStreamNamePrefix",
+          "markdownDescription": "Log-stream name prefix by which log-stream names will start in the CloudWatch Log-group.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        },
+        "EncryptionKeyArn": {
+          "description": "KMS key ARN to encrypt the logs stored in given CloudWatch log-group.",
+          "$ref": "#/definitions/EncryptionKeyArn",
+          "markdownDescription": "KMS key ARN to encrypt the logs stored in given CloudWatch log-group.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        },
+        "LogTypeMap": {
+          "description": "The specific log-streams which need to be uploaded to CloudWatch.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/LogTypeMapKeyValuePair"
+          },
+          "markdownDescription": "The specific log-streams which need to be uploaded to CloudWatch.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      }
+    },
+    "LogTypeMapKeyValuePair": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "$ref": "#/definitions/WorkerTypeString"
+        },
+        "Value": {
+          "$ref": "#/definitions/LogTypeList"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "LogTypeList": {
+      "description": "List of Applicable values: [STDOUT, STDERR, HIVE_LOG, TEZ_AM, SYSTEM_LOGS]",
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "minItems": 1,
+      "maxItems": 5,
+      "items": {
+        "$ref": "#/definitions/LogTypeString"
+      },
+      "markdownDescription": "List of Applicable values: [STDOUT, STDERR, HIVE_LOG, TEZ_AM, SYSTEM_LOGS]\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     },
     "InitialCapacityConfigMap": {
       "type": "array",
@@ -286,6 +356,30 @@
       "maxLength": 1024,
       "minLength": 1,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nPattern: .*\\S.*  \nUpdate requires: No interruption"
+    },
+    "LogGroupName": {
+      "type": "string",
+      "maxLength": 512,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^[\\.\\-_/#A-Za-z0-9]+$  \nUpdate requires: No interruption"
+    },
+    "LogStreamNamePrefix": {
+      "type": "string",
+      "maxLength": 512,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^[^:*]*$  \nUpdate requires: No interruption"
+    },
+    "LogTypeString": {
+      "type": "string",
+      "maxLength": 50,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 50  \nPattern: ^[a-zA-Z]+[-_]*[a-zA-Z]+$  \nUpdate requires: No interruption"
+    },
+    "WorkerTypeString": {
+      "type": "string",
+      "maxLength": 50,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 50  \nPattern: ^[a-zA-Z]+[-_]*[a-zA-Z]+$  \nUpdate requires: No interruption"
     },
     "Tag": {
       "description": "A key-value pair to associate with a resource.",

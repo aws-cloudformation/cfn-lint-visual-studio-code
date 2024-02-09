@@ -10,7 +10,7 @@
         "PublicInternetOnly",
         "VpcOnly"
       ],
-      "markdownDescription": "Specifies the VPC used for non-EFS traffic. The default value is PublicInternetOnly.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PublicInternetOnly | VpcOnly  \nUpdate requires: Replacement"
+      "markdownDescription": "Specifies the VPC used for non-EFS traffic. The default value is PublicInternetOnly.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PublicInternetOnly | VpcOnly  \nUpdate requires: No interruption"
     },
     "AuthMode": {
       "type": "string",
@@ -55,7 +55,7 @@
         "maxLength": 32,
         "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 32  \nPattern: [-0-9a-zA-Z]+  \nUpdate requires: No interruption"
       },
-      "markdownDescription": "The VPC subnets that Studio uses for communication.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: Replacement"
+      "markdownDescription": "The VPC subnets that Studio uses for communication.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
     },
     "Tags": {
       "type": "array",
@@ -116,6 +116,43 @@
         },
         "RSessionAppSettings": {
           "$ref": "#/definitions/RSessionAppSettings"
+        },
+        "JupyterLabAppSettings": {
+          "$ref": "#/definitions/JupyterLabAppSettings"
+        },
+        "SpaceStorageSettings": {
+          "$ref": "#/definitions/DefaultSpaceStorageSettings"
+        },
+        "CodeEditorAppSettings": {
+          "$ref": "#/definitions/CodeEditorAppSettings"
+        },
+        "DefaultLandingUri": {
+          "type": "string",
+          "description": "Defines which Amazon SageMaker application users are directed to by default.",
+          "maxLength": 1023,
+          "markdownDescription": "Defines which Amazon SageMaker application users are directed to by default.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1023  \nUpdate requires: No interruption"
+        },
+        "StudioWebPortal": {
+          "type": "string",
+          "description": "Indicates whether the Studio experience is available to users. If not, users cannot access Studio.",
+          "enum": [
+            "ENABLED",
+            "DISABLED"
+          ],
+          "markdownDescription": "Indicates whether the Studio experience is available to users. If not, users cannot access Studio.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption"
+        },
+        "CustomPosixUserConfig": {
+          "$ref": "#/definitions/CustomPosixUserConfig"
+        },
+        "CustomFileSystemConfigs": {
+          "type": "array",
+          "uniqueItems": true,
+          "minItems": 0,
+          "maxItems": 2,
+          "items": {
+            "$ref": "#/definitions/CustomFileSystemConfig"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
         },
         "SecurityGroups": {
           "type": "array",
@@ -262,9 +299,12 @@
             "ml.g5.48xlarge",
             "ml.p4d.24xlarge",
             "ml.p4de.24xlarge",
-            "ml.geospatial.interactive"
+            "ml.geospatial.interactive",
+            "ml.trn1.2xlarge",
+            "ml.trn1.32xlarge",
+            "ml.trn1n.32xlarge"
           ],
-          "markdownDescription": "The instance type that the image version runs on.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: system | ml.t3.micro | ml.t3.small | ml.t3.medium | ml.t3.large | ml.t3.xlarge | ml.t3.2xlarge | ml.m5.large | ml.m5.xlarge | ml.m5.2xlarge | ml.m5.4xlarge | ml.m5.8xlarge | ml.m5.12xlarge | ml.m5.16xlarge | ml.m5.24xlarge | ml.c5.large | ml.c5.xlarge | ml.c5.2xlarge | ml.c5.4xlarge | ml.c5.9xlarge | ml.c5.12xlarge | ml.c5.18xlarge | ml.c5.24xlarge | ml.p3.2xlarge | ml.p3.8xlarge | ml.p3.16xlarge | ml.g4dn.xlarge | ml.g4dn.2xlarge | ml.g4dn.4xlarge | ml.g4dn.8xlarge | ml.g4dn.12xlarge | ml.g4dn.16xlarge | ml.r5.large | ml.r5.xlarge | ml.r5.2xlarge | ml.r5.4xlarge | ml.r5.8xlarge | ml.r5.12xlarge | ml.r5.16xlarge | ml.r5.24xlarge | ml.p3dn.24xlarge | ml.m5d.large | ml.m5d.xlarge | ml.m5d.2xlarge | ml.m5d.4xlarge | ml.m5d.8xlarge | ml.m5d.12xlarge | ml.m5d.16xlarge | ml.m5d.24xlarge | ml.g5.xlarge | ml.g5.2xlarge | ml.g5.4xlarge | ml.g5.8xlarge | ml.g5.12xlarge | ml.g5.16xlarge | ml.g5.24xlarge | ml.g5.48xlarge | ml.p4d.24xlarge | ml.p4de.24xlarge | ml.geospatial.interactive  \nUpdate requires: No interruption"
+          "markdownDescription": "The instance type that the image version runs on.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: system | ml.t3.micro | ml.t3.small | ml.t3.medium | ml.t3.large | ml.t3.xlarge | ml.t3.2xlarge | ml.m5.large | ml.m5.xlarge | ml.m5.2xlarge | ml.m5.4xlarge | ml.m5.8xlarge | ml.m5.12xlarge | ml.m5.16xlarge | ml.m5.24xlarge | ml.c5.large | ml.c5.xlarge | ml.c5.2xlarge | ml.c5.4xlarge | ml.c5.9xlarge | ml.c5.12xlarge | ml.c5.18xlarge | ml.c5.24xlarge | ml.p3.2xlarge | ml.p3.8xlarge | ml.p3.16xlarge | ml.g4dn.xlarge | ml.g4dn.2xlarge | ml.g4dn.4xlarge | ml.g4dn.8xlarge | ml.g4dn.12xlarge | ml.g4dn.16xlarge | ml.r5.large | ml.r5.xlarge | ml.r5.2xlarge | ml.r5.4xlarge | ml.r5.8xlarge | ml.r5.12xlarge | ml.r5.16xlarge | ml.r5.24xlarge | ml.p3dn.24xlarge | ml.m5d.large | ml.m5d.xlarge | ml.m5d.2xlarge | ml.m5d.4xlarge | ml.m5d.8xlarge | ml.m5d.12xlarge | ml.m5d.16xlarge | ml.m5d.24xlarge | ml.g5.xlarge | ml.g5.2xlarge | ml.g5.4xlarge | ml.g5.8xlarge | ml.g5.12xlarge | ml.g5.16xlarge | ml.g5.24xlarge | ml.g5.48xlarge | ml.p4d.24xlarge | ml.p4de.24xlarge | ml.geospatial.interactive | ml.trn1.2xlarge | ml.trn1.32xlarge | ml.trn1n.32xlarge  \nUpdate requires: No interruption"
         },
         "SageMakerImageArn": {
           "type": "string",
@@ -311,6 +351,192 @@
         }
       },
       "markdownDescription": "The kernel gateway app settings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "JupyterLabAppSettings": {
+      "type": "object",
+      "description": "The JupyterLab app settings.",
+      "additionalProperties": false,
+      "properties": {
+        "DefaultResourceSpec": {
+          "$ref": "#/definitions/ResourceSpec",
+          "description": "The default instance type and the Amazon Resource Name (ARN) of the default SageMaker image used by the JupyterLab app.",
+          "markdownDescription": "The default instance type and the Amazon Resource Name (ARN) of the default SageMaker image used by the JupyterLab app.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        },
+        "LifecycleConfigArns": {
+          "type": "array",
+          "description": "A list of LifecycleConfigArns available for use with JupyterLab apps.",
+          "uniqueItems": false,
+          "minItems": 0,
+          "maxItems": 30,
+          "items": {
+            "$ref": "#/definitions/StudioLifecycleConfigArn"
+          },
+          "markdownDescription": "A list of LifecycleConfigArns available for use with JupyterLab apps.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "CodeRepositories": {
+          "type": "array",
+          "description": "A list of CodeRepositories available for use with JupyterLab apps.",
+          "uniqueItems": false,
+          "minItems": 0,
+          "maxItems": 30,
+          "items": {
+            "$ref": "#/definitions/CodeRepository"
+          },
+          "markdownDescription": "A list of CodeRepositories available for use with JupyterLab apps.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "CustomImages": {
+          "type": "array",
+          "description": "A list of custom images for use for JupyterLab apps.",
+          "uniqueItems": false,
+          "minItems": 0,
+          "maxItems": 30,
+          "items": {
+            "$ref": "#/definitions/CustomImage"
+          },
+          "markdownDescription": "A list of custom images for use for JupyterLab apps.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "The JupyterLab app settings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "CodeRepository": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "RepositoryUrl": {
+          "type": "string",
+          "description": "A CodeRepository (valid URL) to be used within Jupyter's Git extension.",
+          "maxLength": 256,
+          "markdownDescription": "A CodeRepository (valid URL) to be used within Jupyter's Git extension.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: ^https://([.\\-_a-zA-Z0-9]+/?){3,1016}$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "RepositoryUrl"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "DefaultSpaceStorageSettings": {
+      "type": "object",
+      "description": "Default storage settings for a space.",
+      "additionalProperties": false,
+      "properties": {
+        "DefaultEbsStorageSettings": {
+          "$ref": "#/definitions/DefaultEbsStorageSettings"
+        }
+      },
+      "markdownDescription": "Default storage settings for a space.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "DefaultEbsStorageSettings": {
+      "type": "object",
+      "description": "Properties related to the Amazon Elastic Block Store volume. Must be provided if storage type is Amazon EBS and must not be provided if storage type is not Amazon EBS",
+      "additionalProperties": false,
+      "properties": {
+        "DefaultEbsVolumeSizeInGb": {
+          "description": "Default size of the Amazon EBS volume in Gb",
+          "$ref": "#/definitions/SpaceEbsVolumeSizeInGb",
+          "markdownDescription": "Default size of the Amazon EBS volume in Gb\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption"
+        },
+        "MaximumEbsVolumeSizeInGb": {
+          "description": "Maximum size of the Amazon EBS volume in Gb. Must be greater than or equal to the DefaultEbsVolumeSizeInGb.",
+          "$ref": "#/definitions/SpaceEbsVolumeSizeInGb",
+          "markdownDescription": "Maximum size of the Amazon EBS volume in Gb. Must be greater than or equal to the DefaultEbsVolumeSizeInGb.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "DefaultEbsVolumeSizeInGb",
+        "MaximumEbsVolumeSizeInGb"
+      ],
+      "markdownDescription": "Properties related to the Amazon Elastic Block Store volume. Must be provided if storage type is Amazon EBS and must not be provided if storage type is not Amazon EBS\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "SpaceEbsVolumeSizeInGb": {
+      "type": "integer",
+      "minimum": 5,
+      "maximum": 16384,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+    },
+    "CodeEditorAppSettings": {
+      "type": "object",
+      "description": "The CodeEditor app settings.",
+      "additionalProperties": false,
+      "properties": {
+        "DefaultResourceSpec": {
+          "$ref": "#/definitions/ResourceSpec",
+          "description": "The default instance type and the Amazon Resource Name (ARN) of the default SageMaker image used by the CodeEditor app.",
+          "markdownDescription": "The default instance type and the Amazon Resource Name (ARN) of the default SageMaker image used by the CodeEditor app.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        },
+        "LifecycleConfigArns": {
+          "type": "array",
+          "description": "A list of LifecycleConfigArns available for use with CodeEditor apps.",
+          "uniqueItems": false,
+          "minItems": 0,
+          "maxItems": 30,
+          "items": {
+            "$ref": "#/definitions/StudioLifecycleConfigArn"
+          },
+          "markdownDescription": "A list of LifecycleConfigArns available for use with CodeEditor apps.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "The CodeEditor app settings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "StudioLifecycleConfigArn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the Lifecycle Configuration to attach to the Resource.",
+      "maxLength": 256,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the Lifecycle Configuration to attach to the Resource.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nPattern: arn:aws[a-z\\-]*:sagemaker:[a-z0-9\\-]*:[0-9]{12}:studio-lifecycle-config/.*  \nUpdate requires: No interruption"
+    },
+    "CustomPosixUserConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Uid": {
+          "type": "integer",
+          "minimum": 10000,
+          "maximum": 4000000,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "Gid": {
+          "type": "integer",
+          "minimum": 1001,
+          "maximum": 4000000,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Uid",
+        "Gid"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "CustomFileSystemConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "EFSFileSystemConfig": {
+          "$ref": "#/definitions/EFSFileSystemConfig"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "EFSFileSystemConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "FileSystemPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^\\/\\S*$  \nUpdate requires: No interruption"
+        },
+        "FileSystemId": {
+          "type": "string",
+          "minLength": 11,
+          "maxLength": 21,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 11  \nMaximum Length: 21  \nPattern: ^(fs-[0-9a-f]{8,})$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "FileSystemId"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "CustomImage": {
       "type": "object",
@@ -415,9 +641,43 @@
         },
         "RStudioServerProDomainSettings": {
           "$ref": "#/definitions/RStudioServerProDomainSettings"
+        },
+        "DockerSettings": {
+          "$ref": "#/definitions/DockerSettings"
         }
       },
       "markdownDescription": "A collection of Domain settings.\n\n---\n\nRequired: No  \nUpdate requires: Replacement"
+    },
+    "DockerSettings": {
+      "type": "object",
+      "description": "A collection of settings that are required to start docker-proxy server.",
+      "additionalProperties": false,
+      "properties": {
+        "EnableDockerAccess": {
+          "type": "string",
+          "description": "The flag to enable/disable docker-proxy server",
+          "enum": [
+            "ENABLED",
+            "DISABLED"
+          ],
+          "markdownDescription": "The flag to enable/disable docker-proxy server\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption"
+        },
+        "VpcOnlyTrustedAccounts": {
+          "type": "array",
+          "description": "A list of account id's that would be used to pull images from in VpcOnly mode",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "minItems": 0,
+          "maxItems": 10,
+          "items": {
+            "type": "string",
+            "maxLength": 12,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 12  \nPattern: ^[0-9]$  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "A list of account id's that would be used to pull images from in VpcOnly mode\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "A collection of settings that are required to start docker-proxy server.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "RStudioServerProDomainSettings": {
       "type": "object",
@@ -508,12 +768,10 @@
     "VpcId"
   ],
   "createOnlyProperties": [
-    "/properties/AppNetworkAccessType",
     "/properties/AuthMode",
     "/properties/DomainName",
     "/properties/DomainSettings/RStudioServerProDomainSettings/DefaultResourceSpec",
     "/properties/KmsKeyId",
-    "/properties/SubnetIds",
     "/properties/VpcId",
     "/properties/Tags"
   ],
@@ -529,7 +787,8 @@
     "/properties/DomainId",
     "/properties/HomeEfsFileSystemId",
     "/properties/SecurityGroupIdForDomainBoundary",
-    "/properties/SingleSignOnManagedApplicationInstanceId"
+    "/properties/SingleSignOnManagedApplicationInstanceId",
+    "/properties/SingleSignOnApplicationArn"
   ],
   "handlers": {
     "create": {
@@ -606,6 +865,11 @@
       "description": "The SSO managed application instance ID.",
       "maxLength": 256,
       "markdownDescription": "The SSO managed application instance ID.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption"
+    },
+    "SingleSignOnApplicationArn": {
+      "type": "string",
+      "description": "The ARN of the application managed by SageMaker in IAM Identity Center. This value is only returned for domains created after October 1, 2023.",
+      "markdownDescription": "The ARN of the application managed by SageMaker in IAM Identity Center. This value is only returned for domains created after October 1, 2023.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws|aws-us-gov|aws-cn|aws-iso|aws-iso-b):sso::[0-9]+:application/[a-zA-Z0-9-_.]+/apl-[a-zA-Z0-9]+$  \nUpdate requires: No interruption"
     },
     "SecurityGroupIdForDomainBoundary": {
       "type": "string",
