@@ -1,7 +1,6 @@
 {
   "typeName": "AWS::AmplifyUIBuilder::Form",
   "description": "Definition of AWS::AmplifyUIBuilder::Form Resource Type",
-  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-amplifyuibuilder",
   "definitions": {
     "FieldConfig": {
       "type": "object",
@@ -315,14 +314,77 @@
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
+    "FormInputBindingProperties": {
+      "type": "object",
+      "patternProperties": {
+        ".+": {
+          "$ref": "#/definitions/FormInputBindingPropertiesValue"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "FormInputBindingPropertiesValue": {
+      "type": "object",
+      "properties": {
+        "Type": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "BindingProperties": {
+          "$ref": "#/definitions/FormInputBindingPropertiesValueProperties"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "FormInputBindingPropertiesValueProperties": {
+      "type": "object",
+      "properties": {
+        "Model": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "FormInputValueProperty": {
       "type": "object",
       "properties": {
         "Value": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "BindingProperties": {
+          "$ref": "#/definitions/FormInputValuePropertyBindingProperties"
+        },
+        "Concat": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FormInputValueProperty"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
         }
       },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "FormInputValuePropertyBindingProperties": {
+      "type": "object",
+      "properties": {
+        "Property": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Field": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Property"
+      ],
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
@@ -471,6 +533,9 @@
             "$ref": "#/definitions/ValueMapping"
           },
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "BindingProperties": {
+          "$ref": "#/definitions/FormInputBindingProperties"
         }
       },
       "required": [
@@ -483,7 +548,7 @@
   "properties": {
     "AppId": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
     },
     "Cta": {
       "$ref": "#/definitions/FormCTA"
@@ -493,7 +558,7 @@
     },
     "EnvironmentName": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
     },
     "Fields": {
       "$ref": "#/definitions/FieldsMap"
@@ -508,11 +573,11 @@
       "type": "string",
       "maxLength": 255,
       "minLength": 1,
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption"
     },
     "SchemaVersion": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
     "SectionalElements": {
       "$ref": "#/definitions/SectionalElementMap"
@@ -524,20 +589,12 @@
       "$ref": "#/definitions/Tags"
     }
   },
-  "required": [
-    "DataType",
-    "Fields",
-    "FormActionType",
-    "Name",
-    "SchemaVersion",
-    "SectionalElements",
-    "Style"
+  "createOnlyProperties": [
+    "/properties/AppId",
+    "/properties/EnvironmentName"
   ],
   "readOnlyProperties": [
     "/properties/Id"
-  ],
-  "createOnlyProperties": [
-    "/properties/Tags"
   ],
   "primaryIdentifier": [
     "/properties/AppId",
@@ -548,37 +605,39 @@
     "create": {
       "permissions": [
         "amplify:GetApp",
-        "amplifyuibuilder:GetForm",
         "amplifyuibuilder:CreateForm",
-        "amplifyuibuilder:TagResource"
+        "amplifyuibuilder:GetForm",
+        "amplifyuibuilder:TagResource",
+        "amplifyuibuilder:UntagResource"
       ]
     },
     "read": {
       "permissions": [
         "amplify:GetApp",
-        "amplifyuibuilder:GetForm"
+        "amplifyuibuilder:GetForm",
+        "amplifyuibuilder:TagResource"
       ]
     },
     "update": {
       "permissions": [
         "amplify:GetApp",
         "amplifyuibuilder:GetForm",
-        "amplifyuibuilder:UpdateForm",
-        "amplifyuibuilder:TagResource"
+        "amplifyuibuilder:TagResource",
+        "amplifyuibuilder:UntagResource",
+        "amplifyuibuilder:UpdateForm"
       ]
     },
     "delete": {
       "permissions": [
         "amplify:GetApp",
-        "amplifyuibuilder:GetForm",
         "amplifyuibuilder:DeleteForm",
+        "amplifyuibuilder:TagResource",
         "amplifyuibuilder:UntagResource"
       ]
     },
     "list": {
       "permissions": [
         "amplify:GetApp",
-        "amplifyuibuilder:GetForm",
         "amplifyuibuilder:ListForms"
       ],
       "handlerSchema": {
@@ -600,10 +659,11 @@
   "tagging": {
     "taggable": true,
     "tagOnCreate": true,
-    "tagUpdatable": false,
-    "cloudFormationSystemTags": false,
-    "tagProperty": "#/properties/Tags"
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
   },
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-amplifyuibuilder",
   "additionalProperties": false,
   "attributes": {
     "Id": {

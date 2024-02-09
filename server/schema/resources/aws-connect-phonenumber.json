@@ -45,12 +45,12 @@
     "Type": {
       "description": "The phone number type",
       "type": "string",
-      "markdownDescription": "The phone number type\n\n---\n\nRequired: Yes  \nType: String  \nPattern: TOLL_FREE|DID|UIFN|SHARED|THIRD_PARTY_DID|THIRD_PARTY_TF  \nUpdate requires: Replacement"
+      "markdownDescription": "The phone number type\n\n---\n\nRequired: No  \nType: String  \nPattern: TOLL_FREE|DID|UIFN|SHARED|THIRD_PARTY_DID|THIRD_PARTY_TF|SHORT_CODE  \nUpdate requires: Replacement"
     },
     "CountryCode": {
       "description": "The phone number country code.",
       "type": "string",
-      "markdownDescription": "The phone number country code.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[A-Z]{2}  \nUpdate requires: Replacement"
+      "markdownDescription": "The phone number country code.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[A-Z]{2}  \nUpdate requires: Replacement"
     },
     "Prefix": {
       "description": "The phone number prefix.",
@@ -67,6 +67,11 @@
         "$ref": "#/definitions/Tag"
       },
       "markdownDescription": "One or more tags.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "SourcePhoneNumberArn": {
+      "description": "The source phone number arn.",
+      "type": "string",
+      "markdownDescription": "The source phone number arn.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
     }
   },
   "tagging": {
@@ -77,9 +82,7 @@
     "tagProperty": "/properties/Tags"
   },
   "required": [
-    "TargetArn",
-    "Type",
-    "CountryCode"
+    "TargetArn"
   ],
   "handlers": {
     "create": {
@@ -87,7 +90,9 @@
         "connect:ClaimPhoneNumber",
         "connect:SearchAvailablePhoneNumbers",
         "connect:DescribePhoneNumber",
-        "connect:TagResource"
+        "connect:TagResource",
+        "connect:ImportPhoneNumber",
+        "sms-voice:DescribePhoneNumbers"
       ]
     },
     "read": {
@@ -109,6 +114,21 @@
         "connect:TagResource",
         "connect:UntagResource"
       ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "TargetArn": {
+            "$ref": "resource-schema.json#/properties/TargetArn"
+          }
+        },
+        "required": [
+          "TargetArn"
+        ]
+      },
+      "permissions": [
+        "connect:ListPhoneNumbersV2"
+      ]
     }
   },
   "additionalProperties": false,
@@ -125,7 +145,8 @@
   "createOnlyProperties": [
     "/properties/Type",
     "/properties/CountryCode",
-    "/properties/Prefix"
+    "/properties/Prefix",
+    "/properties/SourcePhoneNumberArn"
   ],
   "attributes": {
     "PhoneNumberArn": {

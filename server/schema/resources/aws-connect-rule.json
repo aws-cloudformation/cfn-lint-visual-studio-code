@@ -3,6 +3,64 @@
   "description": "Resource Type definition for AWS:Connect::Rule",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-connect",
   "definitions": {
+    "FieldValue": {
+      "description": "The value of the field.",
+      "type": "object",
+      "properties": {
+        "StringValue": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "BooleanValue": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        },
+        "DoubleValue": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+        },
+        "EmptyValue": {
+          "type": "object",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The value of the field.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Field": {
+      "description": "The field of the case.",
+      "type": "object",
+      "properties": {
+        "Id": {
+          "description": "The Id of the field",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "markdownDescription": "The Id of the field\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 500  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "$ref": "#/definitions/FieldValue"
+        }
+      },
+      "required": [
+        "Id",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The field of the case.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Fields": {
+      "description": "An array of case fields",
+      "type": "array",
+      "insertionOrder": true,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/Field"
+      },
+      "minItems": 1,
+      "maxItems": 100,
+      "markdownDescription": "An array of case fields\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
     "UserArn": {
       "description": "The Amazon Resource Name (ARN) of the user.",
       "type": "string",
@@ -176,6 +234,47 @@
       "additionalProperties": false,
       "markdownDescription": "The definition for sending notification action.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
+    "CreateCaseAction": {
+      "description": "The definition for create case action.",
+      "type": "object",
+      "properties": {
+        "Fields": {
+          "$ref": "#/definitions/Fields"
+        },
+        "TemplateId": {
+          "description": "The Id of template.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "markdownDescription": "The Id of template.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 500  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Fields",
+        "TemplateId"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The definition for create case action.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "UpdateCaseAction": {
+      "description": "The definition for update case action.",
+      "type": "object",
+      "properties": {
+        "Fields": {
+          "$ref": "#/definitions/Fields"
+        }
+      },
+      "required": [
+        "Fields"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The definition for update case action.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "EndAssociatedTasksAction": {
+      "description": "The definition for ending associated task action.",
+      "type": "object",
+      "markdownDescription": "The definition for ending associated task action.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "AssignContactCategoryActions": {
       "description": "This action will assign contact category when a rule is triggered.",
       "type": "array",
@@ -216,9 +315,11 @@
             "OnZendeskTicketCreate",
             "OnZendeskTicketStatusUpdate",
             "OnSalesforceCaseCreate",
-            "OnMetricDataUpdate"
+            "OnMetricDataUpdate",
+            "OnCaseCreate",
+            "OnCaseUpdate"
           ],
-          "markdownDescription": "The name of event source.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: OnContactEvaluationSubmit | OnPostCallAnalysisAvailable | OnRealTimeCallAnalysisAvailable | OnRealTimeChatAnalysisAvailable | OnPostChatAnalysisAvailable | OnZendeskTicketCreate | OnZendeskTicketStatusUpdate | OnSalesforceCaseCreate | OnMetricDataUpdate  \nUpdate requires: No interruption"
+          "markdownDescription": "The name of event source.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: OnContactEvaluationSubmit | OnPostCallAnalysisAvailable | OnRealTimeCallAnalysisAvailable | OnRealTimeChatAnalysisAvailable | OnPostChatAnalysisAvailable | OnZendeskTicketCreate | OnZendeskTicketStatusUpdate | OnSalesforceCaseCreate | OnMetricDataUpdate | OnCaseCreate | OnCaseUpdate  \nUpdate requires: No interruption"
         },
         "IntegrationAssociationArn": {
           "description": "The Amazon Resource Name (ARN) for the AppIntegration association.",
@@ -256,6 +357,42 @@
       "maxItems": 1,
       "markdownDescription": "The action will send notification when a rule is triggered.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     },
+    "CreateCaseActions": {
+      "description": "This action will create a case when a rule is triggered.",
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/CreateCaseAction"
+      },
+      "minItems": 1,
+      "maxItems": 1,
+      "markdownDescription": "This action will create a case when a rule is triggered.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "UpdateCaseActions": {
+      "description": "This action will update a case when a rule is triggered.",
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/UpdateCaseAction"
+      },
+      "minItems": 1,
+      "maxItems": 1,
+      "markdownDescription": "This action will update a case when a rule is triggered.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "EndAssociatedTasksActions": {
+      "description": "This action will end associated tasks when a rule is triggered.",
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/EndAssociatedTasksAction"
+      },
+      "minItems": 1,
+      "maxItems": 1,
+      "markdownDescription": "This action will end associated tasks when a rule is triggered.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
     "Actions": {
       "description": "The list of actions that will be executed when a rule is triggered.",
       "type": "object",
@@ -271,6 +408,15 @@
         },
         "SendNotificationActions": {
           "$ref": "#/definitions/SendNotificationActions"
+        },
+        "CreateCaseActions": {
+          "$ref": "#/definitions/CreateCaseActions"
+        },
+        "UpdateCaseActions": {
+          "$ref": "#/definitions/UpdateCaseActions"
+        },
+        "EndAssociatedTasksActions": {
+          "$ref": "#/definitions/EndAssociatedTasksActions"
         }
       },
       "additionalProperties": false,
@@ -367,7 +513,10 @@
   "handlers": {
     "create": {
       "permissions": [
-        "connect:CreateRule"
+        "connect:CreateRule",
+        "cases:GetTemplate",
+        "cases:ListFields",
+        "cases:ListFieldOptions"
       ]
     },
     "read": {
@@ -384,6 +533,9 @@
     "update": {
       "permissions": [
         "connect:UpdateRule",
+        "cases:GetTemplate",
+        "cases:ListFields",
+        "cases:ListFieldOptions",
         "connect:TagResource",
         "connect:UntagResource"
       ]

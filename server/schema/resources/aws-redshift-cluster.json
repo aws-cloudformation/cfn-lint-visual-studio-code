@@ -35,16 +35,13 @@
       "properties": {
         "BucketName": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         },
         "S3KeyPrefix": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         }
       },
-      "required": [
-        "BucketName"
-      ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "Endpoint": {
@@ -77,10 +74,10 @@
       "markdownDescription": "The user name associated with the master user account for the cluster that is being created. The user name can't be PUBLIC and first character must be a letter.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 128  \nUpdate requires: Replacement"
     },
     "MasterUserPassword": {
-      "description": "The password associated with the master user account for the cluster that is being created. Password must be between 8 and 64 characters in length, should have at least one uppercase letter.Must contain at least one lowercase letter.Must contain one number.Can be any printable ASCII character.",
+      "description": "The password associated with the master user account for the cluster that is being created. You can't use MasterUserPassword if ManageMasterPassword is true. Password must be between 8 and 64 characters in length, should have at least one uppercase letter.Must contain at least one lowercase letter.Must contain one number.Can be any printable ASCII character.",
       "type": "string",
       "maxLength": 64,
-      "markdownDescription": "The password associated with the master user account for the cluster that is being created. Password must be between 8 and 64 characters in length, should have at least one uppercase letter.Must contain at least one lowercase letter.Must contain one number.Can be any printable ASCII character.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 64  \nUpdate requires: No interruption"
+      "markdownDescription": "The password associated with the master user account for the cluster that is being created. You can't use MasterUserPassword if ManageMasterPassword is true. Password must be between 8 and 64 characters in length, should have at least one uppercase letter.Must contain at least one lowercase letter.Must contain one number.Can be any printable ASCII character.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 64  \nUpdate requires: No interruption"
     },
     "NodeType": {
       "description": "The node type to be provisioned for the cluster.Valid Values: ds2.xlarge | ds2.8xlarge | dc1.large | dc1.8xlarge | dc2.large | dc2.8xlarge | ra3.4xlarge | ra3.16xlarge",
@@ -331,11 +328,25 @@
       "description": "A boolean indicating if the redshift cluster is multi-az or not. If you don't provide this parameter or set the value to false, the redshift cluster will be single-az.",
       "type": "boolean",
       "markdownDescription": "A boolean indicating if the redshift cluster is multi-az or not. If you don't provide this parameter or set the value to false, the redshift cluster will be single-az.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+    },
+    "NamespaceResourcePolicy": {
+      "description": "The namespace resource policy document that will be attached to a Redshift cluster.",
+      "type": "object",
+      "markdownDescription": "The namespace resource policy document that will be attached to a Redshift cluster.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ManageMasterPassword": {
+      "description": "A boolean indicating if the redshift cluster's admin user credentials is managed by Redshift or not. You can't use MasterUserPassword if ManageMasterPassword is true. If ManageMasterPassword is false or not set, Amazon Redshift uses MasterUserPassword for the admin user account's password.",
+      "type": "boolean",
+      "markdownDescription": "A boolean indicating if the redshift cluster's admin user credentials is managed by Redshift or not. You can't use MasterUserPassword if ManageMasterPassword is true. If ManageMasterPassword is false or not set, Amazon Redshift uses MasterUserPassword for the admin user account's password.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+    },
+    "MasterPasswordSecretKmsKeyId": {
+      "description": "The ID of the Key Management Service (KMS) key used to encrypt and store the cluster's admin user credentials secret.",
+      "type": "string",
+      "markdownDescription": "The ID of the Key Management Service (KMS) key used to encrypt and store the cluster's admin user credentials secret.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     }
   },
   "additionalProperties": false,
   "required": [
-    "MasterUserPassword",
     "NodeType",
     "MasterUsername",
     "DBName",
@@ -345,10 +356,11 @@
     "/properties/ClusterIdentifier"
   ],
   "readOnlyProperties": [
-    "/properties/Id",
     "/properties/DeferMaintenanceIdentifier",
     "/properties/Endpoint/Port",
-    "/properties/Endpoint/Address"
+    "/properties/Endpoint/Address",
+    "/properties/ClusterNamespaceArn",
+    "/properties/MasterPasswordSecretArn"
   ],
   "createOnlyProperties": [
     "/properties/ClusterIdentifier",
@@ -362,7 +374,10 @@
   "writeOnlyProperties": [
     "/properties/MasterUserPassword",
     "/properties/Classic",
-    "/properties/SnapshotIdentifier"
+    "/properties/SnapshotIdentifier",
+    "/properties/DeferMaintenance",
+    "/properties/DeferMaintenanceDuration",
+    "/properties/ManageMasterPassword"
   ],
   "tagging": {
     "taggable": true
@@ -370,11 +385,38 @@
   "handlers": {
     "create": {
       "permissions": [
+        "iam:PassRole",
+        "iam:CreateServiceLinkedRole",
         "redshift:DescribeClusters",
         "redshift:CreateCluster",
         "redshift:RestoreFromClusterSnapshot",
         "redshift:EnableLogging",
-        "redshift:DescribeTags"
+        "redshift:DescribeLoggingStatus",
+        "redshift:CreateTags",
+        "redshift:DescribeTags",
+        "redshift:GetResourcePolicy",
+        "redshift:PutResourcePolicy",
+        "redshift:ModifyClusterMaintenance",
+        "ec2:DescribeVpcs",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DescribeAddresses",
+        "ec2:AssociateAddress",
+        "ec2:CreateNetworkInterface",
+        "ec2:ModifyNetworkInterfaceAttribute",
+        "ec2:CreateVpcEndpoint",
+        "ec2:DescribeVpcEndpoints",
+        "ec2:ModifyVpcEndpoint",
+        "ec2:AllocateAddress",
+        "ec2:CreateSecurityGroup",
+        "ec2:DescribeVpcAttribute",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeInternetGateways",
+        "ec2:DescribeSecurityGroupRules",
+        "ec2:DescribeAvailabilityZones",
+        "ec2:DescribeNetworkAcls",
+        "ec2:DescribeRouteTables",
+        "cloudwatch:PutMetricData"
       ],
       "timeoutInMinutes": 2160
     },
@@ -384,11 +426,13 @@
         "redshift:DescribeLoggingStatus",
         "redshift:DescribeSnapshotCopyGrant",
         "redshift:DescribeClusterDbRevisions",
-        "redshift:DescribeTags"
+        "redshift:DescribeTags",
+        "redshift:GetResourcePolicy"
       ]
     },
     "update": {
       "permissions": [
+        "iam:PassRole",
         "redshift:DescribeClusters",
         "redshift:ModifyCluster",
         "redshift:ModifyClusterIamRoles",
@@ -397,6 +441,7 @@
         "redshift:DeleteTags",
         "redshift:DescribeTags",
         "redshift:DisableLogging",
+        "redshift:DescribeLoggingStatus",
         "redshift:RebootCluster",
         "redshift:EnableSnapshotCopy",
         "redshift:DisableSnapshotCopy",
@@ -409,7 +454,11 @@
         "redshift:PauseCluster",
         "redshift:ResumeCluster",
         "redshift:RotateEncryptionKey",
-        "redshift:FailoverPrimaryCompute"
+        "redshift:FailoverPrimaryCompute",
+        "redshift:PutResourcePolicy",
+        "redshift:GetResourcePolicy",
+        "redshift:DeleteResourcePolicy",
+        "cloudwatch:PutMetricData"
       ],
       "timeoutInMinutes": 2160
     },
@@ -429,14 +478,20 @@
     }
   },
   "attributes": {
-    "Id": {
+    "ClusterNamespaceArn": {
+      "description": "The Amazon Resource Name (ARN) of the cluster namespace.",
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "markdownDescription": "The Amazon Resource Name (ARN) of the cluster namespace.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
     "DeferMaintenanceIdentifier": {
       "description": "A unique identifier for the deferred maintenance window.",
       "type": "string",
       "markdownDescription": "A unique identifier for the deferred maintenance window.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "MasterPasswordSecretArn": {
+      "description": "The Amazon Resource Name (ARN) for the cluster's admin user credentials secret.",
+      "type": "string",
+      "markdownDescription": "The Amazon Resource Name (ARN) for the cluster's admin user credentials secret.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     }
   }
 }

@@ -52,6 +52,15 @@
       "type": "string",
       "markdownDescription": "The Amazon Resource Name (ARN) of the infrastructure configuration associated with this image pipeline.\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: No interruption"
     },
+    "Workflows": {
+      "description": "Workflows to define the image build process",
+      "type": "array",
+      "insertionOrder": true,
+      "items": {
+        "$ref": "#/definitions/WorkflowConfiguration"
+      },
+      "markdownDescription": "Workflows to define the image build process\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
     "EnhancedImageMetadataEnabled": {
       "description": "Collects additional information about the image being created, including the operating system (OS) version and package list.",
       "type": "boolean",
@@ -61,6 +70,11 @@
       "description": "Contains settings for vulnerability scans.",
       "$ref": "#/definitions/ImageScanningConfiguration",
       "markdownDescription": "Contains settings for vulnerability scans.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+    },
+    "ExecutionRole": {
+      "description": "The execution role name/ARN for the image build, if provided",
+      "type": "string",
+      "markdownDescription": "The execution role name/ARN for the image build, if provided\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
     "Tags": {
       "description": "The tags of this image pipeline.",
@@ -158,6 +172,67 @@
         }
       },
       "markdownDescription": "The schedule of the image pipeline.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "WorkflowConfiguration": {
+      "description": "The workflow configuration of the image",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "WorkflowArn": {
+          "description": "The Amazon Resource Name (ARN) of the workflow",
+          "type": "string",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the workflow\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Parameters": {
+          "description": "The parameters associated with the workflow",
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/WorkflowParameter"
+          },
+          "markdownDescription": "The parameters associated with the workflow\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ParallelGroup": {
+          "description": "The parallel group name",
+          "type": "string",
+          "markdownDescription": "The parallel group name\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "OnFailure": {
+          "description": "Define execution decision in case of workflow failure",
+          "type": "string",
+          "enum": [
+            "CONTINUE",
+            "ABORT"
+          ],
+          "markdownDescription": "Define execution decision in case of workflow failure\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CONTINUE | ABORT  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "The workflow configuration of the image\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "WorkflowParameter": {
+      "description": "A parameter associated with the workflow",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Name": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "array",
+          "insertionOrder": true,
+          "items": {
+            "$ref": "#/definitions/WorkflowParameterValue"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "A parameter associated with the workflow\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "WorkflowParameterValue": {
+      "description": "The value associated with the workflow parameter",
+      "type": "string",
+      "markdownDescription": "The value associated with the workflow parameter\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     }
   },
   "additionalProperties": false,
@@ -194,6 +269,7 @@
       "permissions": [
         "ecr:BatchGetRepositoryScanningConfiguration",
         "iam:GetRole",
+        "iam:PassRole",
         "iam:CreateServiceLinkedRole",
         "imagebuilder:TagResource",
         "imagebuilder:GetImagePipeline",
@@ -201,13 +277,16 @@
         "imagebuilder:GetInfrastructureConfiguration",
         "imagebuilder:GetDistributionConfiguration",
         "imagebuilder:CreateImagePipeline",
+        "imagebuilder:GetWorkflow",
         "inspector2:BatchGetAccountStatus"
       ]
     },
     "update": {
       "permissions": [
+        "iam:PassRole",
         "imagebuilder:GetImagePipeline",
-        "imagebuilder:UpdateImagePipeline"
+        "imagebuilder:UpdateImagePipeline",
+        "imagebuilder:GetWorkflow"
       ]
     },
     "read": {

@@ -9,6 +9,46 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: RequestBasedUsage  \nUpdate requires: No interruption"
     },
+    "TagMap": {
+      "type": "object",
+      "maxProperties": 50,
+      "patternProperties": {
+        "^[a-zA-Z+-=._:/]+$": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 0,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nPattern: ^[A-Za-z0-9 _=@:.+-/]*$  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z+-=._:/]+$  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: ^[A-Za-z0-9 _=@:.+-/]*$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "iso8601UTC": {
       "description": "The datetime value in ISO 8601 format. The timezone is always UTC. (YYYY-MM-DDThh:mm:ss.sssZ)",
       "type": "string",
@@ -26,7 +66,7 @@
       "type": "string",
       "maxLength": 1000,
       "minLength": 0,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1000  \nUpdate requires: Replacement"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1000  \nUpdate requires: No interruption"
     },
     "KmsKeyId": {
       "type": "string",
@@ -40,6 +80,18 @@
     "PricingPlanDataSource": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "Tags": {
+      "description": "An array of key-value pairs to apply to this resource.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "minItems": 0,
+      "maxItems": 200,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "An array of key-value pairs to apply to this resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     }
   },
   "readOnlyProperties": [
@@ -50,34 +102,47 @@
   ],
   "createOnlyProperties": [
     "/properties/CollectionName",
-    "/properties/Description",
     "/properties/KmsKeyId"
   ],
   "deprecatedProperties": [
     "/properties/PricingPlan",
     "/properties/PricingPlanDataSource"
   ],
-  "required": [
-    "CollectionName"
-  ],
   "primaryIdentifier": [
     "/properties/CollectionName"
   ],
-  "additionalProperties": false,
   "handlers": {
     "create": {
       "permissions": [
-        "geo:CreateGeofenceCollection"
+        "geo:CreateGeofenceCollection",
+        "geo:DescribeGeofenceCollection",
+        "geo:TagResource",
+        "geo:UntagResource",
+        "kms:DescribeKey",
+        "kms:CreateGrant"
       ]
     },
     "read": {
       "permissions": [
-        "geo:DescribeGeofenceCollection"
+        "geo:DescribeGeofenceCollection",
+        "kms:DescribeKey"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "geo:CreateGeofenceCollection",
+        "geo:DescribeGeofenceCollection",
+        "geo:TagResource",
+        "geo:UntagResource",
+        "kms:DescribeKey",
+        "kms:CreateGrant",
+        "geo:UpdateGeofenceCollection"
       ]
     },
     "delete": {
       "permissions": [
-        "geo:DeleteGeofenceCollection"
+        "geo:DeleteGeofenceCollection",
+        "geo:DescribeGeofenceCollection"
       ]
     },
     "list": {
@@ -86,13 +151,19 @@
       ]
     }
   },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
+  "required": [
+    "CollectionName"
+  ],
+  "additionalProperties": false,
   "attributes": {
     "CollectionArn": {
-      "type": "string",
-      "maxLength": 1600,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1600  \nPattern: ^arn(:[a-z0-9]+([.-][a-z0-9]+)*){2}(:([a-z0-9]+([.-][a-z0-9]+)*)?){2}:([^/].*)?$  \nUpdate requires: No interruption"
-    },
-    "Arn": {
       "type": "string",
       "maxLength": 1600,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1600  \nPattern: ^arn(:[a-z0-9]+([.-][a-z0-9]+)*){2}(:([a-z0-9]+([.-][a-z0-9]+)*)?){2}:([^/].*)?$  \nUpdate requires: No interruption"
@@ -102,6 +173,11 @@
     },
     "UpdateTime": {
       "$ref": "#/definitions/iso8601UTC"
+    },
+    "Arn": {
+      "type": "string",
+      "maxLength": 1600,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1600  \nPattern: ^arn(:[a-z0-9]+([.-][a-z0-9]+)*){2}(:([a-z0-9]+([.-][a-z0-9]+)*)?){2}:([^/].*)?$  \nUpdate requires: No interruption"
     }
   }
 }

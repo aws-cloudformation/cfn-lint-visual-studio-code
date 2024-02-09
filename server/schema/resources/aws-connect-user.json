@@ -128,6 +128,49 @@
         "Value"
       ],
       "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "UserProficiency": {
+      "description": "Proficiency of a user.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "AttributeName": {
+          "$ref": "#/definitions/AttributeName"
+        },
+        "AttributeValue": {
+          "$ref": "#/definitions/AttributeValue"
+        },
+        "Level": {
+          "$ref": "#/definitions/Level"
+        }
+      },
+      "required": [
+        "AttributeName",
+        "AttributeValue",
+        "Level"
+      ],
+      "markdownDescription": "Proficiency of a user.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AttributeName": {
+      "description": "The name of user's proficiency. You must use name of predefined attribute present in the Amazon Connect instance.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "markdownDescription": "The name of user's proficiency. You must use name of predefined attribute present in the Amazon Connect instance.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nUpdate requires: No interruption"
+    },
+    "AttributeValue": {
+      "description": "The value of user's proficiency. You must use value of predefined attribute present in the Amazon Connect instance.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "markdownDescription": "The value of user's proficiency. You must use value of predefined attribute present in the Amazon Connect instance.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nUpdate requires: No interruption"
+    },
+    "Level": {
+      "description": "The level of the proficiency. The valid values are 1, 2, 3, 4 and 5.",
+      "type": "number",
+      "minimum": 1.0,
+      "maximum": 5.0,
+      "markdownDescription": "The level of the proficiency. The valid values are 1, 2, 3, 4 and 5.\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
     }
   },
   "properties": {
@@ -195,6 +238,15 @@
         "$ref": "#/definitions/Tag"
       },
       "markdownDescription": "One or more tags.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "UserProficiencies": {
+      "description": "One or more predefined attributes assigned to a user, with a level that indicates how skilled they are.",
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/UserProficiency"
+      },
+      "markdownDescription": "One or more predefined attributes assigned to a user, with a level that indicates how skilled they are.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     }
   },
   "required": [
@@ -208,12 +260,14 @@
     "create": {
       "permissions": [
         "connect:CreateUser",
-        "connect:TagResource"
+        "connect:TagResource",
+        "connect:AssociateUserProficiencies"
       ]
     },
     "read": {
       "permissions": [
-        "connect:DescribeUser"
+        "connect:DescribeUser",
+        "connect:ListUserProficiencies"
       ]
     },
     "delete": {
@@ -230,7 +284,10 @@
         "connect:UpdateUserSecurityProfiles",
         "connect:UpdateUserHierarchy",
         "connect:TagResource",
-        "connect:UntagResource"
+        "connect:UntagResource",
+        "connect:AssociateUserProficiencies",
+        "connect:DisassociateUserProficiencies",
+        "connect:UpdateUserProficiencies"
       ]
     }
   },
@@ -244,6 +301,13 @@
   "writeOnlyProperties": [
     "/properties/Password"
   ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
   "attributes": {
     "UserArn": {
       "description": "The Amazon Resource Name (ARN) for the user.",
