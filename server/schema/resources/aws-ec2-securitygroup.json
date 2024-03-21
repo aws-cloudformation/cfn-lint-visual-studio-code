@@ -1,49 +1,79 @@
 {
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "tagProperty": "/properties/Tags",
+    "cloudFormationSystemTags": true
+  },
+  "$schema": "https://raw.githubusercontent.com/aws-cloudformation/cloudformation-resource-schema/master/src/main/resources/schema/provider.definition.schema.v1.json",
+  "deprecatedProperties": [
+    "/properties/SecurityGroupEgress/*/SourceSecurityGroupId"
+  ],
   "typeName": "AWS::EC2::SecurityGroup",
+  "readOnlyProperties": [
+    "/properties/Id",
+    "/properties/GroupId"
+  ],
   "description": "Resource Type definition for AWS::EC2::SecurityGroup",
-  "additionalProperties": false,
-  "properties": {
-    "GroupDescription": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
+  "createOnlyProperties": [
+    "/properties/GroupDescription",
+    "/properties/GroupName",
+    "/properties/VpcId"
+  ],
+  "primaryIdentifier": [
+    "/properties/Id"
+  ],
+  "required": [
+    "GroupDescription"
+  ],
+  "handlers": {
+    "read": {
+      "permissions": [
+        "ec2:DescribeSecurityGroups"
+      ]
     },
-    "GroupName": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    "create": {
+      "permissions": [
+        "ec2:CreateSecurityGroup",
+        "ec2:DescribeSecurityGroups",
+        "ec2:RevokeSecurityGroupEgress",
+        "ec2:AuthorizeSecurityGroupEgress",
+        "ec2:AuthorizeSecurityGroupIngress",
+        "ec2:CreateTags"
+      ]
     },
-    "VpcId": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    "update": {
+      "permissions": [
+        "ec2:RevokeSecurityGroupEgress",
+        "ec2:RevokeSecurityGroupIngress",
+        "ec2:DescribeSecurityGroups",
+        "ec2:AuthorizeSecurityGroupEgress",
+        "ec2:AuthorizeSecurityGroupIngress",
+        "ec2:CreateTags",
+        "ec2:DeleteTags"
+      ]
     },
-    "SecurityGroupIngress": {
-      "type": "array",
-      "uniqueItems": false,
-      "items": {
-        "$ref": "#/definitions/Ingress"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    "list": {
+      "permissions": [
+        "ec2:DescribeSecurityGroups"
+      ]
     },
-    "SecurityGroupEgress": {
-      "type": "array",
-      "uniqueItems": false,
-      "items": {
-        "$ref": "#/definitions/Egress"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-    },
-    "Tags": {
-      "type": "array",
-      "uniqueItems": false,
-      "items": {
-        "$ref": "#/definitions/Tag"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    "delete": {
+      "permissions": [
+        "ec2:DeleteSecurityGroup",
+        "ec2:DescribeInstances"
+      ]
     }
   },
+  "writeOnlyProperties": [
+    "/properties/SecurityGroupIngress/*/SourceSecurityGroupName"
+  ],
+  "additionalProperties": false,
   "definitions": {
     "Ingress": {
-      "type": "object",
       "additionalProperties": false,
+      "type": "object",
       "properties": {
         "CidrIp": {
           "type": "string",
@@ -92,8 +122,8 @@
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "Egress": {
-      "type": "object",
       "additionalProperties": false,
+      "type": "object",
       "properties": {
         "CidrIp": {
           "type": "string",
@@ -126,6 +156,10 @@
         "DestinationPrefixListId": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "SourceSecurityGroupId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         }
       },
       "required": [
@@ -134,8 +168,8 @@
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "Tag": {
-      "type": "object",
       "additionalProperties": false,
+      "type": "object",
       "properties": {
         "Value": {
           "type": "string",
@@ -153,29 +187,63 @@
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     }
   },
-  "required": [
-    "GroupDescription"
-  ],
-  "createOnlyProperties": [
-    "/properties/GroupDescription",
-    "/properties/GroupName",
-    "/properties/VpcId"
-  ],
-  "primaryIdentifier": [
-    "/properties/Id"
-  ],
-  "readOnlyProperties": [
-    "/properties/Id",
-    "/properties/GroupId"
-  ],
+  "properties": {
+    "GroupDescription": {
+      "description": "A description for the security group.",
+      "type": "string",
+      "markdownDescription": "A description for the security group.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
+    },
+    "GroupName": {
+      "description": "The name of the security group.",
+      "type": "string",
+      "markdownDescription": "The name of the security group.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "VpcId": {
+      "description": "The ID of the VPC for the security group.",
+      "type": "string",
+      "markdownDescription": "The ID of the VPC for the security group.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "SecurityGroupIngress": {
+      "uniqueItems": false,
+      "description": "The inbound rules associated with the security group. There is a short interruption during which you cannot connect to the security group.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Ingress"
+      },
+      "markdownDescription": "The inbound rules associated with the security group. There is a short interruption during which you cannot connect to the security group.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "SecurityGroupEgress": {
+      "uniqueItems": false,
+      "description": "[VPC only] The outbound rules associated with the security group. There is a short interruption during which you cannot connect to the security group.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Egress"
+      },
+      "markdownDescription": "[VPC only] The outbound rules associated with the security group. There is a short interruption during which you cannot connect to the security group.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "Tags": {
+      "uniqueItems": false,
+      "description": "Any tags assigned to the security group.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "Any tags assigned to the security group.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    }
+  },
   "attributes": {
     "Id": {
+      "description": "The group name or group ID depending on whether the SG is created in default or specific VPC",
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "markdownDescription": "The group name or group ID depending on whether the SG is created in default or specific VPC\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
     "GroupId": {
+      "description": "The group ID of the specified security group.",
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "markdownDescription": "The group ID of the specified security group.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     }
   }
 }

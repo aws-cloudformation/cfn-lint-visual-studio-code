@@ -11,11 +11,48 @@
       "markdownDescription": "A permission associated with the security profile.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
     },
     "ResourceName": {
-      "description": "A resource that a security profile applies tag restrictions to in Amazon Connect.",
+      "description": "A resource that a security profile applies tag or hierarchy restrictions to in Amazon Connect.",
       "type": "string",
       "minLength": 1,
       "maxLength": 128,
-      "markdownDescription": "A resource that a security profile applies tag restrictions to in Amazon Connect.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+      "markdownDescription": "A resource that a security profile applies tag or hierarchy restrictions to in Amazon Connect.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+    },
+    "ApplicationPermission": {
+      "description": "The permissions that the agent is granted on the application.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "markdownDescription": "The permissions that the agent is granted on the application.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+    },
+    "Application": {
+      "description": "A third-party application's metadata.",
+      "type": "object",
+      "properties": {
+        "ApplicationPermissions": {
+          "type": "array",
+          "maxItems": 10,
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "description": "The permissions that the agent is granted on the application",
+          "items": {
+            "$ref": "#/definitions/ApplicationPermission"
+          },
+          "markdownDescription": "The permissions that the agent is granted on the application\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Namespace": {
+          "type": "string",
+          "description": "Namespace of the application that you want to give access to.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "Namespace of the application that you want to give access to.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "ApplicationPermissions",
+        "Namespace"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A third-party application's metadata.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "Tag": {
       "description": "A key-value pair to associate with a resource.",
@@ -97,6 +134,35 @@
       },
       "markdownDescription": "The list of resources that a security profile applies tag restrictions to in Amazon Connect.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     },
+    "HierarchyRestrictedResources": {
+      "type": "array",
+      "maxItems": 10,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "description": "The list of resources that a security profile applies hierarchy restrictions to in Amazon Connect.",
+      "items": {
+        "$ref": "#/definitions/ResourceName"
+      },
+      "markdownDescription": "The list of resources that a security profile applies hierarchy restrictions to in Amazon Connect.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "AllowedAccessControlHierarchyGroupId": {
+      "type": "string",
+      "minLength": 0,
+      "maxLength": 127,
+      "description": "The identifier of the hierarchy group that a security profile uses to restrict access to resources in Amazon Connect.",
+      "markdownDescription": "The identifier of the hierarchy group that a security profile uses to restrict access to resources in Amazon Connect.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 127  \nPattern: ^[a-zA-Z0-9-]+$  \nUpdate requires: No interruption"
+    },
+    "Applications": {
+      "type": "array",
+      "maxItems": 10,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "description": "A list of third-party applications that the security profile will give access to.",
+      "items": {
+        "$ref": "#/definitions/Application"
+      },
+      "markdownDescription": "A list of third-party applications that the security profile will give access to.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
     "Tags": {
       "type": "array",
       "maxItems": 50,
@@ -126,7 +192,9 @@
     "/properties/InstanceArn"
   ],
   "readOnlyProperties": [
-    "/properties/SecurityProfileArn"
+    "/properties/SecurityProfileArn",
+    "/properties/LastModifiedRegion",
+    "/properties/LastModifiedTime"
   ],
   "primaryIdentifier": [
     "/properties/SecurityProfileArn"
@@ -141,6 +209,7 @@
     "read": {
       "permissions": [
         "connect:DescribeSecurityProfile",
+        "connect:ListSecurityProfileApplications",
         "connect:ListSecurityProfilePermissions"
       ]
     },
@@ -178,6 +247,16 @@
       "type": "string",
       "description": "The Amazon Resource Name (ARN) for the security profile.",
       "markdownDescription": "The Amazon Resource Name (ARN) for the security profile.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:instance/[-a-zA-Z0-9]*/security-profile/[-a-zA-Z0-9]*$  \nUpdate requires: No interruption"
+    },
+    "LastModifiedRegion": {
+      "type": "string",
+      "description": "The AWS Region where this resource was last modified.",
+      "markdownDescription": "The AWS Region where this resource was last modified.\n\n---\n\nRequired: No  \nType: String  \nPattern: [a-z]{2}(-[a-z]+){1,2}(-[0-9])?  \nUpdate requires: No interruption"
+    },
+    "LastModifiedTime": {
+      "type": "number",
+      "description": "The timestamp when this resource was last modified.",
+      "markdownDescription": "The timestamp when this resource was last modified.\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
     }
   }
 }

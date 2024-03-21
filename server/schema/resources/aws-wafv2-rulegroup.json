@@ -126,6 +126,9 @@
         },
         "Cookies": {
           "$ref": "#/definitions/Cookies"
+        },
+        "JA3Fingerprint": {
+          "$ref": "#/definitions/JA3Fingerprint"
         }
       },
       "additionalProperties": false,
@@ -289,15 +292,18 @@
         "Limit": {
           "$ref": "#/definitions/RateLimit"
         },
+        "EvaluationWindowSec": {
+          "$ref": "#/definitions/EvaluationWindowSec"
+        },
         "AggregateKeyType": {
           "type": "string",
           "enum": [
-            "CONSTANT",
             "IP",
             "FORWARDED_IP",
+            "CONSTANT",
             "CUSTOM_KEYS"
           ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: CONSTANT | IP | FORWARDED_IP | CUSTOM_KEYS  \nUpdate requires: No interruption"
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: IP | FORWARDED_IP | CONSTANT | CUSTOM_KEYS  \nUpdate requires: No interruption"
         },
         "CustomKeys": {
           "description": "Specifies the aggregate keys to use in a rate-base rule.",
@@ -507,6 +513,16 @@
       "minimum": 100,
       "maximum": 2000000000,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+    },
+    "EvaluationWindowSec": {
+      "type": "integer",
+      "enum": [
+        60,
+        120,
+        300,
+        600
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nAllowed Values: 60 | 120 | 300 | 600  \nUpdate requires: No interruption"
     },
     "RegexPatternSetReferenceStatement": {
       "type": "object",
@@ -1300,7 +1316,7 @@
       "markdownDescription": "Includes headers of a web request.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "Cookies": {
-      "description": "Includes headers of a web request.",
+      "description": "Includes cookies of a web request.",
       "type": "object",
       "properties": {
         "MatchPattern": {
@@ -1319,7 +1335,7 @@
         "OversizeHandling"
       ],
       "additionalProperties": false,
-      "markdownDescription": "Includes headers of a web request.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+      "markdownDescription": "Includes cookies of a web request.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "HeaderMatchPattern": {
       "description": "The pattern to look for in the request headers.",
@@ -1423,6 +1439,25 @@
         "HIGH"
       ],
       "markdownDescription": "Sensitivity Level current only used for sqli match statements.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: LOW | HIGH  \nUpdate requires: No interruption"
+    },
+    "JA3Fingerprint": {
+      "description": "Includes the JA3 fingerprint of a web request.",
+      "type": "object",
+      "properties": {
+        "FallbackBehavior": {
+          "type": "string",
+          "enum": [
+            "MATCH",
+            "NO_MATCH"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: MATCH | NO_MATCH  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "FallbackBehavior"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Includes the JA3 fingerprint of a web request.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     }
   },
   "properties": {
@@ -1501,6 +1536,12 @@
     "/properties/ConsumedLabels/*/Name"
   ],
   "additionalProperties": false,
+  "tagging": {
+    "cloudFormationSystemTags": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "taggable": false
+  },
   "handlers": {
     "create": {
       "permissions": [

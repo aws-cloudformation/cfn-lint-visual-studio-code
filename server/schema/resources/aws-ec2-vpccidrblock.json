@@ -3,67 +3,125 @@
   "description": "Resource Type definition for AWS::EC2::VPCCidrBlock",
   "additionalProperties": false,
   "properties": {
-    "Ipv6NetmaskLength": {
-      "type": "integer",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: Replacement"
-    },
-    "Ipv6IpamPoolId": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
-    },
-    "VpcId": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
-    },
-    "Ipv4NetmaskLength": {
-      "type": "integer",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: Replacement"
-    },
     "CidrBlock": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
-    },
-    "Ipv4IpamPoolId": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+      "description": "An IPv4 CIDR block to associate with the VPC.",
+      "markdownDescription": "An IPv4 CIDR block to associate with the VPC.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
     },
     "Ipv6Pool": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+      "description": "The ID of an IPv6 address pool from which to allocate the IPv6 CIDR block.",
+      "markdownDescription": "The ID of an IPv6 address pool from which to allocate the IPv6 CIDR block.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "VpcId": {
+      "type": "string",
+      "description": "The ID of the VPC.",
+      "markdownDescription": "The ID of the VPC.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
     },
     "Ipv6CidrBlock": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+      "description": "An IPv6 CIDR block from the IPv6 address pool.",
+      "markdownDescription": "An IPv6 CIDR block from the IPv6 address pool.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "Ipv4IpamPoolId": {
+      "type": "string",
+      "description": "The ID of the IPv4 IPAM pool to Associate a CIDR from to a VPC.",
+      "markdownDescription": "The ID of the IPv4 IPAM pool to Associate a CIDR from to a VPC.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "Ipv4NetmaskLength": {
+      "type": "integer",
+      "description": "The netmask length of the IPv4 CIDR you would like to associate from an Amazon VPC IP Address Manager (IPAM) pool.",
+      "markdownDescription": "The netmask length of the IPv4 CIDR you would like to associate from an Amazon VPC IP Address Manager (IPAM) pool.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: Replacement"
+    },
+    "Ipv6IpamPoolId": {
+      "type": "string",
+      "description": "The ID of the IPv6 IPAM pool to Associate a CIDR from to a VPC.",
+      "markdownDescription": "The ID of the IPv6 IPAM pool to Associate a CIDR from to a VPC.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "Ipv6NetmaskLength": {
+      "type": "integer",
+      "description": "The netmask length of the IPv6 CIDR you would like to associate from an Amazon VPC IP Address Manager (IPAM) pool.",
+      "markdownDescription": "The netmask length of the IPv6 CIDR you would like to associate from an Amazon VPC IP Address Manager (IPAM) pool.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: Replacement"
     },
     "AmazonProvidedIpv6CidrBlock": {
       "type": "boolean",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: Replacement"
+      "description": "Requests an Amazon-provided IPv6 CIDR block with a /56 prefix length for the VPC. You cannot specify the range of IPv6 addresses, or the size of the CIDR block.",
+      "markdownDescription": "Requests an Amazon-provided IPv6 CIDR block with a /56 prefix length for the VPC. You cannot specify the range of IPv6 addresses, or the size of the CIDR block.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: Replacement"
     }
+  },
+  "tagging": {
+    "taggable": false
   },
   "required": [
     "VpcId"
   ],
+  "replacementStrategy": "delete_then_create",
   "createOnlyProperties": [
     "/properties/Ipv6Pool",
     "/properties/VpcId",
-    "/properties/Ipv4IpamPoolId",
     "/properties/AmazonProvidedIpv6CidrBlock",
     "/properties/Ipv6CidrBlock",
-    "/properties/Ipv6NetmaskLength",
+    "/properties/CidrBlock",
+    "/properties/Ipv4IpamPoolId",
     "/properties/Ipv4NetmaskLength",
     "/properties/Ipv6IpamPoolId",
-    "/properties/CidrBlock"
+    "/properties/Ipv6NetmaskLength"
   ],
   "primaryIdentifier": [
-    "/properties/Id"
+    "/properties/Id",
+    "/properties/VpcId"
   ],
   "readOnlyProperties": [
     "/properties/Id"
   ],
+  "writeOnlyProperties": [
+    "/properties/Ipv4IpamPoolId",
+    "/properties/Ipv4NetmaskLength",
+    "/properties/Ipv6IpamPoolId",
+    "/properties/Ipv6NetmaskLength"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ec2:AssociateVpcCidrBlock",
+        "ec2:DescribeVpcs",
+        "ec2:AllocateIpamPoolCidr"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "ec2:DescribeVpcs"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ec2:DescribeVpcs",
+        "ec2:DisassociateVpcCidrBlock"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "VpcId": {
+            "type": "string",
+            "description": "The ID of the VPC.",
+            "markdownDescription": "The ID of the VPC.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+          }
+        },
+        "required": [
+          "VpcId"
+        ]
+      },
+      "permissions": [
+        "ec2:DescribeVpcs"
+      ]
+    }
+  },
   "attributes": {
     "Id": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "description": "The Id of the VPC associated CIDR Block.",
+      "markdownDescription": "The Id of the VPC associated CIDR Block.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     }
   }
 }

@@ -79,6 +79,11 @@
         "ACCOUNT_BASED"
       ],
       "markdownDescription": "The grouping type of the application\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ACCOUNT_BASED  \nUpdate requires: Replacement"
+    },
+    "AttachMissingPermission": {
+      "description": "If set to true, the managed policies for SSM and CW will be attached to the instance roles if they are missing",
+      "type": "boolean",
+      "markdownDescription": "If set to true, the managed policies for SSM and CW will be attached to the instance roles if they are missing\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
     }
   },
   "definitions": {
@@ -318,6 +323,15 @@
           "insertionOrder": true,
           "markdownDescription": "A list of Windows Events to log.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
         },
+        "Processes": {
+          "description": "A list of processes to monitor for the component. Only Windows EC2 instances can have a processes section.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Process"
+          },
+          "insertionOrder": true,
+          "markdownDescription": "A list of processes to monitor for the component. Only Windows EC2 instances can have a processes section.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
         "Alarms": {
           "description": "A list of alarms to monitor for the component.",
           "type": "array",
@@ -341,6 +355,16 @@
           "description": "The HA cluster Prometheus Exporter settings.",
           "$ref": "#/definitions/HAClusterPrometheusExporter",
           "markdownDescription": "The HA cluster Prometheus Exporter settings.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        },
+        "NetWeaverPrometheusExporter": {
+          "description": "The NetWeaver Prometheus Exporter settings.",
+          "$ref": "#/definitions/NetWeaverPrometheusExporter",
+          "markdownDescription": "The NetWeaver Prometheus Exporter settings.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        },
+        "SQLServerPrometheusExporter": {
+          "description": "The SQL Prometheus Exporter settings.",
+          "$ref": "#/definitions/SQLServerPrometheusExporter",
+          "markdownDescription": "The SQL Prometheus Exporter settings.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
         }
       },
       "additionalProperties": false,
@@ -376,6 +400,15 @@
           },
           "insertionOrder": true,
           "markdownDescription": "A list of Windows Events to log.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Processes": {
+          "description": "A list of processes to monitor for the component. Only Windows EC2 instances can have a processes section.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Process"
+          },
+          "insertionOrder": true,
+          "markdownDescription": "A list of processes to monitor for the component. Only Windows EC2 instances can have a processes section.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
         }
       },
       "additionalProperties": false,
@@ -455,6 +488,61 @@
       },
       "additionalProperties": false,
       "markdownDescription": "The HA cluster Prometheus Exporter settings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "NetWeaverPrometheusExporter": {
+      "description": "The NetWeaver Prometheus Exporter Settings.",
+      "type": "object",
+      "properties": {
+        "SAPSID": {
+          "description": "SAP NetWeaver SID.",
+          "type": "string",
+          "markdownDescription": "SAP NetWeaver SID.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "InstanceNumbers": {
+          "description": "SAP instance numbers for ASCS, ERS, and App Servers.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2  \nPattern: \\b([0-9]|[0-9][0-9])\\b  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "SAP instance numbers for ASCS, ERS, and App Servers.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "PrometheusPort": {
+          "description": "Prometheus exporter port.",
+          "type": "string",
+          "markdownDescription": "Prometheus exporter port.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "SAPSID",
+        "InstanceNumbers"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The NetWeaver Prometheus Exporter Settings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "SQLServerPrometheusExporter": {
+      "description": "The SQL prometheus exporter settings.",
+      "type": "object",
+      "properties": {
+        "PrometheusPort": {
+          "description": "Prometheus exporter port.",
+          "type": "string",
+          "markdownDescription": "Prometheus exporter port.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "SQLSecretName": {
+          "description": "Secret name which managers SQL exporter connection. e.g. {\"data_source_name\": \"sqlserver://<USERNAME>:<PASSWORD>@localhost:1433\"}",
+          "type": "string",
+          "markdownDescription": "Secret name which managers SQL exporter connection. e.g. {\"data_source_name\": \"sqlserver://<USERNAME>:<PASSWORD>@localhost:1433\"}\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "PrometheusPort",
+        "SQLSecretName"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The SQL prometheus exporter settings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "AlarmMetric": {
       "description": "A metric to be monitored for the component.",
@@ -563,6 +651,34 @@
       "additionalProperties": false,
       "markdownDescription": "A Windows Event to be monitored for the component.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
+    "Process": {
+      "description": "A process to be monitored for the component.",
+      "type": "object",
+      "properties": {
+        "ProcessName": {
+          "description": "The name of the process to be monitored for the component.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "markdownDescription": "The name of the process to be monitored for the component.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^[a-zA-Z0-9_,-]+$  \nUpdate requires: No interruption"
+        },
+        "AlarmMetrics": {
+          "description": "A list of metrics to monitor for the component.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AlarmMetric"
+          },
+          "insertionOrder": true,
+          "markdownDescription": "A list of metrics to monitor for the component.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "ProcessName",
+        "AlarmMetrics"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A process to be monitored for the component.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "EventLevel": {
       "description": "The level of event to log.",
       "type": "string",
@@ -645,7 +761,8 @@
     "/properties/LogPatternSets",
     "/properties/CustomComponents",
     "/properties/GroupingType",
-    "/properties/OpsItemSNSTopicArn"
+    "/properties/OpsItemSNSTopicArn",
+    "/properties/AttachMissingPermission"
   ],
   "createOnlyProperties": [
     "/properties/ResourceGroupName",
