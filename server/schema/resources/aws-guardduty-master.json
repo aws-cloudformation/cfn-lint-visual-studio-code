@@ -1,36 +1,79 @@
 {
   "typeName": "AWS::GuardDuty::Master",
-  "description": "Resource Type definition for AWS::GuardDuty::Master",
-  "additionalProperties": false,
+  "description": "GuardDuty Master resource schema",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-guardduty.git",
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
   "properties": {
-    "DetectorId": {
+    "MasterId": {
+      "description": "ID of the account used as the master account.",
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
+      "markdownDescription": "ID of the account used as the master account.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
     },
     "InvitationId": {
+      "description": "Value used to validate the master account to the member account.",
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+      "markdownDescription": "Value used to validate the master account to the member account.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "DetectorId": {
+      "description": "Unique ID of the detector of the GuardDuty member account.",
+      "type": "string",
+      "markdownDescription": "Unique ID of the detector of the GuardDuty member account.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
     }
   },
   "required": [
-    "DetectorId",
-    "MasterId"
+    "MasterId",
+    "DetectorId"
   ],
+  "additionalProperties": false,
   "createOnlyProperties": [
-    "/properties/InvitationId",
     "/properties/MasterId",
+    "/properties/InvitationId",
     "/properties/DetectorId"
   ],
   "primaryIdentifier": [
+    "/properties/DetectorId",
     "/properties/MasterId"
   ],
-  "readOnlyProperties": [
-    "/properties/MasterId"
-  ],
-  "attributes": {
-    "MasterId": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
+  "handlers": {
+    "create": {
+      "permissions": [
+        "guardduty:ListInvitations",
+        "guardduty:AcceptInvitation",
+        "guardduty:GetMasterAccount"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "guardduty:GetMasterAccount"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "guardduty:DisassociateFromMasterAccount"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "DetectorId": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          },
+          "MasterId": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          }
+        }
+      },
+      "permissions": [
+        "guardduty:GetMasterAccount"
+      ]
     }
-  }
+  },
+  "attributes": {}
 }

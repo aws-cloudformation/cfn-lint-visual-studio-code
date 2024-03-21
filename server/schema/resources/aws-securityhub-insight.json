@@ -1,0 +1,1402 @@
+{
+  "typeName": "AWS::SecurityHub::Insight",
+  "description": "The AWS::SecurityHub::Insight resource represents the AWS Security Hub Insight in your account. An AWS Security Hub insight is a collection of related findings.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-securityhub",
+  "definitions": {
+    "NonEmptyString": {
+      "description": "Non-empty string definition.",
+      "type": "string",
+      "minLength": 1,
+      "markdownDescription": "Non-empty string definition.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nUpdate requires: No interruption"
+    },
+    "DateFilter": {
+      "description": "A date filter for querying findings.",
+      "properties": {
+        "DateRange": {
+          "$ref": "#/definitions/DateRange"
+        },
+        "End": {
+          "$ref": "#/definitions/ISO8601DateString"
+        },
+        "Start": {
+          "$ref": "#/definitions/ISO8601DateString"
+        }
+      },
+      "type": "object",
+      "oneOf": [
+        {
+          "required": [
+            "DateRange"
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "required": [
+                "Start"
+              ]
+            },
+            {
+              "required": [
+                "End"
+              ]
+            }
+          ]
+        }
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A date filter for querying findings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "DateRange": {
+      "description": "A date range for the date filter.",
+      "properties": {
+        "Unit": {
+          "description": "A date range unit for the date filter.",
+          "enum": [
+            "DAYS"
+          ],
+          "type": "string",
+          "markdownDescription": "A date range unit for the date filter.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: DAYS  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "description": "A date range value for the date filter.",
+          "type": "number",
+          "markdownDescription": "A date range value for the date filter.\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Unit",
+        "Value"
+      ],
+      "type": "object",
+      "additionalProperties": false,
+      "markdownDescription": "A date range for the date filter.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ISO8601DateString": {
+      "description": "The date and time, in UTC and ISO 8601 format.",
+      "type": "string",
+      "markdownDescription": "The date and time, in UTC and ISO 8601 format.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(\\d\\d\\d\\d)-([0][1-9]|[1][0-2])-([0][1-9]|[1-2](\\d)|[3][0-1])[T](?:([0-1](\\d)|[2][0-3]):[0-5](\\d):[0-5](\\d)|23:59:60)(?:\\.(\\d)+)?([Z]|[+-](\\d\\d)(:?(\\d\\d))?)$  \nUpdate requires: No interruption"
+    },
+    "NumberFilter": {
+      "description": "A number filter for querying findings.",
+      "properties": {
+        "Eq": {
+          "description": "The equal-to condition to be applied to a single field when querying for findings.",
+          "type": "number",
+          "markdownDescription": "The equal-to condition to be applied to a single field when querying for findings.\n\n---\n\nRequired: Conditional  \nType: Number  \nUpdate requires: No interruption"
+        },
+        "Gte": {
+          "description": "The greater-than-equal condition to be applied to a single field when querying for findings.",
+          "type": "number",
+          "markdownDescription": "The greater-than-equal condition to be applied to a single field when querying for findings.\n\n---\n\nRequired: Conditional  \nType: Number  \nUpdate requires: No interruption"
+        },
+        "Lte": {
+          "description": "The less-than-equal condition to be applied to a single field when querying for findings.",
+          "type": "number",
+          "markdownDescription": "The less-than-equal condition to be applied to a single field when querying for findings.\n\n---\n\nRequired: Conditional  \nType: Number  \nUpdate requires: No interruption"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "Eq"
+          ]
+        },
+        {
+          "anyOf": [
+            {
+              "required": [
+                "Gte"
+              ]
+            },
+            {
+              "required": [
+                "Lte"
+              ]
+            }
+          ]
+        }
+      ],
+      "type": "object",
+      "additionalProperties": false,
+      "markdownDescription": "A number filter for querying findings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "StringFilter": {
+      "description": "A string filter for filtering AWS Security Hub findings.",
+      "properties": {
+        "Comparison": {
+          "$ref": "#/definitions/StringFilterComparison"
+        },
+        "Value": {
+          "$ref": "#/definitions/NonEmptyString"
+        }
+      },
+      "required": [
+        "Comparison",
+        "Value"
+      ],
+      "type": "object",
+      "additionalProperties": false,
+      "markdownDescription": "A string filter for filtering AWS Security Hub findings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "StringFilterComparison": {
+      "description": "The condition to apply to a string value when filtering Security Hub findings.",
+      "enum": [
+        "EQUALS",
+        "PREFIX",
+        "NOT_EQUALS",
+        "PREFIX_NOT_EQUALS"
+      ],
+      "type": "string",
+      "markdownDescription": "The condition to apply to a string value when filtering Security Hub findings.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: EQUALS | PREFIX | NOT_EQUALS | PREFIX_NOT_EQUALS  \nUpdate requires: No interruption"
+    },
+    "MapFilter": {
+      "description": "A map filter for filtering AWS Security Hub findings.",
+      "properties": {
+        "Comparison": {
+          "description": "The condition to apply to the key value when filtering Security Hub findings with a map filter.",
+          "enum": [
+            "EQUALS",
+            "NOT_EQUALS"
+          ],
+          "type": "string",
+          "markdownDescription": "The condition to apply to the key value when filtering Security Hub findings with a map filter.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: EQUALS | NOT_EQUALS  \nUpdate requires: No interruption"
+        },
+        "Key": {
+          "$ref": "#/definitions/NonEmptyString"
+        },
+        "Value": {
+          "$ref": "#/definitions/NonEmptyString"
+        }
+      },
+      "required": [
+        "Comparison",
+        "Key",
+        "Value"
+      ],
+      "type": "object",
+      "additionalProperties": false,
+      "markdownDescription": "A map filter for filtering AWS Security Hub findings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "IpFilter": {
+      "description": "The IP filter for querying findings.",
+      "properties": {
+        "Cidr": {
+          "description": "A finding's CIDR value.",
+          "$ref": "#/definitions/NonEmptyString",
+          "markdownDescription": "A finding's CIDR value.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        }
+      },
+      "type": "object",
+      "additionalProperties": false,
+      "markdownDescription": "The IP filter for querying findings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "KeywordFilter": {
+      "description": "A keyword filter for querying findings.",
+      "properties": {
+        "Value": {
+          "description": "A value for the keyword.",
+          "$ref": "#/definitions/NonEmptyString",
+          "markdownDescription": "A value for the keyword.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        }
+      },
+      "type": "object",
+      "additionalProperties": false,
+      "markdownDescription": "A keyword filter for querying findings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "BooleanFilter": {
+      "description": "Boolean filter for querying findings.",
+      "properties": {
+        "Value": {
+          "description": "The value of the boolean.",
+          "type": "boolean",
+          "markdownDescription": "The value of the boolean.\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Value"
+      ],
+      "type": "object",
+      "additionalProperties": false,
+      "markdownDescription": "Boolean filter for querying findings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AwsSecurityFindingFilters": {
+      "description": "A collection of filters that are applied to all active findings aggregated by AWS Security Hub.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ProductArn": {
+          "description": "The ARN generated by Security Hub that uniquely identifies a third-party company (security findings provider) after this provider's product (solution that generates findings) is registered with Security Hub.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The ARN generated by Security Hub that uniquely identifies a third-party company (security findings provider) after this provider's product (solution that generates findings) is registered with Security Hub.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "AwsAccountId": {
+          "description": "The AWS account ID in which a finding is generated.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The AWS account ID in which a finding is generated.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "AwsAccountName": {
+          "description": "The name of the AWS account in which a finding is generated.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The name of the AWS account in which a finding is generated.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Id": {
+          "description": "The security findings provider-specific identifier for a finding.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The security findings provider-specific identifier for a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "GeneratorId": {
+          "description": "The identifier for the solution-specific component (a discrete unit of logic) that generated a finding.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The identifier for the solution-specific component (a discrete unit of logic) that generated a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Type": {
+          "description": "A finding type in the format of namespace/category/classifier that classifies a finding.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "A finding type in the format of namespace/category/classifier that classifies a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Region": {
+          "description": "The Region from which the finding was generated.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The Region from which the finding was generated.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "FirstObservedAt": {
+          "description": "An ISO8601-formatted timestamp that indicates when the security findings provider first observed the potential security issue that a finding captured.",
+          "items": {
+            "$ref": "#/definitions/DateFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "An ISO8601-formatted timestamp that indicates when the security findings provider first observed the potential security issue that a finding captured.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "LastObservedAt": {
+          "description": "An ISO8601-formatted timestamp that indicates when the security findings provider most recently observed the potential security issue that a finding captured.",
+          "items": {
+            "$ref": "#/definitions/DateFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "An ISO8601-formatted timestamp that indicates when the security findings provider most recently observed the potential security issue that a finding captured.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "CreatedAt": {
+          "description": "An ISO8601-formatted timestamp that indicates when the security findings provider captured the potential security issue that a finding captured.",
+          "items": {
+            "$ref": "#/definitions/DateFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "An ISO8601-formatted timestamp that indicates when the security findings provider captured the potential security issue that a finding captured.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "UpdatedAt": {
+          "description": "An ISO8601-formatted timestamp that indicates when the security findings provider last updated the finding record.",
+          "items": {
+            "$ref": "#/definitions/DateFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "An ISO8601-formatted timestamp that indicates when the security findings provider last updated the finding record.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "SeverityLabel": {
+          "description": "The label of a finding's severity.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The label of a finding's severity.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Confidence": {
+          "description": "A finding's confidence.",
+          "items": {
+            "$ref": "#/definitions/NumberFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "A finding's confidence.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Criticality": {
+          "description": "The level of importance assigned to the resources associated with the finding.",
+          "items": {
+            "$ref": "#/definitions/NumberFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The level of importance assigned to the resources associated with the finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Title": {
+          "description": "A finding's title.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "A finding's title.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Description": {
+          "description": "A finding's description.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "A finding's description.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "RecommendationText": {
+          "description": "The recommendation of what to do about the issue described in a finding.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The recommendation of what to do about the issue described in a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "SourceUrl": {
+          "description": "A URL that links to a page about the current finding in the security findings provider's solution.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "A URL that links to a page about the current finding in the security findings provider's solution.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ProductFields": {
+          "description": "A data type where security findings providers can include additional solution-specific details that aren't part of the defined AwsSecurityFinding format.",
+          "items": {
+            "$ref": "#/definitions/MapFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "A data type where security findings providers can include additional solution-specific details that aren't part of the defined AwsSecurityFinding format.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ProductName": {
+          "description": "The name of the solution (product) that generates findings.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The name of the solution (product) that generates findings.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "CompanyName": {
+          "description": "The name of the findings provider (company) that owns the solution (product) that generates findings.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The name of the findings provider (company) that owns the solution (product) that generates findings.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "UserDefinedFields": {
+          "description": "A list of name/value string pairs associated with the finding.",
+          "items": {
+            "$ref": "#/definitions/MapFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "A list of name/value string pairs associated with the finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "MalwareName": {
+          "description": "The name of the malware that was observed.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The name of the malware that was observed.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "MalwareType": {
+          "description": "The type of the malware that was observed.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The type of the malware that was observed.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "MalwarePath": {
+          "description": "The filesystem path of the malware that was observed.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The filesystem path of the malware that was observed.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "MalwareState": {
+          "description": "The state of the malware that was observed.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The state of the malware that was observed.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "NetworkDirection": {
+          "description": "Indicates the direction of network traffic associated with a finding.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "Indicates the direction of network traffic associated with a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "NetworkProtocol": {
+          "description": "The protocol of network-related information about a finding.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The protocol of network-related information about a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "NetworkSourceIpV4": {
+          "description": "The source IPv4 address of network-related information about a finding.",
+          "items": {
+            "$ref": "#/definitions/IpFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The source IPv4 address of network-related information about a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "NetworkSourceIpV6": {
+          "description": "The source IPv6 address of network-related information about a finding.",
+          "items": {
+            "$ref": "#/definitions/IpFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The source IPv6 address of network-related information about a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "NetworkSourcePort": {
+          "description": "The source port of network-related information about a finding.",
+          "items": {
+            "$ref": "#/definitions/NumberFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The source port of network-related information about a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "NetworkSourceDomain": {
+          "description": "The source domain of network-related information about a finding.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The source domain of network-related information about a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "NetworkSourceMac": {
+          "description": "The source media access control (MAC) address of network-related information about a finding.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The source media access control (MAC) address of network-related information about a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "NetworkDestinationIpV4": {
+          "description": "The destination IPv4 address of network-related information about a finding.",
+          "items": {
+            "$ref": "#/definitions/IpFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The destination IPv4 address of network-related information about a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "NetworkDestinationIpV6": {
+          "description": "The destination IPv6 address of network-related information about a finding.",
+          "items": {
+            "$ref": "#/definitions/IpFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The destination IPv6 address of network-related information about a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "NetworkDestinationPort": {
+          "description": "The destination port of network-related information about a finding.",
+          "items": {
+            "$ref": "#/definitions/NumberFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The destination port of network-related information about a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "NetworkDestinationDomain": {
+          "description": "The destination domain of network-related information about a finding.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The destination domain of network-related information about a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ProcessName": {
+          "description": "The name of the process.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The name of the process.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ProcessPath": {
+          "description": "The path to the process executable.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The path to the process executable.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ProcessPid": {
+          "description": "The process ID.",
+          "items": {
+            "$ref": "#/definitions/NumberFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The process ID.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ProcessParentPid": {
+          "description": "The parent process ID.",
+          "items": {
+            "$ref": "#/definitions/NumberFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The parent process ID.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ProcessLaunchedAt": {
+          "description": "A timestamp that identifies when the process was launched.",
+          "items": {
+            "$ref": "#/definitions/DateFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "A timestamp that identifies when the process was launched.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ProcessTerminatedAt": {
+          "description": "A timestamp that identifies when the process was terminated.",
+          "items": {
+            "$ref": "#/definitions/DateFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "A timestamp that identifies when the process was terminated.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ThreatIntelIndicatorType": {
+          "description": "The type of a threat intelligence indicator.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The type of a threat intelligence indicator.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ThreatIntelIndicatorValue": {
+          "description": "The value of a threat intelligence indicator.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The value of a threat intelligence indicator.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ThreatIntelIndicatorCategory": {
+          "description": "The category of a threat intelligence indicator.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The category of a threat intelligence indicator.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ThreatIntelIndicatorLastObservedAt": {
+          "description": "A timestamp that identifies the last observation of a threat intelligence indicator.",
+          "items": {
+            "$ref": "#/definitions/DateFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "A timestamp that identifies the last observation of a threat intelligence indicator.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ThreatIntelIndicatorSource": {
+          "description": "The source of the threat intelligence.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The source of the threat intelligence.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ThreatIntelIndicatorSourceUrl": {
+          "description": "The URL for more details from the source of the threat intelligence.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The URL for more details from the source of the threat intelligence.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceType": {
+          "description": "Specifies the type of the resource that details are provided for.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "Specifies the type of the resource that details are provided for.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceId": {
+          "description": "The canonical identifier for the given resource type.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The canonical identifier for the given resource type.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourcePartition": {
+          "description": "The canonical AWS partition name that the Region is assigned to.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The canonical AWS partition name that the Region is assigned to.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceRegion": {
+          "description": "The canonical AWS external Region name where this resource is located.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The canonical AWS external Region name where this resource is located.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceTags": {
+          "description": "A list of AWS tags associated with a resource at the time the finding was processed.",
+          "items": {
+            "$ref": "#/definitions/MapFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "A list of AWS tags associated with a resource at the time the finding was processed.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceAwsEc2InstanceType": {
+          "description": "The instance type of the instance.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The instance type of the instance.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceAwsEc2InstanceImageId": {
+          "description": "The Amazon Machine Image (AMI) ID of the instance.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The Amazon Machine Image (AMI) ID of the instance.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceAwsEc2InstanceIpV4Addresses": {
+          "description": "The IPv4 addresses associated with the instance.",
+          "items": {
+            "$ref": "#/definitions/IpFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The IPv4 addresses associated with the instance.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceAwsEc2InstanceIpV6Addresses": {
+          "description": "The IPv6 addresses associated with the instance.",
+          "items": {
+            "$ref": "#/definitions/IpFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The IPv6 addresses associated with the instance.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceAwsEc2InstanceKeyName": {
+          "description": "The key name associated with the instance.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The key name associated with the instance.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceAwsEc2InstanceIamInstanceProfileArn": {
+          "description": "The IAM profile ARN of the instance.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The IAM profile ARN of the instance.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceAwsEc2InstanceVpcId": {
+          "description": "The identifier of the VPC that the instance was launched in.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The identifier of the VPC that the instance was launched in.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceAwsEc2InstanceSubnetId": {
+          "description": "The identifier of the subnet that the instance was launched in.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The identifier of the subnet that the instance was launched in.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceAwsEc2InstanceLaunchedAt": {
+          "description": "The date and time the instance was launched.",
+          "items": {
+            "$ref": "#/definitions/DateFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The date and time the instance was launched.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceAwsS3BucketOwnerId": {
+          "description": "The canonical user ID of the owner of the S3 bucket.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The canonical user ID of the owner of the S3 bucket.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceAwsS3BucketOwnerName": {
+          "description": "The display name of the owner of the S3 bucket.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The display name of the owner of the S3 bucket.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceAwsIamAccessKeyStatus": {
+          "description": "The status of the IAM access key related to a finding.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The status of the IAM access key related to a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceAwsIamAccessKeyCreatedAt": {
+          "description": "The creation date/time of the IAM access key related to a finding.",
+          "items": {
+            "$ref": "#/definitions/DateFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The creation date/time of the IAM access key related to a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceContainerName": {
+          "description": "The name of the container related to a finding.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The name of the container related to a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceContainerImageId": {
+          "description": "The identifier of the image related to a finding.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The identifier of the image related to a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceContainerImageName": {
+          "description": "The name of the image related to a finding.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The name of the image related to a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceContainerLaunchedAt": {
+          "description": "A timestamp that identifies when the container was started.",
+          "items": {
+            "$ref": "#/definitions/DateFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "A timestamp that identifies when the container was started.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceDetailsOther": {
+          "description": "The details of a resource that doesn't have a specific subfield for the resource type defined.",
+          "items": {
+            "$ref": "#/definitions/MapFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The details of a resource that doesn't have a specific subfield for the resource type defined.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ComplianceStatus": {
+          "description": "Exclusive to findings that are generated as the result of a check run against a specific rule in a supported standard.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "Exclusive to findings that are generated as the result of a check run against a specific rule in a supported standard.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "VerificationState": {
+          "description": "The veracity of a finding.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The veracity of a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "WorkflowState": {
+          "description": "The workflow state of a finding.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The workflow state of a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "WorkflowStatus": {
+          "description": "The status of the investigation into a finding.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The status of the investigation into a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "RecordState": {
+          "description": "The updated record state for the finding.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The updated record state for the finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "RelatedFindingsProductArn": {
+          "description": "The ARN of the solution that generated a related finding.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The ARN of the solution that generated a related finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "RelatedFindingsId": {
+          "description": "The solution-generated identifier for a related finding.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The solution-generated identifier for a related finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceApplicationArn": {
+          "description": "The ARN of the application that is related to a finding.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The ARN of the application that is related to a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceApplicationName": {
+          "description": "The name of the application that is related to a finding.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The name of the application that is related to a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "NoteText": {
+          "description": "The text of a note.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The text of a note.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "NoteUpdatedAt": {
+          "description": "The timestamp of when the note was updated.",
+          "items": {
+            "$ref": "#/definitions/DateFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The timestamp of when the note was updated.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "NoteUpdatedBy": {
+          "description": "The principal that created a note.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The principal that created a note.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Sample": {
+          "description": "Indicates whether or not sample findings are included in the filter results.",
+          "items": {
+            "$ref": "#/definitions/BooleanFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "Indicates whether or not sample findings are included in the filter results.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ComplianceAssociatedStandardsId": {
+          "description": "The unique identifier of a standard in which a control is enabled.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The unique identifier of a standard in which a control is enabled.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ComplianceSecurityControlId": {
+          "description": "The unique identifier of a control across standards.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The unique identifier of a control across standards.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ComplianceSecurityControlParametersName": {
+          "description": "The name of a security control parameter.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The name of a security control parameter.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ComplianceSecurityControlParametersValue": {
+          "description": "The current value of a security control parameter.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The current value of a security control parameter.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "FindingProviderFieldsConfidence": {
+          "description": "The finding provider value for the finding confidence.",
+          "items": {
+            "$ref": "#/definitions/NumberFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The finding provider value for the finding confidence.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "FindingProviderFieldsCriticality": {
+          "description": "The finding provider value for the level of importance assigned to the resources associated with the findings.",
+          "items": {
+            "$ref": "#/definitions/NumberFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The finding provider value for the level of importance assigned to the resources associated with the findings.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "FindingProviderFieldsRelatedFindingsId": {
+          "description": "The finding identifier of a related finding that is identified by the finding provider.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The finding identifier of a related finding that is identified by the finding provider.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "FindingProviderFieldsRelatedFindingsProductArn": {
+          "description": "The ARN of the solution that generated a related finding that is identified by the finding provider.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The ARN of the solution that generated a related finding that is identified by the finding provider.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "FindingProviderFieldsSeverityLabel": {
+          "description": "The finding provider value for the severity label.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The finding provider value for the severity label.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "FindingProviderFieldsSeverityOriginal": {
+          "description": "The finding provider's original value for the severity.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The finding provider's original value for the severity.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "FindingProviderFieldsTypes": {
+          "description": "One or more finding types that the finding provider assigned to the finding.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "One or more finding types that the finding provider assigned to the finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceAwsIamAccessKeyPrincipalName": {
+          "description": "The name of the principal that is associated with an IAM access key.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The name of the principal that is associated with an IAM access key.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceAwsIamUserUserName": {
+          "description": "The name of an IAM user.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The name of an IAM user.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "VulnerabilitiesExploitAvailable": {
+          "description": "Indicates whether a software vulnerability in your environment has a known exploit.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "Indicates whether a software vulnerability in your environment has a known exploit.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "VulnerabilitiesFixAvailable": {
+          "description": "Indicates whether a vulnerability is fixed in a newer version of the affected software packages.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "Indicates whether a vulnerability is fixed in a newer version of the affected software packages.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "A collection of filters that are applied to all active findings aggregated by AWS Security Hub.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "Name": {
+      "description": "The name of a Security Hub insight",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "markdownDescription": "The name of a Security Hub insight\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+    },
+    "Filters": {
+      "description": "One or more attributes used to filter the findings included in the insight",
+      "$ref": "#/definitions/AwsSecurityFindingFilters",
+      "maxProperties": 10,
+      "markdownDescription": "One or more attributes used to filter the findings included in the insight\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption"
+    },
+    "GroupByAttribute": {
+      "description": "The grouping attribute for the insight's findings",
+      "$ref": "#/definitions/NonEmptyString",
+      "markdownDescription": "The grouping attribute for the insight's findings\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "Filters",
+    "Name",
+    "GroupByAttribute"
+  ],
+  "primaryIdentifier": [
+    "/properties/InsightArn"
+  ],
+  "readOnlyProperties": [
+    "/properties/InsightArn"
+  ],
+  "tagging": {
+    "taggable": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "securityhub:CreateInsight"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "securityhub:GetInsights"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "securityhub:UpdateInsight"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "securityhub:GetInsights",
+        "securityhub:DeleteInsight"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "securityhub:GetInsights"
+      ]
+    }
+  },
+  "attributes": {
+    "InsightArn": {
+      "description": "The ARN of a Security Hub insight",
+      "type": "string",
+      "markdownDescription": "The ARN of a Security Hub insight\n\n---\n\nRequired: No  \nType: String  \nPattern: arn:aws\\S*:securityhub:\\S*  \nUpdate requires: No interruption"
+    }
+  }
+}
