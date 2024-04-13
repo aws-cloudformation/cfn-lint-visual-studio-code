@@ -1,0 +1,252 @@
+{
+  "typeName": "AWS::Deadline::Queue",
+  "description": "Definition of AWS::Deadline::Queue Resource Type",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-deadline",
+  "definitions": {
+    "DefaultQueueBudgetAction": {
+      "type": "string",
+      "default": "NONE",
+      "enum": [
+        "NONE",
+        "STOP_SCHEDULING_AND_COMPLETE_TASKS",
+        "STOP_SCHEDULING_AND_CANCEL_TASKS"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: NONE | STOP_SCHEDULING_AND_COMPLETE_TASKS | STOP_SCHEDULING_AND_CANCEL_TASKS  \nUpdate requires: No interruption"
+    },
+    "JobAttachmentSettings": {
+      "type": "object",
+      "properties": {
+        "S3BucketName": {
+          "type": "string",
+          "maxLength": 63,
+          "minLength": 3,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 3  \nMaximum Length: 63  \nPattern: (?!^(\\d+\\.)+\\d+$)(^(([a-z0-9]|[a-z0-9][a-z0-9\\-]*[a-z0-9])\\.)*([a-z0-9]|[a-z0-9][a-z0-9\\-]*[a-z0-9])$)  \nUpdate requires: No interruption"
+        },
+        "RootPrefix": {
+          "type": "string",
+          "maxLength": 63,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 63  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "RootPrefix",
+        "S3BucketName"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "JobRunAsUser": {
+      "type": "object",
+      "properties": {
+        "Posix": {
+          "$ref": "#/definitions/PosixUser"
+        },
+        "Windows": {
+          "$ref": "#/definitions/WindowsUser"
+        },
+        "RunAs": {
+          "$ref": "#/definitions/RunAs"
+        }
+      },
+      "required": [
+        "RunAs"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PosixUser": {
+      "type": "object",
+      "properties": {
+        "User": {
+          "type": "string",
+          "maxLength": 31,
+          "minLength": 0,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 31  \nPattern: ^(?:[a-z][a-z0-9-]{0,30})?$  \nUpdate requires: No interruption"
+        },
+        "Group": {
+          "type": "string",
+          "maxLength": 31,
+          "minLength": 0,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 31  \nPattern: ^(?:[a-z][a-z0-9-]{0,30})?$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Group",
+        "User"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RunAs": {
+      "type": "string",
+      "enum": [
+        "QUEUE_CONFIGURED_USER",
+        "WORKER_AGENT_USER"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: QUEUE_CONFIGURED_USER | WORKER_AGENT_USER  \nUpdate requires: No interruption"
+    },
+    "WindowsUser": {
+      "type": "object",
+      "properties": {
+        "User": {
+          "type": "string",
+          "maxLength": 111,
+          "minLength": 0,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 111  \nPattern: ^[^\"'/\\[\\]:;|=,+*?<>\\s]*$  \nUpdate requires: No interruption"
+        },
+        "PasswordArn": {
+          "type": "string",
+          "maxLength": 2048,
+          "minLength": 20,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:(aws[a-zA-Z-]*):secretsmanager:[a-z]{2}((-gov)|(-iso(b?)))?-[a-z]+-\\d{1}:\\d{12}:secret:[a-zA-Z0-9-/_+=.@]{1,2028}$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "PasswordArn",
+        "User"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "AllowedStorageProfileIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^sp-[0-9a-f]{32}$  \nUpdate requires: No interruption"
+      },
+      "maxItems": 20,
+      "minItems": 0,
+      "uniqueItems": true,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "DefaultBudgetAction": {
+      "$ref": "#/definitions/DefaultQueueBudgetAction"
+    },
+    "Description": {
+      "type": "string",
+      "default": "",
+      "maxLength": 100,
+      "minLength": 0,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 100  \nUpdate requires: No interruption"
+    },
+    "DisplayName": {
+      "type": "string",
+      "maxLength": 100,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nUpdate requires: No interruption"
+    },
+    "FarmId": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^farm-[0-9a-f]{32}$  \nUpdate requires: Replacement"
+    },
+    "JobAttachmentSettings": {
+      "$ref": "#/definitions/JobAttachmentSettings"
+    },
+    "JobRunAsUser": {
+      "$ref": "#/definitions/JobRunAsUser"
+    },
+    "RequiredFileSystemLocationNames": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 64,
+        "minLength": 1,
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[0-9A-Za-z ]*$  \nUpdate requires: No interruption"
+      },
+      "maxItems": 20,
+      "minItems": 0,
+      "uniqueItems": true,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "RoleArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws[a-zA-Z-]*):iam::\\d{12}:role(/[!-.0-~]+)*/[\\w+=,.@-]+$  \nUpdate requires: No interruption"
+    }
+  },
+  "required": [
+    "DisplayName"
+  ],
+  "readOnlyProperties": [
+    "/properties/QueueId",
+    "/properties/Arn"
+  ],
+  "createOnlyProperties": [
+    "/properties/FarmId"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "deadline:CreateQueue",
+        "deadline:GetQueue",
+        "iam:PassRole",
+        "identitystore:ListGroupMembershipsForMember",
+        "logs:CreateLogGroup",
+        "s3:ListBucket"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "deadline:GetQueue",
+        "identitystore:ListGroupMembershipsForMember"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "deadline:UpdateQueue",
+        "deadline:GetQueue",
+        "iam:PassRole",
+        "identitystore:ListGroupMembershipsForMember",
+        "logs:CreateLogGroup",
+        "s3:ListBucket"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "deadline:DeleteQueue",
+        "deadline:GetQueue",
+        "identitystore:ListGroupMembershipsForMember"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "FarmId": {
+            "$ref": "resource-schema.json#/properties/FarmId"
+          }
+        },
+        "required": [
+          "FarmId"
+        ]
+      },
+      "permissions": [
+        "deadline:ListQueues",
+        "identitystore:DescribeGroup",
+        "identitystore:DescribeUser",
+        "identitystore:ListGroupMembershipsForMember"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "attributes": {
+    "QueueId": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^queue-[0-9a-f]{32}$  \nUpdate requires: No interruption"
+    },
+    "Arn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:*  \nUpdate requires: No interruption"
+    }
+  }
+}

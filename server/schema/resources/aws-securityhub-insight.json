@@ -23,27 +23,6 @@
         }
       },
       "type": "object",
-      "oneOf": [
-        {
-          "required": [
-            "DateRange"
-          ]
-        },
-        {
-          "allOf": [
-            {
-              "required": [
-                "Start"
-              ]
-            },
-            {
-              "required": [
-                "End"
-              ]
-            }
-          ]
-        }
-      ],
       "additionalProperties": false,
       "markdownDescription": "A date filter for querying findings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
@@ -75,7 +54,7 @@
     "ISO8601DateString": {
       "description": "The date and time, in UTC and ISO 8601 format.",
       "type": "string",
-      "markdownDescription": "The date and time, in UTC and ISO 8601 format.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(\\d\\d\\d\\d)-([0][1-9]|[1][0-2])-([0][1-9]|[1-2](\\d)|[3][0-1])[T](?:([0-1](\\d)|[2][0-3]):[0-5](\\d):[0-5](\\d)|23:59:60)(?:\\.(\\d)+)?([Z]|[+-](\\d\\d)(:?(\\d\\d))?)$  \nUpdate requires: No interruption"
+      "markdownDescription": "The date and time, in UTC and ISO 8601 format.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^([\\+-]?\\d{4}(?!\\d{2}))((-?)((0[1-9]|1[0-2])(\\3([12]\\d|0[1-9]|3[01]))?|W([0-4]\\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\\d|[12]\\d{2}|3([0-5]\\d|6[1-6])))([tT]((([01]\\d|2[0-3])((:?)[0-5]\\d)?|24\\:?00)([\\.,]\\d+(?!:))?)?(\\17[0-5]\\d([\\.,]\\d+)?)?([zZ]|([\\+-])([01]\\d|2[0-3]):?([0-5]\\d)?)?)?)?$  \nUpdate requires: No interruption"
     },
     "NumberFilter": {
       "description": "A number filter for querying findings.",
@@ -83,40 +62,19 @@
         "Eq": {
           "description": "The equal-to condition to be applied to a single field when querying for findings.",
           "type": "number",
-          "markdownDescription": "The equal-to condition to be applied to a single field when querying for findings.\n\n---\n\nRequired: Conditional  \nType: Number  \nUpdate requires: No interruption"
+          "markdownDescription": "The equal-to condition to be applied to a single field when querying for findings.\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
         },
         "Gte": {
           "description": "The greater-than-equal condition to be applied to a single field when querying for findings.",
           "type": "number",
-          "markdownDescription": "The greater-than-equal condition to be applied to a single field when querying for findings.\n\n---\n\nRequired: Conditional  \nType: Number  \nUpdate requires: No interruption"
+          "markdownDescription": "The greater-than-equal condition to be applied to a single field when querying for findings.\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
         },
         "Lte": {
           "description": "The less-than-equal condition to be applied to a single field when querying for findings.",
           "type": "number",
-          "markdownDescription": "The less-than-equal condition to be applied to a single field when querying for findings.\n\n---\n\nRequired: Conditional  \nType: Number  \nUpdate requires: No interruption"
+          "markdownDescription": "The less-than-equal condition to be applied to a single field when querying for findings.\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
         }
       },
-      "oneOf": [
-        {
-          "required": [
-            "Eq"
-          ]
-        },
-        {
-          "anyOf": [
-            {
-              "required": [
-                "Gte"
-              ]
-            },
-            {
-              "required": [
-                "Lte"
-              ]
-            }
-          ]
-        }
-      ],
       "type": "object",
       "additionalProperties": false,
       "markdownDescription": "A number filter for querying findings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
@@ -184,9 +142,12 @@
         "Cidr": {
           "description": "A finding's CIDR value.",
           "$ref": "#/definitions/NonEmptyString",
-          "markdownDescription": "A finding's CIDR value.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+          "markdownDescription": "A finding's CIDR value.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption"
         }
       },
+      "required": [
+        "Cidr"
+      ],
       "type": "object",
       "additionalProperties": false,
       "markdownDescription": "The IP filter for querying findings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
@@ -197,9 +158,12 @@
         "Value": {
           "description": "A value for the keyword.",
           "$ref": "#/definitions/NonEmptyString",
-          "markdownDescription": "A value for the keyword.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+          "markdownDescription": "A value for the keyword.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption"
         }
       },
+      "required": [
+        "Value"
+      ],
       "type": "object",
       "additionalProperties": false,
       "markdownDescription": "A keyword filter for querying findings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
@@ -1324,6 +1288,50 @@
           "uniqueItems": true,
           "maxItems": 20,
           "markdownDescription": "Indicates whether a vulnerability is fixed in a newer version of the affected software packages.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Keyword": {
+          "description": "A keyword for a finding.",
+          "items": {
+            "$ref": "#/definitions/KeywordFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "A keyword for a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ResourceAwsIamAccessKeyUserName": {
+          "description": "The user associated with the IAM access key related to a finding.",
+          "items": {
+            "$ref": "#/definitions/StringFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The user associated with the IAM access key related to a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "SeverityNormalized": {
+          "description": "The normalized severity of a finding.",
+          "items": {
+            "$ref": "#/definitions/NumberFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The normalized severity of a finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "SeverityProduct": {
+          "description": "The native severity as defined by the security findings provider's solution that generated the finding.",
+          "items": {
+            "$ref": "#/definitions/NumberFilter"
+          },
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
+          "maxItems": 20,
+          "markdownDescription": "The native severity as defined by the security findings provider's solution that generated the finding.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
         }
       },
       "markdownDescription": "A collection of filters that are applied to all active findings aggregated by AWS Security Hub.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
@@ -1360,6 +1368,12 @@
   ],
   "readOnlyProperties": [
     "/properties/InsightArn"
+  ],
+  "deprecatedProperties": [
+    "/properties/Filters/Keyword",
+    "/properties/Filters/ResourceAwsIamAccessKeyUserName",
+    "/properties/Filters/SeverityNormalized",
+    "/properties/Filters/SeverityProduct"
   ],
   "tagging": {
     "taggable": false
