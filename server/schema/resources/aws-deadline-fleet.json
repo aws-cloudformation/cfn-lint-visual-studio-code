@@ -1,0 +1,597 @@
+{
+  "typeName": "AWS::Deadline::Fleet",
+  "description": "Definition of AWS::Deadline::Fleet Resource Type",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-deadline",
+  "definitions": {
+    "AcceleratorCountRange": {
+      "type": "object",
+      "properties": {
+        "Min": {
+          "type": "integer",
+          "maximum": 2147483647,
+          "minimum": 0,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "Max": {
+          "type": "integer",
+          "maximum": 2147483647,
+          "minimum": 0,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Min"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AcceleratorTotalMemoryMiBRange": {
+      "type": "object",
+      "properties": {
+        "Min": {
+          "type": "integer",
+          "maximum": 2147483647,
+          "minimum": 0,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "Max": {
+          "type": "integer",
+          "maximum": 2147483647,
+          "minimum": 0,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Min"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AcceleratorType": {
+      "type": "string",
+      "enum": [
+        "gpu"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: gpu  \nUpdate requires: No interruption"
+    },
+    "AutoScalingMode": {
+      "type": "string",
+      "enum": [
+        "NO_SCALING",
+        "EVENT_BASED_AUTO_SCALING"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: NO_SCALING | EVENT_BASED_AUTO_SCALING  \nUpdate requires: No interruption"
+    },
+    "CpuArchitectureType": {
+      "type": "string",
+      "enum": [
+        "x86_64",
+        "arm64"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: x86_64 | arm64  \nUpdate requires: No interruption"
+    },
+    "CustomerManagedFleetConfiguration": {
+      "type": "object",
+      "properties": {
+        "Mode": {
+          "$ref": "#/definitions/AutoScalingMode"
+        },
+        "WorkerCapabilities": {
+          "$ref": "#/definitions/CustomerManagedWorkerCapabilities"
+        },
+        "StorageProfileId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^sp-[0-9a-f]{32}$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Mode",
+        "WorkerCapabilities"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "CustomerManagedFleetOperatingSystemFamily": {
+      "type": "string",
+      "enum": [
+        "WINDOWS",
+        "LINUX",
+        "MACOS"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: WINDOWS | LINUX | MACOS  \nUpdate requires: No interruption"
+    },
+    "CustomerManagedWorkerCapabilities": {
+      "type": "object",
+      "properties": {
+        "VCpuCount": {
+          "$ref": "#/definitions/VCpuCountRange"
+        },
+        "MemoryMiB": {
+          "$ref": "#/definitions/MemoryMiBRange"
+        },
+        "AcceleratorTypes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AcceleratorType"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "AcceleratorCount": {
+          "$ref": "#/definitions/AcceleratorCountRange"
+        },
+        "AcceleratorTotalMemoryMiB": {
+          "$ref": "#/definitions/AcceleratorTotalMemoryMiBRange"
+        },
+        "OsFamily": {
+          "$ref": "#/definitions/CustomerManagedFleetOperatingSystemFamily"
+        },
+        "CpuArchitectureType": {
+          "$ref": "#/definitions/CpuArchitectureType"
+        },
+        "CustomAmounts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FleetAmountCapability"
+          },
+          "maxItems": 15,
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "CustomAttributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FleetAttributeCapability"
+          },
+          "maxItems": 15,
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "CpuArchitectureType",
+        "MemoryMiB",
+        "OsFamily",
+        "VCpuCount"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Ec2EbsVolume": {
+      "type": "object",
+      "properties": {
+        "SizeGiB": {
+          "type": "integer",
+          "default": 250,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "Iops": {
+          "type": "integer",
+          "default": 3000,
+          "maximum": 16000,
+          "minimum": 3000,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "ThroughputMiB": {
+          "type": "integer",
+          "default": 125,
+          "maximum": 1000,
+          "minimum": 125,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Ec2MarketType": {
+      "type": "string",
+      "enum": [
+        "on-demand",
+        "spot"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: on-demand | spot  \nUpdate requires: No interruption"
+    },
+    "FleetAmountCapability": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "maxLength": 100,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: ^([a-zA-Z][a-zA-Z0-9]{0,63}:)?amount(\\.[a-zA-Z][a-zA-Z0-9]{0,63})+$  \nUpdate requires: No interruption"
+        },
+        "Min": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
+        },
+        "Max": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Min",
+        "Name"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "FleetAttributeCapability": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "maxLength": 100,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: ^([a-zA-Z][a-zA-Z0-9]{0,63}:)?attr(\\.[a-zA-Z][a-zA-Z0-9]{0,63})+$  \nUpdate requires: No interruption"
+        },
+        "Values": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: ^[a-zA-Z_]([a-zA-Z0-9_\\-]{0,99})$  \nUpdate requires: No interruption"
+          },
+          "maxItems": 10,
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Name",
+        "Values"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "FleetCapabilities": {
+      "type": "object",
+      "properties": {
+        "Amounts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FleetAmountCapability"
+          },
+          "maxItems": 15,
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FleetAttributeCapability"
+          },
+          "maxItems": 15,
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "FleetConfiguration": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "CustomerManaged",
+          "properties": {
+            "CustomerManaged": {
+              "$ref": "#/definitions/CustomerManagedFleetConfiguration"
+            }
+          },
+          "required": [
+            "CustomerManaged"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "ServiceManagedEc2",
+          "properties": {
+            "ServiceManagedEc2": {
+              "$ref": "#/definitions/ServiceManagedEc2FleetConfiguration"
+            }
+          },
+          "required": [
+            "ServiceManagedEc2"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "FleetStatus": {
+      "type": "string",
+      "enum": [
+        "ACTIVE",
+        "CREATE_IN_PROGRESS",
+        "UPDATE_IN_PROGRESS",
+        "CREATE_FAILED",
+        "UPDATE_FAILED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ACTIVE | CREATE_IN_PROGRESS | UPDATE_IN_PROGRESS | CREATE_FAILED | UPDATE_FAILED  \nUpdate requires: No interruption"
+    },
+    "MemoryMiBRange": {
+      "type": "object",
+      "properties": {
+        "Min": {
+          "type": "integer",
+          "maximum": 2147483647,
+          "minimum": 512,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "Max": {
+          "type": "integer",
+          "maximum": 2147483647,
+          "minimum": 512,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Min"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ServiceManagedEc2FleetConfiguration": {
+      "type": "object",
+      "properties": {
+        "InstanceCapabilities": {
+          "$ref": "#/definitions/ServiceManagedEc2InstanceCapabilities"
+        },
+        "InstanceMarketOptions": {
+          "$ref": "#/definitions/ServiceManagedEc2InstanceMarketOptions"
+        }
+      },
+      "required": [
+        "InstanceCapabilities",
+        "InstanceMarketOptions"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ServiceManagedEc2InstanceMarketOptions": {
+      "type": "object",
+      "properties": {
+        "Type": {
+          "$ref": "#/definitions/Ec2MarketType"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ServiceManagedEc2InstanceCapabilities": {
+      "type": "object",
+      "properties": {
+        "VCpuCount": {
+          "$ref": "#/definitions/VCpuCountRange"
+        },
+        "MemoryMiB": {
+          "$ref": "#/definitions/MemoryMiBRange"
+        },
+        "OsFamily": {
+          "$ref": "#/definitions/ServiceManagedFleetOperatingSystemFamily"
+        },
+        "CpuArchitectureType": {
+          "$ref": "#/definitions/CpuArchitectureType"
+        },
+        "RootEbsVolume": {
+          "$ref": "#/definitions/Ec2EbsVolume"
+        },
+        "AllowedInstanceTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9]+\\.[a-zA-Z0-9]+$  \nUpdate requires: No interruption"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ExcludedInstanceTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9]+\\.[a-zA-Z0-9]+$  \nUpdate requires: No interruption"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "CustomAmounts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FleetAmountCapability"
+          },
+          "maxItems": 15,
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "CustomAttributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FleetAttributeCapability"
+          },
+          "maxItems": 15,
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "CpuArchitectureType",
+        "MemoryMiB",
+        "OsFamily",
+        "VCpuCount"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ServiceManagedFleetOperatingSystemFamily": {
+      "type": "string",
+      "enum": [
+        "WINDOWS",
+        "LINUX"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: WINDOWS | LINUX  \nUpdate requires: No interruption"
+    },
+    "VCpuCountRange": {
+      "type": "object",
+      "properties": {
+        "Min": {
+          "type": "integer",
+          "maximum": 10000,
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "Max": {
+          "type": "integer",
+          "maximum": 10000,
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Min"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "Configuration": {
+      "$ref": "#/definitions/FleetConfiguration"
+    },
+    "Description": {
+      "type": "string",
+      "default": "",
+      "maxLength": 100,
+      "minLength": 0,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 100  \nUpdate requires: No interruption"
+    },
+    "DisplayName": {
+      "type": "string",
+      "maxLength": 100,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nUpdate requires: No interruption"
+    },
+    "FarmId": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^farm-[0-9a-f]{32}$  \nUpdate requires: Replacement"
+    },
+    "MaxWorkerCount": {
+      "type": "integer",
+      "maximum": 2147483647,
+      "minimum": 0,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+    },
+    "MinWorkerCount": {
+      "type": "integer",
+      "default": 0,
+      "maximum": 2147483647,
+      "minimum": 0,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+    },
+    "RoleArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:(aws[a-zA-Z-]*):iam::\\d{12}:role(/[!-.0-~]+)*/[\\w+=,.@-]+$  \nUpdate requires: No interruption"
+    }
+  },
+  "required": [
+    "Configuration",
+    "DisplayName",
+    "MaxWorkerCount",
+    "RoleArn"
+  ],
+  "readOnlyProperties": [
+    "/properties/Capabilities",
+    "/properties/FleetId",
+    "/properties/Status",
+    "/properties/WorkerCount",
+    "/properties/Arn"
+  ],
+  "createOnlyProperties": [
+    "/properties/FarmId"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "deadline:CreateFleet",
+        "deadline:GetFleet",
+        "iam:PassRole",
+        "identitystore:ListGroupMembershipsForMember",
+        "logs:CreateLogGroup"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "deadline:GetFleet",
+        "identitystore:ListGroupMembershipsForMember"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "deadline:UpdateFleet",
+        "deadline:GetFleet",
+        "iam:PassRole",
+        "identitystore:ListGroupMembershipsForMember"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "deadline:DeleteFleet",
+        "deadline:GetFleet",
+        "identitystore:ListGroupMembershipsForMember"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "FarmId": {
+            "$ref": "resource-schema.json#/properties/FarmId"
+          }
+        },
+        "required": [
+          "FarmId"
+        ]
+      },
+      "permissions": [
+        "deadline:ListFleets",
+        "identitystore:DescribeGroup",
+        "identitystore:DescribeUser",
+        "identitystore:ListGroupMembershipsForMember"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "attributes": {
+    "Capabilities": {
+      "$ref": "#/definitions/FleetCapabilities"
+    },
+    "FleetId": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^fleet-[0-9a-f]{32}$  \nUpdate requires: No interruption"
+    },
+    "Status": {
+      "$ref": "#/definitions/FleetStatus"
+    },
+    "WorkerCount": {
+      "type": "integer",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+    },
+    "Arn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws[a-zA-Z-]*):deadline:[a-z0-9-]+:[0-9]+:farm/farm-[0-9a-z]{32}/fleet/fleet-[0-9a-z]{32}  \nUpdate requires: No interruption"
+    }
+  }
+}

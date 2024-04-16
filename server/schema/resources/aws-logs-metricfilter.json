@@ -1,46 +1,64 @@
 {
-  "typeName": "AWS::Logs::MetricFilter",
-  "resourceLink": {
-    "templateUri": "/cloudwatch/home?region=${awsRegion}#logsV2:log-groups/log-group/${LogGroupName}/edit-metric-filter/${MetricName}",
-    "mappings": {
-      "MetricName": "/MetricName",
-      "LogGroupName": "/LogGroupName"
-    }
-  },
-  "description": "The ``AWS::Logs::MetricFilter`` resource specifies a metric filter that describes how CWL extracts information from logs and transforms it into Amazon CloudWatch metrics. If you have multiple metric filters that are associated with a log group, all the filters are applied to the log streams in that group.\n The maximum number of metric filters that can be associated with a log group is 100.",
-  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs.git",
   "tagging": {
     "taggable": false
   },
-  "replacementStrategy": "delete_then_create",
-  "definitions": {
-    "Dimension": {
-      "description": "Specifies the CW metric dimensions to publish with this metric.\n  Because dimensions are part of the unique identifier for a metric, whenever a unique dimension name/value pair is extracted from your logs, you are creating a new variation of that metric.\n For more information about publishing dimensions with metrics created by metric filters, see [Publishing dimensions with metrics from values in JSON or space-delimited log events](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/FilterAndPatternSyntax.html#logs-metric-filters-dimensions).\n Metrics extracted from log events are charged as custom metrics. To prevent unexpected high charges, do not specify high-cardinality fields such as ``IPAddress`` or ``requestID`` as dimensions. Each different value found for a dimension is treated as a separate metric and accrues charges as a separate custom metric. \n To help prevent accidental high charges, Amazon disables a metric filter if it generates 1000 different name/value pairs for the dimensions that you have specified within a certain amount of time.\n You can also set up a billing alarm to alert you if your charges are higher than expected. For more information, see [Creating a Billing Alarm to Monitor Your Estimated Charges](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/monitor_estimated_charges_with_cloudwatch.html).",
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "Key": {
-          "type": "string",
-          "description": "The name for the CW metric dimension that the metric filter creates.\n Dimension names must contain only ASCII characters, must include at least one non-whitespace character, and cannot start with a colon (:).",
-          "minLength": 1,
-          "maxLength": 255,
-          "markdownDescription": "The name for the CW metric dimension that the metric filter creates.\n Dimension names must contain only ASCII characters, must include at least one non-whitespace character, and cannot start with a colon (:).\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption"
-        },
-        "Value": {
-          "type": "string",
-          "description": "The log event field that will contain the value for this dimension. This dimension will only be published for a metric if the value is found in the log event. For example, ``$.eventType`` for JSON log events, or ``$server`` for space-delimited log events.",
-          "minLength": 1,
-          "maxLength": 255,
-          "markdownDescription": "The log event field that will contain the value for this dimension. This dimension will only be published for a metric if the value is found in the log event. For example, ``$.eventType`` for JSON log events, or ``$server`` for space-delimited log events.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "Key",
-        "Value"
-      ],
-      "markdownDescription": "Specifies the CW metric dimensions to publish with this metric.\n  Because dimensions are part of the unique identifier for a metric, whenever a unique dimension name/value pair is extracted from your logs, you are creating a new variation of that metric.\n For more information about publishing dimensions with metrics created by metric filters, see [Publishing dimensions with metrics from values in JSON or space-delimited log events](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/FilterAndPatternSyntax.html#logs-metric-filters-dimensions).\n Metrics extracted from log events are charged as custom metrics. To prevent unexpected high charges, do not specify high-cardinality fields such as ``IPAddress`` or ``requestID`` as dimensions. Each different value found for a dimension is treated as a separate metric and accrues charges as a separate custom metric. \n To help prevent accidental high charges, Amazon disables a metric filter if it generates 1000 different name/value pairs for the dimensions that you have specified within a certain amount of time.\n You can also set up a billing alarm to alert you if your charges are higher than expected. For more information, see [Creating a Billing Alarm to Monitor Your Estimated Charges](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/monitor_estimated_charges_with_cloudwatch.html).\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+  "typeName": "AWS::Logs::MetricFilter",
+  "description": "The ``AWS::Logs::MetricFilter`` resource specifies a metric filter that describes how CWL extracts information from logs and transforms it into Amazon CloudWatch metrics. If you have multiple metric filters that are associated with a log group, all the filters are applied to the log streams in that group.\n The maximum number of metric filters that can be associated with a log group is 100.",
+  "createOnlyProperties": [
+    "/properties/FilterName",
+    "/properties/LogGroupName"
+  ],
+  "primaryIdentifier": [
+    "/properties/LogGroupName",
+    "/properties/FilterName"
+  ],
+  "required": [
+    "FilterPattern",
+    "LogGroupName",
+    "MetricTransformations"
+  ],
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs.git",
+  "handlers": {
+    "read": {
+      "permissions": [
+        "logs:DescribeMetricFilters"
+      ]
     },
+    "create": {
+      "permissions": [
+        "logs:PutMetricFilter",
+        "logs:DescribeMetricFilters"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "logs:PutMetricFilter",
+        "logs:DescribeMetricFilters"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "logs:DescribeMetricFilters"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "logs:DeleteMetricFilter"
+      ]
+    }
+  },
+  "resourceLink": {
+    "mappings": {
+      "MetricName": "/MetricName",
+      "LogGroupName": "/LogGroupName"
+    },
+    "templateUri": "/cloudwatch/home?region=${awsRegion}#logsV2:log-groups/log-group/${LogGroupName}/edit-metric-filter/${MetricName}"
+  },
+  "additionalProperties": false,
+  "definitions": {
     "MetricTransformation": {
+      "description": "``MetricTransformation`` is a property of the ``AWS::Logs::MetricFilter`` resource that describes how to transform log streams into a CloudWatch metric.",
+      "additionalProperties": false,
       "type": "object",
       "properties": {
         "DefaultValue": {
@@ -49,26 +67,38 @@
           "markdownDescription": "(Optional) The value to emit when a filter pattern does not match a log event. This value can be null.\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
         },
         "MetricName": {
+          "minLength": 1,
           "description": "The name of the CloudWatch metric.",
           "type": "string",
-          "minLength": 1,
           "maxLength": 255,
           "markdownDescription": "The name of the CloudWatch metric.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^((?![:*$])[\\x00-\\x7F]){1,255}  \nUpdate requires: No interruption"
         },
-        "MetricNamespace": {
-          "$comment": "Namespaces can be up to 256 characters long; valid characters include 0-9A-Za-z.-_/#",
-          "description": "A custom namespace to contain your metric in CloudWatch. Use namespaces to group together metrics that are similar. For more information, see [Namespaces](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html#Namespace).",
-          "type": "string",
+        "MetricValue": {
           "minLength": 1,
+          "description": "The value that is published to the CloudWatch metric. For example, if you're counting the occurrences of a particular term like ``Error``, specify 1 for the metric value. If you're counting the number of bytes transferred, reference the value that is in the log event by using $. followed by the name of the field that you specified in the filter pattern, such as ``$.size``.",
+          "type": "string",
+          "maxLength": 100,
+          "markdownDescription": "The value that is published to the CloudWatch metric. For example, if you're counting the occurrences of a particular term like ``Error``, specify 1 for the metric value. If you're counting the number of bytes transferred, reference the value that is in the log event by using $. followed by the name of the field that you specified in the filter pattern, such as ``$.size``.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: .{1,100}  \nUpdate requires: No interruption"
+        },
+        "MetricNamespace": {
+          "minLength": 1,
+          "description": "A custom namespace to contain your metric in CloudWatch. Use namespaces to group together metrics that are similar. For more information, see [Namespaces](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html#Namespace).",
+          "$comment": "Namespaces can be up to 256 characters long; valid characters include 0-9A-Za-z.-_/#",
+          "type": "string",
           "maxLength": 256,
           "markdownDescription": "A custom namespace to contain your metric in CloudWatch. Use namespaces to group together metrics that are similar. For more information, see [Namespaces](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html#Namespace).\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^[0-9a-zA-Z\\.\\-_\\/#]{1,256}  \nUpdate requires: No interruption"
         },
-        "MetricValue": {
-          "description": "The value that is published to the CloudWatch metric. For example, if you're counting the occurrences of a particular term like ``Error``, specify 1 for the metric value. If you're counting the number of bytes transferred, reference the value that is in the log event by using $. followed by the name of the field that you specified in the filter pattern, such as ``$.size``.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 100,
-          "markdownDescription": "The value that is published to the CloudWatch metric. For example, if you're counting the occurrences of a particular term like ``Error``, specify 1 for the metric value. If you're counting the number of bytes transferred, reference the value that is in the log event by using $. followed by the name of the field that you specified in the filter pattern, such as ``$.size``.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: .{1,100}  \nUpdate requires: No interruption"
+        "Dimensions": {
+          "minItems": 1,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "description": "The fields to use as dimensions for the metric. One metric filter can include as many as three dimensions.\n  Metrics extracted from log events are charged as custom metrics. To prevent unexpected high charges, do not specify high-cardinality fields such as ``IPAddress`` or ``requestID`` as dimensions. Each different value found for a dimension is treated as a separate metric and accrues charges as a separate custom metric. \n CloudWatch Logs disables a metric filter if it generates 1000 different name/value pairs for your specified dimensions within a certain amount of time. This helps to prevent accidental high charges.\n You can also set up a billing alarm to alert you if your charges are higher than expected. For more information, see [Creating a Billing Alarm to Monitor Your Estimated Charges](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/monitor_estimated_charges_with_cloudwatch.html).",
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Dimension"
+          },
+          "markdownDescription": "The fields to use as dimensions for the metric. One metric filter can include as many as three dimensions.\n  Metrics extracted from log events are charged as custom metrics. To prevent unexpected high charges, do not specify high-cardinality fields such as ``IPAddress`` or ``requestID`` as dimensions. Each different value found for a dimension is treated as a separate metric and accrues charges as a separate custom metric. \n CloudWatch Logs disables a metric filter if it generates 1000 different name/value pairs for your specified dimensions within a certain amount of time. This helps to prevent accidental high charges.\n You can also set up a billing alarm to alert you if your charges are higher than expected. For more information, see [Creating a Billing Alarm to Monitor Your Estimated Charges](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/monitor_estimated_charges_with_cloudwatch.html).\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
         },
         "Unit": {
           "description": "The unit to assign to the metric. If you omit this, the unit is set as ``None``.",
@@ -103,18 +133,6 @@
             "None"
           ],
           "markdownDescription": "The unit to assign to the metric. If you omit this, the unit is set as ``None``.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Seconds | Microseconds | Milliseconds | Bytes | Kilobytes | Megabytes | Gigabytes | Terabytes | Bits | Kilobits | Megabits | Gigabits | Terabits | Percent | Count | Bytes/Second | Kilobytes/Second | Megabytes/Second | Gigabytes/Second | Terabytes/Second | Bits/Second | Kilobits/Second | Megabits/Second | Gigabits/Second | Terabits/Second | Count/Second | None  \nUpdate requires: No interruption"
-        },
-        "Dimensions": {
-          "description": "The fields to use as dimensions for the metric. One metric filter can include as many as three dimensions.\n  Metrics extracted from log events are charged as custom metrics. To prevent unexpected high charges, do not specify high-cardinality fields such as ``IPAddress`` or ``requestID`` as dimensions. Each different value found for a dimension is treated as a separate metric and accrues charges as a separate custom metric. \n CloudWatch Logs disables a metric filter if it generates 1000 different name/value pairs for your specified dimensions within a certain amount of time. This helps to prevent accidental high charges.\n You can also set up a billing alarm to alert you if your charges are higher than expected. For more information, see [Creating a Billing Alarm to Monitor Your Estimated Charges](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/monitor_estimated_charges_with_cloudwatch.html).",
-          "type": "array",
-          "uniqueItems": true,
-          "insertionOrder": false,
-          "minItems": 1,
-          "maxItems": 3,
-          "items": {
-            "$ref": "#/definitions/Dimension"
-          },
-          "markdownDescription": "The fields to use as dimensions for the metric. One metric filter can include as many as three dimensions.\n  Metrics extracted from log events are charged as custom metrics. To prevent unexpected high charges, do not specify high-cardinality fields such as ``IPAddress`` or ``requestID`` as dimensions. Each different value found for a dimension is treated as a separate metric and accrues charges as a separate custom metric. \n CloudWatch Logs disables a metric filter if it generates 1000 different name/value pairs for your specified dimensions within a certain amount of time. This helps to prevent accidental high charges.\n You can also set up a billing alarm to alert you if your charges are higher than expected. For more information, see [Creating a Billing Alarm to Monitor Your Estimated Charges](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/monitor_estimated_charges_with_cloudwatch.html).\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
         }
       },
       "required": [
@@ -122,18 +140,47 @@
         "MetricNamespace",
         "MetricValue"
       ],
-      "additionalProperties": false,
-      "description": "``MetricTransformation`` is a property of the ``AWS::Logs::MetricFilter`` resource that describes how to transform log streams into a CloudWatch metric.",
       "markdownDescription": "``MetricTransformation`` is a property of the ``AWS::Logs::MetricFilter`` resource that describes how to transform log streams into a CloudWatch metric.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Dimension": {
+      "description": "Specifies the CW metric dimensions to publish with this metric.\n  Because dimensions are part of the unique identifier for a metric, whenever a unique dimension name/value pair is extracted from your logs, you are creating a new variation of that metric.\n For more information about publishing dimensions with metrics created by metric filters, see [Publishing dimensions with metrics from values in JSON or space-delimited log events](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/FilterAndPatternSyntax.html#logs-metric-filters-dimensions).\n  Metrics extracted from log events are charged as custom metrics. To prevent unexpected high charges, do not specify high-cardinality fields such as ``IPAddress`` or ``requestID`` as dimensions. Each different value found for a dimension is treated as a separate metric and accrues charges as a separate custom metric. \n To help prevent accidental high charges, Amazon disables a metric filter if it generates 1000 different name/value pairs for the dimensions that you have specified within a certain amount of time.\n You can also set up a billing alarm to alert you if your charges are higher than expected. For more information, see [Creating a Billing Alarm to Monitor Your Estimated Charges](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/monitor_estimated_charges_with_cloudwatch.html).",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "minLength": 1,
+          "description": "The log event field that will contain the value for this dimension. This dimension will only be published for a metric if the value is found in the log event. For example, ``$.eventType`` for JSON log events, or ``$server`` for space-delimited log events.",
+          "type": "string",
+          "maxLength": 255,
+          "markdownDescription": "The log event field that will contain the value for this dimension. This dimension will only be published for a metric if the value is found in the log event. For example, ``$.eventType`` for JSON log events, or ``$server`` for space-delimited log events.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption"
+        },
+        "Key": {
+          "minLength": 1,
+          "description": "The name for the CW metric dimension that the metric filter creates.\n Dimension names must contain only ASCII characters, must include at least one non-whitespace character, and cannot start with a colon (:).",
+          "type": "string",
+          "maxLength": 255,
+          "markdownDescription": "The name for the CW metric dimension that the metric filter creates.\n Dimension names must contain only ASCII characters, must include at least one non-whitespace character, and cannot start with a colon (:).\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "Specifies the CW metric dimensions to publish with this metric.\n  Because dimensions are part of the unique identifier for a metric, whenever a unique dimension name/value pair is extracted from your logs, you are creating a new variation of that metric.\n For more information about publishing dimensions with metrics created by metric filters, see [Publishing dimensions with metrics from values in JSON or space-delimited log events](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/FilterAndPatternSyntax.html#logs-metric-filters-dimensions).\n  Metrics extracted from log events are charged as custom metrics. To prevent unexpected high charges, do not specify high-cardinality fields such as ``IPAddress`` or ``requestID`` as dimensions. Each different value found for a dimension is treated as a separate metric and accrues charges as a separate custom metric. \n To help prevent accidental high charges, Amazon disables a metric filter if it generates 1000 different name/value pairs for the dimensions that you have specified within a certain amount of time.\n You can also set up a billing alarm to alert you if your charges are higher than expected. For more information, see [Creating a Billing Alarm to Monitor Your Estimated Charges](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/monitor_estimated_charges_with_cloudwatch.html).\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     }
   },
+  "replacementStrategy": "delete_then_create",
   "properties": {
-    "FilterName": {
-      "description": "The name of the metric filter.",
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 512,
-      "markdownDescription": "The name of the metric filter.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^[^:*]{1,512}  \nUpdate requires: Replacement"
+    "MetricTransformations": {
+      "minItems": 1,
+      "maxItems": 1,
+      "description": "The metric transformations.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/MetricTransformation"
+      },
+      "markdownDescription": "The metric transformations.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
     },
     "FilterPattern": {
       "description": "A filter pattern for extracting metric data out of ingested log events. For more information, see [Filter and Pattern Syntax](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/FilterAndPatternSyntax.html).",
@@ -142,66 +189,19 @@
       "markdownDescription": "A filter pattern for extracting metric data out of ingested log events. For more information, see [Filter and Pattern Syntax](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/FilterAndPatternSyntax.html).\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 1024  \nUpdate requires: No interruption"
     },
     "LogGroupName": {
+      "minLength": 1,
       "description": "The name of an existing log group that you want to associate with this metric filter.",
       "type": "string",
-      "minLength": 1,
       "maxLength": 512,
       "markdownDescription": "The name of an existing log group that you want to associate with this metric filter.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^[.\\-_/#A-Za-z0-9]{1,512}  \nUpdate requires: Replacement"
     },
-    "MetricTransformations": {
-      "description": "The metric transformations.",
-      "type": "array",
-      "minItems": 1,
-      "maxItems": 1,
-      "insertionOrder": false,
-      "items": {
-        "$ref": "#/definitions/MetricTransformation"
-      },
-      "markdownDescription": "The metric transformations.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+    "FilterName": {
+      "minLength": 1,
+      "description": "The name of the metric filter.",
+      "type": "string",
+      "maxLength": 512,
+      "markdownDescription": "The name of the metric filter.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^[^:*]{1,512}  \nUpdate requires: Replacement"
     }
   },
-  "handlers": {
-    "create": {
-      "permissions": [
-        "logs:PutMetricFilter",
-        "logs:DescribeMetricFilters"
-      ]
-    },
-    "read": {
-      "permissions": [
-        "logs:DescribeMetricFilters"
-      ]
-    },
-    "update": {
-      "permissions": [
-        "logs:PutMetricFilter",
-        "logs:DescribeMetricFilters"
-      ]
-    },
-    "delete": {
-      "permissions": [
-        "logs:DeleteMetricFilter"
-      ]
-    },
-    "list": {
-      "permissions": [
-        "logs:DescribeMetricFilters"
-      ]
-    }
-  },
-  "required": [
-    "FilterPattern",
-    "LogGroupName",
-    "MetricTransformations"
-  ],
-  "createOnlyProperties": [
-    "/properties/FilterName",
-    "/properties/LogGroupName"
-  ],
-  "primaryIdentifier": [
-    "/properties/LogGroupName",
-    "/properties/FilterName"
-  ],
-  "additionalProperties": false,
   "attributes": {}
 }

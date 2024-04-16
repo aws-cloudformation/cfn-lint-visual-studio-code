@@ -1,0 +1,147 @@
+{
+  "typeName": "AWS::Deadline::StorageProfile",
+  "description": "Definition of AWS::Deadline::StorageProfile Resource Type",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-deadline",
+  "definitions": {
+    "FileSystemLocation": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "maxLength": 64,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[0-9A-Za-z ]*$  \nUpdate requires: No interruption"
+        },
+        "Path": {
+          "type": "string",
+          "maxLength": 1024,
+          "minLength": 0,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 1024  \nUpdate requires: No interruption"
+        },
+        "Type": {
+          "$ref": "#/definitions/FileSystemLocationType"
+        }
+      },
+      "required": [
+        "Name",
+        "Path",
+        "Type"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "FileSystemLocationType": {
+      "type": "string",
+      "enum": [
+        "SHARED",
+        "LOCAL"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SHARED | LOCAL  \nUpdate requires: No interruption"
+    },
+    "StorageProfileOperatingSystemFamily": {
+      "type": "string",
+      "enum": [
+        "WINDOWS",
+        "LINUX",
+        "MACOS"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: WINDOWS | LINUX | MACOS  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "DisplayName": {
+      "type": "string",
+      "maxLength": 100,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nUpdate requires: No interruption"
+    },
+    "FarmId": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^farm-[0-9a-f]{32}$  \nUpdate requires: Replacement"
+    },
+    "FileSystemLocations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/FileSystemLocation"
+      },
+      "maxItems": 20,
+      "minItems": 0,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "OsFamily": {
+      "$ref": "#/definitions/StorageProfileOperatingSystemFamily"
+    }
+  },
+  "required": [
+    "DisplayName",
+    "OsFamily"
+  ],
+  "readOnlyProperties": [
+    "/properties/StorageProfileId"
+  ],
+  "createOnlyProperties": [
+    "/properties/FarmId"
+  ],
+  "primaryIdentifier": [
+    "/properties/FarmId",
+    "/properties/StorageProfileId"
+  ],
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "deadline:CreateStorageProfile",
+        "deadline:GetStorageProfile",
+        "identitystore:ListGroupMembershipsForMember"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "deadline:GetStorageProfile",
+        "identitystore:ListGroupMembershipsForMember"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "deadline:UpdateStorageProfile",
+        "deadline:GetStorageProfile",
+        "identitystore:ListGroupMembershipsForMember"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "deadline:DeleteStorageProfile",
+        "deadline:GetStorageProfile",
+        "identitystore:ListGroupMembershipsForMember"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "FarmId": {
+            "$ref": "resource-schema.json#/properties/FarmId"
+          }
+        },
+        "required": [
+          "FarmId"
+        ]
+      },
+      "permissions": [
+        "deadline:ListStorageProfiles",
+        "identitystore:ListGroupMembershipsForMember"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "attributes": {
+    "StorageProfileId": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^sp-[0-9a-f]{32}$  \nUpdate requires: No interruption"
+    }
+  }
+}
