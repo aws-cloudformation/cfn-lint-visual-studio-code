@@ -198,8 +198,11 @@ export class LanguageHandlers extends YamlLanguageHandlers {
     );
 
     if (!document) {
-      // @ts-ignore
-      return;
+      return [];
+    }
+
+    if (document.uri.endsWith(".json")) {
+      return [];
     }
 
     let [_, template] = getNode(document, {
