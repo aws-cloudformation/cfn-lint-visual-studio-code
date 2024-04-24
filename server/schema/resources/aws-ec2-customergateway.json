@@ -1,105 +1,22 @@
 {
-  "typeName": "AWS::EC2::CustomerGateway",
-  "description": "Specifies a customer gateway.",
-  "additionalProperties": false,
-  "properties": {
-    "CertificateArn": {
-      "type": "string",
-      "description": "",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws[a-zA-Z-]*)?:acm:[a-z]{2}((-gov)|(-iso(b?)))?-[a-z]+-\\d{1}:\\d{12}:certificate\\/[a-zA-Z0-9-_]+$  \nUpdate requires: Replacement"
-    },
-    "BgpAsn": {
-      "type": "integer",
-      "default": 65000,
-      "description": "For devices that support BGP, the customer gateway's BGP ASN.\n Default: 65000",
-      "markdownDescription": "For devices that support BGP, the customer gateway's BGP ASN.\n Default: 65000\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: Replacement"
-    },
-    "IpAddress": {
-      "type": "string",
-      "description": "IPv4 address for the customer gateway device's outside interface. The address must be static.",
-      "markdownDescription": "IPv4 address for the customer gateway device's outside interface. The address must be static.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
-    },
-    "Tags": {
-      "type": "array",
-      "uniqueItems": false,
-      "insertionOrder": false,
-      "items": {
-        "$ref": "#/definitions/Tag"
-      },
-      "description": "One or more tags for the customer gateway.",
-      "markdownDescription": "One or more tags for the customer gateway.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-    },
-    "Type": {
-      "type": "string",
-      "description": "The type of VPN connection that this customer gateway supports (``ipsec.1``).",
-      "markdownDescription": "The type of VPN connection that this customer gateway supports (``ipsec.1``).\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
-    },
-    "DeviceName": {
-      "type": "string",
-      "description": "The name of customer gateway device.",
-      "markdownDescription": "The name of customer gateway device.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
-    }
-  },
-  "definitions": {
-    "Tag": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "Key": {
-          "type": "string",
-          "description": "The tag key.",
-          "markdownDescription": "The tag key.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
-        },
-        "Value": {
-          "type": "string",
-          "description": "The tag value.",
-          "markdownDescription": "The tag value.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "Value",
-        "Key"
-      ],
-      "description": "Specifies a tag. For more information, see [Add tags to a resource](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Tags.html#cloudformation-add-tag-specifications).",
-      "markdownDescription": "Specifies a tag. For more information, see [Add tags to a resource](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Tags.html#cloudformation-add-tag-specifications).\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    }
-  },
-  "required": [
-    "BgpAsn",
-    "IpAddress",
-    "Type"
-  ],
-  "createOnlyProperties": [
-    "/properties/CertificateArn",
-    "/properties/BgpAsn",
-    "/properties/Type",
-    "/properties/IpAddress",
-    "/properties/DeviceName"
-  ],
-  "readOnlyProperties": [
-    "/properties/CustomerGatewayId"
-  ],
-  "primaryIdentifier": [
-    "/properties/CustomerGatewayId"
-  ],
   "tagging": {
     "taggable": true,
     "tagOnCreate": true,
     "tagUpdatable": true,
-    "cloudFormationSystemTags": true,
-    "tagProperty": "/properties/Tags"
+    "tagProperty": "/properties/Tags",
+    "cloudFormationSystemTags": true
   },
   "handlers": {
+    "read": {
+      "permissions": [
+        "ec2:DescribeCustomerGateways"
+      ]
+    },
     "create": {
       "permissions": [
         "ec2:CreateCustomerGateway",
         "ec2:DescribeCustomerGateways",
         "ec2:CreateTags"
-      ]
-    },
-    "read": {
-      "permissions": [
-        "ec2:DescribeCustomerGateways"
       ]
     },
     "update": {
@@ -109,23 +26,114 @@
         "ec2:DescribeCustomerGateways"
       ]
     },
+    "list": {
+      "permissions": [
+        "ec2:DescribeCustomerGateways"
+      ]
+    },
     "delete": {
       "permissions": [
         "ec2:DeleteCustomerGateway",
         "ec2:DescribeCustomerGateways",
         "ec2:DeleteTags"
       ]
-    },
-    "list": {
-      "permissions": [
-        "ec2:DescribeCustomerGateways"
-      ]
     }
   },
+  "typeName": "AWS::EC2::CustomerGateway",
+  "readOnlyProperties": [
+    "/properties/CustomerGatewayId"
+  ],
+  "description": "Specifies a customer gateway.",
+  "createOnlyProperties": [
+    "/properties/CertificateArn",
+    "/properties/BgpAsn",
+    "/properties/BgpAsnExtended",
+    "/properties/Type",
+    "/properties/IpAddress",
+    "/properties/DeviceName"
+  ],
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/CustomerGatewayId"
+  ],
+  "definitions": {
+    "Tag": {
+      "description": "Specifies a tag. For more information, see [Add tags to a resource](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Tags.html#cloudformation-add-tag-specifications).",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "description": "The tag value.",
+          "type": "string",
+          "markdownDescription": "The tag value.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Key": {
+          "description": "The tag key.",
+          "type": "string",
+          "markdownDescription": "The tag key.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ],
+      "markdownDescription": "Specifies a tag. For more information, see [Add tags to a resource](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Tags.html#cloudformation-add-tag-specifications).\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "Type": {
+      "description": "The type of VPN connection that this customer gateway supports (``ipsec.1``).",
+      "type": "string",
+      "markdownDescription": "The type of VPN connection that this customer gateway supports (``ipsec.1``).\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
+    },
+    "IpAddress": {
+      "description": "IPv4 address for the customer gateway device's outside interface. The address must be static.",
+      "type": "string",
+      "markdownDescription": "IPv4 address for the customer gateway device's outside interface. The address must be static.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
+    },
+    "BgpAsnExtended": {
+      "multipleOf": 1,
+      "maximum": 4294967294,
+      "description": "",
+      "type": "number",
+      "minimum": 2147483648,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: Replacement"
+    },
+    "BgpAsn": {
+      "default": 65000,
+      "description": "For devices that support BGP, the customer gateway's BGP ASN.\n Default: 65000",
+      "type": "integer",
+      "markdownDescription": "For devices that support BGP, the customer gateway's BGP ASN.\n Default: 65000\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: Replacement"
+    },
+    "Tags": {
+      "uniqueItems": false,
+      "description": "One or more tags for the customer gateway.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "One or more tags for the customer gateway.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "CertificateArn": {
+      "description": "",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws[a-zA-Z-]*)?:acm:[a-z]{2}((-gov)|(-iso(b?)))?-[a-z]+-\\d{1}:\\d{12}:certificate\\/[a-zA-Z0-9-_]+$  \nUpdate requires: Replacement"
+    },
+    "DeviceName": {
+      "description": "The name of customer gateway device.",
+      "type": "string",
+      "markdownDescription": "The name of customer gateway device.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    }
+  },
+  "required": [
+    "IpAddress",
+    "Type"
+  ],
   "attributes": {
     "CustomerGatewayId": {
-      "type": "string",
       "description": "",
+      "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     }
   }
