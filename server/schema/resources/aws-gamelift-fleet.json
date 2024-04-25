@@ -8,6 +8,7 @@
   "taggable": true,
   "typeName": "AWS::GameLift::Fleet",
   "readOnlyProperties": [
+    "/properties/ContainerGroupsConfiguration/ContainerGroupsPerInstance/MaxReplicaContainerGroupsPerInstance",
     "/properties/FleetId"
   ],
   "description": "The AWS::GameLift::Fleet resource creates an Amazon GameLift (GameLift) fleet to host game servers. A fleet is a set of EC2 or Anywhere instances, each of which can host multiple game sessions.",
@@ -15,6 +16,7 @@
     "/properties/ApplyCapacity",
     "/properties/BuildId",
     "/properties/CertificateConfiguration",
+    "/properties/ContainerGroupsConfiguration",
     "/properties/EC2InstanceType",
     "/properties/FleetType",
     "/properties/InstanceRoleARN",
@@ -208,6 +210,32 @@
       ],
       "markdownDescription": "Rule that controls how a fleet is scaled. Scaling policies are uniquely identified by the combination of name and fleet ID.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
+    "ConnectionPortRange": {
+      "description": "Defines the range of ports on the instance that allow inbound traffic to connect with containers in a fleet.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "FromPort": {
+          "description": "A starting value for a range of allowed port numbers.",
+          "maximum": 60000,
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "A starting value for a range of allowed port numbers.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "ToPort": {
+          "description": "An ending value for a range of allowed port numbers. Port numbers are end-inclusive. This value must be higher than FromPort.",
+          "maximum": 60000,
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "An ending value for a range of allowed port numbers. Port numbers are end-inclusive. This value must be higher than FromPort.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "FromPort",
+        "ToPort"
+      ],
+      "markdownDescription": "Defines the range of ports on the instance that allow inbound traffic to connect with containers in a fleet.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "ServerProcess": {
       "description": "A set of instructions for launching server processes on each instance in a fleet. Each instruction set identifies the location of the server executable, optional launch parameters, and the number of server processes with this configuration to maintain concurrently on the instance. Server process configurations make up a fleet's RuntimeConfiguration.",
       "additionalProperties": false,
@@ -255,6 +283,38 @@
         "TargetValue"
       ],
       "markdownDescription": "Settings for a target-based scaling policy. A target-based policy tracks a particular fleet metric specifies a target value for the metric. As player usage changes, the policy triggers Amazon GameLift to adjust capacity so that the metric returns to the target value. The target configuration specifies settings as needed for the target based policy, including the target value.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ContainerGroupsConfiguration": {
+      "description": "Specifies container groups that this instance will hold. You must specify exactly one replica group. Optionally, you may specify exactly one daemon group. You can't change this property after you create the fleet.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ConnectionPortRange": {
+          "$ref": "#/definitions/ConnectionPortRange"
+        },
+        "ContainerGroupDefinitionNames": {
+          "minItems": 1,
+          "maxItems": 2,
+          "description": "The names of the container group definitions that will be created in an instance. You must specify exactly one REPLICA container group. You have the option to also specify one DAEMON container group.",
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "minLength": 1,
+            "type": "string",
+            "maxLength": 128,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9\\-]+$  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "The names of the container group definitions that will be created in an instance. You must specify exactly one REPLICA container group. You have the option to also specify one DAEMON container group.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ContainerGroupsPerInstance": {
+          "$ref": "#/definitions/ContainerGroupsPerInstance"
+        }
+      },
+      "required": [
+        "ContainerGroupDefinitionNames",
+        "ConnectionPortRange"
+      ],
+      "markdownDescription": "Specifies container groups that this instance will hold. You must specify exactly one replica group. Optionally, you may specify exactly one daemon group. You can't change this property after you create the fleet.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "RuntimeConfiguration": {
       "description": "A collection of server process configurations that describe the processes to run on each instance in a fleet. All fleets must have a runtime configuration. Each instance in the fleet maintains server processes as specified in the runtime configuration, launching new ones as existing processes end. Each instance regularly checks for an updated runtime configuration makes adjustments as called for.\n\nThe runtime configuration enables the instances in a fleet to run multiple processes simultaneously. Potential scenarios are as follows: (1) Run multiple processes of a single game server executable to maximize usage of your hosting resources. (2) Run one or more processes of different executables, such as your game server and a metrics tracking program. (3) Run multiple processes of a single game server but with different launch parameters, for example to run one process on each instance in debug mode.\n\nAn Amazon GameLift instance is limited to 50 processes running simultaneously. A runtime configuration must specify fewer than this limit. To calculate the total number of processes specified in a runtime configuration, add the values of the ConcurrentExecutions parameter for each ServerProcess object in the runtime configuration.",
@@ -392,6 +452,28 @@
       ],
       "markdownDescription": "Information about the use of a TLS/SSL certificate for a fleet. TLS certificate generation is enabled at the fleet level, with one certificate generated for the fleet. When this feature is enabled, the certificate can be retrieved using the GameLift Server SDK call GetInstanceCertificate. All instances in a fleet share the same certificate.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
+    "ContainerGroupsPerInstance": {
+      "description": "The number of container groups per instance.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "MaxReplicaContainerGroupsPerInstance": {
+          "description": "GameLift calculates the maximum number of replica container groups it can launch per instance based on instance properties such as CPU, memory, and connection ports.",
+          "maximum": 5000,
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "GameLift calculates the maximum number of replica container groups it can launch per instance based on instance properties such as CPU, memory, and connection ports.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "DesiredReplicaContainerGroupsPerInstance": {
+          "description": "Use this parameter to override the number of replica container groups GameLift will launch per instance with a number that is lower than that calculated maximum.",
+          "maximum": 5000,
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "Use this parameter to override the number of replica container groups GameLift will launch per instance with a number that is lower than that calculated maximum.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "The number of container groups per instance.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "IpPermission": {
       "description": "A range of IP addresses and port settings that allow inbound traffic to connect to server processes on an Amazon GameLift hosting resource. New game sessions that are started on the fleet are assigned an IP address/port number combination, which must fall into the fleet's allowed ranges. For fleets created with a custom game server, the ranges reflect the server's game session assignments. For Realtime Servers fleets, Amazon GameLift automatically opens two port ranges, one for TCP messaging and one for UDP, for use by the Realtime servers.",
       "additionalProperties": false,
@@ -485,14 +567,18 @@
       },
       "markdownDescription": "A range of IP addresses and port settings that allow inbound traffic to connect to server processes on an Amazon GameLift server.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     },
+    "ContainerGroupsConfiguration": {
+      "$ref": "#/definitions/ContainerGroupsConfiguration"
+    },
     "ComputeType": {
       "description": "ComputeType to differentiate EC2 hardware managed by GameLift and Anywhere hardware managed by the customer.",
       "type": "string",
       "enum": [
         "EC2",
-        "ANYWHERE"
+        "ANYWHERE",
+        "CONTAINER"
       ],
-      "markdownDescription": "ComputeType to differentiate EC2 hardware managed by GameLift and Anywhere hardware managed by the customer.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: EC2 | ANYWHERE  \nUpdate requires: Replacement"
+      "markdownDescription": "ComputeType to differentiate EC2 hardware managed by GameLift and Anywhere hardware managed by the customer.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: EC2 | ANYWHERE | CONTAINER  \nUpdate requires: Replacement"
     },
     "Name": {
       "minLength": 1,
