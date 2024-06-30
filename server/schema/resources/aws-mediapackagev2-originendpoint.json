@@ -2,6 +2,14 @@
   "typeName": "AWS::MediaPackageV2::OriginEndpoint",
   "description": "<p>Represents an origin endpoint that is associated with a channel, offering a dynamically repackaged version of its content through various streaming media protocols. The content can be efficiently disseminated to end-users via a Content Delivery Network (CDN), like Amazon CloudFront.</p>",
   "definitions": {
+    "AdMarkerDash": {
+      "type": "string",
+      "enum": [
+        "BINARY",
+        "XML"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: BINARY | XML  \nUpdate requires: No interruption"
+    },
     "AdMarkerHls": {
       "type": "string",
       "enum": [
@@ -24,6 +32,60 @@
         "CMAF"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: TS | CMAF  \nUpdate requires: No interruption"
+    },
+    "DashDrmSignaling": {
+      "type": "string",
+      "enum": [
+        "INDIVIDUAL",
+        "REFERENCED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: INDIVIDUAL | REFERENCED  \nUpdate requires: No interruption"
+    },
+    "DashPeriodTrigger": {
+      "type": "string",
+      "enum": [
+        "AVAILS",
+        "DRM_KEY_ROTATION",
+        "SOURCE_CHANGES",
+        "SOURCE_DISRUPTIONS",
+        "NONE"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AVAILS | DRM_KEY_ROTATION | SOURCE_CHANGES | SOURCE_DISRUPTIONS | NONE  \nUpdate requires: No interruption"
+    },
+    "DashSegmentTemplateFormat": {
+      "type": "string",
+      "enum": [
+        "NUMBER_WITH_TIMELINE"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: NUMBER_WITH_TIMELINE  \nUpdate requires: No interruption"
+    },
+    "DashUtcTiming": {
+      "type": "object",
+      "description": "<p>Determines the type of UTC timing included in the DASH Media Presentation Description (MPD).</p>",
+      "properties": {
+        "TimingMode": {
+          "$ref": "#/definitions/DashUtcTimingMode"
+        },
+        "TimingSource": {
+          "type": "string",
+          "maxLength": 1024,
+          "minLength": 1,
+          "description": "<p>The the method that the player uses to synchronize to coordinated universal time (UTC) wall clock time.</p>",
+          "markdownDescription": "<p>The the method that the player uses to synchronize to coordinated universal time (UTC) wall clock time.</p>\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "<p>Determines the type of UTC timing included in the DASH Media Presentation Description (MPD).</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "DashUtcTimingMode": {
+      "type": "string",
+      "enum": [
+        "HTTP_HEAD",
+        "HTTP_ISO",
+        "HTTP_XSDATE",
+        "UTC_DIRECT"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: HTTP_HEAD | HTTP_ISO | HTTP_XSDATE | UTC_DIRECT  \nUpdate requires: No interruption"
     },
     "DrmSystem": {
       "type": "string",
@@ -132,6 +194,69 @@
       },
       "additionalProperties": false,
       "markdownDescription": "<p>Filter configuration includes settings for manifest filtering, start and end times, and time delay that apply to all of your egress requests for this manifest. </p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "DashManifestConfiguration": {
+      "type": "object",
+      "description": "<p>Retrieve the DASH manifest configuration.</p>",
+      "properties": {
+        "ManifestName": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 1,
+          "description": "<p>A short string that's appended to the endpoint URL. The manifest name creates a unique path to this endpoint. If you don't enter a value, MediaPackage uses the default manifest name, index. </p>",
+          "markdownDescription": "<p>A short string that's appended to the endpoint URL. The manifest name creates a unique path to this endpoint. If you don't enter a value, MediaPackage uses the default manifest name, index. </p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^[a-zA-Z0-9_-]+$  \nUpdate requires: No interruption"
+        },
+        "ManifestWindowSeconds": {
+          "type": "integer",
+          "description": "<p>The total duration (in seconds) of the manifest's content.</p>",
+          "markdownDescription": "<p>The total duration (in seconds) of the manifest's content.</p>\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "FilterConfiguration": {
+          "$ref": "#/definitions/FilterConfiguration"
+        },
+        "MinUpdatePeriodSeconds": {
+          "type": "integer",
+          "description": "<p>Minimum amount of time (in seconds) that the player should wait before requesting updates to the manifest.</p>",
+          "markdownDescription": "<p>Minimum amount of time (in seconds) that the player should wait before requesting updates to the manifest.</p>\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "MinBufferTimeSeconds": {
+          "type": "integer",
+          "description": "<p>Minimum amount of content (in seconds) that a player must keep available in the buffer.</p>",
+          "markdownDescription": "<p>Minimum amount of content (in seconds) that a player must keep available in the buffer.</p>\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "SuggestedPresentationDelaySeconds": {
+          "type": "integer",
+          "description": "<p>The amount of time (in seconds) that the player should be from the end of the manifest.</p>",
+          "markdownDescription": "<p>The amount of time (in seconds) that the player should be from the end of the manifest.</p>\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "SegmentTemplateFormat": {
+          "$ref": "#/definitions/DashSegmentTemplateFormat"
+        },
+        "PeriodTriggers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DashPeriodTrigger"
+          },
+          "maxItems": 100,
+          "minItems": 0,
+          "description": "<p>A list of triggers that controls when AWS Elemental MediaPackage separates the MPEG-DASH manifest into multiple periods. Leave this value empty to indicate that the manifest is contained all in one period.\n         For more information about periods in the DASH manifest, see <a href=\"https://docs.aws.amazon.com/mediapackage/latest/userguide/multi-period.html\">Multi-period DASH in AWS Elemental MediaPackage</a>.</p>",
+          "markdownDescription": "<p>A list of triggers that controls when AWS Elemental MediaPackage separates the MPEG-DASH manifest into multiple periods. Leave this value empty to indicate that the manifest is contained all in one period.\n         For more information about periods in the DASH manifest, see <a href=\"https://docs.aws.amazon.com/mediapackage/latest/userguide/multi-period.html\">Multi-period DASH in AWS Elemental MediaPackage</a>.</p>\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ScteDash": {
+          "$ref": "#/definitions/ScteDash"
+        },
+        "DrmSignaling": {
+          "$ref": "#/definitions/DashDrmSignaling"
+        },
+        "UtcTiming": {
+          "$ref": "#/definitions/DashUtcTiming"
+        }
+      },
+      "required": [
+        "ManifestName"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "<p>Retrieve the DASH manifest configuration.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "HlsManifestConfiguration": {
       "type": "object",
@@ -265,6 +390,17 @@
           "minItems": 0,
           "description": "<p>The SCTE-35 message types that you want to be treated as ad markers in the output.</p>",
           "markdownDescription": "<p>The SCTE-35 message types that you want to be treated as ad markers in the output.</p>\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "<p>The SCTE configuration.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ScteDash": {
+      "type": "object",
+      "description": "<p>The SCTE configuration.</p>",
+      "properties": {
+        "AdMarkerDash": {
+          "$ref": "#/definitions/AdMarkerDash"
         }
       },
       "additionalProperties": false,
@@ -428,6 +564,14 @@
     "ContainerType": {
       "$ref": "#/definitions/ContainerType"
     },
+    "DashManifests": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/DashManifestConfiguration"
+      },
+      "description": "<p>A DASH manifest configuration.</p>",
+      "markdownDescription": "<p>A DASH manifest configuration.</p>\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
     "Description": {
       "type": "string",
       "maxLength": 1024,
@@ -484,6 +628,9 @@
   "readOnlyProperties": [
     "/properties/Arn",
     "/properties/CreatedAt",
+    "/properties/DashManifestUrls",
+    "/properties/HlsManifestUrls",
+    "/properties/LowLatencyHlsManifestUrls",
     "/properties/ModifiedAt",
     "/properties/LowLatencyHlsManifests/*/Url",
     "/properties/HlsManifests/*/Url"
@@ -577,6 +724,30 @@
       "description": "<p>The date and time the origin endpoint was modified.</p>",
       "format": "date-time",
       "markdownDescription": "<p>The date and time the origin endpoint was modified.</p>\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "DashManifestUrls": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "HlsManifestUrls": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "LowLatencyHlsManifestUrls": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     }
   }
 }

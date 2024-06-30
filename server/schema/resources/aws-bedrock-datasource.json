@@ -52,9 +52,10 @@
       "description": "The status of a data source.",
       "enum": [
         "AVAILABLE",
-        "DELETING"
+        "DELETING",
+        "DELETE_UNSUCCESSFUL"
       ],
-      "markdownDescription": "The status of a data source.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AVAILABLE | DELETING  \nUpdate requires: No interruption"
+      "markdownDescription": "The status of a data source.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AVAILABLE | DELETING | DELETE_UNSUCCESSFUL  \nUpdate requires: No interruption"
     },
     "DataSourceType": {
       "type": "string",
@@ -63,6 +64,15 @@
         "S3"
       ],
       "markdownDescription": "The type of the data source location.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: S3  \nUpdate requires: No interruption"
+    },
+    "DataDeletionPolicy": {
+      "type": "string",
+      "description": "The deletion policy for the data source.",
+      "enum": [
+        "RETAIN",
+        "DELETE"
+      ],
+      "markdownDescription": "The deletion policy for the data source.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: RETAIN | DELETE  \nUpdate requires: No interruption"
     },
     "FixedSizeChunkingConfiguration": {
       "type": "object",
@@ -114,6 +124,13 @@
           "description": "A list of S3 prefixes that define the object containing the data sources.",
           "insertionOrder": false,
           "markdownDescription": "A list of S3 prefixes that define the object containing the data sources.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "BucketOwnerAccountId": {
+          "type": "string",
+          "maxLength": 12,
+          "minLength": 12,
+          "description": "The account ID for the owner of the S3 bucket.",
+          "markdownDescription": "The account ID for the owner of the S3 bucket.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 12  \nMaximum Length: 12  \nPattern: ^[0-9]{12}$  \nUpdate requires: No interruption"
         }
       },
       "required": [
@@ -175,6 +192,9 @@
     },
     "VectorIngestionConfiguration": {
       "$ref": "#/definitions/VectorIngestionConfiguration"
+    },
+    "DataDeletionPolicy": {
+      "$ref": "#/definitions/DataDeletionPolicy"
     }
   },
   "required": [
@@ -186,7 +206,8 @@
     "/properties/DataSourceId",
     "/properties/DataSourceStatus",
     "/properties/CreatedAt",
-    "/properties/UpdatedAt"
+    "/properties/UpdatedAt",
+    "/properties/FailureReasons"
   ],
   "createOnlyProperties": [
     "/properties/KnowledgeBaseId",
@@ -260,6 +281,19 @@
       "type": "string",
       "description": "The time at which the knowledge base was last updated.",
       "markdownDescription": "The time at which the knowledge base was last updated.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "FailureReasons": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 2048,
+        "description": "Failure Reason for Error.",
+        "markdownDescription": "Failure Reason for Error.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nUpdate requires: No interruption"
+      },
+      "maxItems": 2048,
+      "description": "The details of the failure reasons related to the data source.",
+      "insertionOrder": false,
+      "markdownDescription": "The details of the failure reasons related to the data source.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     }
   }
 }

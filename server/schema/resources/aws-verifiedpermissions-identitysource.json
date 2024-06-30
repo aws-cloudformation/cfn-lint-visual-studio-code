@@ -51,18 +51,34 @@
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "IdentitySourceConfiguration": {
-      "type": "object",
-      "title": "CognitoUserPoolConfiguration",
-      "properties": {
-        "CognitoUserPoolConfiguration": {
-          "$ref": "#/definitions/CognitoUserPoolConfiguration"
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "CognitoUserPoolConfiguration",
+          "properties": {
+            "CognitoUserPoolConfiguration": {
+              "$ref": "#/definitions/CognitoUserPoolConfiguration"
+            }
+          },
+          "required": [
+            "CognitoUserPoolConfiguration"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "OpenIdConnectConfiguration",
+          "properties": {
+            "OpenIdConnectConfiguration": {
+              "$ref": "#/definitions/OpenIdConnectConfiguration"
+            }
+          },
+          "required": [
+            "OpenIdConnectConfiguration"
+          ],
+          "additionalProperties": false
         }
-      },
-      "required": [
-        "CognitoUserPoolConfiguration"
-      ],
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+      ]
     },
     "IdentitySourceDetails": {
       "type": "object",
@@ -98,6 +114,139 @@
       },
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "OpenIdConnectAccessTokenConfiguration": {
+      "type": "object",
+      "properties": {
+        "PrincipalIdClaim": {
+          "type": "string",
+          "default": "sub",
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nUpdate requires: No interruption"
+        },
+        "Audiences": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption"
+          },
+          "maxItems": 255,
+          "minItems": 1,
+          "insertionOrder": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "OpenIdConnectConfiguration": {
+      "type": "object",
+      "properties": {
+        "Issuer": {
+          "type": "string",
+          "maxLength": 2048,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^https://.*$  \nUpdate requires: No interruption"
+        },
+        "EntityIdPrefix": {
+          "type": "string",
+          "maxLength": 100,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nUpdate requires: No interruption"
+        },
+        "GroupConfiguration": {
+          "$ref": "#/definitions/OpenIdConnectGroupConfiguration"
+        },
+        "TokenSelection": {
+          "$ref": "#/definitions/OpenIdConnectTokenSelection"
+        }
+      },
+      "required": [
+        "Issuer",
+        "TokenSelection"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "OpenIdConnectGroupConfiguration": {
+      "type": "object",
+      "properties": {
+        "GroupClaim": {
+          "type": "string",
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nUpdate requires: No interruption"
+        },
+        "GroupEntityType": {
+          "type": "string",
+          "maxLength": 200,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 200  \nPattern: ^([_a-zA-Z][_a-zA-Z0-9]*::)*[_a-zA-Z][_a-zA-Z0-9]*$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "GroupClaim",
+        "GroupEntityType"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "OpenIdConnectIdentityTokenConfiguration": {
+      "type": "object",
+      "properties": {
+        "PrincipalIdClaim": {
+          "type": "string",
+          "default": "sub",
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nUpdate requires: No interruption"
+        },
+        "ClientIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^.*$  \nUpdate requires: No interruption"
+          },
+          "maxItems": 1000,
+          "minItems": 0,
+          "insertionOrder": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "OpenIdConnectTokenSelection": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "AccessTokenOnly",
+          "properties": {
+            "AccessTokenOnly": {
+              "$ref": "#/definitions/OpenIdConnectAccessTokenConfiguration"
+            }
+          },
+          "required": [
+            "AccessTokenOnly"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "IdentityTokenOnly",
+          "properties": {
+            "IdentityTokenOnly": {
+              "$ref": "#/definitions/OpenIdConnectIdentityTokenConfiguration"
+            }
+          },
+          "required": [
+            "IdentityTokenOnly"
+          ],
+          "additionalProperties": false
+        }
+      ]
     },
     "OpenIdIssuer": {
       "type": "string",
