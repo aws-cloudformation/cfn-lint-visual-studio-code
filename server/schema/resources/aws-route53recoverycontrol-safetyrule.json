@@ -2,7 +2,6 @@
   "typeName": "AWS::Route53RecoveryControl::SafetyRule",
   "description": "Resource schema for AWS Route53 Recovery Control basic constructs and validation rules.",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-route53-recovery-control.git",
-  "taggable": true,
   "definitions": {
     "SafetyRuleName": {
       "description": "The name for the safety rule.",
@@ -81,7 +80,7 @@
         "GatingControls"
       ],
       "additionalProperties": false,
-      "markdownDescription": "A gating rule verifies that a set of gating controls evaluates as true, based on a rule configuration that you specify. If the gating rule evaluates to true, Amazon Route 53 Application Recovery Controller allows a set of routing control state changes to run and complete against the set of target controls.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+      "markdownDescription": "A gating rule verifies that a set of gating controls evaluates as true, based on a rule configuration that you specify. If the gating rule evaluates to true, Amazon Route 53 Application Recovery Controller allows a set of routing control state changes to run and complete against the set of target controls.\n\n---\n\nRequired: No  \nUpdate requires: Some interruptions"
     },
     "AssertionRule": {
       "description": "An assertion rule enforces that, when a routing control state is changed, that the criteria set by the rule configuration is met. Otherwise, the change to the routing control is not accepted.",
@@ -108,7 +107,7 @@
         "WaitPeriodMs"
       ],
       "additionalProperties": false,
-      "markdownDescription": "An assertion rule enforces that, when a routing control state is changed, that the criteria set by the rule configuration is met. Otherwise, the change to the routing control is not accepted.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+      "markdownDescription": "An assertion rule enforces that, when a routing control state is changed, that the criteria set by the rule configuration is met. Otherwise, the change to the routing control is not accepted.\n\n---\n\nRequired: No  \nUpdate requires: Some interruptions"
     },
     "Tag": {
       "type": "object",
@@ -146,7 +145,7 @@
     "ControlPanelArn": {
       "description": "The Amazon Resource Name (ARN) of the control panel.",
       "type": "string",
-      "markdownDescription": "The Amazon Resource Name (ARN) of the control panel.\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: Replacement"
+      "markdownDescription": "The Amazon Resource Name (ARN) of the control panel.\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: Some interruptions"
     },
     "RuleConfig": {
       "$ref": "#/definitions/RuleConfig"
@@ -159,7 +158,7 @@
         "maxItems": 20
       },
       "insertionOrder": false,
-      "markdownDescription": "A collection of tags associated with a resource\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement"
+      "markdownDescription": "A collection of tags associated with a resource\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Some interruptions"
     }
   },
   "oneOf": [
@@ -182,11 +181,13 @@
   ],
   "required": [],
   "additionalProperties": false,
-  "createOnlyProperties": [
+  "conditionalCreateOnlyProperties": [
     "/properties/ControlPanelArn",
     "/properties/RuleConfig",
-    "/properties/ControlPanelArn",
-    "/properties/Tags"
+    "/properties/Tags",
+    "/properties/AssertionRule/AssertedControls",
+    "/properties/GatingRule/GatingControls",
+    "/properties/GatingRule/TargetControls"
   ],
   "writeOnlyProperties": [
     "/properties/Tags"
@@ -245,6 +246,13 @@
         "route53-recovery-control-config:ListSafetyRules"
       ]
     }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "tagProperty": "/properties/Tags",
+    "cloudFormationSystemTags": false
   },
   "attributes": {
     "SafetyRuleArn": {

@@ -1,106 +1,78 @@
 {
-  "typeName": "AWS::Redshift::EndpointAccess",
-  "description": "Resource schema for a Redshift-managed VPC endpoint.",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-redshift",
-  "definitions": {
-    "VpcSecurityGroup": {
-      "description": "Describes the members of a VPC security group.",
-      "type": "object",
-      "properties": {
-        "VpcSecurityGroupId": {
-          "type": "string",
-          "description": "The identifier of the VPC security group.",
-          "markdownDescription": "The identifier of the VPC security group.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "Status": {
-          "type": "string",
-          "description": "The status of the VPC security group.",
-          "markdownDescription": "The status of the VPC security group.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "Describes the members of a VPC security group.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "NetworkInterface": {
-      "description": "Describes a network interface.",
-      "type": "object",
-      "properties": {
-        "NetworkInterfaceId": {
-          "type": "string",
-          "description": "The network interface identifier.",
-          "markdownDescription": "The network interface identifier.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "SubnetId": {
-          "type": "string",
-          "description": "The subnet identifier.",
-          "markdownDescription": "The subnet identifier.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "PrivateIpAddress": {
-          "type": "string",
-          "description": "The IPv4 address of the network interface within the subnet.",
-          "markdownDescription": "The IPv4 address of the network interface within the subnet.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "AvailabilityZone": {
-          "type": "string",
-          "description": "The Availability Zone.",
-          "markdownDescription": "The Availability Zone.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "Describes a network interface.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    }
-  },
-  "properties": {
-    "ClusterIdentifier": {
-      "description": "A unique identifier for the cluster. You use this identifier to refer to the cluster for any subsequent cluster operations such as deleting or modifying. All alphabetical characters must be lower case, no hypens at the end, no two consecutive hyphens. Cluster name should be unique for all clusters within an AWS account",
-      "type": "string",
-      "markdownDescription": "A unique identifier for the cluster. You use this identifier to refer to the cluster for any subsequent cluster operations such as deleting or modifying. All alphabetical characters must be lower case, no hypens at the end, no two consecutive hyphens. Cluster name should be unique for all clusters within an AWS account\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
-    },
-    "ResourceOwner": {
-      "description": "The AWS account ID of the owner of the cluster.",
-      "type": "string",
-      "markdownDescription": "The AWS account ID of the owner of the cluster.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^\\d{12}$  \nUpdate requires: Replacement"
-    },
-    "EndpointName": {
-      "description": "The name of the endpoint.",
-      "type": "string",
-      "markdownDescription": "The name of the endpoint.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^(?=^[a-z][a-z0-9]*(-[a-z0-9]+)*$).{1,30}$  \nUpdate requires: Replacement"
-    },
-    "SubnetGroupName": {
-      "description": "The subnet group name where Amazon Redshift chooses to deploy the endpoint.",
-      "type": "string",
-      "markdownDescription": "The subnet group name where Amazon Redshift chooses to deploy the endpoint.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^(?=^[a-zA-Z0-9-]+$).{1,255}$  \nUpdate requires: Replacement"
-    },
-    "VpcSecurityGroupIds": {
-      "description": "A list of vpc security group ids to apply to the created endpoint access.",
-      "type": "array",
-      "insertionOrder": false,
-      "items": {
-        "type": "string",
-        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-      },
-      "markdownDescription": "A list of vpc security group ids to apply to the created endpoint access.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
-    }
-  },
   "tagging": {
     "taggable": false
   },
-  "additionalProperties": false,
-  "required": [
-    "ClusterIdentifier",
-    "SubnetGroupName",
-    "EndpointName",
-    "VpcSecurityGroupIds"
-  ],
-  "primaryIdentifier": [
-    "/properties/EndpointName"
-  ],
-  "createOnlyProperties": [
-    "/properties/EndpointName",
-    "/properties/ClusterIdentifier",
-    "/properties/ResourceOwner",
-    "/properties/SubnetGroupName"
-  ],
+  "handlers": {
+    "read": {
+      "permissions": [
+        "redshift:DescribeEndpointAccess",
+        "ec2:DescribeClientVpnEndpoints",
+        "ec2:DescribeVpcEndpoint",
+        "ec2:DescribeVpcAttribute",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeAddresses",
+        "ec2:DescribeInternetGateways",
+        "ec2:DescribeSubnets"
+      ]
+    },
+    "create": {
+      "permissions": [
+        "redshift:CreateEndpointAccess",
+        "redshift:DescribeEndpointAccess",
+        "ec2:CreateClientVpnEndpoint",
+        "ec2:CreateVpcEndpoint",
+        "ec2:DescribeVpcAttribute",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeAddresses",
+        "ec2:DescribeInternetGateways",
+        "ec2:DescribeSubnets"
+      ],
+      "timeoutInMinutes": 60
+    },
+    "update": {
+      "permissions": [
+        "redshift:DescribeEndpointAccess",
+        "redshift:ModifyEndpointAccess",
+        "ec2:ModifyClientVpnEndpoint",
+        "ec2:ModifyVpcEndpoint",
+        "ec2:DescribeVpcAttribute",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeAddresses",
+        "ec2:DescribeInternetGateways",
+        "ec2:DescribeSubnets"
+      ],
+      "timeoutInMinutes": 60
+    },
+    "list": {
+      "permissions": [
+        "redshift:DescribeEndpointAccess",
+        "ec2:DescribeClientVpnEndpoints",
+        "ec2:DescribeVpcEndpoints",
+        "ec2:DescribeVpcAttribute",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeAddresses",
+        "ec2:DescribeInternetGateways",
+        "ec2:DescribeSubnets"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "redshift:DeleteEndpointAccess",
+        "redshift:DescribeEndpointAccess",
+        "ec2:DeleteClientVpnEndpoint",
+        "ec2:DeleteVpcEndpoint",
+        "ec2:DescribeVpcAttribute",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeAddresses",
+        "ec2:DescribeInternetGateways",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeVpcEndpoint"
+      ],
+      "timeoutInMinutes": 60
+    }
+  },
+  "typeName": "AWS::Redshift::EndpointAccess",
   "readOnlyProperties": [
     "/properties/Address",
     "/properties/EndpointStatus",
@@ -117,131 +89,183 @@
     "/properties/VpcEndpoint/NetworkInterfaces/*/SubnetId",
     "/properties/VpcEndpoint/NetworkInterfaces/*/AvailabilityZone"
   ],
-  "handlers": {
-    "create": {
-      "permissions": [
-        "redshift:CreateEndpointAccess",
-        "redshift:DescribeEndpointAccess",
-        "ec2:CreateClientVpnEndpoint",
-        "ec2:CreateVpcEndpoint",
-        "ec2:DescribeVpcAttribute",
-        "ec2:DescribeSecurityGroups",
-        "ec2:DescribeAddresses",
-        "ec2:DescribeInternetGateways",
-        "ec2:DescribeSubnets"
-      ],
-      "timeoutInMinutes": 60
+  "description": "Resource schema for a Redshift-managed VPC endpoint.",
+  "createOnlyProperties": [
+    "/properties/EndpointName",
+    "/properties/ClusterIdentifier",
+    "/properties/ResourceOwner",
+    "/properties/SubnetGroupName"
+  ],
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/EndpointName"
+  ],
+  "definitions": {
+    "VpcSecurityGroup": {
+      "description": "Describes the members of a VPC security group.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Status": {
+          "description": "The status of the VPC security group.",
+          "type": "string",
+          "markdownDescription": "The status of the VPC security group.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "VpcSecurityGroupId": {
+          "relationshipRef": {
+            "typeName": "AWS::EC2::SecurityGroup",
+            "propertyPath": "/properties/Id"
+          },
+          "description": "The identifier of the VPC security group.",
+          "type": "string",
+          "markdownDescription": "The identifier of the VPC security group.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "Describes the members of a VPC security group.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
-    "read": {
-      "permissions": [
-        "redshift:DescribeEndpointAccess",
-        "ec2:DescribeClientVpnEndpoints",
-        "ec2:DescribeVpcEndpoint",
-        "ec2:DescribeVpcAttribute",
-        "ec2:DescribeSecurityGroups",
-        "ec2:DescribeAddresses",
-        "ec2:DescribeInternetGateways",
-        "ec2:DescribeSubnets"
-      ]
-    },
-    "update": {
-      "permissions": [
-        "redshift:DescribeEndpointAccess",
-        "redshift:ModifyEndpointAccess",
-        "ec2:ModifyClientVpnEndpoint",
-        "ec2:ModifyVpcEndpoint",
-        "ec2:DescribeVpcAttribute",
-        "ec2:DescribeSecurityGroups",
-        "ec2:DescribeAddresses",
-        "ec2:DescribeInternetGateways",
-        "ec2:DescribeSubnets"
-      ],
-      "timeoutInMinutes": 60
-    },
-    "delete": {
-      "permissions": [
-        "redshift:DeleteEndpointAccess",
-        "redshift:DescribeEndpointAccess",
-        "ec2:DeleteClientVpnEndpoint",
-        "ec2:DeleteVpcEndpoint",
-        "ec2:DescribeVpcAttribute",
-        "ec2:DescribeSecurityGroups",
-        "ec2:DescribeAddresses",
-        "ec2:DescribeInternetGateways",
-        "ec2:DescribeSubnets",
-        "ec2:DescribeVpcEndpoint"
-      ],
-      "timeoutInMinutes": 60
-    },
-    "list": {
-      "permissions": [
-        "redshift:DescribeEndpointAccess",
-        "ec2:DescribeClientVpnEndpoints",
-        "ec2:DescribeVpcEndpoints",
-        "ec2:DescribeVpcAttribute",
-        "ec2:DescribeSecurityGroups",
-        "ec2:DescribeAddresses",
-        "ec2:DescribeInternetGateways",
-        "ec2:DescribeSubnets"
-      ]
+    "NetworkInterface": {
+      "description": "Describes a network interface.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "PrivateIpAddress": {
+          "relationshipRef": {
+            "typeName": "AWS::EC2::NetworkInterface",
+            "propertyPath": "/properties/PrivateIpAddress"
+          },
+          "description": "The IPv4 address of the network interface within the subnet.",
+          "type": "string",
+          "markdownDescription": "The IPv4 address of the network interface within the subnet.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "AvailabilityZone": {
+          "description": "The Availability Zone.",
+          "type": "string",
+          "markdownDescription": "The Availability Zone.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "SubnetId": {
+          "relationshipRef": {
+            "typeName": "AWS::EC2::NetworkInterface",
+            "propertyPath": "/properties/SubnetId"
+          },
+          "description": "The subnet identifier.",
+          "type": "string",
+          "markdownDescription": "The subnet identifier.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "NetworkInterfaceId": {
+          "relationshipRef": {
+            "typeName": "AWS::EC2::NetworkInterface",
+            "propertyPath": "/properties/Id"
+          },
+          "description": "The network interface identifier.",
+          "type": "string",
+          "markdownDescription": "The network interface identifier.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "Describes a network interface.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     }
   },
-  "attributes": {
-    "Address": {
-      "description": "The DNS address of the endpoint.",
+  "properties": {
+    "EndpointName": {
+      "description": "The name of the endpoint.",
       "type": "string",
-      "markdownDescription": "The DNS address of the endpoint.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "markdownDescription": "The name of the endpoint.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^(?=^[a-z][a-z0-9]*(-[a-z0-9]+)*$).{1,30}$  \nUpdate requires: Replacement"
     },
-    "VpcSecurityGroups": {
-      "description": "A list of Virtual Private Cloud (VPC) security groups to be associated with the endpoint.",
-      "type": "array",
+    "VpcSecurityGroupIds": {
+      "description": "A list of vpc security group ids to apply to the created endpoint access.",
       "insertionOrder": false,
+      "type": "array",
       "items": {
-        "$ref": "#/definitions/VpcSecurityGroup"
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
       },
-      "markdownDescription": "A list of Virtual Private Cloud (VPC) security groups to be associated with the endpoint.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+      "markdownDescription": "A list of vpc security group ids to apply to the created endpoint access.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
     },
+    "ResourceOwner": {
+      "description": "The AWS account ID of the owner of the cluster.",
+      "type": "string",
+      "markdownDescription": "The AWS account ID of the owner of the cluster.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^\\d{12}$  \nUpdate requires: Replacement"
+    },
+    "SubnetGroupName": {
+      "description": "The subnet group name where Amazon Redshift chooses to deploy the endpoint.",
+      "type": "string",
+      "markdownDescription": "The subnet group name where Amazon Redshift chooses to deploy the endpoint.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^(?=^[a-zA-Z0-9-]+$).{1,255}$  \nUpdate requires: Replacement"
+    },
+    "ClusterIdentifier": {
+      "description": "A unique identifier for the cluster. You use this identifier to refer to the cluster for any subsequent cluster operations such as deleting or modifying. All alphabetical characters must be lower case, no hypens at the end, no two consecutive hyphens. Cluster name should be unique for all clusters within an AWS account",
+      "type": "string",
+      "markdownDescription": "A unique identifier for the cluster. You use this identifier to refer to the cluster for any subsequent cluster operations such as deleting or modifying. All alphabetical characters must be lower case, no hypens at the end, no two consecutive hyphens. Cluster name should be unique for all clusters within an AWS account\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
+    }
+  },
+  "required": [
+    "ClusterIdentifier",
+    "SubnetGroupName",
+    "EndpointName",
+    "VpcSecurityGroupIds"
+  ],
+  "attributes": {
     "EndpointStatus": {
       "description": "The status of the endpoint.",
       "type": "string",
       "markdownDescription": "The status of the endpoint.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
-    "EndpointCreateTime": {
-      "description": "The time (UTC) that the endpoint was created.",
+    "VpcEndpoint": {
+      "description": "The connection endpoint for connecting to an Amazon Redshift cluster through the proxy.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "VpcId": {
+          "relationshipRef": {
+            "typeName": "AWS::EC2::VPCEndpoint",
+            "propertyPath": "/properties/VpcId"
+          },
+          "description": "The VPC identifier that the endpoint is associated.",
+          "type": "string",
+          "markdownDescription": "The VPC identifier that the endpoint is associated.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "NetworkInterfaces": {
+          "description": "One or more network interfaces of the endpoint. Also known as an interface endpoint.",
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/NetworkInterface"
+          },
+          "markdownDescription": "One or more network interfaces of the endpoint. Also known as an interface endpoint.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "VpcEndpointId": {
+          "relationshipRef": {
+            "typeName": "AWS::EC2::VPCEndpoint",
+            "propertyPath": "/properties/Id"
+          },
+          "description": "The connection endpoint ID for connecting an Amazon Redshift cluster through the proxy.",
+          "type": "string",
+          "markdownDescription": "The connection endpoint ID for connecting an Amazon Redshift cluster through the proxy.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "The connection endpoint for connecting to an Amazon Redshift cluster through the proxy.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Address": {
+      "description": "The DNS address of the endpoint.",
       "type": "string",
-      "markdownDescription": "The time (UTC) that the endpoint was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "markdownDescription": "The DNS address of the endpoint.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
     "Port": {
       "description": "The port number on which the cluster accepts incoming connections.",
       "type": "integer",
       "markdownDescription": "The port number on which the cluster accepts incoming connections.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
     },
-    "VpcEndpoint": {
-      "description": "The connection endpoint for connecting to an Amazon Redshift cluster through the proxy.",
-      "type": "object",
-      "properties": {
-        "VpcEndpointId": {
-          "type": "string",
-          "description": "The connection endpoint ID for connecting an Amazon Redshift cluster through the proxy.",
-          "markdownDescription": "The connection endpoint ID for connecting an Amazon Redshift cluster through the proxy.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "VpcId": {
-          "type": "string",
-          "description": "The VPC identifier that the endpoint is associated.",
-          "markdownDescription": "The VPC identifier that the endpoint is associated.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "NetworkInterfaces": {
-          "type": "array",
-          "insertionOrder": false,
-          "description": "One or more network interfaces of the endpoint. Also known as an interface endpoint.",
-          "items": {
-            "$ref": "#/definitions/NetworkInterface"
-          },
-          "markdownDescription": "One or more network interfaces of the endpoint. Also known as an interface endpoint.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-        }
+    "EndpointCreateTime": {
+      "description": "The time (UTC) that the endpoint was created.",
+      "type": "string",
+      "markdownDescription": "The time (UTC) that the endpoint was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "VpcSecurityGroups": {
+      "description": "A list of Virtual Private Cloud (VPC) security groups to be associated with the endpoint.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/VpcSecurityGroup"
       },
-      "additionalProperties": false,
-      "markdownDescription": "The connection endpoint for connecting to an Amazon Redshift cluster through the proxy.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+      "markdownDescription": "A list of Virtual Private Cloud (VPC) security groups to be associated with the endpoint.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     }
   }
 }

@@ -25,6 +25,36 @@
         "Value"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "EncryptionConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "KmsKeyId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: No interruption"
+        },
+        "KmsDataKeyReusePeriodSeconds": {
+          "type": "integer",
+          "minimum": 60,
+          "maximum": 900,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "Type": {
+          "type": "string",
+          "enum": [
+            "CUSTOMER_MANAGED_KMS_KEY",
+            "AWS_OWNED_KEY"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: CUSTOMER_MANAGED_KMS_KEY | AWS_OWNED_KEY  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     }
   },
   "properties": {
@@ -42,6 +72,9 @@
         "$ref": "#/definitions/TagsEntry"
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "EncryptionConfiguration": {
+      "$ref": "#/definitions/EncryptionConfiguration"
     }
   },
   "additionalProperties": false,
@@ -62,12 +95,15 @@
     "/properties/Arn"
   ],
   "createOnlyProperties": [
-    "/properties/Name"
+    "/properties/Name",
+    "/properties/EncryptionConfiguration"
   ],
   "handlers": {
     "create": {
       "permissions": [
-        "states:CreateActivity"
+        "states:CreateActivity",
+        "states:TagResource",
+        "kms:DescribeKey"
       ]
     },
     "read": {
@@ -85,7 +121,13 @@
     },
     "delete": {
       "permissions": [
+        "states:DescribeActivity",
         "states:DeleteActivity"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "states:ListActivities"
       ]
     }
   },

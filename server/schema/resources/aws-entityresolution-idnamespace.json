@@ -9,6 +9,12 @@
       "maxLength": 255,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[a-zA-Z_0-9-]*$  \nUpdate requires: No interruption"
     },
+    "AttributeName": {
+      "type": "string",
+      "minLength": 0,
+      "maxLength": 255,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 255  \nPattern: ^[a-zA-Z_0-9- \\t]*$  \nUpdate requires: No interruption"
+    },
     "IdNamespaceInputSource": {
       "type": "object",
       "properties": {
@@ -32,9 +38,13 @@
         "IdMappingType": {
           "type": "string",
           "enum": [
-            "PROVIDER"
+            "PROVIDER",
+            "RULE_BASED"
           ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: PROVIDER  \nUpdate requires: No interruption"
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: PROVIDER | RULE_BASED  \nUpdate requires: No interruption"
+        },
+        "RuleBasedProperties": {
+          "$ref": "#/definitions/NamespaceRuleBasedProperties"
         },
         "ProviderProperties": {
           "$ref": "#/definitions/NamespaceProviderProperties"
@@ -42,6 +52,90 @@
       },
       "required": [
         "IdMappingType"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "NamespaceRuleBasedProperties": {
+      "type": "object",
+      "properties": {
+        "Rules": {
+          "type": "array",
+          "insertionOrder": false,
+          "minItems": 1,
+          "maxItems": 25,
+          "items": {
+            "$ref": "#/definitions/Rule"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "RuleDefinitionTypes": {
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/RuleDefinitionType"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "AttributeMatchingModel": {
+          "type": "string",
+          "enum": [
+            "ONE_TO_ONE",
+            "MANY_TO_MANY"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ONE_TO_ONE | MANY_TO_MANY  \nUpdate requires: No interruption"
+        },
+        "RecordMatchingModels": {
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/RecordMatchingModel"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RecordMatchingModel": {
+      "type": "string",
+      "enum": [
+        "ONE_SOURCE_TO_ONE_TARGET",
+        "MANY_SOURCE_TO_ONE_TARGET"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ONE_SOURCE_TO_ONE_TARGET | MANY_SOURCE_TO_ONE_TARGET  \nUpdate requires: No interruption"
+    },
+    "RuleDefinitionType": {
+      "type": "string",
+      "enum": [
+        "SOURCE",
+        "TARGET"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SOURCE | TARGET  \nUpdate requires: No interruption"
+    },
+    "Rule": {
+      "type": "object",
+      "properties": {
+        "RuleName": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 255,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 255  \nPattern: ^[a-zA-Z_0-9- \\t]*$  \nUpdate requires: No interruption"
+        },
+        "MatchingKeys": {
+          "type": "array",
+          "insertionOrder": false,
+          "minItems": 1,
+          "maxItems": 25,
+          "items": {
+            "$ref": "#/definitions/AttributeName"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "RuleName",
+        "MatchingKeys"
       ],
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"

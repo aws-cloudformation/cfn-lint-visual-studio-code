@@ -1,15 +1,624 @@
 {
-  "handlers": {
-    "read": {
-      "permissions": [
-        "dynamodb:Describe*",
-        "dynamodb:GetResourcePolicy",
-        "application-autoscaling:Describe*",
-        "cloudwatch:PutMetricData",
-        "dynamodb:ListTagsOfResource",
-        "kms:DescribeKey"
-      ]
+  "typeName": "AWS::DynamoDB::GlobalTable",
+  "description": "Version: None. Resource Type definition for AWS::DynamoDB::GlobalTable",
+  "additionalProperties": false,
+  "properties": {
+    "AttributeDefinitions": {
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/AttributeDefinition"
+      },
+      "minItems": 1,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
     },
+    "BillingMode": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "GlobalSecondaryIndexes": {
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/GlobalSecondaryIndex"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "KeySchema": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/KeySchema"
+      },
+      "minItems": 1,
+      "maxItems": 2,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: Replacement"
+    },
+    "LocalSecondaryIndexes": {
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/LocalSecondaryIndex"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement"
+    },
+    "WriteProvisionedThroughputSettings": {
+      "$ref": "#/definitions/WriteProvisionedThroughputSettings"
+    },
+    "WriteOnDemandThroughputSettings": {
+      "$ref": "#/definitions/WriteOnDemandThroughputSettings"
+    },
+    "Replicas": {
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/ReplicaSpecification"
+      },
+      "minItems": 1,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "SSESpecification": {
+      "$ref": "#/definitions/SSESpecification"
+    },
+    "StreamSpecification": {
+      "$ref": "#/definitions/StreamSpecification"
+    },
+    "TableName": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "TimeToLiveSpecification": {
+      "$ref": "#/definitions/TimeToLiveSpecification"
+    }
+  },
+  "definitions": {
+    "StreamSpecification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "StreamViewType": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "StreamViewType"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ResourcePolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "PolicyDocument": {
+          "type": "object",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "PolicyDocument"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ReplicaStreamSpecification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ResourcePolicy": {
+          "$ref": "#/definitions/ResourcePolicy"
+        }
+      },
+      "required": [
+        "ResourcePolicy"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "KinesisStreamSpecification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "StreamArn": {
+          "type": "string",
+          "relationshipRef": {
+            "typeName": "AWS::Kinesis::Stream",
+            "propertyPath": "/properties/Arn"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "ApproximateCreationDateTimePrecision": {
+          "type": "string",
+          "enum": [
+            "MICROSECOND",
+            "MILLISECOND"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MICROSECOND | MILLISECOND  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "StreamArn"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "KeySchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "AttributeName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption"
+        },
+        "KeyType": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "KeyType",
+        "AttributeName"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PointInTimeRecoverySpecification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "PointInTimeRecoveryEnabled": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ReplicaSpecification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Region": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "GlobalSecondaryIndexes": {
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/ReplicaGlobalSecondaryIndexSpecification"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ContributorInsightsSpecification": {
+          "$ref": "#/definitions/ContributorInsightsSpecification"
+        },
+        "PointInTimeRecoverySpecification": {
+          "$ref": "#/definitions/PointInTimeRecoverySpecification"
+        },
+        "TableClass": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "DeletionProtectionEnabled": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        },
+        "SSESpecification": {
+          "$ref": "#/definitions/ReplicaSSESpecification"
+        },
+        "Tags": {
+          "type": "array",
+          "insertionOrder": false,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/Tag"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ReadProvisionedThroughputSettings": {
+          "$ref": "#/definitions/ReadProvisionedThroughputSettings"
+        },
+        "ReadOnDemandThroughputSettings": {
+          "$ref": "#/definitions/ReadOnDemandThroughputSettings"
+        },
+        "KinesisStreamSpecification": {
+          "$ref": "#/definitions/KinesisStreamSpecification"
+        },
+        "ResourcePolicy": {
+          "$ref": "#/definitions/ResourcePolicy"
+        },
+        "ReplicaStreamSpecification": {
+          "$ref": "#/definitions/ReplicaStreamSpecification"
+        }
+      },
+      "required": [
+        "Region"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "TimeToLiveSpecification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "AttributeName": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Enabled": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Enabled"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "LocalSecondaryIndex": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "IndexName": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 255,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 3  \nMaximum Length: 255  \nUpdate requires: No interruption"
+        },
+        "KeySchema": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/KeySchema"
+          },
+          "maxItems": 2,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Projection": {
+          "$ref": "#/definitions/Projection"
+        }
+      },
+      "required": [
+        "IndexName",
+        "Projection",
+        "KeySchema"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "GlobalSecondaryIndex": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "IndexName": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 255,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 3  \nMaximum Length: 255  \nUpdate requires: No interruption"
+        },
+        "KeySchema": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/KeySchema"
+          },
+          "minItems": 1,
+          "maxItems": 2,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Projection": {
+          "$ref": "#/definitions/Projection"
+        },
+        "WriteProvisionedThroughputSettings": {
+          "$ref": "#/definitions/WriteProvisionedThroughputSettings"
+        },
+        "WriteOnDemandThroughputSettings": {
+          "$ref": "#/definitions/WriteOnDemandThroughputSettings"
+        }
+      },
+      "required": [
+        "IndexName",
+        "Projection",
+        "KeySchema"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "SSESpecification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "SSEEnabled": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
+        },
+        "SSEType": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "SSEEnabled"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ReplicaSSESpecification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "KMSMasterKeyId": {
+          "type": "string",
+          "anyOf": [
+            {
+              "relationshipRef": {
+                "typeName": "AWS::KMS::Key",
+                "propertyPath": "/properties/Arn"
+              }
+            },
+            {
+              "relationshipRef": {
+                "typeName": "AWS::KMS::Key",
+                "propertyPath": "/properties/KeyId"
+              }
+            },
+            {
+              "relationshipRef": {
+                "typeName": "AWS::KMS::Alias",
+                "propertyPath": "/properties/AliasName"
+              }
+            }
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "KMSMasterKeyId"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AttributeDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "AttributeName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption"
+        },
+        "AttributeType": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "AttributeName",
+        "AttributeType"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Projection": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "NonKeyAttributes": {
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          },
+          "maxItems": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ProjectionType": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ReplicaGlobalSecondaryIndexSpecification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "IndexName": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 255,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 3  \nMaximum Length: 255  \nUpdate requires: No interruption"
+        },
+        "ContributorInsightsSpecification": {
+          "$ref": "#/definitions/ContributorInsightsSpecification"
+        },
+        "ReadProvisionedThroughputSettings": {
+          "$ref": "#/definitions/ReadProvisionedThroughputSettings"
+        },
+        "ReadOnDemandThroughputSettings": {
+          "$ref": "#/definitions/ReadOnDemandThroughputSettings"
+        }
+      },
+      "required": [
+        "IndexName"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ContributorInsightsSpecification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Enabled": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Enabled"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ReadProvisionedThroughputSettings": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ReadCapacityUnits": {
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "ReadCapacityAutoScalingSettings": {
+          "$ref": "#/definitions/CapacityAutoScalingSettings"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "WriteProvisionedThroughputSettings": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "WriteCapacityAutoScalingSettings": {
+          "$ref": "#/definitions/CapacityAutoScalingSettings"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ReadOnDemandThroughputSettings": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "MaxReadRequestUnits": {
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "WriteOnDemandThroughputSettings": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "MaxWriteRequestUnits": {
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "CapacityAutoScalingSettings": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "MinCapacity": {
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "MaxCapacity": {
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "SeedCapacity": {
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "TargetTrackingScalingPolicyConfiguration": {
+          "$ref": "#/definitions/TargetTrackingScalingPolicyConfiguration"
+        }
+      },
+      "required": [
+        "MinCapacity",
+        "MaxCapacity",
+        "TargetTrackingScalingPolicyConfiguration"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "TargetTrackingScalingPolicyConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "DisableScaleIn": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        },
+        "ScaleInCooldown": {
+          "type": "integer",
+          "minimum": 0,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "ScaleOutCooldown": {
+          "type": "integer",
+          "minimum": 0,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "TargetValue": {
+          "type": "number",
+          "format": "double",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "TargetValue"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "required": [
+    "KeySchema",
+    "AttributeDefinitions",
+    "Replicas"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/StreamArn",
+    "/properties/TableId"
+  ],
+  "createOnlyProperties": [
+    "/properties/LocalSecondaryIndexes",
+    "/properties/TableName",
+    "/properties/KeySchema"
+  ],
+  "primaryIdentifier": [
+    "/properties/TableName"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/Arn"
+    ],
+    [
+      "/properties/StreamArn"
+    ]
+  ],
+  "writeOnlyProperties": [
+    "/properties/Replicas/*/ReadProvisionedThroughputSettings/ReadCapacityAutoScalingSettings/SeedCapacity",
+    "/properties/Replicas/*/GlobalSecondaryIndexes/*/ReadProvisionedThroughputSettings/ReadCapacityAutoScalingSettings/SeedCapacity",
+    "/properties/WriteProvisionedThroughputSettings/WriteCapacityAutoScalingSettings/SeedCapacity",
+    "/properties/GlobalSecondaryIndexes/*/WriteProvisionedThroughputSettings/WriteCapacityAutoScalingSettings/SeedCapacity"
+  ],
+  "handlers": {
     "create": {
       "permissions": [
         "dynamodb:CreateTable",
@@ -50,6 +659,16 @@
         "kms:RevokeGrant",
         "cloudwatch:PutMetricData",
         "iam:CreateServiceLinkedRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "dynamodb:Describe*",
+        "dynamodb:GetResourcePolicy",
+        "application-autoscaling:Describe*",
+        "cloudwatch:PutMetricData",
+        "dynamodb:ListTagsOfResource",
+        "kms:DescribeKey"
       ]
     },
     "update": {
@@ -98,12 +717,6 @@
       ],
       "timeoutInMinutes": 1200
     },
-    "list": {
-      "permissions": [
-        "dynamodb:ListTables",
-        "cloudwatch:PutMetricData"
-      ]
-    },
     "delete": {
       "permissions": [
         "dynamodb:Describe*",
@@ -116,601 +729,24 @@
         "application-autoscaling:PutScheduledAction",
         "application-autoscaling:RegisterScalableTarget"
       ]
-    }
-  },
-  "typeName": "AWS::DynamoDB::GlobalTable",
-  "readOnlyProperties": [
-    "/properties/Arn",
-    "/properties/StreamArn",
-    "/properties/TableId"
-  ],
-  "description": "Version: None. Resource Type definition for AWS::DynamoDB::GlobalTable",
-  "additionalIdentifiers": [
-    [
-      "/properties/Arn"
-    ],
-    [
-      "/properties/StreamArn"
-    ]
-  ],
-  "writeOnlyProperties": [
-    "/properties/Replicas/*/ReadProvisionedThroughputSettings/ReadCapacityAutoScalingSettings/SeedCapacity",
-    "/properties/Replicas/*/GlobalSecondaryIndexes/*/ReadProvisionedThroughputSettings/ReadCapacityAutoScalingSettings/SeedCapacity",
-    "/properties/WriteProvisionedThroughputSettings/WriteCapacityAutoScalingSettings/SeedCapacity",
-    "/properties/GlobalSecondaryIndexes/*/WriteProvisionedThroughputSettings/WriteCapacityAutoScalingSettings/SeedCapacity"
-  ],
-  "createOnlyProperties": [
-    "/properties/LocalSecondaryIndexes",
-    "/properties/TableName",
-    "/properties/KeySchema"
-  ],
-  "additionalProperties": false,
-  "primaryIdentifier": [
-    "/properties/TableName"
-  ],
-  "definitions": {
-    "LocalSecondaryIndex": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "IndexName": {
-          "minLength": 3,
-          "type": "string",
-          "maxLength": 255,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 3  \nMaximum Length: 255  \nUpdate requires: No interruption"
-        },
-        "Projection": {
-          "$ref": "#/definitions/Projection"
-        },
-        "KeySchema": {
-          "maxItems": 2,
-          "uniqueItems": true,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/KeySchema"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "IndexName",
-        "Projection",
-        "KeySchema"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
-    "SSESpecification": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "SSEEnabled": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
-        },
-        "SSEType": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "SSEEnabled"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "KinesisStreamSpecification": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "ApproximateCreationDateTimePrecision": {
-          "type": "string",
-          "enum": [
-            "MICROSECOND",
-            "MILLISECOND"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MICROSECOND | MILLISECOND  \nUpdate requires: No interruption"
-        },
-        "StreamArn": {
-          "relationshipRef": {
-            "typeName": "AWS::Kinesis::Stream",
-            "propertyPath": "/properties/Arn"
-          },
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "StreamArn"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "StreamSpecification": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "StreamViewType": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "StreamViewType"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "ContributorInsightsSpecification": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Enabled": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "Enabled"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "ReplicaSpecification": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "SSESpecification": {
-          "$ref": "#/definitions/ReplicaSSESpecification"
-        },
-        "KinesisStreamSpecification": {
-          "$ref": "#/definitions/KinesisStreamSpecification"
-        },
-        "ContributorInsightsSpecification": {
-          "$ref": "#/definitions/ContributorInsightsSpecification"
-        },
-        "PointInTimeRecoverySpecification": {
-          "$ref": "#/definitions/PointInTimeRecoverySpecification"
-        },
-        "ReplicaStreamSpecification": {
-          "$ref": "#/definitions/ReplicaStreamSpecification"
-        },
-        "GlobalSecondaryIndexes": {
-          "uniqueItems": true,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ReplicaGlobalSecondaryIndexSpecification"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-        },
-        "Region": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
-        },
-        "ResourcePolicy": {
-          "$ref": "#/definitions/ResourcePolicy"
-        },
-        "ReadProvisionedThroughputSettings": {
-          "$ref": "#/definitions/ReadProvisionedThroughputSettings"
-        },
-        "TableClass": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "DeletionProtectionEnabled": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
-        },
-        "Tags": {
-          "uniqueItems": true,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Tag"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "Region"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "CapacityAutoScalingSettings": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "MinCapacity": {
-          "type": "integer",
-          "minimum": 1,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
-        },
-        "SeedCapacity": {
-          "type": "integer",
-          "minimum": 1,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-        },
-        "TargetTrackingScalingPolicyConfiguration": {
-          "$ref": "#/definitions/TargetTrackingScalingPolicyConfiguration"
-        },
-        "MaxCapacity": {
-          "type": "integer",
-          "minimum": 1,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "MinCapacity",
-        "MaxCapacity",
-        "TargetTrackingScalingPolicyConfiguration"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "AttributeDefinition": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "AttributeType": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
-        },
-        "AttributeName": {
-          "minLength": 1,
-          "type": "string",
-          "maxLength": 255,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "AttributeName",
-        "AttributeType"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "Projection": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "NonKeyAttributes": {
-          "maxItems": 20,
-          "uniqueItems": true,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-        },
-        "ProjectionType": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "PointInTimeRecoverySpecification": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "PointInTimeRecoveryEnabled": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "ReplicaGlobalSecondaryIndexSpecification": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "IndexName": {
-          "minLength": 3,
-          "type": "string",
-          "maxLength": 255,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 3  \nMaximum Length: 255  \nUpdate requires: No interruption"
-        },
-        "ContributorInsightsSpecification": {
-          "$ref": "#/definitions/ContributorInsightsSpecification"
-        },
-        "ReadProvisionedThroughputSettings": {
-          "$ref": "#/definitions/ReadProvisionedThroughputSettings"
-        }
-      },
-      "required": [
-        "IndexName"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "TargetTrackingScalingPolicyConfiguration": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "ScaleOutCooldown": {
-          "type": "integer",
-          "minimum": 0,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-        },
-        "TargetValue": {
-          "format": "double",
-          "type": "number",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
-        },
-        "DisableScaleIn": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
-        },
-        "ScaleInCooldown": {
-          "type": "integer",
-          "minimum": 0,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "TargetValue"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "GlobalSecondaryIndex": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "IndexName": {
-          "minLength": 3,
-          "type": "string",
-          "maxLength": 255,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 3  \nMaximum Length: 255  \nUpdate requires: No interruption"
-        },
-        "Projection": {
-          "$ref": "#/definitions/Projection"
-        },
-        "KeySchema": {
-          "minItems": 1,
-          "maxItems": 2,
-          "uniqueItems": true,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/KeySchema"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
-        },
-        "WriteProvisionedThroughputSettings": {
-          "$ref": "#/definitions/WriteProvisionedThroughputSettings"
-        }
-      },
-      "required": [
-        "IndexName",
-        "Projection",
-        "KeySchema"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "WriteProvisionedThroughputSettings": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "WriteCapacityAutoScalingSettings": {
-          "$ref": "#/definitions/CapacityAutoScalingSettings"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "ReplicaStreamSpecification": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "ResourcePolicy": {
-          "$ref": "#/definitions/ResourcePolicy"
-        }
-      },
-      "required": [
-        "ResourcePolicy"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "ReplicaSSESpecification": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "KMSMasterKeyId": {
-          "anyOf": [
-            {
-              "relationshipRef": {
-                "typeName": "AWS::KMS::Key",
-                "propertyPath": "/properties/Arn"
-              }
-            },
-            {
-              "relationshipRef": {
-                "typeName": "AWS::KMS::Key",
-                "propertyPath": "/properties/KeyId"
-              }
-            },
-            {
-              "relationshipRef": {
-                "typeName": "AWS::KMS::Alias",
-                "propertyPath": "/properties/AliasName"
-              }
-            }
-          ],
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "KMSMasterKeyId"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "ResourcePolicy": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "PolicyDocument": {
-          "type": "object",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "PolicyDocument"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "KeySchema": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "KeyType": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
-        },
-        "AttributeName": {
-          "minLength": 1,
-          "type": "string",
-          "maxLength": 255,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "KeyType",
-        "AttributeName"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "Tag": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Value": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
-        },
-        "Key": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "Value",
-        "Key"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "ReadProvisionedThroughputSettings": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "ReadCapacityUnits": {
-          "type": "integer",
-          "minimum": 1,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-        },
-        "ReadCapacityAutoScalingSettings": {
-          "$ref": "#/definitions/CapacityAutoScalingSettings"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "TimeToLiveSpecification": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Enabled": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
-        },
-        "AttributeName": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "Enabled"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    }
-  },
-  "required": [
-    "KeySchema",
-    "AttributeDefinitions",
-    "Replicas"
-  ],
-  "properties": {
-    "SSESpecification": {
-      "$ref": "#/definitions/SSESpecification"
-    },
-    "StreamSpecification": {
-      "$ref": "#/definitions/StreamSpecification"
-    },
-    "Replicas": {
-      "minItems": 1,
-      "uniqueItems": true,
-      "insertionOrder": false,
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/ReplicaSpecification"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
-    },
-    "WriteProvisionedThroughputSettings": {
-      "$ref": "#/definitions/WriteProvisionedThroughputSettings"
-    },
-    "TableName": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
-    },
-    "AttributeDefinitions": {
-      "minItems": 1,
-      "uniqueItems": true,
-      "insertionOrder": false,
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/AttributeDefinition"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
-    },
-    "BillingMode": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-    },
-    "GlobalSecondaryIndexes": {
-      "uniqueItems": true,
-      "insertionOrder": false,
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/GlobalSecondaryIndex"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-    },
-    "KeySchema": {
-      "minItems": 1,
-      "maxItems": 2,
-      "uniqueItems": true,
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/KeySchema"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: Replacement"
-    },
-    "LocalSecondaryIndexes": {
-      "uniqueItems": true,
-      "insertionOrder": false,
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/LocalSecondaryIndex"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement"
-    },
-    "TimeToLiveSpecification": {
-      "$ref": "#/definitions/TimeToLiveSpecification"
+    "list": {
+      "permissions": [
+        "dynamodb:ListTables",
+        "cloudwatch:PutMetricData"
+      ]
     }
   },
   "attributes": {
-    "TableId": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-    },
     "Arn": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
     "StreamArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "TableId": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     }

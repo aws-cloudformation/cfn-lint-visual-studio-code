@@ -86,6 +86,32 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: QUEUE_CONFIGURED_USER | WORKER_AGENT_USER  \nUpdate requires: No interruption"
     },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 127 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "minLength": 1,
+          "maxLength": 127,
+          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 127 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. \n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 127  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 1 to 255 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "The value for the tag. You can specify a value that is 1 to 255 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. \n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "WindowsUser": {
       "type": "object",
       "properties": {
@@ -164,6 +190,17 @@
     "RoleArn": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws[a-zA-Z-]*):iam::\\d{12}:role(/[!-.0-~]+)*/[\\w+=,.@-]+$  \nUpdate requires: No interruption"
+    },
+    "Tags": {
+      "type": "array",
+      "maxItems": 50,
+      "description": "An array of key-value pairs to apply to this resource.",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "markdownDescription": "An array of key-value pairs to apply to this resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     }
   },
   "required": [
@@ -180,10 +217,16 @@
     "/properties/Arn"
   ],
   "tagging": {
-    "taggable": false,
-    "tagOnCreate": false,
-    "tagUpdatable": false,
-    "cloudFormationSystemTags": false
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "deadline:TagResource",
+      "deadline:UntagResource",
+      "deadline:ListTagsForResource"
+    ]
   },
   "handlers": {
     "create": {
@@ -193,13 +236,16 @@
         "iam:PassRole",
         "identitystore:ListGroupMembershipsForMember",
         "logs:CreateLogGroup",
-        "s3:ListBucket"
+        "s3:ListBucket",
+        "deadline:TagResource",
+        "deadline:ListTagsForResource"
       ]
     },
     "read": {
       "permissions": [
         "deadline:GetQueue",
-        "identitystore:ListGroupMembershipsForMember"
+        "identitystore:ListGroupMembershipsForMember",
+        "deadline:ListTagsForResource"
       ]
     },
     "update": {
@@ -209,7 +255,10 @@
         "iam:PassRole",
         "identitystore:ListGroupMembershipsForMember",
         "logs:CreateLogGroup",
-        "s3:ListBucket"
+        "s3:ListBucket",
+        "deadline:TagResource",
+        "deadline:UntagResource",
+        "deadline:ListTagsForResource"
       ]
     },
     "delete": {
