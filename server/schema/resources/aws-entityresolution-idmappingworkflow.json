@@ -49,9 +49,9 @@
       "type": "object",
       "properties": {
         "InputSourceARN": {
-          "description": "An Glue table ARN for the input source table or IdNamespace ARN",
+          "description": "An Glue table ARN for the input source table, MatchingWorkflow arn or IdNamespace ARN",
           "type": "string",
-          "markdownDescription": "An Glue table ARN for the input source table or IdNamespace ARN\n\n---\n\nRequired: Yes  \nType: String  \nPattern: arn:(aws|aws-us-gov|aws-cn):.*:.*:[0-9]+:.*$  \nUpdate requires: No interruption"
+          "markdownDescription": "An Glue table ARN for the input source table, MatchingWorkflow arn or IdNamespace ARN\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:(aws|aws-us-gov|aws-cn):entityresolution:[a-z]{2}-[a-z]{1,10}-[0-9]:[0-9]{12}:(idnamespace/[a-zA-Z_0-9-]{1,255})$|^arn:(aws|aws-us-gov|aws-cn):entityresolution:[a-z]{2}-[a-z]{1,10}-[0-9]:[0-9]{12}:(matchingworkflow/[a-zA-Z_0-9-]{1,255})$|^arn:(aws|aws-us-gov|aws-cn):glue:[a-z]{2}-[a-z]{1,10}-[0-9]:[0-9]{12}:(table/[a-zA-Z_0-9-]{1,255}/[a-zA-Z_0-9-]{1,255})$  \nUpdate requires: No interruption"
         },
         "SchemaArn": {
           "type": "string",
@@ -97,14 +97,94 @@
         "IdMappingType": {
           "type": "string",
           "enum": [
-            "PROVIDER"
+            "PROVIDER",
+            "RULE_BASED"
           ],
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PROVIDER  \nUpdate requires: No interruption"
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PROVIDER | RULE_BASED  \nUpdate requires: No interruption"
+        },
+        "NormalizationVersion": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "RuleBasedProperties": {
+          "$ref": "#/definitions/IdMappingRuleBasedProperties"
         },
         "ProviderProperties": {
           "$ref": "#/definitions/ProviderProperties"
         }
       },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "IdMappingRuleBasedProperties": {
+      "type": "object",
+      "properties": {
+        "Rules": {
+          "type": "array",
+          "insertionOrder": false,
+          "minItems": 1,
+          "maxItems": 25,
+          "items": {
+            "$ref": "#/definitions/Rule"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "RuleDefinitionType": {
+          "type": "string",
+          "enum": [
+            "SOURCE",
+            "TARGET"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SOURCE | TARGET  \nUpdate requires: No interruption"
+        },
+        "AttributeMatchingModel": {
+          "type": "string",
+          "enum": [
+            "ONE_TO_ONE",
+            "MANY_TO_MANY"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: ONE_TO_ONE | MANY_TO_MANY  \nUpdate requires: No interruption"
+        },
+        "RecordMatchingModel": {
+          "type": "string",
+          "enum": [
+            "ONE_SOURCE_TO_ONE_TARGET",
+            "MANY_SOURCE_TO_ONE_TARGET"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: ONE_SOURCE_TO_ONE_TARGET | MANY_SOURCE_TO_ONE_TARGET  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "AttributeMatchingModel",
+        "RecordMatchingModel"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Rule": {
+      "type": "object",
+      "properties": {
+        "RuleName": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 255,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 255  \nPattern: ^[a-zA-Z_0-9- \\t]*$  \nUpdate requires: No interruption"
+        },
+        "MatchingKeys": {
+          "type": "array",
+          "insertionOrder": false,
+          "minItems": 1,
+          "maxItems": 15,
+          "items": {
+            "$ref": "#/definitions/AttributeName"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "RuleName",
+        "MatchingKeys"
+      ],
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },

@@ -1,0 +1,760 @@
+{
+  "typeName": "AWS::AppTest::TestCase",
+  "description": "Represents a Test Case that can be captured and executed",
+  "definitions": {
+    "Batch": {
+      "type": "object",
+      "properties": {
+        "BatchJobName": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^\\S{1,1000}$  \nUpdate requires: No interruption"
+        },
+        "BatchJobParameters": {
+          "$ref": "#/definitions/BatchJobParameters"
+        },
+        "ExportDataSetNames": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^\\S{1,100}$  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "BatchJobName"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "BatchJobParameters": {
+      "type": "object",
+      "patternProperties": {
+        ".+": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "CaptureTool": {
+      "type": "string",
+      "enum": [
+        "Precisely",
+        "AWS DMS"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Precisely | AWS DMS  \nUpdate requires: No interruption"
+    },
+    "CloudFormationAction": {
+      "type": "object",
+      "properties": {
+        "Resource": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^\\S{1,1000}$  \nUpdate requires: No interruption"
+        },
+        "ActionType": {
+          "$ref": "#/definitions/CloudFormationActionType"
+        }
+      },
+      "required": [
+        "Resource"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "CloudFormationActionType": {
+      "type": "string",
+      "enum": [
+        "Create",
+        "Delete"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Create | Delete  \nUpdate requires: No interruption"
+    },
+    "CompareAction": {
+      "type": "object",
+      "properties": {
+        "Input": {
+          "$ref": "#/definitions/Input"
+        },
+        "Output": {
+          "$ref": "#/definitions/Output"
+        }
+      },
+      "required": [
+        "Input"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "DataSet": {
+      "type": "object",
+      "properties": {
+        "Type": {
+          "$ref": "#/definitions/DataSetType"
+        },
+        "Name": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^\\S{1,100}$  \nUpdate requires: No interruption"
+        },
+        "Ccsid": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^\\S{1,50}$  \nUpdate requires: No interruption"
+        },
+        "Format": {
+          "$ref": "#/definitions/Format"
+        },
+        "Length": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Ccsid",
+        "Format",
+        "Length",
+        "Name",
+        "Type"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "DataSetType": {
+      "type": "string",
+      "enum": [
+        "PS"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PS  \nUpdate requires: No interruption"
+    },
+    "DatabaseCDC": {
+      "type": "object",
+      "properties": {
+        "SourceMetadata": {
+          "$ref": "#/definitions/SourceDatabaseMetadata"
+        },
+        "TargetMetadata": {
+          "$ref": "#/definitions/TargetDatabaseMetadata"
+        }
+      },
+      "required": [
+        "SourceMetadata",
+        "TargetMetadata"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "FileMetadata": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "DataSets",
+          "properties": {
+            "DataSets": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DataSet"
+              }
+            }
+          },
+          "required": [
+            "DataSets"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "DatabaseCDC",
+          "properties": {
+            "DatabaseCDC": {
+              "$ref": "#/definitions/DatabaseCDC"
+            }
+          },
+          "required": [
+            "DatabaseCDC"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "Format": {
+      "type": "string",
+      "enum": [
+        "FIXED",
+        "VARIABLE",
+        "LINE_SEQUENTIAL"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: FIXED | VARIABLE | LINE_SEQUENTIAL  \nUpdate requires: No interruption"
+    },
+    "Input": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "File",
+          "properties": {
+            "File": {
+              "$ref": "#/definitions/InputFile"
+            }
+          },
+          "required": [
+            "File"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "InputFile": {
+      "type": "object",
+      "properties": {
+        "SourceLocation": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^\\S{1,1000}$  \nUpdate requires: No interruption"
+        },
+        "TargetLocation": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^\\S{1,1000}$  \nUpdate requires: No interruption"
+        },
+        "FileMetadata": {
+          "$ref": "#/definitions/FileMetadata"
+        }
+      },
+      "required": [
+        "FileMetadata",
+        "SourceLocation",
+        "TargetLocation"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "M2ManagedActionProperties": {
+      "type": "object",
+      "properties": {
+        "ForceStop": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        },
+        "ImportDataSetLocation": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^\\S{1,1000}$  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "M2ManagedActionType": {
+      "type": "string",
+      "enum": [
+        "Configure",
+        "Deconfigure"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Configure | Deconfigure  \nUpdate requires: No interruption"
+    },
+    "M2ManagedApplicationAction": {
+      "type": "object",
+      "properties": {
+        "Resource": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^\\S{1,1000}$  \nUpdate requires: No interruption"
+        },
+        "ActionType": {
+          "$ref": "#/definitions/M2ManagedActionType"
+        },
+        "Properties": {
+          "$ref": "#/definitions/M2ManagedActionProperties"
+        }
+      },
+      "required": [
+        "ActionType",
+        "Resource"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "M2NonManagedActionType": {
+      "type": "string",
+      "enum": [
+        "Configure",
+        "Deconfigure"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Configure | Deconfigure  \nUpdate requires: No interruption"
+    },
+    "M2NonManagedApplicationAction": {
+      "type": "object",
+      "properties": {
+        "Resource": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^\\S{1,1000}$  \nUpdate requires: No interruption"
+        },
+        "ActionType": {
+          "$ref": "#/definitions/M2NonManagedActionType"
+        }
+      },
+      "required": [
+        "ActionType",
+        "Resource"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "MainframeAction": {
+      "type": "object",
+      "properties": {
+        "Resource": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^\\S{1,1000}$  \nUpdate requires: No interruption"
+        },
+        "ActionType": {
+          "$ref": "#/definitions/MainframeActionType"
+        },
+        "Properties": {
+          "$ref": "#/definitions/MainframeActionProperties"
+        }
+      },
+      "required": [
+        "ActionType",
+        "Resource"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "MainframeActionProperties": {
+      "type": "object",
+      "properties": {
+        "DmsTaskArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^\\S{1,1000}$  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "MainframeActionType": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "Batch",
+          "properties": {
+            "Batch": {
+              "$ref": "#/definitions/Batch"
+            }
+          },
+          "required": [
+            "Batch"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Tn3270",
+          "properties": {
+            "Tn3270": {
+              "$ref": "#/definitions/TN3270"
+            }
+          },
+          "required": [
+            "Tn3270"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "Output": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "File",
+          "properties": {
+            "File": {
+              "$ref": "#/definitions/OutputFile"
+            }
+          },
+          "required": [
+            "File"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "OutputFile": {
+      "type": "object",
+      "properties": {
+        "FileLocation": {
+          "type": "string",
+          "maxLength": 1024,
+          "minLength": 0,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ResourceAction": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "M2ManagedApplicationAction",
+          "properties": {
+            "M2ManagedApplicationAction": {
+              "$ref": "#/definitions/M2ManagedApplicationAction"
+            }
+          },
+          "required": [
+            "M2ManagedApplicationAction"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "M2NonManagedApplicationAction",
+          "properties": {
+            "M2NonManagedApplicationAction": {
+              "$ref": "#/definitions/M2NonManagedApplicationAction"
+            }
+          },
+          "required": [
+            "M2NonManagedApplicationAction"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "CloudFormationAction",
+          "properties": {
+            "CloudFormationAction": {
+              "$ref": "#/definitions/CloudFormationAction"
+            }
+          },
+          "required": [
+            "CloudFormationAction"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "Script": {
+      "type": "object",
+      "properties": {
+        "ScriptLocation": {
+          "type": "string",
+          "maxLength": 1024,
+          "minLength": 0,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 1024  \nUpdate requires: No interruption"
+        },
+        "Type": {
+          "$ref": "#/definitions/ScriptType"
+        }
+      },
+      "required": [
+        "ScriptLocation",
+        "Type"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ScriptType": {
+      "type": "string",
+      "enum": [
+        "Selenium"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Selenium  \nUpdate requires: No interruption"
+    },
+    "SourceDatabase": {
+      "type": "string",
+      "enum": [
+        "z/OS-DB2"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: z/OS-DB2  \nUpdate requires: No interruption"
+    },
+    "SourceDatabaseMetadata": {
+      "type": "object",
+      "properties": {
+        "Type": {
+          "$ref": "#/definitions/SourceDatabase"
+        },
+        "CaptureTool": {
+          "$ref": "#/definitions/CaptureTool"
+        }
+      },
+      "required": [
+        "CaptureTool",
+        "Type"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Step": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[A-Za-z][A-Za-z0-9_\\-]{1,59}$  \nUpdate requires: No interruption"
+        },
+        "Description": {
+          "type": "string",
+          "maxLength": 1000,
+          "minLength": 0,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1000  \nUpdate requires: No interruption"
+        },
+        "Action": {
+          "$ref": "#/definitions/StepAction"
+        }
+      },
+      "required": [
+        "Action",
+        "Name"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "StepAction": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "ResourceAction",
+          "properties": {
+            "ResourceAction": {
+              "$ref": "#/definitions/ResourceAction"
+            }
+          },
+          "required": [
+            "ResourceAction"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "MainframeAction",
+          "properties": {
+            "MainframeAction": {
+              "$ref": "#/definitions/MainframeAction"
+            }
+          },
+          "required": [
+            "MainframeAction"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "CompareAction",
+          "properties": {
+            "CompareAction": {
+              "$ref": "#/definitions/CompareAction"
+            }
+          },
+          "required": [
+            "CompareAction"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "TN3270": {
+      "type": "object",
+      "properties": {
+        "Script": {
+          "$ref": "#/definitions/Script"
+        },
+        "ExportDataSetNames": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^\\S{1,100}$  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Script"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "TagMap": {
+      "type": "object",
+      "maxProperties": 200,
+      "minProperties": 0,
+      "patternProperties": {
+        "^(?!aws:).+$": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 0,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "TargetDatabase": {
+      "type": "string",
+      "enum": [
+        "PostgreSQL"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PostgreSQL  \nUpdate requires: No interruption"
+    },
+    "TargetDatabaseMetadata": {
+      "type": "object",
+      "properties": {
+        "Type": {
+          "$ref": "#/definitions/TargetDatabase"
+        },
+        "CaptureTool": {
+          "$ref": "#/definitions/CaptureTool"
+        }
+      },
+      "required": [
+        "CaptureTool",
+        "Type"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "TestCaseLatestVersion": {
+      "type": "object",
+      "properties": {
+        "Version": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
+        },
+        "Status": {
+          "$ref": "#/definitions/TestCaseLifecycle"
+        }
+      },
+      "required": [
+        "Status",
+        "Version"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "TestCaseLifecycle": {
+      "type": "string",
+      "enum": [
+        "Active",
+        "Deleting"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Active | Deleting  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "Description": {
+      "type": "string",
+      "maxLength": 1000,
+      "minLength": 0,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1000  \nUpdate requires: No interruption"
+    },
+    "Name": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[A-Za-z][A-Za-z0-9_\\-]{1,59}$  \nUpdate requires: Replacement"
+    },
+    "Steps": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Step"
+      },
+      "maxItems": 20,
+      "minItems": 1,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "Tags": {
+      "$ref": "#/definitions/TagMap"
+    }
+  },
+  "required": [
+    "Name",
+    "Steps"
+  ],
+  "readOnlyProperties": [
+    "/properties/CreationTime",
+    "/properties/LastUpdateTime",
+    "/properties/LatestVersion",
+    "/properties/Status",
+    "/properties/TestCaseArn",
+    "/properties/TestCaseId",
+    "/properties/TestCaseVersion"
+  ],
+  "createOnlyProperties": [
+    "/properties/Name"
+  ],
+  "primaryIdentifier": [
+    "/properties/TestCaseId"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "apptest:TagResource",
+      "apptest:UntagResource",
+      "apptest:ListTagsForResource"
+    ]
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "apptest:CreateTestCase",
+        "apptest:GetTestCase",
+        "apptest:ListTagsForResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "apptest:GetTestCase",
+        "apptest:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "apptest:UpdateTestCase",
+        "apptest:GetTestCase",
+        "apptest:TagResource",
+        "apptest:UnTagResource",
+        "apptest:ListTagsForResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "apptest:GetTestCase",
+        "apptest:ListTagsForResource",
+        "apptest:DeleteTestCase"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "apptest:ListTestCases"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "attributes": {
+    "CreationTime": {
+      "type": "string",
+      "format": "date-time",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "LastUpdateTime": {
+      "type": "string",
+      "format": "date-time",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "LatestVersion": {
+      "$ref": "#/definitions/TestCaseLatestVersion"
+    },
+    "Status": {
+      "$ref": "#/definitions/TestCaseLifecycle"
+    },
+    "TestCaseArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws|aws-cn|aws-iso|aws-iso-[a-z]{1}|aws-us-gov):[A-Za-z0-9][A-Za-z0-9_/.-]{0,62}:([a-z]{2}-((iso[a-z]{0,1}-)|(gov-)){0,1}[a-z]+-[0-9]):[0-9]{12}:[A-Za-z0-9/][A-Za-z0-9:_/+=,@.-]{0,1023}$  \nUpdate requires: No interruption"
+    },
+    "TestCaseId": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[A-Za-z0-9:/\\-]{1,100}$  \nUpdate requires: No interruption"
+    },
+    "TestCaseVersion": {
+      "type": "number",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+    }
+  }
+}

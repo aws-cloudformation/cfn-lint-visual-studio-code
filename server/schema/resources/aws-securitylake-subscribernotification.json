@@ -1,0 +1,215 @@
+{
+  "typeName": "AWS::SecurityLake::SubscriberNotification",
+  "description": "Resource Type definition for AWS::SecurityLake::SubscriberNotification",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-securitylake.git",
+  "definitions": {
+    "HttpsNotificationConfiguration": {
+      "type": "object",
+      "properties": {
+        "AuthorizationApiKeyName": {
+          "type": "string",
+          "description": "The key name for the notification subscription.",
+          "markdownDescription": "The key name for the notification subscription.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "AuthorizationApiKeyValue": {
+          "type": "string",
+          "description": "The key value for the notification subscription.",
+          "markdownDescription": "The key value for the notification subscription.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Endpoint": {
+          "type": "string",
+          "description": "The subscription endpoint in Security Lake.",
+          "markdownDescription": "The subscription endpoint in Security Lake.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^https?://.+$  \nUpdate requires: No interruption"
+        },
+        "HttpMethod": {
+          "type": "string",
+          "enum": [
+            "POST",
+            "PUT"
+          ],
+          "description": "The HTTPS method used for the notification subscription.",
+          "markdownDescription": "The HTTPS method used for the notification subscription.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: POST | PUT  \nUpdate requires: No interruption"
+        },
+        "TargetRoleArn": {
+          "type": "string",
+          "description": "The Amazon Resource Name (ARN) of the EventBridge API destinations IAM role that you created.",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the EventBridge API destinations IAM role that you created.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:.*$  \nUpdate requires: No interruption"
+        }
+      },
+      "description": "The configuration for HTTPS subscriber notification.",
+      "additionalProperties": false,
+      "required": [
+        "Endpoint",
+        "TargetRoleArn"
+      ],
+      "markdownDescription": "The configuration for HTTPS subscriber notification.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "SqsNotificationConfiguration": {
+      "type": "object",
+      "description": "The configurations for SQS subscriber notification. The members of this structure are context-dependent.",
+      "markdownDescription": "The configurations for SQS subscriber notification. The members of this structure are context-dependent.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "NotificationConfiguration": {
+      "type": "object",
+      "properties": {
+        "HttpsNotificationConfiguration": {
+          "$ref": "#/definitions/HttpsNotificationConfiguration"
+        },
+        "SqsNotificationConfiguration": {
+          "$ref": "#/definitions/SqsNotificationConfiguration"
+        }
+      },
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "required": [
+            "HttpsNotificationConfiguration"
+          ]
+        },
+        {
+          "required": [
+            "SqsNotificationConfiguration"
+          ]
+        }
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "NotificationConfiguration": {
+      "$ref": "#/definitions/NotificationConfiguration"
+    },
+    "SubscriberArn": {
+      "description": "The ARN for the subscriber",
+      "type": "string",
+      "markdownDescription": "The ARN for the subscriber\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:.*$  \nUpdate requires: Replacement"
+    }
+  },
+  "tagging": {
+    "taggable": false
+  },
+  "additionalProperties": false,
+  "required": [
+    "SubscriberArn",
+    "NotificationConfiguration"
+  ],
+  "primaryIdentifier": [
+    "/properties/SubscriberArn"
+  ],
+  "readOnlyProperties": [
+    "/properties/SubscriberEndpoint"
+  ],
+  "createOnlyProperties": [
+    "/properties/SubscriberArn"
+  ],
+  "writeOnlyProperties": [
+    "/properties/NotificationConfiguration/HttpsNotificationConfiguration/AuthorizationApiKeyName",
+    "/properties/NotificationConfiguration/HttpsNotificationConfiguration/AuthorizationApiKeyValue",
+    "/properties/NotificationConfiguration/HttpsNotificationConfiguration/Endpoint",
+    "/properties/NotificationConfiguration/HttpsNotificationConfiguration/HttpMethod",
+    "/properties/NotificationConfiguration/HttpsNotificationConfiguration/TargetRoleArn"
+  ],
+  "replacementStrategy": "delete_then_create",
+  "handlers": {
+    "create": {
+      "permissions": [
+        "securitylake:CreateDataLake",
+        "securitylake:CreateSubscriber",
+        "securitylake:CreateSubscriberNotification",
+        "securitylake:GetSubscriber",
+        "iam:CreateServiceLinkedRole",
+        "iam:PutRolePolicy",
+        "iam:DeleteRolePolicy",
+        "iam:PassRole",
+        "s3:PutBucketNotification",
+        "s3:GetBucketNotification",
+        "events:CreateApiDestination",
+        "events:CreateConnection",
+        "events:CreateRule",
+        "events:UpdateConnection",
+        "events:DeleteConnection",
+        "events:UpdateApiDestination",
+        "events:DeleteApiDestination",
+        "events:ListApiDestinations",
+        "events:ListConnections",
+        "events:PutRule",
+        "events:DescribeRule",
+        "events:DeleteRule",
+        "events:PutTargets",
+        "events:RemoveTargets",
+        "events:ListTargetsByRule",
+        "secretsmanager:CreateSecret",
+        "sqs:CreateQueue",
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:SetQueueAttributes"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "securitylake:GetSubscriber"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "securitylake:UpdateSubscriberNotification",
+        "securitylake:GetSubscriber",
+        "iam:CreateServiceLinkedRole",
+        "iam:PutRolePolicy",
+        "iam:DeleteRolePolicy",
+        "iam:PassRole",
+        "events:CreateApiDestination",
+        "events:CreateConnection",
+        "events:UpdateConnection",
+        "events:DeleteConnection",
+        "events:UpdateApiDestination",
+        "events:DeleteApiDestination",
+        "events:DeleteRule",
+        "events:ListApiDestinations",
+        "events:ListConnections",
+        "events:PutRule",
+        "events:DescribeRule",
+        "events:DeleteRule",
+        "events:PutTargets",
+        "events:RemoveTargets",
+        "events:ListTargetsByRule",
+        "secretsmanager:CreateSecret",
+        "s3:GetBucketNotificationConfiguration",
+        "s3:PutBucketNotificationConfiguration",
+        "s3:PutBucketNotification",
+        "s3:GetBucketNotification",
+        "sqs:CreateQueue",
+        "sqs:DeleteQueue",
+        "sqs:GetQueueAttributes",
+        "sqs:SetQueueAttributes"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "securitylake:DeleteSubscriberNotification",
+        "securitylake:GetSubscriber",
+        "iam:DeleteRole",
+        "iam:DeleteRolePolicy",
+        "events:DeleteApiDestination",
+        "events:DeleteConnection",
+        "events:DeleteRule",
+        "events:ListTargetsByRule",
+        "events:DescribeRule",
+        "events:RemoveTargets",
+        "sqs:DeleteQueue"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "securitylake:ListSubscribers"
+      ]
+    }
+  },
+  "attributes": {
+    "SubscriberEndpoint": {
+      "description": "The endpoint the subscriber should listen to for notifications",
+      "type": "string",
+      "markdownDescription": "The endpoint the subscriber should listen to for notifications\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    }
+  }
+}

@@ -224,6 +224,11 @@
           "description": "Per worker Disk resource. GB is the only supported unit and specifying GB is optional",
           "$ref": "#/definitions/DiskSize",
           "markdownDescription": "Per worker Disk resource. GB is the only supported unit and specifying GB is optional\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        },
+        "DiskType": {
+          "description": "Per worker DiskType resource. Shuffle optimized and Standard are only supported types and specifying diskType is optional",
+          "$ref": "#/definitions/DiskType",
+          "markdownDescription": "Per worker DiskType resource. Shuffle optimized and Standard are only supported types and specifying diskType is optional\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
         }
       },
       "required": [
@@ -475,6 +480,11 @@
       "maxLength": 15,
       "markdownDescription": "Per worker Disk resource. GB is the only supported unit and specifying GB is optional\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 15  \nPattern: ^[1-9][0-9]*(\\s)?(GB|gb|gB|Gb)$  \nUpdate requires: No interruption"
     },
+    "DiskType": {
+      "description": "Per worker DiskType resource. Shuffle optimized and Standard are only supported types and specifying diskType is optional",
+      "type": "string",
+      "markdownDescription": "Per worker DiskType resource. Shuffle optimized and Standard are only supported types and specifying diskType is optional\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(SHUFFLE_OPTIMIZED|[Ss]huffle_[Oo]ptimized|STANDARD|[Ss]tandard)$  \nUpdate requires: No interruption"
+    },
     "WorkerTypeSpecificationInput": {
       "type": "object",
       "description": "The specifications for a worker type.",
@@ -601,22 +611,32 @@
   ],
   "tagging": {
     "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
     "cloudFormationSystemTags": false,
     "tagProperty": "/properties/Tags"
   },
   "handlers": {
     "create": {
       "permissions": [
-        "kms:Create*",
-        "kms:Describe*",
-        "kms:Enable*",
-        "kms:List*",
-        "kms:Put*",
-        "kms:Update*",
-        "kms:Revoke*",
-        "kms:Disable*",
-        "kms:Get*",
-        "kms:Delete*",
+        "kms:CreateKey",
+        "kms:CreateAlias",
+        "kms:DescribeKey",
+        "kms:EnableKey",
+        "kms:ListGrants",
+        "kms:ListAliases",
+        "kms:ListKeyPolicies",
+        "kms:ListKeys",
+        "kms:PutKeyPolicy",
+        "kms:UpdateKeyDescription",
+        "kms:UpdateAlias",
+        "kms:UpdatePrimaryRegion",
+        "kms:RevokeGrant",
+        "kms:DisableKey",
+        "kms:DisableKeyRotation",
+        "kms:GetKeyPolicy",
+        "kms:GetKeyRotationStatus",
+        "kms:DeleteAlias",
         "kms:ScheduleKeyDeletion",
         "kms:CancelKeyDeletion",
         "kms:GenerateDataKey",
@@ -648,16 +668,24 @@
         "ecr:BatchGetImage",
         "ecr:DescribeImages",
         "ecr:GetDownloadUrlForLayer",
-        "kms:Create*",
-        "kms:Describe*",
-        "kms:Enable*",
-        "kms:List*",
-        "kms:Put*",
-        "kms:Update*",
-        "kms:Revoke*",
-        "kms:Disable*",
-        "kms:Get*",
-        "kms:Delete*",
+        "kms:CreateKey",
+        "kms:CreateAlias",
+        "kms:DescribeKey",
+        "kms:EnableKey",
+        "kms:ListGrants",
+        "kms:ListAliases",
+        "kms:ListKeyPolicies",
+        "kms:ListKeys",
+        "kms:PutKeyPolicy",
+        "kms:UpdateKeyDescription",
+        "kms:UpdateAlias",
+        "kms:UpdatePrimaryRegion",
+        "kms:RevokeGrant",
+        "kms:DisableKey",
+        "kms:DisableKeyRotation",
+        "kms:GetKeyPolicy",
+        "kms:GetKeyRotationStatus",
+        "kms:DeleteAlias",
         "kms:ScheduleKeyDeletion",
         "kms:CancelKeyDeletion",
         "kms:GenerateDataKey",
@@ -682,7 +710,7 @@
     "Arn": {
       "description": "The Amazon Resource Name (ARN) of the EMR Serverless Application.",
       "type": "string",
-      "markdownDescription": "The Amazon Resource Name (ARN) of the EMR Serverless Application.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "markdownDescription": "The Amazon Resource Name (ARN) of the EMR Serverless Application.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws[a-zA-Z0-9-]*):emr-serverless:.+:(\\d{12}):\\/applications\\/[0-9a-zA-Z]+$  \nUpdate requires: No interruption"
     },
     "ApplicationId": {
       "description": "The ID of the EMR Serverless Application.",

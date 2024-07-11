@@ -36,21 +36,39 @@
       "markdownDescription": "Contains information about the API Schema for the Action Group\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
     },
     "ActionGroupExecutor": {
-      "type": "object",
-      "title": "Lambda",
-      "properties": {
-        "Lambda": {
-          "type": "string",
-          "maxLength": 2048,
-          "description": "ARN of a Lambda.",
-          "markdownDescription": "ARN of a Lambda.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nPattern: ^arn:(aws[a-zA-Z-]*)?:lambda:[a-z]{2}(-gov)?-[a-z]+-\\d{1}:\\d{12}:function:[a-zA-Z0-9-_\\.]+(:(\\$LATEST|[a-zA-Z0-9-_]+))?$  \nUpdate requires: No interruption"
+      "description": "Type of Executors for an Action Group",
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "Lambda",
+          "properties": {
+            "Lambda": {
+              "type": "string",
+              "maxLength": 2048,
+              "pattern": "^arn:(aws[a-zA-Z-]*)?:lambda:[a-z]{2}(-gov)?-[a-z]+-\\d{1}:\\d{12}:function:[a-zA-Z0-9-_\\.]+(:(\\$LATEST|[a-zA-Z0-9-_]+))?$",
+              "description": "ARN of a Lambda."
+            }
+          },
+          "required": [
+            "Lambda"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "CustomControl",
+          "properties": {
+            "CustomControl": {
+              "$ref": "#/definitions/CustomControlMethod"
+            }
+          },
+          "required": [
+            "CustomControl"
+          ],
+          "additionalProperties": false
         }
-      },
-      "required": [
-        "Lambda"
       ],
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+      "markdownDescription": "Type of Executors for an Action Group\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
     },
     "ActionGroupSignature": {
       "type": "string",
@@ -96,6 +114,9 @@
         },
         "ActionGroupState": {
           "$ref": "#/definitions/ActionGroupState"
+        },
+        "FunctionSchema": {
+          "$ref": "#/definitions/FunctionSchema"
         },
         "SkipResourceInUseCheckOnDelete": {
           "description": "Specifies whether to allow deleting action group while it is in use.",
@@ -161,6 +182,80 @@
       ],
       "markdownDescription": "Creation Mode for Prompt Configuration.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DEFAULT | OVERRIDDEN  \nUpdate requires: No interruption"
     },
+    "CustomControlMethod": {
+      "type": "string",
+      "description": "Custom control of action execution",
+      "enum": [
+        "RETURN_CONTROL"
+      ],
+      "markdownDescription": "Custom control of action execution\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: RETURN_CONTROL  \nUpdate requires: No interruption"
+    },
+    "Function": {
+      "type": "object",
+      "description": "Function definition",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "description": "Name for a resource.",
+          "markdownDescription": "Name for a resource.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^([0-9a-zA-Z][_-]?){1,100}$  \nUpdate requires: No interruption"
+        },
+        "Description": {
+          "type": "string",
+          "maxLength": 1200,
+          "minLength": 1,
+          "description": "Description of function",
+          "markdownDescription": "Description of function\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1200  \nUpdate requires: No interruption"
+        },
+        "Parameters": {
+          "$ref": "#/definitions/ParameterMap"
+        }
+      },
+      "required": [
+        "Name"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Function definition\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "FunctionSchema": {
+      "description": "Schema of Functions",
+      "type": "object",
+      "title": "Functions",
+      "properties": {
+        "Functions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Function"
+          },
+          "description": "List of Function definitions",
+          "insertionOrder": false,
+          "markdownDescription": "List of Function definitions\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Functions"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Schema of Functions\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "GuardrailConfiguration": {
+      "type": "object",
+      "description": "Configuration for a guardrail.",
+      "properties": {
+        "GuardrailIdentifier": {
+          "type": "string",
+          "maxLength": 2048,
+          "description": "Identifier for the guardrail, could be the id or the arn",
+          "markdownDescription": "Identifier for the guardrail, could be the id or the arn\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nPattern: ^(([a-z0-9]+)|(arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:guardrail/[a-z0-9]+))$  \nUpdate requires: No interruption"
+        },
+        "GuardrailVersion": {
+          "type": "string",
+          "description": "Version of the guardrail",
+          "markdownDescription": "Version of the guardrail\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(([0-9]{1,8})|(DRAFT))$  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for a guardrail.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "InferenceConfiguration": {
       "type": "object",
       "description": "Configuration for inference in prompt configuration",
@@ -217,6 +312,43 @@
         "DISABLED"
       ],
       "markdownDescription": "State of the knowledge base; whether it is enabled or disabled\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption"
+    },
+    "ParameterDetail": {
+      "type": "object",
+      "description": "Parameter detail",
+      "properties": {
+        "Description": {
+          "type": "string",
+          "maxLength": 500,
+          "minLength": 1,
+          "description": "Description of function parameter.",
+          "markdownDescription": "Description of function parameter.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 500  \nUpdate requires: No interruption"
+        },
+        "Type": {
+          "$ref": "#/definitions/Type"
+        },
+        "Required": {
+          "type": "boolean",
+          "description": "Information about if a parameter is required for function call. Default to false.",
+          "markdownDescription": "Information about if a parameter is required for function call. Default to false.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Parameter detail\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ParameterMap": {
+      "type": "object",
+      "description": "A map of parameter name and detail",
+      "patternProperties": {
+        "^([0-9a-zA-Z][_-]?){1,100}$": {
+          "$ref": "#/definitions/ParameterDetail"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "A map of parameter name and detail\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "PromptConfiguration": {
       "type": "object",
@@ -331,6 +463,18 @@
       },
       "additionalProperties": false,
       "markdownDescription": "A map of tag keys and values\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Type": {
+      "type": "string",
+      "description": "Parameter Type",
+      "enum": [
+        "string",
+        "number",
+        "integer",
+        "boolean",
+        "array"
+      ],
+      "markdownDescription": "Parameter Type\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: string | number | integer | boolean | array  \nUpdate requires: No interruption"
     }
   },
   "properties": {
@@ -352,7 +496,7 @@
       "type": "string",
       "maxLength": 2048,
       "description": "ARN of a IAM role.",
-      "markdownDescription": "ARN of a IAM role.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nPattern: ^arn:aws(-[^:]+)?:iam::([0-9]{12})?:role/(service-role/)?AmazonBedrockExecutionRoleForAgents.+$  \nUpdate requires: No interruption"
+      "markdownDescription": "ARN of a IAM role.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nUpdate requires: No interruption"
     },
     "AutoPrepare": {
       "description": "Specifies whether to automatically prepare after creating or updating the agent.",
@@ -387,6 +531,9 @@
       "description": "ARN or name of a Bedrock model.",
       "markdownDescription": "ARN or name of a Bedrock model.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:(([0-9]{12}:custom-model/[a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}(([:][a-z0-9-]{1,63}){0,2})?/[a-z0-9]{12})|(:foundation-model/([a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}([.]?[a-z0-9-]{1,63})([:][a-z0-9-]{1,63}){0,2})))|(([a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}([.]?[a-z0-9-]{1,63})([:][a-z0-9-]{1,63}){0,2}))|(([0-9a-zA-Z][_-]?)+)$  \nUpdate requires: No interruption"
     },
+    "GuardrailConfiguration": {
+      "$ref": "#/definitions/GuardrailConfiguration"
+    },
     "IdleSessionTTLInSeconds": {
       "type": "number",
       "maximum": 3600,
@@ -396,10 +543,9 @@
     },
     "Instruction": {
       "type": "string",
-      "maxLength": 1200,
       "minLength": 40,
       "description": "Instruction for the agent.",
-      "markdownDescription": "Instruction for the agent.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 40  \nMaximum Length: 1200  \nUpdate requires: No interruption"
+      "markdownDescription": "Instruction for the agent.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 40  \nUpdate requires: No interruption"
     },
     "KnowledgeBases": {
       "type": "array",
@@ -456,6 +602,9 @@
         "bedrock:ListAgentActionGroups",
         "bedrock:TagResource",
         "bedrock:ListTagsForResource",
+        "bedrock:CreateGuardrail",
+        "bedrock:CreateGuardrailVersion",
+        "bedrock:GetGuardrail",
         "iam:PassRole"
       ]
     },
@@ -466,7 +615,9 @@
         "bedrock:ListAgentActionGroups",
         "bedrock:GetAgentKnowledgeBase",
         "bedrock:ListAgentKnowledgeBases",
-        "bedrock:ListTagsForResource"
+        "bedrock:ListTagsForResource",
+        "bedrock:GetGuardrail",
+        "kms:Decrypt"
       ]
     },
     "update": {
@@ -487,18 +638,24 @@
         "bedrock:TagResource",
         "bedrock:UntagResource",
         "bedrock:ListTagsForResource",
+        "bedrock:UpdateGuardrail",
+        "bedrock:GetGuardrail",
+        "kms:Decrypt",
         "iam:PassRole"
       ]
     },
     "delete": {
       "permissions": [
         "bedrock:GetAgent",
-        "bedrock:DeleteAgent"
+        "bedrock:DeleteAgent",
+        "bedrock:DeleteGuardrail",
+        "bedrock:GetGuardrail"
       ]
     },
     "list": {
       "permissions": [
-        "bedrock:ListAgents"
+        "bedrock:ListAgents",
+        "bedrock:ListGuardrails"
       ]
     }
   },

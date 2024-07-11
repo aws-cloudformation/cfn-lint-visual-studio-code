@@ -34,12 +34,7 @@
         "lambda:GetLayerVersion",
         "lambda:GetRuntimeManagementConfig",
         "lambda:PutRuntimeManagementConfig",
-        "lambda:TagResource",
-        "lambda:GetPolicy",
-        "lambda:AddPermission",
-        "lambda:RemovePermission",
-        "lambda:GetResourcePolicy",
-        "lambda:PutResourcePolicy"
+        "lambda:TagResource"
       ]
     },
     "update": {
@@ -67,13 +62,7 @@
         "lambda:PutFunctionCodeSigningConfig",
         "lambda:DeleteFunctionCodeSigningConfig",
         "lambda:GetCodeSigningConfig",
-        "lambda:GetFunctionCodeSigningConfig",
-        "lambda:GetPolicy",
-        "lambda:AddPermission",
-        "lambda:RemovePermission",
-        "lambda:GetResourcePolicy",
-        "lambda:PutResourcePolicy",
-        "lambda:DeleteResourcePolicy"
+        "lambda:GetFunctionCodeSigningConfig"
       ]
     },
     "list": {
@@ -183,26 +172,6 @@
           "description": "A list of VPC security group IDs.",
           "type": "array",
           "items": {
-            "anyOf": [
-              {
-                "relationshipRef": {
-                  "typeName": "AWS::EC2::SecurityGroup",
-                  "propertyPath": "/properties/GroupId"
-                }
-              },
-              {
-                "relationshipRef": {
-                  "typeName": "AWS::EC2::SecurityGroup",
-                  "propertyPath": "/properties/Id"
-                }
-              },
-              {
-                "relationshipRef": {
-                  "typeName": "AWS::EC2::VPC",
-                  "propertyPath": "/properties/DefaultSecurityGroup"
-                }
-              }
-            ],
             "type": "string",
             "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
           },
@@ -214,10 +183,6 @@
           "description": "A list of VPC subnet IDs.",
           "type": "array",
           "items": {
-            "relationshipRef": {
-              "typeName": "AWS::EC2::Subnet",
-              "propertyPath": "/properties/SubnetId"
-            },
             "type": "string",
             "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
           },
@@ -233,20 +198,6 @@
       "properties": {
         "TargetArn": {
           "description": "The Amazon Resource Name (ARN) of an Amazon SQS queue or Amazon SNS topic.",
-          "anyOf": [
-            {
-              "relationshipRef": {
-                "typeName": "AWS::SQS::Queue",
-                "propertyPath": "/properties/Arn"
-              }
-            },
-            {
-              "relationshipRef": {
-                "typeName": "AWS::SNS::Topic",
-                "propertyPath": "/properties/TopicArn"
-              }
-            }
-          ],
           "type": "string",
           "markdownDescription": "The Amazon Resource Name (ARN) of an Amazon SQS queue or Amazon SNS topic.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(arn:(aws[a-zA-Z-]*)?:[a-z0-9-.]+:.*)|()$  \nUpdate requires: No interruption"
         }
@@ -338,10 +289,6 @@
           "markdownDescription": "For versioned objects, the version of the deployment package object to use.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption"
         },
         "S3Bucket": {
-          "relationshipRef": {
-            "typeName": "AWS::S3::Bucket",
-            "propertyPath": "/properties/BucketName"
-          },
           "minLength": 3,
           "description": "An Amazon S3 bucket in the same AWS-Region as your function. The bucket can be in a different AWS-account.",
           "type": "string",
@@ -503,6 +450,10 @@
       "markdownDescription": "The size of the function's ``/tmp`` directory in MB. The default value is 512, but it can be any whole number between 512 and 10,240 MB.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     }
   },
+  "required": [
+    "Code",
+    "Role"
+  ],
   "properties": {
     "Description": {
       "description": "A description of the function.",
@@ -552,9 +503,9 @@
       "markdownDescription": "The name of the Lambda function, up to 64 characters in length. If you don't specify a name, CFN generates one.\n If you specify a name, you cannot perform updates that require replacement of this resource. You can perform updates that require no or some interruption. If you must replace the resource, specify a new name.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nUpdate requires: Replacement"
     },
     "Runtime": {
-      "description": "The identifier of the function's [runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html). Runtime is required if the deployment package is a .zip file archive.\n The following list includes deprecated runtimes. For more information, see [Runtime deprecation policy](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtime-support-policy).",
+      "description": "The identifier of the function's [runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html). Runtime is required if the deployment package is a .zip file archive. Specifying a runtime results in an error if you're deploying a function using a container image.\n The following list includes deprecated runtimes. Lambda blocks creating new functions and updating existing functions shortly after each runtime is deprecated. For more information, see [Runtime use after deprecation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtime-deprecation-levels).\n For a list of all currently supported runtimes, see [Supported runtimes](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtimes-supported).",
       "type": "string",
-      "markdownDescription": "The identifier of the function's [runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html). Runtime is required if the deployment package is a .zip file archive.\n The following list includes deprecated runtimes. For more information, see [Runtime deprecation policy](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtime-support-policy).\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "markdownDescription": "The identifier of the function's [runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html). Runtime is required if the deployment package is a .zip file archive. Specifying a runtime results in an error if you're deploying a function using a container image.\n The following list includes deprecated runtimes. Lambda blocks creating new functions and updating existing functions shortly after each runtime is deprecated. For more information, see [Runtime use after deprecation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtime-deprecation-levels).\n For a list of all currently supported runtimes, see [Supported runtimes](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtimes-supported).\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
     "KmsKeyArn": {
       "description": "The ARN of the KMSlong (KMS) customer managed key that's used to encrypt your function's [environment variables](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-encryption). When [Lambda SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart-security.html) is activated, Lambda also uses this key is to encrypt your function's snapshot. If you deploy your function using a container image, Lambda also uses this key to encrypt your function when it's deployed. Note that this is not the same key that's used to protect your container image in the Amazon Elastic Container Registry (Amazon ECR). If you don't provide a customer managed key, Lambda uses a default service key.",
@@ -580,10 +531,6 @@
       "description": "A list of [function layers](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html) to add to the function's execution environment. Specify each layer by its ARN, including the version.",
       "type": "array",
       "items": {
-        "relationshipRef": {
-          "typeName": "AWS::Lambda::LayerVersion",
-          "propertyPath": "/properties/LayerVersionArn"
-        },
         "type": "string",
         "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
       },
@@ -668,10 +615,6 @@
       "markdownDescription": "The instruction set architecture that the function supports. Enter a string array with one of the valid values (arm64 or x86_64). The default value is ``x86_64``.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     }
   },
-  "required": [
-    "Code",
-    "Role"
-  ],
   "attributes": {
     "SnapStartResponse": {
       "description": "",

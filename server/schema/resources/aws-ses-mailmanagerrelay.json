@@ -1,0 +1,170 @@
+{
+  "typeName": "AWS::SES::MailManagerRelay",
+  "description": "Definition of AWS::SES::MailManagerRelay Resource Type",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-ses-mailmanager",
+  "definitions": {
+    "NoAuthentication": {
+      "type": "object",
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RelayAuthentication": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "SecretArn",
+          "properties": {
+            "SecretArn": {
+              "type": "string",
+              "pattern": "^arn:(aws|aws-cn|aws-us-gov):secretsmanager:[a-z0-9-]+:\\d{12}:secret:[a-zA-Z0-9/_+=,.@-]+$"
+            }
+          },
+          "required": [
+            "SecretArn"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "NoAuthentication",
+          "properties": {
+            "NoAuthentication": {
+              "$ref": "#/definitions/NoAuthentication"
+            }
+          },
+          "required": [
+            "NoAuthentication"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9/_\\+=\\.:@\\-]+$  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 0,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: ^[a-zA-Z0-9/_\\+=\\.:@\\-]*$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "ses:TagResource",
+      "ses:UntagResource"
+    ]
+  },
+  "properties": {
+    "Authentication": {
+      "$ref": "#/definitions/RelayAuthentication"
+    },
+    "RelayName": {
+      "type": "string",
+      "maxLength": 100,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: ^[a-zA-Z0-9-_]+$  \nUpdate requires: No interruption"
+    },
+    "ServerName": {
+      "type": "string",
+      "maxLength": 100,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: ^[a-zA-Z0-9-\\.]+$  \nUpdate requires: No interruption"
+    },
+    "ServerPort": {
+      "type": "number",
+      "maximum": 65535,
+      "minimum": 1,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
+    },
+    "Tags": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "maxItems": 200,
+      "minItems": 0,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    }
+  },
+  "required": [
+    "Authentication",
+    "ServerName",
+    "ServerPort"
+  ],
+  "readOnlyProperties": [
+    "/properties/RelayArn",
+    "/properties/RelayId"
+  ],
+  "primaryIdentifier": [
+    "/properties/RelayId"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ses:TagResource",
+        "ses:ListTagsForResource",
+        "ses:GetRelay",
+        "ses:CreateRelay"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "ses:ListTagsForResource",
+        "ses:GetRelay"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ses:TagResource",
+        "ses:UntagResource",
+        "ses:ListTagsForResource",
+        "ses:GetRelay",
+        "ses:UpdateRelay"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ses:GetRelay",
+        "ses:DeleteRelay"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ses:ListRelays"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "attributes": {
+    "RelayArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "RelayId": {
+      "type": "string",
+      "maxLength": 100,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: ^[a-zA-Z0-9-]+$  \nUpdate requires: No interruption"
+    }
+  }
+}

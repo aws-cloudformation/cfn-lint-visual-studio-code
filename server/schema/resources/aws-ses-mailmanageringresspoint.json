@@ -1,0 +1,218 @@
+{
+  "typeName": "AWS::SES::MailManagerIngressPoint",
+  "description": "Definition of AWS::SES::MailManagerIngressPoint Resource Type",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-ses-mailmanager",
+  "definitions": {
+    "IngressPointConfiguration": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "SmtpPassword",
+          "properties": {
+            "SmtpPassword": {
+              "type": "string",
+              "maxLength": 64,
+              "minLength": 8,
+              "pattern": "^[A-Za-z0-9!@#$%^&*()_+\\-=\\[\\]{}|.,?]+$"
+            }
+          },
+          "required": [
+            "SmtpPassword"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "SecretArn",
+          "properties": {
+            "SecretArn": {
+              "type": "string",
+              "pattern": "^arn:(aws|aws-cn|aws-us-gov):secretsmanager:[a-z0-9-]+:\\d{12}:secret:[a-zA-Z0-9/_+=,.@-]+$"
+            }
+          },
+          "required": [
+            "SecretArn"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "IngressPointStatus": {
+      "type": "string",
+      "enum": [
+        "PROVISIONING",
+        "DEPROVISIONING",
+        "UPDATING",
+        "ACTIVE",
+        "CLOSED",
+        "FAILED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PROVISIONING | DEPROVISIONING | UPDATING | ACTIVE | CLOSED | FAILED  \nUpdate requires: No interruption"
+    },
+    "IngressPointStatusToUpdate": {
+      "type": "string",
+      "enum": [
+        "ACTIVE",
+        "CLOSED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ACTIVE | CLOSED  \nUpdate requires: No interruption"
+    },
+    "IngressPointType": {
+      "type": "string",
+      "enum": [
+        "OPEN",
+        "AUTH"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: OPEN | AUTH  \nUpdate requires: No interruption"
+    },
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9/_\\+=\\.:@\\-]+$  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 0,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: ^[a-zA-Z0-9/_\\+=\\.:@\\-]*$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "TrafficPolicyId": {
+      "type": "string",
+      "maxLength": 100,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nUpdate requires: No interruption"
+    },
+    "IngressPointConfiguration": {
+      "$ref": "#/definitions/IngressPointConfiguration"
+    },
+    "IngressPointName": {
+      "type": "string",
+      "maxLength": 63,
+      "minLength": 3,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 63  \nPattern: ^[A-Za-z0-9_\\-]+$  \nUpdate requires: No interruption"
+    },
+    "RuleSetId": {
+      "type": "string",
+      "maxLength": 100,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nUpdate requires: No interruption"
+    },
+    "StatusToUpdate": {
+      "$ref": "#/definitions/IngressPointStatusToUpdate"
+    },
+    "Tags": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "maxItems": 200,
+      "minItems": 0,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "Type": {
+      "$ref": "#/definitions/IngressPointType"
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "ses:TagResource",
+      "ses:UntagResource"
+    ]
+  },
+  "required": [
+    "Type",
+    "TrafficPolicyId",
+    "RuleSetId"
+  ],
+  "readOnlyProperties": [
+    "/properties/IngressPointId",
+    "/properties/IngressPointArn",
+    "/properties/Status",
+    "/properties/ARecord"
+  ],
+  "createOnlyProperties": [
+    "/properties/Type"
+  ],
+  "writeOnlyProperties": [
+    "/properties/IngressPointConfiguration"
+  ],
+  "primaryIdentifier": [
+    "/properties/IngressPointId"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ses:TagResource",
+        "ses:ListTagsForResource",
+        "ses:GetIngressPoint",
+        "ses:CreateIngressPoint",
+        "iam:CreateServiceLinkedRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "ses:ListTagsForResource",
+        "ses:GetIngressPoint"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ses:TagResource",
+        "ses:UntagResource",
+        "ses:ListTagsForResource",
+        "ses:GetIngressPoint",
+        "ses:UpdateIngressPoint"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ses:GetIngressPoint",
+        "ses:DeleteIngressPoint"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ses:ListIngressPoints"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "attributes": {
+    "ARecord": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "IngressPointArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "IngressPointId": {
+      "type": "string",
+      "maxLength": 100,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nUpdate requires: No interruption"
+    },
+    "Status": {
+      "$ref": "#/definitions/IngressPointStatus"
+    }
+  }
+}
