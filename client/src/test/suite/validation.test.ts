@@ -13,7 +13,7 @@ suite("Should validate a template against cfn-lint", () => {
         {
           severity: vscode.DiagnosticSeverity.Error,
           message:
-            "[cfn-lint] E1001: Top level template section Errors is not valid",
+            "[cfn-lint] E1001: Additional properties are not allowed ('Errors' was unexpected)",
           range: toRange(2, 0, 2, 6),
         },
         {
@@ -24,7 +24,7 @@ suite("Should validate a template against cfn-lint", () => {
         {
           severity: vscode.DiagnosticSeverity.Error,
           message:
-            "[cfn-lint] E3001: Invalid or unsupported Type AWS::EC2::Instance1 for resource MyEC2Instance1 in us-east-1",
+            "[cfn-lint] E3006: Resource type 'AWS::EC2::Instance1' does not exist in 'us-east-1'",
           range: toRange(12, 4, 12, 8),
         },
       ]);
@@ -38,7 +38,7 @@ suite("Should validate a template against cfn-lint", () => {
         {
           severity: vscode.DiagnosticSeverity.Error,
           message:
-            "[cfn-lint] E1001: Top level template section Errors is not valid",
+            "[cfn-lint] E1001: Additional properties are not allowed ('Errors' was unexpected)",
           range: toRange(3, 2, 3, 10),
         },
         {
@@ -49,7 +49,7 @@ suite("Should validate a template against cfn-lint", () => {
         {
           severity: vscode.DiagnosticSeverity.Error,
           message:
-            "[cfn-lint] E3001: Invalid or unsupported Type AWS::EC2::Instance1 for resource MyEC2Instance1 in us-east-1",
+            "[cfn-lint] E3006: Resource type 'AWS::EC2::Instance1' does not exist in 'us-east-1'",
           range: toRange(13, 6, 13, 12),
         },
       ]);
@@ -62,7 +62,7 @@ suite("Should validate a template against cfn-lint", () => {
         {
           severity: vscode.DiagnosticSeverity.Error,
           message:
-            "[cfn-lint] E3002: Invalid Property Resources/RootRole/Properties/BadKey",
+            "[cfn-lint] E3002: Additional properties are not allowed ('BadKey' was unexpected)",
           range: toRange(5, 6, 5, 12),
         },
       ]);
@@ -75,7 +75,7 @@ suite("Should validate a template against cfn-lint", () => {
         {
           severity: vscode.DiagnosticSeverity.Error,
           message:
-            "[cfn-lint] E3002: Invalid Property Resources/RootRole/Properties/BadKey",
+            "[cfn-lint] E3002: Additional properties are not allowed ('BadKey' was unexpected)",
           range: toRange(4, 6, 4, 12),
         },
       ]);
@@ -88,7 +88,7 @@ suite("Should validate a template against cfn-lint", () => {
         {
           severity: vscode.DiagnosticSeverity.Error,
           message:
-            "[cfn-lint] E3002: Invalid Property Resources/RootRole/Properties/BadKey",
+            "[cfn-lint] E3002: Additional properties are not allowed ('BadKey' was unexpected)",
           range: toRange(5, 6, 5, 12),
         },
       ]);
