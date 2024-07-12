@@ -1,6 +1,23 @@
 # Change Log
 All notable changes to the "vscode-cfn-lint" extension will be documented in this file.
 
+## 0.25.6
+## What's Changed
+* Bump @types/vscode from 1.87.0 to 1.88.0 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/391
+* Bump @types/vscode from 1.88.0 to 1.89.0 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/396
+* Bump @types/lodash from 4.17.0 to 4.17.4 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/394
+* Fixes for tests for cfn-lint v1 by @kddejong in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/403
+* Bump @types/vscode from 1.89.0 to 1.91.0 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/404
+* Bump semver from 7.6.0 to 7.6.2 in /server by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/397
+* Bump @types/lodash from 4.17.4 to 4.17.6 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/401
+* Bump yaml-language-server from 1.14.0 to 1.15.0 in /server by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/400
+* Bump braces from 3.0.2 to 3.0.3 by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/399
+* Bump braces from 3.0.2 to 3.0.3 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/398
+* Bump @vscode/test-electron from 2.3.9 to 2.4.1 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/405
+* CloudFormation Template Schema upgrade by @github-actions in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/389
+
+**Full Changelog**: https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/compare/v0.25.5...v0.25.6
+
 ## 0.25.5
 - Update CloudFormation schema files as of `2024-04-24` (pull #[386](https://github.com/aws-cloudformation/aws-cfn-lint-visual-studio-code/pull/386))
 - Fix an issue with symbols being falsy in json (pull #[387](https://github.com/aws-cloudformation/aws-cfn-lint-visual-studio-code/pull/387))
