@@ -54,6 +54,9 @@
     "SnowflakeDestinationConfiguration": {
       "$ref": "#/definitions/SnowflakeDestinationConfiguration"
     },
+    "IcebergDestinationConfiguration": {
+      "$ref": "#/definitions/IcebergDestinationConfiguration"
+    },
     "Tags": {
       "type": "array",
       "items": {
@@ -252,6 +255,10 @@
           "minLength": 1,
           "maxLength": 255,
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: [a-zA-Z0-9\\._\\-]+  \nUpdate requires: No interruption"
+        },
+        "ReadFromTimestamp": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         },
         "AuthenticationConfiguration": {
           "$ref": "#/definitions/AuthenticationConfiguration"
@@ -950,6 +957,9 @@
         },
         "SecretsManagerConfiguration": {
           "$ref": "#/definitions/SecretsManagerConfiguration"
+        },
+        "BufferingHints": {
+          "$ref": "#/definitions/SnowflakeBufferingHints"
         }
       },
       "required": [
@@ -961,6 +971,113 @@
         "S3Configuration"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: Replacement"
+    },
+    "IcebergDestinationConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "DestinationTableConfigurationList": {
+          "$ref": "#/definitions/DestinationTableConfigurationList"
+        },
+        "ProcessingConfiguration": {
+          "$ref": "#/definitions/ProcessingConfiguration"
+        },
+        "CloudWatchLoggingOptions": {
+          "$ref": "#/definitions/CloudWatchLoggingOptions"
+        },
+        "CatalogConfiguration": {
+          "$ref": "#/definitions/CatalogConfiguration"
+        },
+        "RoleARN": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "relationshipRef": {
+            "typeName": "AWS::IAM::Role",
+            "propertyPath": "/properties/Arn"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: arn:.*  \nUpdate requires: No interruption"
+        },
+        "RetryOptions": {
+          "$ref": "#/definitions/RetryOptions"
+        },
+        "s3BackupMode": {
+          "type": "string",
+          "enum": [
+            "AllData",
+            "FailedDataOnly"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AllData | FailedDataOnly  \nUpdate requires: No interruption"
+        },
+        "BufferingHints": {
+          "$ref": "#/definitions/BufferingHints"
+        },
+        "S3Configuration": {
+          "$ref": "#/definitions/S3DestinationConfiguration"
+        }
+      },
+      "required": [
+        "RoleARN",
+        "CatalogConfiguration",
+        "S3Configuration"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "CatalogConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "CatalogArn": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: arn:.*  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "DestinationTableConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "DestinationTableName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nUpdate requires: No interruption"
+        },
+        "DestinationDatabaseName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nUpdate requires: No interruption"
+        },
+        "S3ErrorOutputPrefix": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption"
+        },
+        "UniqueKeys": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/UniqueKey"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "DestinationDatabaseName",
+        "DestinationTableName"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "UniqueKey": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nUpdate requires: No interruption"
     },
     "BufferingHints": {
       "type": "object",
@@ -995,6 +1112,13 @@
         }
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "DestinationTableConfigurationList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/DestinationTableConfiguration"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     },
     "SplunkRetryOptions": {
       "type": "object",
@@ -1198,6 +1322,21 @@
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "SplunkBufferingHints": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "IntervalInSeconds": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "SizeInMBs": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "SnowflakeBufferingHints": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
@@ -1764,6 +1903,7 @@
     "/properties/AmazonOpenSearchServerlessDestinationConfiguration/VpcConfiguration",
     "/properties/KinesisStreamSourceConfiguration",
     "/properties/MSKSourceConfiguration",
+    "/properties/IcebergDestinationConfiguration",
     "/properties/SnowflakeDestinationConfiguration/SnowflakeVpcConfiguration"
   ],
   "primaryIdentifier": [

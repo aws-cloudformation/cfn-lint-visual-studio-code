@@ -39,9 +39,10 @@
       "enum": [
         "OPENSEARCH_SERVERLESS",
         "PINECONE",
-        "RDS"
+        "RDS",
+        "MONGO_DB_ATLAS"
       ],
-      "markdownDescription": "The storage type of a knowledge base.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: OPENSEARCH_SERVERLESS | PINECONE | RDS  \nUpdate requires: No interruption"
+      "markdownDescription": "The storage type of a knowledge base.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: OPENSEARCH_SERVERLESS | PINECONE | RDS | MONGO_DB_ATLAS  \nUpdate requires: No interruption"
     },
     "KnowledgeBaseType": {
       "type": "string",
@@ -310,6 +311,91 @@
       "additionalProperties": false,
       "markdownDescription": "Contains the names of the fields to which to map information about the vector store.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
+    "MongoDbAtlasFieldMapping": {
+      "type": "object",
+      "description": "Contains the names of the fields to which to map information about the vector store.",
+      "properties": {
+        "VectorField": {
+          "type": "string",
+          "maxLength": 2048,
+          "description": "The name of the field in which Amazon Bedrock stores the vector embeddings for your data sources.",
+          "markdownDescription": "The name of the field in which Amazon Bedrock stores the vector embeddings for your data sources.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nPattern: ^.*$  \nUpdate requires: No interruption"
+        },
+        "TextField": {
+          "type": "string",
+          "maxLength": 2048,
+          "description": "The name of the field in which Amazon Bedrock stores the raw text from your data. The text is split according to the chunking strategy you choose.",
+          "markdownDescription": "The name of the field in which Amazon Bedrock stores the raw text from your data. The text is split according to the chunking strategy you choose.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nPattern: ^.*$  \nUpdate requires: No interruption"
+        },
+        "MetadataField": {
+          "type": "string",
+          "maxLength": 2048,
+          "description": "The name of the field in which Amazon Bedrock stores metadata about the vector store.",
+          "markdownDescription": "The name of the field in which Amazon Bedrock stores metadata about the vector store.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nPattern: ^.*$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "VectorField",
+        "MetadataField",
+        "TextField"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Contains the names of the fields to which to map information about the vector store.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "MongoDbAtlasConfiguration": {
+      "type": "object",
+      "description": "Contains the storage configuration of the knowledge base in MongoDb Atlas Cloud.",
+      "properties": {
+        "Endpoint": {
+          "type": "string",
+          "maxLength": 2048,
+          "description": "MongoDB Atlas endpoint.",
+          "markdownDescription": "MongoDB Atlas endpoint.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nPattern: ^[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]+\\.mongodb\\.net$  \nUpdate requires: No interruption"
+        },
+        "CredentialsSecretArn": {
+          "type": "string",
+          "description": "The ARN of the secret that you created in AWS Secrets Manager that is linked to your Amazon Mongo database.",
+          "markdownDescription": "The ARN of the secret that you created in AWS Secrets Manager that is linked to your Amazon Mongo database.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:aws(|-cn|-us-gov):secretsmanager:[a-z0-9-]{1,20}:([0-9]{12}|):secret:[a-zA-Z0-9!/_+=.@-]{1,512}$  \nUpdate requires: No interruption"
+        },
+        "DatabaseName": {
+          "type": "string",
+          "maxLength": 63,
+          "description": "Name of the database within MongoDB Atlas.",
+          "markdownDescription": "Name of the database within MongoDB Atlas.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 63  \nPattern: ^.*$  \nUpdate requires: No interruption"
+        },
+        "CollectionName": {
+          "type": "string",
+          "maxLength": 63,
+          "description": "Name of the collection within MongoDB Atlas.",
+          "markdownDescription": "Name of the collection within MongoDB Atlas.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 63  \nPattern: ^.*$  \nUpdate requires: No interruption"
+        },
+        "VectorIndexName": {
+          "type": "string",
+          "maxLength": 2048,
+          "description": "Name of a MongoDB Atlas index.",
+          "markdownDescription": "Name of a MongoDB Atlas index.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nPattern: ^.*$  \nUpdate requires: No interruption"
+        },
+        "EndpointServiceName": {
+          "type": "string",
+          "maxLength": 255,
+          "description": "MongoDB Atlas endpoint service name.",
+          "markdownDescription": "MongoDB Atlas endpoint service name.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 255  \nPattern: ^(?:arn:aws(?:-us-gov|-cn|-iso|-iso-[a-z])*:.+:.*:\\d+:.+/.+$|[a-zA-Z0-9*]+[a-zA-Z0-9._-]*)$  \nUpdate requires: No interruption"
+        },
+        "FieldMapping": {
+          "$ref": "#/definitions/MongoDbAtlasFieldMapping"
+        }
+      },
+      "required": [
+        "Endpoint",
+        "CredentialsSecretArn",
+        "DatabaseName",
+        "CollectionName",
+        "VectorIndexName",
+        "FieldMapping"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Contains the storage configuration of the knowledge base in MongoDb Atlas Cloud.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "StorageConfiguration": {
       "type": "object",
       "description": "The vector store service in which the knowledge base is stored.",
@@ -325,6 +411,9 @@
         },
         "RdsConfiguration": {
           "$ref": "#/definitions/RdsConfiguration"
+        },
+        "MongoDbAtlasConfiguration": {
+          "$ref": "#/definitions/MongoDbAtlasConfiguration"
         }
       },
       "required": [
@@ -344,6 +433,11 @@
         {
           "required": [
             "RdsConfiguration"
+          ]
+        },
+        {
+          "required": [
+            "MongoDbAtlasConfiguration"
           ]
         }
       ],
@@ -365,6 +459,32 @@
       "additionalProperties": false,
       "markdownDescription": "A map of tag keys and values\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
+    "BedrockEmbeddingModelConfiguration": {
+      "type": "object",
+      "description": "The vector configuration details for the Bedrock embeddings model.",
+      "properties": {
+        "Dimensions": {
+          "type": "integer",
+          "maximum": 4096,
+          "minimum": 0,
+          "description": "The dimensions details for the vector configuration used on the Bedrock embeddings model.",
+          "markdownDescription": "The dimensions details for the vector configuration used on the Bedrock embeddings model.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The vector configuration details for the Bedrock embeddings model.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "EmbeddingModelConfiguration": {
+      "type": "object",
+      "description": "The embeddings model configuration details for the vector model used in Knowledge Base.",
+      "properties": {
+        "BedrockEmbeddingModelConfiguration": {
+          "$ref": "#/definitions/BedrockEmbeddingModelConfiguration"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The embeddings model configuration details for the vector model used in Knowledge Base.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "VectorKnowledgeBaseConfiguration": {
       "type": "object",
       "description": "Contains details about the model used to create vector embeddings for the knowledge base.",
@@ -374,7 +494,10 @@
           "maxLength": 2048,
           "minLength": 20,
           "description": "The ARN of the model used to create vector embeddings for the knowledge base.",
-          "markdownDescription": "The ARN of the model used to create vector embeddings for the knowledge base.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^(arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:(([0-9]{12}:custom-model/[a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}/[a-z0-9]{12})|(:foundation-model/[a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}([.:]?[a-z0-9-]{1,63}))|([0-9]{12}:provisioned-model/[a-z0-9]{12})))|([a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}([.:]?[a-z0-9-]{1,63}))|(([0-9a-zA-Z][_-]?)+)$  \nUpdate requires: No interruption"
+          "markdownDescription": "The ARN of the model used to create vector embeddings for the knowledge base.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^(arn:aws(-[^:]+)?:[a-z0-9-]+:[a-z0-9-]{1,20}:[0-9]{0,12}:[a-zA-Z0-9-:/._+]+)$  \nUpdate requires: No interruption"
+        },
+        "EmbeddingModelConfiguration": {
+          "$ref": "#/definitions/EmbeddingModelConfiguration"
         }
       },
       "required": [
