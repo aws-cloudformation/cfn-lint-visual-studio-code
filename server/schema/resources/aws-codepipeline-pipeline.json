@@ -334,6 +334,18 @@
           "description": "The method to use when a stage has not completed successfully",
           "$ref": "#/definitions/FailureConditions",
           "markdownDescription": "The method to use when a stage has not completed successfully\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+        },
+        "OnSuccess": {
+          "type": "object",
+          "description": "The method to use when a stage has completed successfully",
+          "$ref": "#/definitions/SuccessConditions",
+          "markdownDescription": "The method to use when a stage has completed successfully\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+        },
+        "BeforeEntry": {
+          "type": "object",
+          "description": "The method to use before stage runs.",
+          "$ref": "#/definitions/BeforeEntryConditions",
+          "markdownDescription": "The method to use before stage runs.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
         }
       },
       "required": [
@@ -540,9 +552,137 @@
             "ROLLBACK"
           ],
           "markdownDescription": "The specified result for when the failure conditions are met, such as rolling back the stage\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ROLLBACK  \nUpdate requires: No interruption"
+        },
+        "Conditions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/Condition"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
         }
       },
       "markdownDescription": "The configuration that specifies the result, such as rollback, to occur upon stage failure\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "SuccessConditions": {
+      "description": "The configuration that specifies the result, such as rollback, to occur upon stage failure",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Conditions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/Condition"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "The configuration that specifies the result, such as rollback, to occur upon stage failure\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "BeforeEntryConditions": {
+      "description": "The configuration that specifies the rules to run before stage starts.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Conditions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/Condition"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "The configuration that specifies the rules to run before stage starts.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Condition": {
+      "description": "Represents information about condition.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Result": {
+          "type": "string",
+          "description": "The specified result for when the failure conditions are met, such as rolling back the stage",
+          "markdownDescription": "The specified result for when the failure conditions are met, such as rolling back the stage\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Rules": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/RuleDeclaration"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "Represents information about condition.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RuleDeclaration": {
+      "description": "Represents information about condition.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "RuleTypeId": {
+          "$ref": "#/definitions/RuleTypeId"
+        },
+        "Configuration": {
+          "description": "The rule's configuration. These are key-value pairs that specify input values for a rule.",
+          "type": "object",
+          "markdownDescription": "The rule's configuration. These are key-value pairs that specify input values for a rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+        },
+        "InputArtifacts": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/InputArtifact"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Region": {
+          "description": "The rule declaration's AWS Region, such as us-east-1.",
+          "type": "string",
+          "markdownDescription": "The rule declaration's AWS Region, such as us-east-1.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "RoleArn": {
+          "description": "The ARN of the IAM service role that performs the declared rule. This is assumed through the roleArn for the pipeline.",
+          "type": "string",
+          "markdownDescription": "The ARN of the IAM service role that performs the declared rule. This is assumed through the roleArn for the pipeline.\n\n---\n\nRequired: No  \nType: String  \nPattern: arn:aws(-[\\w]+)*:iam::[0-9]{12}:role/.*  \nUpdate requires: No interruption"
+        },
+        "Name": {
+          "description": "The rule declaration's name.",
+          "type": "string",
+          "markdownDescription": "The rule declaration's name.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "Represents information about condition.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RuleTypeId": {
+      "description": "Represents information about a rule type.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Owner": {
+          "description": "The creator of the rule being called. Only AWS is supported.",
+          "type": "string",
+          "markdownDescription": "The creator of the rule being called. Only AWS is supported.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Category": {
+          "description": "A category for the provider type for the rule.",
+          "type": "string",
+          "markdownDescription": "A category for the provider type for the rule.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Version": {
+          "description": "A string that describes the rule version.",
+          "type": "string",
+          "markdownDescription": "A string that describes the rule version.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Provider": {
+          "description": "The provider of the service being called by the rule.",
+          "type": "string",
+          "markdownDescription": "The provider of the service being called by the rule.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "Represents information about a rule type.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     }
   },
   "properties": {
@@ -647,7 +787,11 @@
     "tagOnCreate": true,
     "tagUpdatable": true,
     "cloudFormationSystemTags": false,
-    "tagProperty": "/properties/Tags"
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "codepipeline:TagResource",
+      "codepipeline:UntagResource"
+    ]
   },
   "required": [
     "Stages",
