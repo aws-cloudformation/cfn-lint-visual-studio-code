@@ -1,60 +1,103 @@
 {
-  "typeName": "AWS::Cognito::UserPool",
-  "description": "Resource Type definition for AWS::Cognito::UserPool",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
   "tagging": {
+    "permissions": [
+      "cognito-idp:ListTagsForResource",
+      "cognito-idp:UntagResource",
+      "cognito-idp:TagResource"
+    ],
     "taggable": true,
     "tagOnCreate": true,
     "tagUpdatable": true,
-    "cloudFormationSystemTags": false,
-    "tagProperty": "/properties/UserPoolTags"
+    "tagProperty": "/properties/UserPoolTags",
+    "cloudFormationSystemTags": false
   },
-  "definitions": {
-    "PasswordPolicy": {
-      "type": "object",
-      "properties": {
-        "MinimumLength": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-        },
-        "RequireLowercase": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
-        },
-        "RequireNumbers": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
-        },
-        "RequireSymbols": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
-        },
-        "RequireUppercase": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
-        },
-        "TemporaryPasswordValidityDays": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+  "propertyTransform": {
+    "/properties/Schema/*/Name": "'custom:' & '' & Name"
+  },
+  "handlers": {
+    "read": {
+      "permissions": [
+        "cognito-idp:DescribeUserPool",
+        "cognito-idp:GetUserPoolMfaConfig"
+      ]
     },
+    "create": {
+      "permissions": [
+        "cognito-idp:CreateUserPool",
+        "iam:PassRole",
+        "cognito-idp:SetUserPoolMfaConfig",
+        "cognito-idp:DescribeUserPool",
+        "kms:CreateGrant",
+        "iam:CreateServiceLinkedRole"
+      ],
+      "timeoutInMinutes": 2
+    },
+    "update": {
+      "permissions": [
+        "cognito-idp:UpdateUserPool",
+        "cognito-idp:ListTagsForResource",
+        "cognito-idp:UntagResource",
+        "cognito-idp:TagResource",
+        "cognito-idp:SetUserPoolMfaConfig",
+        "cognito-idp:AddCustomAttributes",
+        "cognito-idp:DescribeUserPool",
+        "cognito-idp:GetUserPoolMfaConfig",
+        "iam:PassRole"
+      ],
+      "timeoutInMinutes": 2
+    },
+    "list": {
+      "permissions": [
+        "cognito-idp:ListUserPools"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "cognito-idp:DeleteUserPool"
+      ],
+      "timeoutInMinutes": 2
+    }
+  },
+  "typeName": "AWS::Cognito::UserPool",
+  "readOnlyProperties": [
+    "/properties/ProviderName",
+    "/properties/UserPoolId",
+    "/properties/ProviderURL",
+    "/properties/Arn"
+  ],
+  "description": "Definition of AWS::Cognito::UserPool Resource Type",
+  "writeOnlyProperties": [
+    "/properties/EnabledMfas"
+  ],
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/UserPoolId"
+  ],
+  "definitions": {
     "Policies": {
+      "additionalProperties": false,
       "type": "object",
       "properties": {
         "PasswordPolicy": {
           "$ref": "#/definitions/PasswordPolicy"
         }
       },
-      "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
-    "InviteMessageTemplate": {
+    "VerificationMessageTemplate": {
+      "additionalProperties": false,
       "type": "object",
       "properties": {
+        "EmailMessageByLink": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
         "EmailMessage": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "SmsMessage": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         },
@@ -62,291 +105,71 @@
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         },
+        "DefaultEmailOption": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "EmailSubjectByLink": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "InviteMessageTemplate": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "EmailMessage": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
         "SMSMessage": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "EmailSubject": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         }
       },
-      "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
-    "RecoveryOption": {
+    "NumberAttributeConstraints": {
+      "additionalProperties": false,
       "type": "object",
       "properties": {
-        "Name": {
+        "MinValue": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         },
-        "Priority": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        "MaxValue": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         }
       },
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "AccountRecoverySetting": {
-      "type": "object",
-      "properties": {
-        "RecoveryMechanisms": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/RecoveryOption"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-        }
-      },
-      "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "AdminCreateUserConfig": {
+      "additionalProperties": false,
       "type": "object",
       "properties": {
-        "AllowAdminCreateUserOnly": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
-        },
         "InviteMessageTemplate": {
           "$ref": "#/definitions/InviteMessageTemplate"
         },
         "UnusedAccountValidityDays": {
           "type": "integer",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "DeviceConfiguration": {
-      "type": "object",
-      "properties": {
-        "ChallengeRequiredOnNewDevice": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
         },
-        "DeviceOnlyRememberedOnUserPrompt": {
+        "AllowAdminCreateUserOnly": {
           "type": "boolean",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
         }
       },
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "EmailConfiguration": {
-      "type": "object",
-      "properties": {
-        "ReplyToEmailAddress": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "SourceArn": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "From": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "ConfigurationSet": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "EmailSendingAccount": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "CustomEmailSender": {
-      "type": "object",
-      "properties": {
-        "LambdaVersion": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "LambdaArn": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "CustomSMSSender": {
-      "type": "object",
-      "properties": {
-        "LambdaVersion": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "LambdaArn": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "PreTokenGenerationConfig": {
-      "type": "object",
-      "properties": {
-        "LambdaVersion": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "LambdaArn": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "LambdaConfig": {
-      "type": "object",
-      "properties": {
-        "CreateAuthChallenge": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "CustomMessage": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "DefineAuthChallenge": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "PostAuthentication": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "PostConfirmation": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "PreAuthentication": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "PreSignUp": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "VerifyAuthChallengeResponse": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "UserMigration": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "PreTokenGeneration": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "CustomEmailSender": {
-          "$ref": "#/definitions/CustomEmailSender"
-        },
-        "CustomSMSSender": {
-          "$ref": "#/definitions/CustomSMSSender"
-        },
-        "KMSKeyID": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "PreTokenGenerationConfig": {
-          "$ref": "#/definitions/PreTokenGenerationConfig"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "SmsConfiguration": {
-      "type": "object",
-      "properties": {
-        "ExternalId": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "SnsCallerArn": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "SnsRegion": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "StringAttributeConstraints": {
-      "type": "object",
-      "properties": {
-        "MaxLength": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "MinLength": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "NumberAttributeConstraints": {
-      "type": "object",
-      "properties": {
-        "MaxValue": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "MinValue": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "SchemaAttribute": {
-      "type": "object",
-      "properties": {
-        "AttributeDataType": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "DeveloperOnlyAttribute": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
-        },
-        "Mutable": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
-        },
-        "Name": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "NumberAttributeConstraints": {
-          "$ref": "#/definitions/NumberAttributeConstraints"
-        },
-        "StringAttributeConstraints": {
-          "$ref": "#/definitions/StringAttributeConstraints"
-        },
-        "Required": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
-        }
-      },
-      "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "UsernameConfiguration": {
+      "additionalProperties": false,
       "type": "object",
       "properties": {
         "CaseSensitive": {
@@ -354,10 +177,51 @@
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
         }
       },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "UserPoolAddOns": {
       "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "AdvancedSecurityMode": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RecoveryOption": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Priority": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "Name": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "StringAttributeConstraints": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "MinLength": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "MaxLength": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "UserAttributeUpdateSettings": {
+      "additionalProperties": false,
       "type": "object",
       "properties": {
         "AttributesRequireVerificationBeforeUpdate": {
@@ -372,67 +236,334 @@
       "required": [
         "AttributesRequireVerificationBeforeUpdate"
       ],
-      "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
-    "VerificationMessageTemplate": {
+    "CustomSMSSender": {
+      "additionalProperties": false,
       "type": "object",
       "properties": {
-        "DefaultEmailOption": {
+        "LambdaArn": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         },
-        "EmailMessage": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "EmailMessageByLink": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "EmailSubject": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "EmailSubjectByLink": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "SmsMessage": {
+        "LambdaVersion": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         }
       },
-      "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
-    "UserPoolAddOns": {
+    "EmailConfiguration": {
+      "additionalProperties": false,
       "type": "object",
       "properties": {
-        "AdvancedSecurityMode": {
+        "ReplyToEmailAddress": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "ConfigurationSet": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "EmailSendingAccount": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "SourceArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "From": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         }
       },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "SmsConfiguration": {
       "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "SnsRegion": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "ExternalId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "SnsCallerArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PasswordPolicy": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "RequireNumbers": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        },
+        "MinimumLength": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "TemporaryPasswordValidityDays": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "RequireUppercase": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        },
+        "RequireLowercase": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        },
+        "RequireSymbols": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        },
+        "PasswordHistorySize": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PreTokenGenerationConfig": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "LambdaArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "LambdaVersion": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "CustomEmailSender": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "LambdaArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "LambdaVersion": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "LambdaConfig": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "CreateAuthChallenge": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "PreSignUp": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "KMSKeyID": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "UserMigration": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "PostAuthentication": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "VerifyAuthChallengeResponse": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "PreAuthentication": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "DefineAuthChallenge": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "PreTokenGeneration": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "CustomSMSSender": {
+          "$ref": "#/definitions/CustomSMSSender"
+        },
+        "PostConfirmation": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "CustomMessage": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "PreTokenGenerationConfig": {
+          "$ref": "#/definitions/PreTokenGenerationConfig"
+        },
+        "CustomEmailSender": {
+          "$ref": "#/definitions/CustomEmailSender"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "SchemaAttribute": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "DeveloperOnlyAttribute": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        },
+        "Mutable": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        },
+        "AttributeDataType": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "StringAttributeConstraints": {
+          "$ref": "#/definitions/StringAttributeConstraints"
+        },
+        "Required": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        },
+        "NumberAttributeConstraints": {
+          "$ref": "#/definitions/NumberAttributeConstraints"
+        },
+        "Name": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "DeviceConfiguration": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "DeviceOnlyRememberedOnUserPrompt": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        },
+        "ChallengeRequiredOnNewDevice": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AccountRecoverySetting": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "RecoveryMechanisms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RecoveryOption"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     }
   },
   "properties": {
-    "UserPoolName": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 128,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+    "UserPoolTags": {
+      "patternProperties": {
+        ".*": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "Policies": {
       "$ref": "#/definitions/Policies"
     },
-    "AccountRecoverySetting": {
-      "$ref": "#/definitions/AccountRecoverySetting"
+    "Schema": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/SchemaAttribute"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     },
     "AdminCreateUserConfig": {
       "$ref": "#/definitions/AdminCreateUserConfig"
+    },
+    "UsernameConfiguration": {
+      "$ref": "#/definitions/UsernameConfiguration"
+    },
+    "UserPoolName": {
+      "minLength": 1,
+      "type": "string",
+      "maxLength": 128,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+    },
+    "SmsVerificationMessage": {
+      "minLength": 6,
+      "type": "string",
+      "maxLength": 140,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 6  \nMaximum Length: 140  \nUpdate requires: No interruption"
+    },
+    "UserAttributeUpdateSettings": {
+      "$ref": "#/definitions/UserAttributeUpdateSettings"
+    },
+    "EmailConfiguration": {
+      "$ref": "#/definitions/EmailConfiguration"
+    },
+    "SmsConfiguration": {
+      "$ref": "#/definitions/SmsConfiguration"
+    },
+    "EmailVerificationSubject": {
+      "minLength": 1,
+      "type": "string",
+      "maxLength": 140,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 140  \nUpdate requires: No interruption"
+    },
+    "AccountRecoverySetting": {
+      "$ref": "#/definitions/AccountRecoverySetting"
+    },
+    "VerificationMessageTemplate": {
+      "$ref": "#/definitions/VerificationMessageTemplate"
+    },
+    "MfaConfiguration": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "DeletionProtection": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "SmsAuthenticationMessage": {
+      "minLength": 6,
+      "type": "string",
+      "maxLength": 140,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 6  \nMaximum Length: 140  \nUpdate requires: No interruption"
+    },
+    "UserPoolAddOns": {
+      "$ref": "#/definitions/UserPoolAddOns"
     },
     "AliasAttributes": {
       "type": "array",
@@ -441,6 +572,17 @@
         "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "EnabledMfas": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "LambdaConfig": {
+      "$ref": "#/definitions/LambdaConfig"
     },
     "UsernameAttributes": {
       "type": "array",
@@ -461,158 +603,27 @@
     "DeviceConfiguration": {
       "$ref": "#/definitions/DeviceConfiguration"
     },
-    "EmailConfiguration": {
-      "$ref": "#/definitions/EmailConfiguration"
-    },
     "EmailVerificationMessage": {
-      "type": "string",
       "minLength": 6,
+      "type": "string",
       "maxLength": 20000,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 6  \nMaximum Length: 20000  \nUpdate requires: No interruption"
-    },
-    "EmailVerificationSubject": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 140,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 140  \nUpdate requires: No interruption"
-    },
-    "DeletionProtection": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-    },
-    "LambdaConfig": {
-      "$ref": "#/definitions/LambdaConfig"
-    },
-    "MfaConfiguration": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-    },
-    "EnabledMfas": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-    },
-    "SmsAuthenticationMessage": {
-      "type": "string",
-      "minLength": 6,
-      "maxLength": 140,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 6  \nMaximum Length: 140  \nUpdate requires: No interruption"
-    },
-    "SmsConfiguration": {
-      "$ref": "#/definitions/SmsConfiguration"
-    },
-    "SmsVerificationMessage": {
-      "type": "string",
-      "minLength": 6,
-      "maxLength": 140,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 6  \nMaximum Length: 140  \nUpdate requires: No interruption"
-    },
-    "Schema": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/SchemaAttribute"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-    },
-    "UsernameConfiguration": {
-      "$ref": "#/definitions/UsernameConfiguration"
-    },
-    "UserAttributeUpdateSettings": {
-      "$ref": "#/definitions/UserAttributeUpdateSettings"
-    },
-    "UserPoolTags": {
-      "type": "object",
-      "patternProperties": {
-        ".*": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "VerificationMessageTemplate": {
-      "$ref": "#/definitions/VerificationMessageTemplate"
-    },
-    "UserPoolAddOns": {
-      "$ref": "#/definitions/UserPoolAddOns"
-    }
-  },
-  "additionalProperties": false,
-  "primaryIdentifier": [
-    "/properties/UserPoolId"
-  ],
-  "readOnlyProperties": [
-    "/properties/ProviderName",
-    "/properties/UserPoolId",
-    "/properties/ProviderURL",
-    "/properties/Arn"
-  ],
-  "writeOnlyProperties": [
-    "/properties/EnabledMfas"
-  ],
-  "propertyTransform": {
-    "/properties/Schema/*/Name": "'custom:' & '' & Name"
-  },
-  "handlers": {
-    "create": {
-      "permissions": [
-        "cognito-idp:CreateUserPool",
-        "iam:PassRole",
-        "cognito-idp:SetUserPoolMfaConfig",
-        "cognito-idp:DescribeUserPool",
-        "kms:CreateGrant",
-        "iam:CreateServiceLinkedRole"
-      ],
-      "timeoutInMinutes": 2
-    },
-    "read": {
-      "permissions": [
-        "cognito-idp:DescribeUserPool"
-      ]
-    },
-    "update": {
-      "permissions": [
-        "cognito-idp:UpdateUserPool",
-        "cognito-idp:ListTagsForResource",
-        "cognito-idp:UntagResource",
-        "cognito-idp:TagResource",
-        "cognito-idp:SetUserPoolMfaConfig",
-        "cognito-idp:AddCustomAttributes",
-        "cognito-idp:DescribeUserPool",
-        "iam:PassRole"
-      ],
-      "timeoutInMinutes": 2
-    },
-    "delete": {
-      "permissions": [
-        "cognito-idp:DeleteUserPool"
-      ],
-      "timeoutInMinutes": 2
-    },
-    "list": {
-      "permissions": [
-        "cognito-idp:ListUserPools"
-      ]
     }
   },
   "attributes": {
-    "ProviderName": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-    },
     "ProviderURL": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
-    "Arn": {
+    "ProviderName": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
     "UserPoolId": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "Arn": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     }

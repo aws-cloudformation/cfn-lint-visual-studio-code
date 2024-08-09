@@ -1,20 +1,62 @@
 {
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "tagging": {
+    "tagOnCreate": false,
+    "taggable": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "handlers": {
+    "read": {
+      "permissions": [
+        "ecs:DescribeClusters"
+      ]
+    },
+    "create": {
+      "permissions": [
+        "ecs:DescribeClusters",
+        "ecs:PutClusterCapacityProviders"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ecs:DescribeClusters",
+        "ecs:PutClusterCapacityProviders"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ecs:DescribeClusters",
+        "ecs:ListClusters"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ecs:PutClusterCapacityProviders",
+        "ecs:DescribeClusters"
+      ]
+    }
+  },
   "typeName": "AWS::ECS::ClusterCapacityProviderAssociations",
   "description": "Associate a set of ECS Capacity Providers with a specified ECS Cluster",
-  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "createOnlyProperties": [
+    "/properties/Cluster"
+  ],
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/Cluster"
+  ],
   "definitions": {
-    "CapacityProviders": {
+    "DefaultCapacityProviderStrategy": {
       "description": "List of capacity providers to associate with the cluster",
       "type": "array",
       "items": {
-        "$ref": "#/definitions/CapacityProvider"
+        "$ref": "#/definitions/CapacityProviderStrategy"
       },
-      "uniqueItems": true,
       "markdownDescription": "List of capacity providers to associate with the cluster\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     },
     "CapacityProvider": {
       "description": "If using ec2 auto-scaling, the name of the associated capacity provider. Otherwise FARGATE, FARGATE_SPOT.",
-      "type": "string",
       "anyOf": [
         {
           "type": "string",
@@ -24,64 +66,65 @@
           ]
         },
         {
-          "type": "string",
           "minLength": 1,
+          "type": "string",
           "maxLength": 2048
         }
       ],
+      "type": "string",
       "markdownDescription": "If using ec2 auto-scaling, the name of the associated capacity provider. Otherwise FARGATE, FARGATE_SPOT.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
-    "Cluster": {
-      "description": "The name of the cluster",
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 2048,
-      "markdownDescription": "The name of the cluster\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: No interruption"
-    },
-    "DefaultCapacityProviderStrategy": {
+    "CapacityProviders": {
+      "uniqueItems": true,
       "description": "List of capacity providers to associate with the cluster",
       "type": "array",
       "items": {
-        "$ref": "#/definitions/CapacityProviderStrategy"
+        "$ref": "#/definitions/CapacityProvider"
       },
       "markdownDescription": "List of capacity providers to associate with the cluster\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     },
+    "Cluster": {
+      "minLength": 1,
+      "description": "The name of the cluster",
+      "type": "string",
+      "maxLength": 2048,
+      "markdownDescription": "The name of the cluster\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: No interruption"
+    },
     "CapacityProviderStrategy": {
+      "additionalProperties": false,
       "type": "object",
       "properties": {
+        "CapacityProvider": {
+          "$ref": "#/definitions/CapacityProvider"
+        },
         "Base": {
+          "maximum": 100000,
           "type": "integer",
           "minimum": 0,
-          "maximum": 100000,
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
         },
         "Weight": {
+          "maximum": 1000,
           "type": "integer",
           "minimum": 0,
-          "maximum": 1000,
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-        },
-        "CapacityProvider": {
-          "$ref": "#/definitions/CapacityProvider"
         }
       },
       "required": [
         "CapacityProvider"
       ],
-      "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     }
   },
-  "additionalProperties": false,
   "properties": {
+    "DefaultCapacityProviderStrategy": {
+      "$ref": "#/definitions/DefaultCapacityProviderStrategy"
+    },
     "CapacityProviders": {
       "$ref": "#/definitions/CapacityProviders"
     },
     "Cluster": {
       "$ref": "#/definitions/Cluster"
-    },
-    "DefaultCapacityProviderStrategy": {
-      "$ref": "#/definitions/DefaultCapacityProviderStrategy"
     }
   },
   "required": [
@@ -89,48 +132,5 @@
     "Cluster",
     "DefaultCapacityProviderStrategy"
   ],
-  "createOnlyProperties": [
-    "/properties/Cluster"
-  ],
-  "primaryIdentifier": [
-    "/properties/Cluster"
-  ],
-  "tagging": {
-    "cloudFormationSystemTags": false,
-    "tagOnCreate": false,
-    "tagUpdatable": false,
-    "taggable": false
-  },
-  "handlers": {
-    "create": {
-      "permissions": [
-        "ecs:DescribeClusters",
-        "ecs:PutClusterCapacityProviders"
-      ]
-    },
-    "read": {
-      "permissions": [
-        "ecs:DescribeClusters"
-      ]
-    },
-    "update": {
-      "permissions": [
-        "ecs:DescribeClusters",
-        "ecs:PutClusterCapacityProviders"
-      ]
-    },
-    "delete": {
-      "permissions": [
-        "ecs:PutClusterCapacityProviders",
-        "ecs:DescribeClusters"
-      ]
-    },
-    "list": {
-      "permissions": [
-        "ecs:DescribeClusters",
-        "ecs:ListClusters"
-      ]
-    }
-  },
   "attributes": {}
 }
