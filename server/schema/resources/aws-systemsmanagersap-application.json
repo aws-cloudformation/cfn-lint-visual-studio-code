@@ -4,14 +4,15 @@
   "properties": {
     "ApplicationId": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: [\\w\\d]{1,50}  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: [\\w\\d\\.-]{1,60}  \nUpdate requires: No interruption"
     },
     "ApplicationType": {
       "type": "string",
       "enum": [
-        "HANA"
+        "HANA",
+        "SAP_ABAP"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: HANA  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: HANA | SAP_ABAP  \nUpdate requires: No interruption"
     },
     "Credentials": {
       "type": "array",
@@ -47,6 +48,11 @@
       },
       "insertionOrder": true,
       "markdownDescription": "The tags of a SystemsManagerSAP application.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "DatabaseArn": {
+      "description": "The ARN of the SAP HANA database",
+      "type": "string",
+      "markdownDescription": "The ARN of the SAP HANA database\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(.+:){2,4}.+$|^arn:(.+:){1,3}.+\\/.+$  \nUpdate requires: Replacement"
     }
   },
   "required": [
@@ -63,13 +69,15 @@
     "/properties/Credentials",
     "/properties/Instances",
     "/properties/SapInstanceNumber",
-    "/properties/Sid"
+    "/properties/Sid",
+    "/properties/DatabaseArn"
   ],
   "writeOnlyProperties": [
     "/properties/Credentials",
     "/properties/Instances",
     "/properties/SapInstanceNumber",
-    "/properties/Sid"
+    "/properties/Sid",
+    "/properties/DatabaseArn"
   ],
   "additionalProperties": false,
   "definitions": {
@@ -132,7 +140,8 @@
         "ssm-sap:RegisterApplication",
         "ssm-sap:GetApplication",
         "ssm-sap:TagResource",
-        "ssm-sap:ListTagsForResource"
+        "ssm-sap:ListTagsForResource",
+        "iam:CreateServiceLinkedRole"
       ]
     },
     "read": {
@@ -166,13 +175,18 @@
     "tagOnCreate": true,
     "tagUpdatable": true,
     "cloudFormationSystemTags": true,
-    "tagProperty": "/properties/Tags"
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "ssm-sap:UntagResource",
+      "ssm-sap:TagResource",
+      "ssm-sap:ListTagsForResource"
+    ]
   },
   "attributes": {
     "Arn": {
-      "description": "The ARN of the Helix application",
+      "description": "The ARN of the SSM-SAP application",
       "type": "string",
-      "markdownDescription": "The ARN of the Helix application\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(.+:){2,4}.+$|^arn:(.+:){1,3}.+\\/.+$  \nUpdate requires: No interruption"
+      "markdownDescription": "The ARN of the SSM-SAP application\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(.+:){2,4}.+$|^arn:(.+:){1,3}.+\\/.+$  \nUpdate requires: No interruption"
     }
   }
 }

@@ -34,6 +34,30 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption"
     },
+    "AutoSubscriptionConfiguration": {
+      "type": "object",
+      "properties": {
+        "AutoSubscribe": {
+          "$ref": "#/definitions/AutoSubscriptionStatus"
+        },
+        "DefaultSubscriptionType": {
+          "$ref": "#/definitions/SubscriptionType"
+        }
+      },
+      "required": [
+        "AutoSubscribe"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AutoSubscriptionStatus": {
+      "type": "string",
+      "enum": [
+        "ENABLED",
+        "DISABLED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption"
+    },
     "EncryptionConfiguration": {
       "type": "object",
       "properties": {
@@ -46,6 +70,15 @@
       },
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "IdentityType": {
+      "type": "string",
+      "enum": [
+        "AWS_IAM_IDP_SAML",
+        "AWS_IAM_IDP_OIDC",
+        "AWS_IAM_IDC"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AWS_IAM_IDP_SAML | AWS_IAM_IDP_OIDC | AWS_IAM_IDC  \nUpdate requires: No interruption"
     },
     "QAppsConfiguration": {
       "type": "object",
@@ -61,6 +94,35 @@
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "QAppsControlMode": {
+      "type": "string",
+      "enum": [
+        "ENABLED",
+        "DISABLED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption"
+    },
+    "SubscriptionType": {
+      "type": "string",
+      "enum": [
+        "Q_LITE",
+        "Q_BUSINESS"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Q_LITE | Q_BUSINESS  \nUpdate requires: No interruption"
+    },
+    "PersonalizationConfiguration": {
+      "type": "object",
+      "properties": {
+        "PersonalizationControlMode": {
+          "$ref": "#/definitions/PersonalizationControlMode"
+        }
+      },
+      "required": [
+        "PersonalizationControlMode"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PersonalizationControlMode": {
       "type": "string",
       "enum": [
         "ENABLED",
@@ -96,6 +158,20 @@
     "AttachmentsConfiguration": {
       "$ref": "#/definitions/AttachmentsConfiguration"
     },
+    "AutoSubscriptionConfiguration": {
+      "$ref": "#/definitions/AutoSubscriptionConfiguration"
+    },
+    "ClientIdsForOIDC": {
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "type": "string",
+        "maxLength": 255,
+        "minLength": 1,
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[a-zA-Z0-9_.:/()*?=-]*$  \nUpdate requires: No interruption"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement"
+    },
     "Description": {
       "type": "string",
       "maxLength": 1000,
@@ -111,14 +187,26 @@
     "EncryptionConfiguration": {
       "$ref": "#/definitions/EncryptionConfiguration"
     },
+    "IamIdentityProviderArn": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 20,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:aws:iam::\\d{12}:(oidc-provider|saml-provider)/[a-zA-Z0-9_\\.\\/@\\-]+$  \nUpdate requires: Replacement"
+    },
     "QAppsConfiguration": {
       "$ref": "#/definitions/QAppsConfiguration"
+    },
+    "PersonalizationConfiguration": {
+      "$ref": "#/definitions/PersonalizationConfiguration"
     },
     "IdentityCenterInstanceArn": {
       "type": "string",
       "maxLength": 1224,
       "minLength": 10,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 10  \nMaximum Length: 1224  \nPattern: ^arn:(aws|aws-us-gov|aws-cn|aws-iso|aws-iso-b):sso:::instance/(sso)?ins-[a-zA-Z0-9-.]{16}$  \nUpdate requires: No interruption"
+    },
+    "IdentityType": {
+      "$ref": "#/definitions/IdentityType"
     },
     "RoleArn": {
       "type": "string",
@@ -152,7 +240,10 @@
     "/properties/IdentityCenterInstanceArn"
   ],
   "createOnlyProperties": [
-    "/properties/EncryptionConfiguration"
+    "/properties/ClientIdsForOIDC",
+    "/properties/EncryptionConfiguration",
+    "/properties/IamIdentityProviderArn",
+    "/properties/IdentityType"
   ],
   "primaryIdentifier": [
     "/properties/ApplicationId"
@@ -160,15 +251,18 @@
   "handlers": {
     "create": {
       "permissions": [
+        "iam:GetSAMLProvider",
         "iam:PassRole",
         "kms:CreateGrant",
         "kms:DescribeKey",
         "qbusiness:CreateApplication",
         "qbusiness:GetApplication",
+        "qbusiness:UpdateApplication",
         "qbusiness:ListTagsForResource",
         "qbusiness:TagResource",
         "sso:CreateApplication",
         "sso:DeleteApplication",
+        "sso:DescribeInstance",
         "sso:PutApplicationAccessScope",
         "sso:PutApplicationAuthenticationMethod",
         "sso:PutApplicationGrant"
@@ -190,6 +284,7 @@
         "qbusiness:UpdateApplication",
         "sso:CreateApplication",
         "sso:DeleteApplication",
+        "sso:DescribeInstance",
         "sso:PutApplicationAccessScope",
         "sso:PutApplicationAuthenticationMethod",
         "sso:PutApplicationGrant"

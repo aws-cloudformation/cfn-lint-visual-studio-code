@@ -1,0 +1,217 @@
+{
+  "typeName": "AWS::Glue::UsageProfile",
+  "description": "This creates a Resource of UsageProfile type.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-glue",
+  "definitions": {
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "description": "A key to identify the tag.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "A key to identify the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        },
+        "Value": {
+          "description": "Corresponding tag value for the key.",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "Corresponding tag value for the key.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ProfileConfiguration": {
+      "properties": {
+        "JobConfiguration": {
+          "patternProperties": {
+            "^.+$": {
+              "$ref": "#/definitions/ConfigurationObject"
+            }
+          },
+          "additionalProperties": false
+        },
+        "SessionConfiguration": {
+          "patternProperties": {
+            "^.+$": {
+              "$ref": "#/definitions/ConfigurationObject"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "JobConfiguration"
+          ]
+        },
+        {
+          "required": [
+            "SessionConfiguration"
+          ]
+        }
+      ],
+      "additionalProperties": false
+    },
+    "ConfigurationObject": {
+      "properties": {
+        "DefaultValue": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: No interruption"
+        },
+        "AllowedValues": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          },
+          "insertionOrder": false,
+          "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "MinValue": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: No interruption"
+        },
+        "MaxValue": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "DefaultValue"
+          ]
+        },
+        {
+          "oneOf": [
+            {
+              "required": [
+                "AllowedValues"
+              ]
+            },
+            {
+              "required": [
+                "MinValue",
+                "MaxValue"
+              ]
+            }
+          ]
+        }
+      ],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "Name": {
+      "description": "The name of the UsageProfile.",
+      "type": "string",
+      "maxLength": 128,
+      "minLength": 5,
+      "markdownDescription": "The name of the UsageProfile.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 5  \nMaximum Length: 128  \nUpdate requires: Replacement"
+    },
+    "Description": {
+      "description": "The description of the UsageProfile.",
+      "type": "string",
+      "maxLength": 512,
+      "minLength": 1,
+      "markdownDescription": "The description of the UsageProfile.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: [a-zA-Z0-9\\-\\:\\_]{1,64}  \nUpdate requires: No interruption"
+    },
+    "Configuration": {
+      "description": "UsageProfile configuration for supported service ex: (Jobs, Sessions).",
+      "$ref": "#/definitions/ProfileConfiguration",
+      "minItems": 1,
+      "markdownDescription": "UsageProfile configuration for supported service ex: (Jobs, Sessions).\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+    },
+    "Tags": {
+      "description": "The tags to be applied to this UsageProfiles.",
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 50,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "markdownDescription": "The tags to be applied to this UsageProfiles.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    }
+  },
+  "additionalProperties": false,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "glue:TagResource",
+      "glue:UntagResource",
+      "glue:GetTags"
+    ]
+  },
+  "required": [
+    "Name"
+  ],
+  "readOnlyProperties": [
+    "/properties/CreatedOn"
+  ],
+  "createOnlyProperties": [
+    "/properties/Name"
+  ],
+  "primaryIdentifier": [
+    "/properties/Name"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "glue:CreateUsageProfile",
+        "glue:GetUsageProfile",
+        "glue:GetTags",
+        "glue:TagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "glue:GetUsageProfile",
+        "glue:GetTags"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "glue:UpdateUsageProfile",
+        "glue:GetUsageProfile",
+        "glue:TagResource",
+        "glue:UntagResource",
+        "glue:GetTags"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "glue:DeleteUsageProfile",
+        "glue:GetUsageProfile"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "glue:ListUsageProfiles"
+      ]
+    }
+  },
+  "attributes": {
+    "CreatedOn": {
+      "description": "Creation time.",
+      "type": "string",
+      "maxLength": 128,
+      "minLength": 1,
+      "markdownDescription": "Creation time.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+    }
+  }
+}

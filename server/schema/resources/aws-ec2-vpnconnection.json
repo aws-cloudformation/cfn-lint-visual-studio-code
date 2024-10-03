@@ -1,129 +1,27 @@
 {
-  "typeName": "AWS::EC2::VPNConnection",
-  "$schema": "https://raw.githubusercontent.com/aws-cloudformation/cloudformation-resource-schema/blob/master/src/main/resources/schema/provider.definition.schema.v1.json",
-  "description": "Resource Type definition for AWS::EC2::VPNConnection",
-  "additionalProperties": false,
-  "properties": {
-    "CustomerGatewayId": {
-      "description": "The ID of the customer gateway at your end of the VPN connection.",
-      "type": "string",
-      "markdownDescription": "The ID of the customer gateway at your end of the VPN connection.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
-    },
-    "StaticRoutesOnly": {
-      "description": "Indicates whether the VPN connection uses static routes only.",
-      "type": "boolean",
-      "markdownDescription": "Indicates whether the VPN connection uses static routes only.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: Replacement"
-    },
-    "Tags": {
-      "description": "Any tags assigned to the VPN connection.",
-      "type": "array",
-      "uniqueItems": false,
-      "insertionOrder": false,
-      "items": {
-        "$ref": "#/definitions/Tag"
-      },
-      "markdownDescription": "Any tags assigned to the VPN connection.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-    },
-    "TransitGatewayId": {
-      "description": "The ID of the transit gateway associated with the VPN connection.",
-      "type": "string",
-      "markdownDescription": "The ID of the transit gateway associated with the VPN connection.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
-    },
-    "Type": {
-      "description": "The type of VPN connection.",
-      "type": "string",
-      "markdownDescription": "The type of VPN connection.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
-    },
-    "VpnGatewayId": {
-      "description": "The ID of the virtual private gateway at the AWS side of the VPN connection.",
-      "type": "string",
-      "markdownDescription": "The ID of the virtual private gateway at the AWS side of the VPN connection.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
-    },
-    "VpnTunnelOptionsSpecifications": {
-      "description": "The tunnel options for the VPN connection.",
-      "type": "array",
-      "uniqueItems": false,
-      "insertionOrder": false,
-      "items": {
-        "$ref": "#/definitions/VpnTunnelOptionsSpecification"
-      },
-      "markdownDescription": "The tunnel options for the VPN connection.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement"
-    }
-  },
-  "definitions": {
-    "VpnTunnelOptionsSpecification": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "PreSharedKey": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "TunnelInsideCidr": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "Tag": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "Key": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
-        },
-        "Value": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "Value",
-        "Key"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    }
-  },
-  "required": [
-    "Type",
-    "CustomerGatewayId"
-  ],
-  "createOnlyProperties": [
-    "/properties/Type",
-    "/properties/CustomerGatewayId",
-    "/properties/VpnGatewayId",
-    "/properties/TransitGatewayId",
-    "/properties/VpnTunnelOptionsSpecifications",
-    "/properties/StaticRoutesOnly"
-  ],
-  "readOnlyProperties": [
-    "/properties/VpnConnectionId"
-  ],
-  "primaryIdentifier": [
-    "/properties/VpnConnectionId"
-  ],
   "tagging": {
+    "permissions": [
+      "ec2:CreateTags",
+      "ec2:DeleteTags"
+    ],
     "taggable": true,
     "tagOnCreate": true,
     "tagUpdatable": true,
-    "cloudFormationSystemTags": false,
-    "tagProperty": "/properties/Tags"
+    "tagProperty": "/properties/Tags",
+    "cloudFormationSystemTags": false
   },
+  "$schema": "https://raw.githubusercontent.com/aws-cloudformation/cloudformation-resource-schema/blob/master/src/main/resources/schema/provider.definition.schema.v1.json",
   "handlers": {
+    "read": {
+      "permissions": [
+        "ec2:DescribeVpnConnections"
+      ]
+    },
     "create": {
       "permissions": [
         "ec2:DescribeVpnConnections",
         "ec2:CreateVpnConnection",
         "ec2:CreateTags"
-      ]
-    },
-    "delete": {
-      "permissions": [
-        "ec2:DescribeVpnConnections",
-        "ec2:DeleteVpnConnection",
-        "ec2:DeleteTags"
       ]
     },
     "update": {
@@ -133,22 +31,181 @@
         "ec2:DeleteTags"
       ]
     },
-    "read": {
-      "permissions": [
-        "ec2:DescribeVpnConnections"
-      ]
-    },
     "list": {
       "permissions": [
         "ec2:DescribeVpnConnections"
       ]
+    },
+    "delete": {
+      "permissions": [
+        "ec2:DescribeVpnConnections",
+        "ec2:DeleteVpnConnection"
+      ]
     }
   },
+  "typeName": "AWS::EC2::VPNConnection",
+  "readOnlyProperties": [
+    "/properties/VpnConnectionId"
+  ],
+  "description": "Specifies a VPN connection between a virtual private gateway and a VPN customer gateway or a transit gateway and a VPN customer gateway.\n To specify a VPN connection between a transit gateway and customer gateway, use the ``TransitGatewayId`` and ``CustomerGatewayId`` properties.\n To specify a VPN connection between a virtual private gateway and customer gateway, use the ``VpnGatewayId`` and ``CustomerGatewayId`` properties.\n For more information, see [](https://docs.aws.amazon.com/vpn/latest/s2svpn/VPC_VPN.html) in the *User Guide*.",
+  "createOnlyProperties": [
+    "/properties/Type",
+    "/properties/CustomerGatewayId",
+    "/properties/VpnGatewayId",
+    "/properties/TransitGatewayId",
+    "/properties/EnableAcceleration",
+    "/properties/LocalIpv4NetworkCidr",
+    "/properties/LocalIpv6NetworkCidr",
+    "/properties/OutsideIpAddressType",
+    "/properties/RemoteIpv4NetworkCidr",
+    "/properties/RemoteIpv6NetworkCidr",
+    "/properties/StaticRoutesOnly",
+    "/properties/TransportTransitGatewayAttachmentId",
+    "/properties/TunnelInsideIpVersion",
+    "/properties/VpnTunnelOptionsSpecifications"
+  ],
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/VpnConnectionId"
+  ],
+  "definitions": {
+    "VpnTunnelOptionsSpecification": {
+      "description": "The tunnel options for a single VPN tunnel.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "PreSharedKey": {
+          "description": "The pre-shared key (PSK) to establish initial authentication between the virtual private gateway and customer gateway.\n Constraints: Allowed characters are alphanumeric characters, periods (.), and underscores (_). Must be between 8 and 64 characters in length and cannot start with zero (0).",
+          "type": "string",
+          "markdownDescription": "The pre-shared key (PSK) to establish initial authentication between the virtual private gateway and customer gateway.\n Constraints: Allowed characters are alphanumeric characters, periods (.), and underscores (_). Must be between 8 and 64 characters in length and cannot start with zero (0).\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "TunnelInsideCidr": {
+          "description": "The range of inside IP addresses for the tunnel. Any specified CIDR blocks must be unique across all VPN connections that use the same virtual private gateway. \n Constraints: A size /30 CIDR block from the ``169.254.0.0/16`` range. The following CIDR blocks are reserved and cannot be used:\n  +   ``169.254.0.0/30`` \n  +   ``169.254.1.0/30`` \n  +   ``169.254.2.0/30`` \n  +   ``169.254.3.0/30`` \n  +   ``169.254.4.0/30`` \n  +   ``169.254.5.0/30`` \n  +   ``169.254.169.252/30``",
+          "type": "string",
+          "markdownDescription": "The range of inside IP addresses for the tunnel. Any specified CIDR blocks must be unique across all VPN connections that use the same virtual private gateway. \n Constraints: A size /30 CIDR block from the ``169.254.0.0/16`` range. The following CIDR blocks are reserved and cannot be used:\n  +   ``169.254.0.0/30`` \n  +   ``169.254.1.0/30`` \n  +   ``169.254.2.0/30`` \n  +   ``169.254.3.0/30`` \n  +   ``169.254.4.0/30`` \n  +   ``169.254.5.0/30`` \n  +   ``169.254.169.252/30``\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "The tunnel options for a single VPN tunnel.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Tag": {
+      "description": "Specifies a tag. For more information, see [Resource tags](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-resource-tags.html).",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "description": "The tag value.",
+          "type": "string",
+          "markdownDescription": "The tag value.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Key": {
+          "description": "The tag key.",
+          "type": "string",
+          "markdownDescription": "The tag key.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ],
+      "markdownDescription": "Specifies a tag. For more information, see [Resource tags](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-resource-tags.html).\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "RemoteIpv6NetworkCidr": {
+      "description": "",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "RemoteIpv4NetworkCidr": {
+      "description": "",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "VpnTunnelOptionsSpecifications": {
+      "uniqueItems": false,
+      "description": "The tunnel options for the VPN connection.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/VpnTunnelOptionsSpecification"
+      },
+      "markdownDescription": "The tunnel options for the VPN connection.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement"
+    },
+    "CustomerGatewayId": {
+      "description": "The ID of the customer gateway at your end of the VPN connection.",
+      "type": "string",
+      "markdownDescription": "The ID of the customer gateway at your end of the VPN connection.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
+    },
+    "OutsideIpAddressType": {
+      "description": "",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "StaticRoutesOnly": {
+      "description": "Indicates whether the VPN connection uses static routes only. Static routes must be used for devices that don't support BGP.\n If you are creating a VPN connection for a device that does not support Border Gateway Protocol (BGP), you must specify ``true``.",
+      "type": "boolean",
+      "markdownDescription": "Indicates whether the VPN connection uses static routes only. Static routes must be used for devices that don't support BGP.\n If you are creating a VPN connection for a device that does not support Border Gateway Protocol (BGP), you must specify ``true``.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: Replacement"
+    },
+    "EnableAcceleration": {
+      "description": "Indicate whether to enable acceleration for the VPN connection.\n Default: ``false``",
+      "type": "boolean",
+      "markdownDescription": "Indicate whether to enable acceleration for the VPN connection.\n Default: ``false``\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: Replacement"
+    },
+    "TransitGatewayId": {
+      "description": "The ID of the transit gateway associated with the VPN connection.\n You must specify either ``TransitGatewayId`` or ``VpnGatewayId``, but not both.",
+      "type": "string",
+      "markdownDescription": "The ID of the transit gateway associated with the VPN connection.\n You must specify either ``TransitGatewayId`` or ``VpnGatewayId``, but not both.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "Type": {
+      "description": "The type of VPN connection.",
+      "type": "string",
+      "markdownDescription": "The type of VPN connection.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
+    },
+    "LocalIpv4NetworkCidr": {
+      "description": "",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "VpnGatewayId": {
+      "description": "The ID of the virtual private gateway at the AWS side of the VPN connection.\n You must specify either ``TransitGatewayId`` or ``VpnGatewayId``, but not both.",
+      "type": "string",
+      "markdownDescription": "The ID of the virtual private gateway at the AWS side of the VPN connection.\n You must specify either ``TransitGatewayId`` or ``VpnGatewayId``, but not both.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "TransportTransitGatewayAttachmentId": {
+      "description": "",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "LocalIpv6NetworkCidr": {
+      "description": "",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "TunnelInsideIpVersion": {
+      "description": "",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+    },
+    "Tags": {
+      "uniqueItems": false,
+      "description": "Any tags assigned to the VPN connection.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "Any tags assigned to the VPN connection.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    }
+  },
+  "required": [
+    "Type",
+    "CustomerGatewayId"
+  ],
   "attributes": {
     "VpnConnectionId": {
-      "description": "The provider-assigned unique ID for this managed resource",
+      "description": "",
       "type": "string",
-      "markdownDescription": "The provider-assigned unique ID for this managed resource\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     }
   }
 }

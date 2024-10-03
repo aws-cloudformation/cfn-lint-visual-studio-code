@@ -1,0 +1,1038 @@
+{
+  "typeName": "AWS::Bedrock::FlowVersion",
+  "description": "Definition of AWS::Bedrock::FlowVersion Resource Type",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-bedrock-flows",
+  "definitions": {
+    "ConditionFlowNodeConfiguration": {
+      "type": "object",
+      "description": "Condition flow node configuration",
+      "properties": {
+        "Conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FlowCondition"
+          },
+          "maxItems": 5,
+          "minItems": 1,
+          "description": "List of conditions in a condition node",
+          "insertionOrder": true,
+          "markdownDescription": "List of conditions in a condition node\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Conditions"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Condition flow node configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "FlowCondition": {
+      "type": "object",
+      "description": "Condition branch for a condition node",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "description": "Name of a condition in a flow",
+          "markdownDescription": "Name of a condition in a flow\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z]([_]?[0-9a-zA-Z]){1,50}$  \nUpdate requires: No interruption"
+        },
+        "Expression": {
+          "type": "string",
+          "maxLength": 64,
+          "minLength": 1,
+          "description": "Expression for a condition in a flow",
+          "markdownDescription": "Expression for a condition in a flow\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Name"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Condition branch for a condition node\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "FlowConditionalConnectionConfiguration": {
+      "type": "object",
+      "description": "Conditional connection configuration",
+      "properties": {
+        "Condition": {
+          "type": "string",
+          "description": "Name of a condition in a flow",
+          "markdownDescription": "Name of a condition in a flow\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z]([_]?[0-9a-zA-Z]){1,50}$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Condition"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Conditional connection configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "FlowConnection": {
+      "type": "object",
+      "description": "Flow connection",
+      "properties": {
+        "Type": {
+          "$ref": "#/definitions/FlowConnectionType"
+        },
+        "Name": {
+          "type": "string",
+          "description": "Name of a connection in a flow",
+          "markdownDescription": "Name of a connection in a flow\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z]([_]?[0-9a-zA-Z]){1,100}$  \nUpdate requires: No interruption"
+        },
+        "Source": {
+          "type": "string",
+          "description": "Name of a node in a flow",
+          "markdownDescription": "Name of a node in a flow\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z]([_]?[0-9a-zA-Z]){1,50}$  \nUpdate requires: No interruption"
+        },
+        "Target": {
+          "type": "string",
+          "description": "Name of a node in a flow",
+          "markdownDescription": "Name of a node in a flow\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z]([_]?[0-9a-zA-Z]){1,50}$  \nUpdate requires: No interruption"
+        },
+        "Configuration": {
+          "$ref": "#/definitions/FlowConnectionConfiguration"
+        }
+      },
+      "required": [
+        "Name",
+        "Source",
+        "Target",
+        "Type"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Flow connection\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "FlowConnectionConfiguration": {
+      "description": "Connection configuration",
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "Data",
+          "properties": {
+            "Data": {
+              "$ref": "#/definitions/FlowDataConnectionConfiguration"
+            }
+          },
+          "required": [
+            "Data"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Conditional",
+          "properties": {
+            "Conditional": {
+              "$ref": "#/definitions/FlowConditionalConnectionConfiguration"
+            }
+          },
+          "required": [
+            "Conditional"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "Connection configuration\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+    },
+    "FlowConnectionType": {
+      "type": "string",
+      "description": "Connection type",
+      "enum": [
+        "Data",
+        "Conditional"
+      ],
+      "markdownDescription": "Connection type\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Data | Conditional  \nUpdate requires: No interruption"
+    },
+    "FlowDataConnectionConfiguration": {
+      "type": "object",
+      "description": "Data connection configuration",
+      "properties": {
+        "SourceOutput": {
+          "type": "string",
+          "description": "Name of a node output in a flow",
+          "markdownDescription": "Name of a node output in a flow\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z]([_]?[0-9a-zA-Z]){1,50}$  \nUpdate requires: No interruption"
+        },
+        "TargetInput": {
+          "type": "string",
+          "description": "Name of a node input in a flow",
+          "markdownDescription": "Name of a node input in a flow\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z]([_]?[0-9a-zA-Z]){1,50}$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "SourceOutput",
+        "TargetInput"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Data connection configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "FlowDefinition": {
+      "type": "object",
+      "description": "Flow definition",
+      "properties": {
+        "Nodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FlowNode"
+          },
+          "maxItems": 20,
+          "description": "List of nodes in a flow",
+          "insertionOrder": true,
+          "markdownDescription": "List of nodes in a flow\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Connections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FlowConnection"
+          },
+          "maxItems": 20,
+          "description": "List of connections",
+          "insertionOrder": true,
+          "markdownDescription": "List of connections\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Flow definition\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "FlowNode": {
+      "type": "object",
+      "description": "Internal mixin for flow node",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "description": "Name of a node in a flow",
+          "markdownDescription": "Name of a node in a flow\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z]([_]?[0-9a-zA-Z]){1,50}$  \nUpdate requires: No interruption"
+        },
+        "Type": {
+          "$ref": "#/definitions/FlowNodeType"
+        },
+        "Configuration": {
+          "$ref": "#/definitions/FlowNodeConfiguration"
+        },
+        "Inputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FlowNodeInput"
+          },
+          "maxItems": 5,
+          "description": "List of node inputs in a flow",
+          "insertionOrder": true,
+          "markdownDescription": "List of node inputs in a flow\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Outputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FlowNodeOutput"
+          },
+          "maxItems": 5,
+          "description": "List of node outputs in a flow",
+          "insertionOrder": true,
+          "markdownDescription": "List of node outputs in a flow\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Name",
+        "Type"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Internal mixin for flow node\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "FlowNodeConfiguration": {
+      "description": "Node configuration in a flow",
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "Input",
+          "properties": {
+            "Input": {
+              "$ref": "#/definitions/InputFlowNodeConfiguration"
+            }
+          },
+          "required": [
+            "Input"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Output",
+          "properties": {
+            "Output": {
+              "$ref": "#/definitions/OutputFlowNodeConfiguration"
+            }
+          },
+          "required": [
+            "Output"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "KnowledgeBase",
+          "properties": {
+            "KnowledgeBase": {
+              "$ref": "#/definitions/KnowledgeBaseFlowNodeConfiguration"
+            }
+          },
+          "required": [
+            "KnowledgeBase"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Condition",
+          "properties": {
+            "Condition": {
+              "$ref": "#/definitions/ConditionFlowNodeConfiguration"
+            }
+          },
+          "required": [
+            "Condition"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Lex",
+          "properties": {
+            "Lex": {
+              "$ref": "#/definitions/LexFlowNodeConfiguration"
+            }
+          },
+          "required": [
+            "Lex"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Prompt",
+          "properties": {
+            "Prompt": {
+              "$ref": "#/definitions/PromptFlowNodeConfiguration"
+            }
+          },
+          "required": [
+            "Prompt"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "LambdaFunction",
+          "properties": {
+            "LambdaFunction": {
+              "$ref": "#/definitions/LambdaFunctionFlowNodeConfiguration"
+            }
+          },
+          "required": [
+            "LambdaFunction"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Agent",
+          "properties": {
+            "Agent": {
+              "$ref": "#/definitions/AgentFlowNodeConfiguration"
+            }
+          },
+          "required": [
+            "Agent"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Storage",
+          "properties": {
+            "Storage": {
+              "$ref": "#/definitions/StorageFlowNodeConfiguration"
+            }
+          },
+          "required": [
+            "Storage"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Retrieval",
+          "properties": {
+            "Retrieval": {
+              "$ref": "#/definitions/RetrievalFlowNodeConfiguration"
+            }
+          },
+          "required": [
+            "Retrieval"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Iterator",
+          "properties": {
+            "Iterator": {
+              "$ref": "#/definitions/IteratorFlowNodeConfiguration"
+            }
+          },
+          "required": [
+            "Iterator"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Collector",
+          "properties": {
+            "Collector": {
+              "$ref": "#/definitions/CollectorFlowNodeConfiguration"
+            }
+          },
+          "required": [
+            "Collector"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "Node configuration in a flow\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+    },
+    "LexFlowNodeConfiguration": {
+      "type": "object",
+      "description": "Lex flow node configuration",
+      "properties": {
+        "BotAliasArn": {
+          "type": "string",
+          "maxLength": 78,
+          "description": "ARN of a Lex bot alias",
+          "markdownDescription": "ARN of a Lex bot alias\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 78  \nPattern: ^arn:aws(|-us-gov):lex:[a-z]{2}(-gov)?-[a-z]+-\\d{1}:\\d{12}:bot-alias/[0-9a-zA-Z]+/[0-9a-zA-Z]+$  \nUpdate requires: No interruption"
+        },
+        "LocaleId": {
+          "type": "string",
+          "maxLength": 10,
+          "minLength": 1,
+          "description": "Lex bot locale id",
+          "markdownDescription": "Lex bot locale id\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 10  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "BotAliasArn",
+        "LocaleId"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Lex flow node configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "FlowNodeIODataType": {
+      "type": "string",
+      "description": "Type of input/output for a node in a flow",
+      "enum": [
+        "String",
+        "Number",
+        "Boolean",
+        "Object",
+        "Array"
+      ],
+      "markdownDescription": "Type of input/output for a node in a flow\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: String | Number | Boolean | Object | Array  \nUpdate requires: No interruption"
+    },
+    "FlowNodeInput": {
+      "type": "object",
+      "description": "Input to a node in a flow",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "description": "Name of a node input in a flow",
+          "markdownDescription": "Name of a node input in a flow\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z]([_]?[0-9a-zA-Z]){1,50}$  \nUpdate requires: No interruption"
+        },
+        "Type": {
+          "$ref": "#/definitions/FlowNodeIODataType"
+        },
+        "Expression": {
+          "type": "string",
+          "maxLength": 64,
+          "minLength": 1,
+          "description": "Expression for a node input in a flow",
+          "markdownDescription": "Expression for a node input in a flow\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Expression",
+        "Name",
+        "Type"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Input to a node in a flow\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "FlowNodeOutput": {
+      "type": "object",
+      "description": "Output of a node in a flow",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "description": "Name of a node output in a flow",
+          "markdownDescription": "Name of a node output in a flow\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z]([_]?[0-9a-zA-Z]){1,50}$  \nUpdate requires: No interruption"
+        },
+        "Type": {
+          "$ref": "#/definitions/FlowNodeIODataType"
+        }
+      },
+      "required": [
+        "Name",
+        "Type"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Output of a node in a flow\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "FlowNodeType": {
+      "type": "string",
+      "description": "Flow node types",
+      "enum": [
+        "Input",
+        "Output",
+        "KnowledgeBase",
+        "Condition",
+        "Lex",
+        "Prompt",
+        "LambdaFunction",
+        "Agent",
+        "Iterator",
+        "Collector",
+        "Storage",
+        "Retrieval"
+      ],
+      "markdownDescription": "Flow node types\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Input | Output | KnowledgeBase | Condition | Lex | Prompt | LambdaFunction | Agent | Iterator | Collector | Storage | Retrieval  \nUpdate requires: No interruption"
+    },
+    "FlowStatus": {
+      "type": "string",
+      "description": "Schema Type for Flow APIs",
+      "enum": [
+        "Failed",
+        "Prepared",
+        "Preparing",
+        "NotPrepared"
+      ],
+      "markdownDescription": "Schema Type for Flow APIs\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Failed | Prepared | Preparing | NotPrepared  \nUpdate requires: No interruption"
+    },
+    "InputFlowNodeConfiguration": {
+      "type": "object",
+      "description": "Input flow node configuration",
+      "additionalProperties": false,
+      "markdownDescription": "Input flow node configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AgentFlowNodeConfiguration": {
+      "type": "object",
+      "description": "Agent flow node configuration",
+      "properties": {
+        "AgentAliasArn": {
+          "type": "string",
+          "maxLength": 2048,
+          "description": "Arn representation of the Agent Alias.",
+          "markdownDescription": "Arn representation of the Agent Alias.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nPattern: ^arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:agent-alias/[0-9a-zA-Z]{10}/[0-9a-zA-Z]{10}$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "AgentAliasArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Agent flow node configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "KnowledgeBaseFlowNodeConfiguration": {
+      "type": "object",
+      "description": "Knowledge base flow node configuration",
+      "properties": {
+        "KnowledgeBaseId": {
+          "type": "string",
+          "maxLength": 10,
+          "description": "Identifier of the KnowledgeBase",
+          "markdownDescription": "Identifier of the KnowledgeBase\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 10  \nPattern: ^[0-9a-zA-Z]+$  \nUpdate requires: No interruption"
+        },
+        "ModelId": {
+          "type": "string",
+          "maxLength": 2048,
+          "minLength": 1,
+          "description": "ARN or name of a Bedrock model.",
+          "markdownDescription": "ARN or name of a Bedrock model.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:(([0-9]{12}:custom-model/[a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}(([:][a-z0-9-]{1,63}){0,2})?/[a-z0-9]{12})|(:foundation-model/([a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}([.]?[a-z0-9-]{1,63})([:][a-z0-9-]{1,63}){0,2})))|(([a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}([.]?[a-z0-9-]{1,63})([:][a-z0-9-]{1,63}){0,2}))|(([0-9a-zA-Z][_-]?)+)$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "KnowledgeBaseId"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Knowledge base flow node configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "LambdaFunctionFlowNodeConfiguration": {
+      "type": "object",
+      "description": "Lambda function flow node configuration",
+      "properties": {
+        "LambdaArn": {
+          "type": "string",
+          "maxLength": 2048,
+          "description": "ARN of a Lambda.",
+          "markdownDescription": "ARN of a Lambda.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nPattern: ^arn:(aws[a-zA-Z-]*)?:lambda:[a-z]{2}(-gov)?-[a-z]+-\\d{1}:\\d{12}:function:[a-zA-Z0-9-_\\.]+(:(\\$LATEST|[a-zA-Z0-9-_]+))?$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "LambdaArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Lambda function flow node configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "OutputFlowNodeConfiguration": {
+      "type": "object",
+      "description": "Output flow node configuration",
+      "additionalProperties": false,
+      "markdownDescription": "Output flow node configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "IteratorFlowNodeConfiguration": {
+      "type": "object",
+      "description": "Iterator flow node configuration",
+      "additionalProperties": false,
+      "markdownDescription": "Iterator flow node configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "CollectorFlowNodeConfiguration": {
+      "type": "object",
+      "description": "Collector flow node configuration",
+      "additionalProperties": false,
+      "markdownDescription": "Collector flow node configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PromptFlowNodeConfiguration": {
+      "type": "object",
+      "description": "Prompt flow node configuration",
+      "properties": {
+        "SourceConfiguration": {
+          "$ref": "#/definitions/PromptFlowNodeSourceConfiguration"
+        }
+      },
+      "required": [
+        "SourceConfiguration"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Prompt flow node configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "StorageFlowNodeConfiguration": {
+      "type": "object",
+      "description": "Storage flow node configuration",
+      "properties": {
+        "ServiceConfiguration": {
+          "$ref": "#/definitions/StorageFlowNodeServiceConfiguration"
+        }
+      },
+      "required": [
+        "ServiceConfiguration"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Storage flow node configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RetrievalFlowNodeConfiguration": {
+      "type": "object",
+      "description": "Retrieval flow node configuration",
+      "properties": {
+        "ServiceConfiguration": {
+          "$ref": "#/definitions/RetrievalFlowNodeServiceConfiguration"
+        }
+      },
+      "required": [
+        "ServiceConfiguration"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Retrieval flow node configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PromptFlowNodeInlineConfiguration": {
+      "type": "object",
+      "description": "Inline prompt configuration for prompt node",
+      "properties": {
+        "TemplateType": {
+          "$ref": "#/definitions/PromptTemplateType"
+        },
+        "TemplateConfiguration": {
+          "$ref": "#/definitions/PromptTemplateConfiguration"
+        },
+        "ModelId": {
+          "type": "string",
+          "maxLength": 2048,
+          "minLength": 1,
+          "description": "ARN or name of a Bedrock model.",
+          "markdownDescription": "ARN or name of a Bedrock model.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^(arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:(([0-9]{12}:custom-model/[a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}/[a-z0-9]{12})|(:foundation-model/[a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}([.:]?[a-z0-9-]{1,63}))|([0-9]{12}:provisioned-model/[a-z0-9]{12})))|([a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}([.:]?[a-z0-9-]{1,63}))|(([0-9a-zA-Z][_-]?)+)$  \nUpdate requires: No interruption"
+        },
+        "InferenceConfiguration": {
+          "$ref": "#/definitions/PromptInferenceConfiguration"
+        }
+      },
+      "required": [
+        "ModelId",
+        "TemplateConfiguration",
+        "TemplateType"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Inline prompt configuration for prompt node\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PromptFlowNodeResourceConfiguration": {
+      "type": "object",
+      "description": "Resource prompt configuration for prompt node",
+      "properties": {
+        "PromptArn": {
+          "type": "string",
+          "description": "ARN of a prompt resource possibly with a version",
+          "markdownDescription": "ARN of a prompt resource possibly with a version\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^(arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:prompt/[0-9a-zA-Z]{10}(?::[0-9]{1,5})?)$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "PromptArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Resource prompt configuration for prompt node\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PromptFlowNodeSourceConfiguration": {
+      "description": "Prompt source configuration for prompt node",
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "Resource",
+          "properties": {
+            "Resource": {
+              "$ref": "#/definitions/PromptFlowNodeResourceConfiguration"
+            }
+          },
+          "required": [
+            "Resource"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Inline",
+          "properties": {
+            "Inline": {
+              "$ref": "#/definitions/PromptFlowNodeInlineConfiguration"
+            }
+          },
+          "required": [
+            "Inline"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "Prompt source configuration for prompt node\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+    },
+    "StorageFlowNodeServiceConfiguration": {
+      "description": "storage service configuration for storage node",
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "S3",
+          "properties": {
+            "S3": {
+              "$ref": "#/definitions/StorageFlowNodeS3Configuration"
+            }
+          },
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "storage service configuration for storage node\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+    },
+    "StorageFlowNodeS3Configuration": {
+      "type": "object",
+      "description": "s3 storage configuration for storage node",
+      "properties": {
+        "BucketName": {
+          "type": "string",
+          "description": "bucket name of an s3 that will be used for storage flow node configuration",
+          "markdownDescription": "bucket name of an s3 that will be used for storage flow node configuration\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-z0-9][\\.\\-a-z0-9]{1,61}[a-z0-9]$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "BucketName"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "s3 storage configuration for storage node\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "RetrievalFlowNodeServiceConfiguration": {
+      "description": "Retrieval service configuration for Retrieval node",
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "S3",
+          "properties": {
+            "S3": {
+              "$ref": "#/definitions/RetrievalFlowNodeS3Configuration"
+            }
+          },
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "Retrieval service configuration for Retrieval node\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+    },
+    "RetrievalFlowNodeS3Configuration": {
+      "type": "object",
+      "description": "s3 Retrieval configuration for Retrieval node",
+      "properties": {
+        "BucketName": {
+          "type": "string",
+          "description": "bucket name of an s3 that will be used for Retrieval flow node configuration",
+          "markdownDescription": "bucket name of an s3 that will be used for Retrieval flow node configuration\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-z0-9][\\.\\-a-z0-9]{1,61}[a-z0-9]$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "BucketName"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "s3 Retrieval configuration for Retrieval node\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PromptInferenceConfiguration": {
+      "description": "Model inference configuration",
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "Text",
+          "properties": {
+            "Text": {
+              "$ref": "#/definitions/PromptModelInferenceConfiguration"
+            }
+          },
+          "required": [
+            "Text"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "Model inference configuration\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+    },
+    "PromptInputVariable": {
+      "type": "object",
+      "description": "Input variable",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "description": "Name for an input variable",
+          "markdownDescription": "Name for an input variable\n\n---\n\nRequired: No  \nType: String  \nPattern: ^([0-9a-zA-Z][_-]?){1,100}$  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Input variable\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PromptModelInferenceConfiguration": {
+      "type": "object",
+      "description": "Prompt model inference configuration",
+      "properties": {
+        "Temperature": {
+          "type": "number",
+          "maximum": 1,
+          "minimum": 0,
+          "description": "Controls randomness, higher values increase diversity",
+          "markdownDescription": "Controls randomness, higher values increase diversity\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+        },
+        "TopP": {
+          "type": "number",
+          "maximum": 1,
+          "minimum": 0,
+          "description": "Cumulative probability cutoff for token selection",
+          "markdownDescription": "Cumulative probability cutoff for token selection\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+        },
+        "TopK": {
+          "type": "number",
+          "maximum": 500,
+          "minimum": 0,
+          "description": "Sample from the k most likely next tokens",
+          "markdownDescription": "Sample from the k most likely next tokens\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+        },
+        "MaxTokens": {
+          "type": "number",
+          "maximum": 4096,
+          "minimum": 0,
+          "description": "Maximum length of output",
+          "markdownDescription": "Maximum length of output\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+        },
+        "StopSequences": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          },
+          "maxItems": 4,
+          "minItems": 0,
+          "description": "List of stop sequences",
+          "insertionOrder": true,
+          "markdownDescription": "List of stop sequences\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Prompt model inference configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PromptTemplateConfiguration": {
+      "description": "Prompt template configuration",
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "Text",
+          "properties": {
+            "Text": {
+              "$ref": "#/definitions/TextPromptTemplateConfiguration"
+            }
+          },
+          "required": [
+            "Text"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "Prompt template configuration\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+    },
+    "PromptTemplateType": {
+      "type": "string",
+      "description": "Prompt template type",
+      "enum": [
+        "TEXT"
+      ],
+      "markdownDescription": "Prompt template type\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: TEXT  \nUpdate requires: No interruption"
+    },
+    "TextPromptTemplateConfiguration": {
+      "type": "object",
+      "description": "Configuration for text prompt template",
+      "properties": {
+        "Text": {
+          "type": "string",
+          "maxLength": 200000,
+          "minLength": 1,
+          "description": "Prompt content for String prompt template",
+          "markdownDescription": "Prompt content for String prompt template\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 200000  \nUpdate requires: No interruption"
+        },
+        "InputVariables": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PromptInputVariable"
+          },
+          "maxItems": 5,
+          "minItems": 0,
+          "description": "List of input variables",
+          "insertionOrder": true,
+          "markdownDescription": "List of input variables\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Text"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for text prompt template\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    }
+  },
+  "properties": {
+    "FlowArn": {
+      "type": "string",
+      "description": "Arn representation of the Flow",
+      "markdownDescription": "Arn representation of the Flow\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:flow/[0-9a-zA-Z]{10}$  \nUpdate requires: Replacement"
+    },
+    "Description": {
+      "type": "string",
+      "maxLength": 200,
+      "minLength": 1,
+      "description": "Description of the flow version",
+      "markdownDescription": "Description of the flow version\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 200  \nUpdate requires: Replacement"
+    }
+  },
+  "required": [
+    "FlowArn"
+  ],
+  "readOnlyProperties": [
+    "/properties/CreatedAt",
+    "/properties/Definition",
+    "/properties/ExecutionRoleArn",
+    "/properties/FlowId",
+    "/properties/Name",
+    "/properties/Status",
+    "/properties/Version",
+    "/properties/CustomerEncryptionKeyArn"
+  ],
+  "createOnlyProperties": [
+    "/properties/Description",
+    "/properties/FlowArn"
+  ],
+  "primaryIdentifier": [
+    "/properties/FlowArn",
+    "/properties/Version"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "bedrock:CreateFlowVersion",
+        "bedrock:GetFlowVersion",
+        "kms:GenerateDataKey",
+        "kms:Decrypt"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "bedrock:GetFlowVersion",
+        "kms:Decrypt"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "bedrock:DeleteFlowVersion",
+        "bedrock:GetFlowVersion"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "bedrock:ListFlowVersions"
+      ],
+      "handlerSchema": {
+        "properties": {
+          "FlowArn": {
+            "$ref": "resource-schema.json#/properties/FlowArn"
+          }
+        },
+        "required": [
+          "FlowArn"
+        ]
+      }
+    },
+    "update": {
+      "permissions": [
+        "noservice:NoAction"
+      ]
+    }
+  },
+  "tagging": {
+    "taggable": false
+  },
+  "additionalProperties": false,
+  "attributes": {
+    "CreatedAt": {
+      "type": "string",
+      "description": "Time Stamp.",
+      "format": "date-time",
+      "markdownDescription": "Time Stamp.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "Definition": {
+      "$ref": "#/definitions/FlowDefinition"
+    },
+    "ExecutionRoleArn": {
+      "type": "string",
+      "maxLength": 2048,
+      "description": "ARN of a IAM role",
+      "markdownDescription": "ARN of a IAM role\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nPattern: ^arn:aws(-[^:]+)?:iam::([0-9]{12})?:role/(service-role/)?.+$  \nUpdate requires: No interruption"
+    },
+    "FlowId": {
+      "type": "string",
+      "description": "Identifier for a Flow",
+      "markdownDescription": "Identifier for a Flow\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[0-9a-zA-Z]{10}$  \nUpdate requires: No interruption"
+    },
+    "Name": {
+      "type": "string",
+      "description": "Name for the flow",
+      "markdownDescription": "Name for the flow\n\n---\n\nRequired: No  \nType: String  \nPattern: ^([0-9a-zA-Z][_-]?){1,100}$  \nUpdate requires: No interruption"
+    },
+    "Status": {
+      "$ref": "#/definitions/FlowStatus"
+    },
+    "Version": {
+      "type": "string",
+      "description": "Numerical Version.",
+      "markdownDescription": "Numerical Version.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[0-9]{1,5}$  \nUpdate requires: No interruption"
+    },
+    "CustomerEncryptionKeyArn": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 1,
+      "description": "A KMS key ARN",
+      "markdownDescription": "A KMS key ARN\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws(|-cn|-us-gov):kms:[a-zA-Z0-9-]*:[0-9]{12}:key/[a-zA-Z0-9-]{36}$  \nUpdate requires: No interruption"
+    }
+  }
+}

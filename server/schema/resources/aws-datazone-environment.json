@@ -43,6 +43,16 @@
     }
   },
   "properties": {
+    "EnvironmentAccountIdentifier": {
+      "type": "string",
+      "description": "The AWS account in which the Amazon DataZone environment is created.",
+      "markdownDescription": "The AWS account in which the Amazon DataZone environment is created.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^\\d{12}$  \nUpdate requires: Replacement"
+    },
+    "EnvironmentAccountRegion": {
+      "type": "string",
+      "description": "The AWS region in which the Amazon DataZone environment is created.",
+      "markdownDescription": "The AWS region in which the Amazon DataZone environment is created.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-z]{2}-[a-z]{4,10}-\\d$  \nUpdate requires: Replacement"
+    },
     "Description": {
       "type": "string",
       "description": "The description of the Amazon DataZone environment.",
@@ -57,7 +67,7 @@
     "EnvironmentProfileIdentifier": {
       "type": "string",
       "description": "The ID of the environment profile with which the Amazon DataZone environment would be created.",
-      "markdownDescription": "The ID of the environment profile with which the Amazon DataZone environment would be created.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z0-9_-]{1,36}$  \nUpdate requires: Replacement"
+      "markdownDescription": "The ID of the environment profile with which the Amazon DataZone environment would be created.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9_-]{0,36}$  \nUpdate requires: Replacement"
     },
     "GlossaryTerms": {
       "type": "array",
@@ -70,6 +80,11 @@
       "maxItems": 20,
       "minItems": 1,
       "markdownDescription": "The glossary terms that can be used in the Amazon DataZone environment.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "EnvironmentRoleArn": {
+      "type": "string",
+      "description": "Environment role arn for custom aws environment permissions",
+      "markdownDescription": "Environment role arn for custom aws environment permissions\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
     "Name": {
       "type": "string",
@@ -94,7 +109,6 @@
     }
   },
   "required": [
-    "EnvironmentProfileIdentifier",
     "Name",
     "ProjectIdentifier",
     "DomainIdentifier"
@@ -116,13 +130,18 @@
   "writeOnlyProperties": [
     "/properties/EnvironmentProfileIdentifier",
     "/properties/ProjectIdentifier",
-    "/properties/DomainIdentifier"
+    "/properties/DomainIdentifier",
+    "/properties/EnvironmentAccountIdentifier",
+    "/properties/EnvironmentAccountRegion",
+    "/properties/EnvironmentRoleArn"
   ],
   "createOnlyProperties": [
     "/properties/DomainIdentifier",
     "/properties/EnvironmentProfileIdentifier",
     "/properties/ProjectIdentifier",
-    "/properties/UserParameters"
+    "/properties/UserParameters",
+    "/properties/EnvironmentAccountIdentifier",
+    "/properties/EnvironmentAccountRegion"
   ],
   "primaryIdentifier": [
     "/properties/DomainId",
@@ -141,7 +160,9 @@
       "permissions": [
         "datazone:CreateEnvironment",
         "datazone:GetEnvironment",
-        "datazone:DeleteEnvironment"
+        "datazone:DeleteEnvironment",
+        "datazone:AssociateEnvironmentRole",
+        "iam:PassRole"
       ]
     },
     "read": {
@@ -153,7 +174,10 @@
       "permissions": [
         "datazone:UpdateEnvironment",
         "datazone:GetEnvironment",
-        "datazone:DeleteEnvironment"
+        "datazone:DeleteEnvironment",
+        "datazone:AssociateEnvironmentRole",
+        "datazone:DisassociateEnvironmentRole",
+        "iam:PassRole"
       ]
     },
     "delete": {
@@ -218,7 +242,7 @@
     "EnvironmentProfileId": {
       "type": "string",
       "description": "The ID of the environment profile with which the Amazon DataZone environment was created.",
-      "markdownDescription": "The ID of the environment profile with which the Amazon DataZone environment was created.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9_-]{1,36}$  \nUpdate requires: No interruption"
+      "markdownDescription": "The ID of the environment profile with which the Amazon DataZone environment was created.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9_-]{0,36}$  \nUpdate requires: No interruption"
     },
     "Id": {
       "type": "string",

@@ -25,6 +25,44 @@
         "Key"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AutoParticipantRecordingConfiguration": {
+      "description": "Configuration object for individual participant recording, to attach to the new stage.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "StorageConfigurationArn": {
+          "description": "ARN of the StorageConfiguration resource to use for individual participant recording.",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 128,
+          "markdownDescription": "ARN of the StorageConfiguration resource to use for individual participant recording.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 128  \nPattern: ^$|^arn:aws:ivs:[a-z0-9-]+:[0-9]+:storage-configuration/[a-zA-Z0-9-]+$  \nUpdate requires: No interruption"
+        },
+        "MediaTypes": {
+          "description": "Types of media to be recorded. Default: AUDIO_VIDEO.",
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 1,
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "enum": [
+              "AUDIO_VIDEO",
+              "AUDIO_ONLY"
+            ],
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AUDIO_VIDEO | AUDIO_ONLY  \nUpdate requires: No interruption"
+          },
+          "default": [
+            "AUDIO_VIDEO"
+          ],
+          "markdownDescription": "Types of media to be recorded. Default: AUDIO_VIDEO.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "StorageConfigurationArn"
+      ],
+      "markdownDescription": "Configuration object for individual participant recording, to attach to the new stage.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     }
   },
   "properties": {
@@ -34,6 +72,9 @@
       "minLength": 0,
       "maxLength": 128,
       "markdownDescription": "Stage name\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9-_]*$  \nUpdate requires: No interruption"
+    },
+    "AutoParticipantRecordingConfiguration": {
+      "$ref": "#/definitions/AutoParticipantRecordingConfiguration"
     },
     "Tags": {
       "description": "An array of key-value pairs to apply to this resource.",
@@ -52,7 +93,12 @@
     "tagOnCreate": true,
     "tagUpdatable": true,
     "cloudFormationSystemTags": false,
-    "tagProperty": "/properties/Tags"
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "ivs:TagResource",
+      "ivs:UntagResource",
+      "ivs:ListTagsForResource"
+    ]
   },
   "readOnlyProperties": [
     "/properties/Arn",
@@ -81,14 +127,14 @@
         "ivs:GetStage",
         "ivs:UpdateStage",
         "ivs:TagResource",
-        "ivs:UnTagResource",
+        "ivs:UntagResource",
         "ivs:ListTagsForResource"
       ]
     },
     "delete": {
       "permissions": [
         "ivs:DeleteStage",
-        "ivs:UnTagResource"
+        "ivs:UntagResource"
       ]
     },
     "list": {

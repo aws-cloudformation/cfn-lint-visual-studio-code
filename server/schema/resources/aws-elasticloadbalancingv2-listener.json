@@ -24,21 +24,24 @@
   "handlers": {
     "read": {
       "permissions": [
-        "elasticloadbalancing:DescribeListeners"
+        "elasticloadbalancing:DescribeListeners",
+        "elasticloadbalancing:DescribeListenerAttributes"
       ]
     },
     "create": {
       "permissions": [
         "elasticloadbalancing:CreateListener",
         "elasticloadbalancing:DescribeListeners",
-        "cognito-idp:DescribeUserPoolClient"
+        "cognito-idp:DescribeUserPoolClient",
+        "elasticloadbalancing:ModifyListenerAttributes"
       ]
     },
     "update": {
       "permissions": [
         "elasticloadbalancing:ModifyListener",
         "elasticloadbalancing:DescribeListeners",
-        "cognito-idp:DescribeUserPoolClient"
+        "cognito-idp:DescribeUserPoolClient",
+        "elasticloadbalancing:ModifyListenerAttributes"
       ]
     },
     "list": {
@@ -351,6 +354,24 @@
       },
       "markdownDescription": "Information about the target group stickiness for a rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
+    "ListenerAttribute": {
+      "description": "Information about a listener attribute.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "description": "The value of the attribute.",
+          "type": "string",
+          "markdownDescription": "The value of the attribute.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Key": {
+          "description": "The name of the attribute.\n The following attribute is supported by Network Load Balancers, and Gateway Load Balancers.\n  +   ``tcp.idle_timeout.seconds`` - The tcp idle timeout value, in seconds. The valid range is 60-6000 seconds. The default is 350 seconds.",
+          "type": "string",
+          "markdownDescription": "The name of the attribute.\n The following attribute is supported by Network Load Balancers, and Gateway Load Balancers.\n  +   ``tcp.idle_timeout.seconds`` - The tcp idle timeout value, in seconds. The valid range is 60-6000 seconds. The default is 350 seconds.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "Information about a listener attribute.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "ForwardConfig": {
       "description": "Information for creating an action that distributes requests among one or more target groups. For Network Load Balancers, you can specify a single target group. Specify only when ``Type`` is ``forward``. If you specify both ``ForwardConfig`` and ``TargetGroupArn``, you can specify only one target group using ``ForwardConfig`` and it must be the same target group specified in ``TargetGroupArn``.",
       "additionalProperties": false,
@@ -374,6 +395,18 @@
       "markdownDescription": "Information for creating an action that distributes requests among one or more target groups. For Network Load Balancers, you can specify a single target group. Specify only when ``Type`` is ``forward``. If you specify both ``ForwardConfig`` and ``TargetGroupArn``, you can specify only one target group using ``ForwardConfig`` and it must be the same target group specified in ``TargetGroupArn``.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "AuthenticateOidcConfig": {
+      "anyOf": [
+        {
+          "required": [
+            "ClientSecret"
+          ]
+        },
+        {
+          "required": [
+            "UseExistingClientSecret"
+          ]
+        }
+      ],
       "description": "Specifies information required using an identity provide (IdP) that is compliant with OpenID Connect (OIDC) to authenticate users.",
       "additionalProperties": false,
       "type": "object",
@@ -386,12 +419,12 @@
         "TokenEndpoint": {
           "description": "The token endpoint of the IdP. This must be a full URL, including the HTTPS protocol, the domain, and the path.",
           "type": "string",
-          "markdownDescription": "The token endpoint of the IdP. This must be a full URL, including the HTTPS protocol, the domain, and the path.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+          "markdownDescription": "The token endpoint of the IdP. This must be a full URL, including the HTTPS protocol, the domain, and the path.\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: No interruption"
         },
         "UseExistingClientSecret": {
           "description": "Indicates whether to use the existing client secret when modifying a rule. If you are creating a rule, you can omit this parameter or set it to false.",
           "type": "boolean",
-          "markdownDescription": "Indicates whether to use the existing client secret when modifying a rule. If you are creating a rule, you can omit this parameter or set it to false.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+          "markdownDescription": "Indicates whether to use the existing client secret when modifying a rule. If you are creating a rule, you can omit this parameter or set it to false.\n\n---\n\nRequired: Conditional  \nType: Boolean  \nUpdate requires: No interruption"
         },
         "SessionTimeout": {
           "description": "The maximum duration of the authentication session, in seconds. The default is 604800 seconds (7 days).",
@@ -406,27 +439,27 @@
         "Issuer": {
           "description": "The OIDC issuer identifier of the IdP. This must be a full URL, including the HTTPS protocol, the domain, and the path.",
           "type": "string",
-          "markdownDescription": "The OIDC issuer identifier of the IdP. This must be a full URL, including the HTTPS protocol, the domain, and the path.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+          "markdownDescription": "The OIDC issuer identifier of the IdP. This must be a full URL, including the HTTPS protocol, the domain, and the path.\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: No interruption"
         },
         "ClientSecret": {
           "description": "The OAuth 2.0 client secret. This parameter is required if you are creating a rule. If you are modifying a rule, you can omit this parameter if you set ``UseExistingClientSecret`` to true.",
           "type": "string",
-          "markdownDescription": "The OAuth 2.0 client secret. This parameter is required if you are creating a rule. If you are modifying a rule, you can omit this parameter if you set ``UseExistingClientSecret`` to true.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          "markdownDescription": "The OAuth 2.0 client secret. This parameter is required if you are creating a rule. If you are modifying a rule, you can omit this parameter if you set ``UseExistingClientSecret`` to true.\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: No interruption"
         },
         "UserInfoEndpoint": {
           "description": "The user info endpoint of the IdP. This must be a full URL, including the HTTPS protocol, the domain, and the path.",
           "type": "string",
-          "markdownDescription": "The user info endpoint of the IdP. This must be a full URL, including the HTTPS protocol, the domain, and the path.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+          "markdownDescription": "The user info endpoint of the IdP. This must be a full URL, including the HTTPS protocol, the domain, and the path.\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: No interruption"
         },
         "ClientId": {
           "description": "The OAuth 2.0 client identifier.",
           "type": "string",
-          "markdownDescription": "The OAuth 2.0 client identifier.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+          "markdownDescription": "The OAuth 2.0 client identifier.\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: No interruption"
         },
         "AuthorizationEndpoint": {
           "description": "The authorization endpoint of the IdP. This must be a full URL, including the HTTPS protocol, the domain, and the path.",
           "type": "string",
-          "markdownDescription": "The authorization endpoint of the IdP. This must be a full URL, including the HTTPS protocol, the domain, and the path.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+          "markdownDescription": "The authorization endpoint of the IdP. This must be a full URL, including the HTTPS protocol, the domain, and the path.\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: No interruption"
         },
         "SessionCookieName": {
           "description": "The name of the cookie used to maintain session information. The default is AWSELBAuthSessionCookie.",
@@ -487,6 +520,17 @@
       "description": "The mutual authentication configuration information.",
       "$ref": "#/definitions/MutualAuthentication",
       "markdownDescription": "The mutual authentication configuration information.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+    },
+    "ListenerAttributes": {
+      "arrayType": "AttributeList",
+      "uniqueItems": true,
+      "description": "The listener attributes.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ListenerAttribute"
+      },
+      "markdownDescription": "The listener attributes.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     },
     "AlpnPolicy": {
       "description": "[TLS listener] The name of the Application-Layer Protocol Negotiation (ALPN) policy.",
