@@ -143,6 +143,17 @@
       "properties": {
         "DefaultResourceSpec": {
           "$ref": "#/definitions/ResourceSpec"
+        },
+        "LifecycleConfigArns": {
+          "type": "array",
+          "description": "A list of LifecycleConfigArns available for use with JupyterServer apps.",
+          "uniqueItems": false,
+          "minItems": 0,
+          "maxItems": 30,
+          "items": {
+            "$ref": "#/definitions/StudioLifecycleConfigArn"
+          },
+          "markdownDescription": "A list of LifecycleConfigArns available for use with JupyterServer apps.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
         }
       },
       "markdownDescription": "The JupyterServer app settings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
@@ -232,6 +243,12 @@
           "description": "The ARN of the image version created on the instance.",
           "maxLength": 256,
           "markdownDescription": "The ARN of the image version created on the instance.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nPattern: ^arn:aws(-[\\w]+)*:sagemaker:.+:[0-9]{12}:image-version/[a-z0-9]([-.]?[a-z0-9])*/[0-9]+$  \nUpdate requires: No interruption"
+        },
+        "LifecycleConfigArn": {
+          "type": "string",
+          "description": "The Amazon Resource Name (ARN) of the Lifecycle Configuration to attach to the Resource.",
+          "maxLength": 256,
+          "markdownDescription": "The Amazon Resource Name (ARN) of the Lifecycle Configuration to attach to the Resource.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nPattern: arn:aws[a-z\\-]*:sagemaker:[a-z0-9\\-]*:[0-9]{12}:studio-lifecycle-config/.*  \nUpdate requires: No interruption"
         }
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
@@ -256,6 +273,17 @@
           "$ref": "#/definitions/ResourceSpec",
           "description": "The default instance type and the Amazon Resource Name (ARN) of the default SageMaker image used by the KernelGateway app.",
           "markdownDescription": "The default instance type and the Amazon Resource Name (ARN) of the default SageMaker image used by the KernelGateway app.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        },
+        "LifecycleConfigArns": {
+          "type": "array",
+          "description": "A list of LifecycleConfigArns available for use with KernelGateway apps.",
+          "uniqueItems": false,
+          "minItems": 0,
+          "maxItems": 30,
+          "items": {
+            "$ref": "#/definitions/StudioLifecycleConfigArn"
+          },
+          "markdownDescription": "A list of LifecycleConfigArns available for use with KernelGateway apps.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
         }
       },
       "markdownDescription": "The kernel gateway app settings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
@@ -302,9 +330,71 @@
             "$ref": "#/definitions/CustomImage"
           },
           "markdownDescription": "A list of custom images available for use for JupyterLab apps\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "AppLifecycleManagement": {
+          "$ref": "#/definitions/AppLifecycleManagement"
         }
       },
       "markdownDescription": "The JupyterLab app settings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AppLifecycleManagement": {
+      "type": "object",
+      "properties": {
+        "IdleSettings": {
+          "$ref": "#/definitions/IdleSettings"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "IdleSettings": {
+      "type": "object",
+      "properties": {
+        "LifecycleManagement": {
+          "$ref": "#/definitions/LifecycleManagement"
+        },
+        "IdleTimeoutInMinutes": {
+          "$ref": "#/definitions/IdleTimeoutInMinutes"
+        },
+        "MinIdleTimeoutInMinutes": {
+          "$ref": "#/definitions/MinIdleTimeoutInMinutes"
+        },
+        "MaxIdleTimeoutInMinutes": {
+          "$ref": "#/definitions/MaxIdleTimeoutInMinutes"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "LifecycleManagement": {
+      "type": "string",
+      "description": "A flag to enable/disable AppLifecycleManagement settings",
+      "enum": [
+        "ENABLED",
+        "DISABLED"
+      ],
+      "markdownDescription": "A flag to enable/disable AppLifecycleManagement settings\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption"
+    },
+    "IdleTimeoutInMinutes": {
+      "type": "integer",
+      "description": "The idle timeout value set in minutes",
+      "minimum": 60,
+      "maximum": 525600,
+      "markdownDescription": "The idle timeout value set in minutes\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+    },
+    "MinIdleTimeoutInMinutes": {
+      "type": "integer",
+      "description": "The minimum idle timeout value set in minutes",
+      "minimum": 60,
+      "maximum": 525600,
+      "markdownDescription": "The minimum idle timeout value set in minutes\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+    },
+    "MaxIdleTimeoutInMinutes": {
+      "type": "integer",
+      "description": "The maximum idle timeout value set in minutes",
+      "minimum": 60,
+      "maximum": 525600,
+      "markdownDescription": "The maximum idle timeout value set in minutes\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
     },
     "CodeRepository": {
       "type": "object",
@@ -392,6 +482,9 @@
             "$ref": "#/definitions/CustomImage"
           },
           "markdownDescription": "A list of custom images for use for CodeEditor apps.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "AppLifecycleManagement": {
+          "$ref": "#/definitions/AppLifecycleManagement"
         }
       },
       "markdownDescription": "The CodeEditor app settings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
@@ -601,7 +694,7 @@
         "DataWrangler",
         "FeatureStore",
         "EmrClusters",
-        "AutoML",
+        "AutoMl",
         "Experiments",
         "Training",
         "ModelEvaluation",
@@ -610,9 +703,10 @@
         "JumpStart",
         "InferenceRecommender",
         "Endpoints",
-        "Projects"
+        "Projects",
+        "InferenceOptimization"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DataWrangler | FeatureStore | EmrClusters | AutoML | Experiments | Training | ModelEvaluation | Pipelines | Models | JumpStart | InferenceRecommender | Endpoints | Projects  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DataWrangler | FeatureStore | EmrClusters | AutoMl | Experiments | Training | ModelEvaluation | Pipelines | Models | JumpStart | InferenceRecommender | Endpoints | Projects | InferenceOptimization  \nUpdate requires: No interruption"
     },
     "AppType": {
       "type": "string",

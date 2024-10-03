@@ -11,6 +11,26 @@
       "default": "OFF",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: OFF | SNAPPY  \nUpdate requires: No interruption"
     },
+    "ConditionBasedSignalFetchConfig": {
+      "type": "object",
+      "properties": {
+        "ConditionExpression": {
+          "type": "string",
+          "maxLength": 2048,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: No interruption"
+        },
+        "TriggerMode": {
+          "$ref": "#/definitions/TriggerMode"
+        }
+      },
+      "required": [
+        "ConditionExpression",
+        "TriggerMode"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "DataDestinationConfig": {
       "oneOf": [
         {
@@ -38,6 +58,19 @@
           "required": [
             "TimestreamConfig"
           ]
+        },
+        {
+          "type": "object",
+          "title": "MqttTopicConfig",
+          "properties": {
+            "MqttTopicConfig": {
+              "$ref": "#/definitions/MqttTopicConfig"
+            }
+          },
+          "required": [
+            "MqttTopicConfig"
+          ],
+          "additionalProperties": false
         }
       ]
     },
@@ -90,6 +123,29 @@
         "TimestreamTableArn",
         "ExecutionRoleArn"
       ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "MqttTopicConfig": {
+      "type": "object",
+      "properties": {
+        "MqttTopicArn": {
+          "type": "string",
+          "maxLength": 2048,
+          "minLength": 20,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:.*  \nUpdate requires: No interruption"
+        },
+        "ExecutionRoleArn": {
+          "type": "string",
+          "maxLength": 2048,
+          "minLength": 20,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:(aws[a-zA-Z0-9-]*):iam::(\\d{12})?:(role((\\u002F)|(\\u002F[\\u0021-\\u007F]+\\u002F))[\\w+=,.@-]+)$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "ExecutionRoleArn",
+        "MqttTopicArn"
+      ],
+      "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "UpdateCampaignAction": {
@@ -149,12 +205,81 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
+    "SignalFetchConfig": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "TimeBased",
+          "properties": {
+            "TimeBased": {
+              "$ref": "#/definitions/TimeBasedSignalFetchConfig"
+            }
+          },
+          "required": [
+            "TimeBased"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "ConditionBased",
+          "properties": {
+            "ConditionBased": {
+              "$ref": "#/definitions/ConditionBasedSignalFetchConfig"
+            }
+          },
+          "required": [
+            "ConditionBased"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "SignalFetchInformation": {
+      "type": "object",
+      "properties": {
+        "FullyQualifiedName": {
+          "type": "string",
+          "maxLength": 150,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 150  \nPattern: ^[a-zA-Z0-9_.]+$  \nUpdate requires: No interruption"
+        },
+        "SignalFetchConfig": {
+          "$ref": "#/definitions/SignalFetchConfig"
+        },
+        "ConditionLanguageVersion": {
+          "type": "number",
+          "maximum": 1,
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+        },
+        "Actions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: No interruption"
+          },
+          "maxItems": 5,
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Actions",
+        "FullyQualifiedName",
+        "SignalFetchConfig"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "TimeBasedCollectionScheme": {
       "additionalProperties": false,
       "type": "object",
       "properties": {
         "PeriodMs": {
-          "maximum": 60000,
+          "maximum": 86400000,
           "type": "number",
           "minimum": 10000,
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
@@ -163,6 +288,21 @@
       "required": [
         "PeriodMs"
       ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "TimeBasedSignalFetchConfig": {
+      "type": "object",
+      "properties": {
+        "ExecutionFrequencyMs": {
+          "type": "number",
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "ExecutionFrequencyMs"
+      ],
+      "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "SpoolingMode": {
@@ -280,6 +420,35 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "TimePeriod": {
+      "type": "object",
+      "properties": {
+        "Unit": {
+          "$ref": "#/definitions/TimeUnit"
+        },
+        "Value": {
+          "type": "number",
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Unit",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "TimeUnit": {
+      "type": "string",
+      "enum": [
+        "MILLISECOND",
+        "SECOND",
+        "MINUTE",
+        "HOUR"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MILLISECOND | SECOND | MINUTE | HOUR  \nUpdate requires: No interruption"
     }
   },
   "properties": {
@@ -309,6 +478,16 @@
       "items": {
         "$ref": "#/definitions/SignalInformation"
       },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "SignalsToFetch": {
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/SignalFetchInformation"
+      },
+      "maxItems": 10,
+      "minItems": 0,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     },
     "DataDestinationConfigs": {
@@ -393,7 +572,12 @@
     "tagOnCreate": true,
     "tagUpdatable": true,
     "cloudFormationSystemTags": true,
-    "tagProperty": "/properties/Tags"
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "iotfleetwise:UntagResource",
+      "iotfleetwise:TagResource",
+      "iotfleetwise:ListTagsForResource"
+    ]
   },
   "readOnlyProperties": [
     "/properties/Arn",
@@ -423,7 +607,6 @@
   ],
   "required": [
     "Name",
-    "Action",
     "CollectionScheme",
     "SignalCatalogArn",
     "TargetArn"

@@ -1,13 +1,18 @@
 {
   "typeName": "AWS::Cognito::UserPool",
-  "description": "Resource Type definition for AWS::Cognito::UserPool",
+  "description": "Definition of AWS::Cognito::UserPool Resource Type",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
   "tagging": {
     "taggable": true,
     "tagOnCreate": true,
     "tagUpdatable": true,
     "cloudFormationSystemTags": false,
-    "tagProperty": "/properties/UserPoolTags"
+    "tagProperty": "/properties/UserPoolTags",
+    "permissions": [
+      "cognito-idp:ListTagsForResource",
+      "cognito-idp:UntagResource",
+      "cognito-idp:TagResource"
+    ]
   },
   "definitions": {
     "PasswordPolicy": {
@@ -34,6 +39,10 @@
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
         },
         "TemporaryPasswordValidityDays": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "PasswordHistorySize": {
           "type": "integer",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
         }
@@ -406,12 +415,26 @@
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
+    "AdvancedSecurityAdditionalFlows": {
+      "type": "object",
+      "properties": {
+        "CustomAuthMode": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "UserPoolAddOns": {
       "type": "object",
       "properties": {
         "AdvancedSecurityMode": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "AdvancedSecurityAdditionalFlows": {
+          "$ref": "#/definitions/AdvancedSecurityAdditionalFlows"
         }
       },
       "additionalProperties": false,
@@ -501,6 +524,18 @@
       "maxLength": 140,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 6  \nMaximum Length: 140  \nUpdate requires: No interruption"
     },
+    "EmailAuthenticationMessage": {
+      "type": "string",
+      "minLength": 6,
+      "maxLength": 20000,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 6  \nMaximum Length: 20000  \nUpdate requires: No interruption"
+    },
+    "EmailAuthenticationSubject": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 140,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 140  \nUpdate requires: No interruption"
+    },
     "SmsConfiguration": {
       "$ref": "#/definitions/SmsConfiguration"
     },
@@ -571,7 +606,8 @@
     },
     "read": {
       "permissions": [
-        "cognito-idp:DescribeUserPool"
+        "cognito-idp:DescribeUserPool",
+        "cognito-idp:GetUserPoolMfaConfig"
       ]
     },
     "update": {
@@ -583,6 +619,7 @@
         "cognito-idp:SetUserPoolMfaConfig",
         "cognito-idp:AddCustomAttributes",
         "cognito-idp:DescribeUserPool",
+        "cognito-idp:GetUserPoolMfaConfig",
         "iam:PassRole"
       ],
       "timeoutInMinutes": 2

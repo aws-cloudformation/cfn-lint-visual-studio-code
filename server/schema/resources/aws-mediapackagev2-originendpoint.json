@@ -93,9 +93,10 @@
         "CLEAR_KEY_AES_128",
         "FAIRPLAY",
         "PLAYREADY",
-        "WIDEVINE"
+        "WIDEVINE",
+        "IRDETO"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CLEAR_KEY_AES_128 | FAIRPLAY | PLAYREADY | WIDEVINE  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CLEAR_KEY_AES_128 | FAIRPLAY | PLAYREADY | WIDEVINE | IRDETO  \nUpdate requires: No interruption"
     },
     "Encryption": {
       "type": "object",
@@ -161,6 +162,16 @@
       "additionalProperties": false,
       "markdownDescription": "<p>The encryption type.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
+    "EndpointErrorCondition": {
+      "type": "string",
+      "enum": [
+        "STALE_MANIFEST",
+        "INCOMPLETE_MANIFEST",
+        "MISSING_DRM_KEY",
+        "SLATE_INPUT"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: STALE_MANIFEST | INCOMPLETE_MANIFEST | MISSING_DRM_KEY | SLATE_INPUT  \nUpdate requires: No interruption"
+    },
     "FilterConfiguration": {
       "type": "object",
       "description": "<p>Filter configuration includes settings for manifest filtering, start and end times, and time delay that apply to all of your egress requests for this manifest. </p>",
@@ -194,6 +205,22 @@
       },
       "additionalProperties": false,
       "markdownDescription": "<p>Filter configuration includes settings for manifest filtering, start and end times, and time delay that apply to all of your egress requests for this manifest. </p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ForceEndpointErrorConfiguration": {
+      "type": "object",
+      "description": "<p>The failover settings for the endpoint.</p>",
+      "properties": {
+        "EndpointErrorConditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EndpointErrorCondition"
+          },
+          "description": "<p>The failover settings for the endpoint. The options are:</p>\n         <ul>\n            <li>\n               <p>\n                  <code>STALE_MANIFEST</code> - The manifest stalled and there a no new segments or parts.</p>\n            </li>\n            <li>\n               <p>\n                  <code>INCOMPLETE_MANIFEST</code> - There is a gap in the manifest.</p>\n            </li>\n            <li>\n               <p>\n                  <code>MISSING_DRM_KEY</code> - Key rotation is enabled but we're unable to fetch the key for the current key period.</p>\n            </li>\n         </ul>",
+          "markdownDescription": "<p>The failover settings for the endpoint. The options are:</p>\n         <ul>\n            <li>\n               <p>\n                  <code>STALE_MANIFEST</code> - The manifest stalled and there a no new segments or parts.</p>\n            </li>\n            <li>\n               <p>\n                  <code>INCOMPLETE_MANIFEST</code> - There is a gap in the manifest.</p>\n            </li>\n            <li>\n               <p>\n                  <code>MISSING_DRM_KEY</code> - Key rotation is enabled but we're unable to fetch the key for the current key period.</p>\n            </li>\n         </ul>\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "<p>The failover settings for the endpoint.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "DashManifestConfiguration": {
       "type": "object",
@@ -579,6 +606,9 @@
       "description": "<p>Enter any descriptive text that helps you to identify the origin endpoint.</p>",
       "markdownDescription": "<p>Enter any descriptive text that helps you to identify the origin endpoint.</p>\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nUpdate requires: No interruption"
     },
+    "ForceEndpointErrorConfiguration": {
+      "$ref": "#/definitions/ForceEndpointErrorConfiguration"
+    },
     "HlsManifests": {
       "type": "array",
       "items": {
@@ -623,7 +653,8 @@
   "required": [
     "ChannelGroupName",
     "ChannelName",
-    "OriginEndpointName"
+    "OriginEndpointName",
+    "ContainerType"
   ],
   "readOnlyProperties": [
     "/properties/Arn",
@@ -696,7 +727,12 @@
     "tagOnCreate": true,
     "tagUpdatable": true,
     "cloudFormationSystemTags": false,
-    "tagProperty": "/properties/Tags"
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "mediapackagev2:TagResource",
+      "mediapackagev2:UntagResource",
+      "mediapackagev2:ListTagsForResource"
+    ]
   },
   "additionalIdentifiers": [
     [

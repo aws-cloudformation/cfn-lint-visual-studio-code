@@ -119,7 +119,7 @@
       "type": "string",
       "maxLength": 2048,
       "minLength": 20,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:[\\w+=\\/,.@-]+:kms:[a-zA-Z0-9\\-]*:[a-zA-Z0-9]{1,12}:key\\/[a-zA-Z0-9-]+$  \nUpdate requires: Replacement"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:[\\w+=\\/,.@-]+:kms:[a-zA-Z0-9\\-]*:[a-zA-Z0-9]{1,12}:key\\/[a-zA-Z0-9-]+$  \nUpdate requires: No interruption"
     },
     "DisconnectTimeoutInMinutes": {
       "type": "number",
@@ -156,6 +156,9 @@
     },
     "UploadAllowed": {
       "$ref": "#/definitions/EnabledType"
+    },
+    "DeepLinkAllowed": {
+      "$ref": "#/definitions/EnabledType"
     }
   },
   "required": [
@@ -169,10 +172,6 @@
     "/properties/AssociatedPortalArns",
     "/properties/UserSettingsArn"
   ],
-  "createOnlyProperties": [
-    "/properties/AdditionalEncryptionContext",
-    "/properties/CustomerManagedKey"
-  ],
   "primaryIdentifier": [
     "/properties/UserSettingsArn"
   ],
@@ -183,10 +182,12 @@
         "workspaces-web:GetUserSettings",
         "workspaces-web:ListTagsForResource",
         "workspaces-web:TagResource",
-        "kms:CreateGrant",
         "kms:DescribeKey",
         "kms:GenerateDataKey",
-        "kms:Decrypt"
+        "kms:Decrypt",
+        "kms:GenerateDataKeyWithoutPlaintext",
+        "kms:ReEncryptTo",
+        "kms:ReEncryptFrom"
       ]
     },
     "read": {
@@ -237,7 +238,12 @@
     "tagOnCreate": true,
     "tagProperty": "/properties/Tags",
     "tagUpdatable": true,
-    "taggable": true
+    "taggable": true,
+    "permissions": [
+      "workspaces-web:UntagResource",
+      "workspaces-web:ListTagsForResource",
+      "workspaces-web:TagResource"
+    ]
   },
   "additionalProperties": false,
   "attributes": {

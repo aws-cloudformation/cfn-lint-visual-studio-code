@@ -7,7 +7,12 @@
     "tagOnCreate": true,
     "tagUpdatable": true,
     "cloudFormationSystemTags": true,
-    "tagProperty": "/properties/Tags"
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "kafka:UntagResource",
+      "kafka:ListTagsForResource",
+      "kafka:TagResource"
+    ]
   },
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-msk-replicator.git",
   "properties": {
@@ -143,6 +148,11 @@
           "description": "Configuration for specifying the position in the topics to start replicating from.",
           "$ref": "#/definitions/ReplicationStartingPosition",
           "markdownDescription": "Configuration for specifying the position in the topics to start replicating from.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        },
+        "TopicNameConfiguration": {
+          "description": "Configuration for specifying replicated topic names should be the same as their corresponding upstream topics or prefixed with source cluster alias.",
+          "$ref": "#/definitions/ReplicationTopicNameConfiguration",
+          "markdownDescription": "Configuration for specifying replicated topic names should be the same as their corresponding upstream topics or prefixed with source cluster alias.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
         }
       },
       "required": [
@@ -170,6 +180,27 @@
         "EARLIEST"
       ],
       "markdownDescription": "The type of replication starting position.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: LATEST | EARLIEST  \nUpdate requires: No interruption"
+    },
+    "ReplicationTopicNameConfiguration": {
+      "description": "Configuration for specifying replicated topic names should be the same as their corresponding upstream topics or prefixed with source cluster alias.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Type": {
+          "$ref": "#/definitions/ReplicationTopicNameConfigurationType"
+        }
+      },
+      "required": [],
+      "markdownDescription": "Configuration for specifying replicated topic names should be the same as their corresponding upstream topics or prefixed with source cluster alias.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ReplicationTopicNameConfigurationType": {
+      "description": "The type of replicated topic name.",
+      "type": "string",
+      "enum": [
+        "PREFIXED_WITH_SOURCE_CLUSTER_ALIAS",
+        "IDENTICAL"
+      ],
+      "markdownDescription": "The type of replicated topic name.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PREFIXED_WITH_SOURCE_CLUSTER_ALIAS | IDENTICAL  \nUpdate requires: No interruption"
     },
     "ConsumerGroupReplication": {
       "description": "Configuration relating to consumer group replication.",
@@ -364,8 +395,7 @@
     "/properties/ReplicatorName",
     "/properties/Description",
     "/properties/KafkaClusters",
-    "/properties/ServiceExecutionRoleArn",
-    "/properties/ReplicationInfoList/-/TopicReplication/StartingPosition/Type"
+    "/properties/ServiceExecutionRoleArn"
   ],
   "handlers": {
     "create": {
