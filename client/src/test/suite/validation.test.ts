@@ -27,6 +27,11 @@ suite("Should validate a template against cfn-lint", () => {
             "[cfn-lint] E3006: Resource type 'AWS::EC2::Instance1' does not exist in 'us-east-1'",
           range: toRange(12, 4, 12, 8),
         },
+        {
+          severity: vscode.DiagnosticSeverity.Error,
+          message: "[cfn-lint] E3673: 'ImageId' is a required property",
+          range: toRange(13, 2, 13, 16),
+        },
       ]);
     });
 
