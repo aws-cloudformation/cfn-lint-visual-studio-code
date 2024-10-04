@@ -1,6 +1,21 @@
 # Change Log
 All notable changes to the "vscode-cfn-lint" extension will be documented in this file.
 
+## 0.26.0
+## What's Changed
+* Update tests and vscode test version by @kddejong in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/418
+* Bump @types/lodash from 4.17.6 to 4.17.10 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/419
+* Bump @types/vscode from 1.91.0 to 1.94.0 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/420
+* Bump peter-evans/create-pull-request from 6 to 7 by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/415
+* Bump path-to-regexp from 1.8.0 to 1.9.0 in /server by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/414
+* Bump mocha from 10.4.0 to 10.7.3 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/412
+* Bump semver from 7.6.2 to 7.6.3 in /server by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/410
+* Bump vscode-languageserver-textdocument from 1.0.11 to 1.0.12 in /server by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/411
+* CloudFormation Template Schema upgrade by @github-actions in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/406
+* Publish to open vsx by @kddejong in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/421
+
+**Full Changelog**: https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/compare/v0.25.6...v0.26.0
+
 ## 0.25.6
 ## What's Changed
 * Bump @types/vscode from 1.87.0 to 1.88.0 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/391
