@@ -16,7 +16,9 @@
   "readOnlyProperties": [
     "/properties/ContainerGroupDefinitionArn",
     "/properties/CreationTime",
-    "/properties/ContainerDefinitions/*/ResolvedImageDigest"
+    "/properties/ContainerDefinitions/*/ResolvedImageDigest",
+    "/properties/Status",
+    "/properties/StatusReason"
   ],
   "description": "The AWS::GameLift::ContainerGroupDefinition resource creates an Amazon GameLift container group definition.",
   "createOnlyProperties": [
@@ -113,6 +115,40 @@
         "ToPort"
       ],
       "markdownDescription": "A set of one or more port numbers that can be opened on the container.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ContainerMountPoint": {
+      "description": "Defines the mount point configuration within a container.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "InstancePath": {
+          "minLength": 1,
+          "description": "The path on the host that will be mounted in the container.",
+          "type": "string",
+          "maxLength": 1024,
+          "markdownDescription": "The path on the host that will be mounted in the container.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nPattern: ^\\/[\\s\\S]*$  \nUpdate requires: No interruption"
+        },
+        "ContainerPath": {
+          "minLength": 1,
+          "description": "The path inside the container where the mount is accessible.",
+          "type": "string",
+          "maxLength": 1024,
+          "markdownDescription": "The path inside the container where the mount is accessible.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nPattern: ^(\\/+[^\\/]+\\/*)+$  \nUpdate requires: No interruption"
+        },
+        "AccessLevel": {
+          "description": "The access permissions for the mounted path.",
+          "type": "string",
+          "enum": [
+            "READ_ONLY",
+            "READ_AND_WRITE"
+          ],
+          "markdownDescription": "The access permissions for the mounted path.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: READ_ONLY | READ_AND_WRITE  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "InstancePath"
+      ],
+      "markdownDescription": "Defines the mount point configuration within a container.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "MemoryLimits": {
       "description": "Specifies how much memory is available to the container.",
@@ -459,6 +495,12 @@
       },
       "markdownDescription": "A collection of container definitions that define the containers in this group.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: Replacement"
     },
+    "SourceVersionNumber": {
+      "description": "A specific ContainerGroupDefinition version to be updated",
+      "type": "integer",
+      "minimum": 0,
+      "markdownDescription": "A specific ContainerGroupDefinition version to be updated\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+    },
     "Tags": {
       "minItems": 0,
       "maxItems": 200,
@@ -471,6 +513,16 @@
       },
       "markdownDescription": "An array of key-value pairs to apply to this resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     },
+    "SupportContainerDefinitions": {
+      "minItems": 1,
+      "maxItems": 10,
+      "uniqueItems": true,
+      "description": "A collection of support container definitions that define the containers in this group.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {},
+      "markdownDescription": "A collection of support container definitions that define the containers in this group.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
     "TotalCpuLimit": {
       "description": "The maximum number of CPU units reserved for this container group. The value is expressed as an integer amount of CPU units. (1 vCPU is equal to 1024 CPU units.)",
       "maximum": 10240,
@@ -480,6 +532,21 @@
     }
   },
   "attributes": {
+    "Status": {
+      "description": "A string indicating ContainerGroupDefinition status.",
+      "type": "string",
+      "enum": [
+        "READY",
+        "COPYING",
+        "FAILED"
+      ],
+      "markdownDescription": "A string indicating ContainerGroupDefinition status.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: READY | COPYING | FAILED  \nUpdate requires: No interruption"
+    },
+    "StatusReason": {
+      "description": "A string indicating the reason for ContainerGroupDefinition status.",
+      "type": "string",
+      "markdownDescription": "A string indicating the reason for ContainerGroupDefinition status.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
     "ContainerGroupDefinitionArn": {
       "minLength": 1,
       "description": "The Amazon Resource Name (ARN) that is assigned to a Amazon GameLift container group resource and uniquely identifies it across all AWS Regions.",
