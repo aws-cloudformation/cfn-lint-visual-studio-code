@@ -2,7 +2,6 @@
   "typeName": "AWS::MemoryDB::Cluster",
   "description": "The AWS::MemoryDB::Cluster resource creates an Amazon MemoryDB Cluster.",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-memorydb",
-  "taggable": true,
   "definitions": {
     "Endpoint": {
       "type": "object",
@@ -175,6 +174,11 @@
       "type": "string",
       "markdownDescription": "The user-supplied name of a final cluster snapshot. This is the unique name that identifies the snapshot. MemoryDB creates the snapshot, and then deletes the cluster immediately afterward.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     },
+    "Engine": {
+      "description": "The engine type used by the cluster.",
+      "type": "string",
+      "markdownDescription": "The engine type used by the cluster.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
     "EngineVersion": {
       "description": "The Redis engine version used by the cluster.",
       "type": "string",
@@ -201,6 +205,18 @@
       },
       "markdownDescription": "An array of key-value pairs to apply to this cluster.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "memorydb:TagResource",
+      "memorydb:ListTags",
+      "memorydb:UntagResource"
+    ]
   },
   "additionalProperties": false,
   "readOnlyProperties": [
@@ -236,8 +252,11 @@
   "handlers": {
     "create": {
       "permissions": [
+        "kms:DescribeKey",
+        "kms:CreateGrant",
         "memorydb:CreateCluster",
         "memorydb:DescribeClusters",
+        "memorydb:TagResource",
         "memorydb:ListTags"
       ]
     },
@@ -254,7 +273,8 @@
         "memorydb:ListTags",
         "memorydb:TagResource",
         "memorydb:UntagResource"
-      ]
+      ],
+      "timeoutInMinutes": 2160
     },
     "delete": {
       "permissions": [

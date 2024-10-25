@@ -1,6 +1,6 @@
 {
-  "typeName": "AWS::Backup::BackupVault",
-  "description": "Resource Type definition for AWS::Backup::BackupVault",
+  "typeName": "AWS::Backup::LogicallyAirGappedBackupVault",
+  "description": "Resource Type definition for AWS::Backup::LogicallyAirGappedBackupVault",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
   "definitions": {
     "NotificationObjectType": {
@@ -28,28 +28,6 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
-    "LockConfigurationType": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "MinRetentionDays": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
-        },
-        "MaxRetentionDays": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-        },
-        "ChangeableForDays": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "MinRetentionDays"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
     "BackupVaultNamePattern": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9\\-\\_]{2,50}$  \nUpdate requires: No interruption"
@@ -66,6 +44,14 @@
     "BackupVaultName": {
       "$ref": "#/definitions/BackupVaultNamePattern"
     },
+    "MinRetentionDays": {
+      "type": "integer",
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: Replacement"
+    },
+    "MaxRetentionDays": {
+      "type": "integer",
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: Replacement"
+    },
     "BackupVaultTags": {
       "type": "object",
       "additionalProperties": false,
@@ -77,15 +63,16 @@
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
-    "EncryptionKeyArn": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
-    },
     "Notifications": {
       "$ref": "#/definitions/NotificationObjectType"
     },
-    "LockConfiguration": {
-      "$ref": "#/definitions/LockConfigurationType"
+    "VaultState": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "VaultType": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
     }
   },
   "additionalProperties": false,
@@ -102,17 +89,18 @@
     ]
   },
   "required": [
-    "BackupVaultName"
+    "BackupVaultName",
+    "MinRetentionDays",
+    "MaxRetentionDays"
   ],
   "createOnlyProperties": [
     "/properties/BackupVaultName",
-    "/properties/EncryptionKeyArn"
-  ],
-  "writeOnlyProperties": [
-    "/properties/LockConfiguration/ChangeableForDays"
+    "/properties/MinRetentionDays",
+    "/properties/MaxRetentionDays"
   ],
   "readOnlyProperties": [
-    "/properties/BackupVaultArn"
+    "/properties/BackupVaultArn",
+    "/properties/EncryptionKeyArn"
   ],
   "primaryIdentifier": [
     "/properties/BackupVaultName"
@@ -121,17 +109,12 @@
     "create": {
       "permissions": [
         "backup:TagResource",
-        "backup:CreateBackupVault",
+        "backup:CreateLogicallyAirGappedBackupVault",
         "backup:PutBackupVaultAccessPolicy",
         "backup:PutBackupVaultNotifications",
-        "backup:PutBackupVaultLockConfiguration",
         "backup-storage:Mount",
         "backup-storage:MountCapsule",
-        "kms:CreateGrant",
-        "kms:GenerateDataKey",
-        "kms:Decrypt",
-        "kms:RetireGrant",
-        "kms:DescribeKey"
+        "backup:DescribeBackupVault"
       ]
     },
     "read": {
@@ -148,6 +131,7 @@
         "backup:DeleteBackupVaultAccessPolicy",
         "backup:DeleteBackupVaultNotifications",
         "backup:DeleteBackupVaultLockConfiguration",
+        "backup:GetBackupVaultAccessPolicy",
         "backup:ListTags",
         "backup:TagResource",
         "backup:UntagResource",
@@ -168,6 +152,10 @@
     }
   },
   "attributes": {
+    "EncryptionKeyArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
     "BackupVaultArn": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
