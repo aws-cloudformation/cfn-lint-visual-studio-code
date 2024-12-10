@@ -36,9 +36,10 @@
       "enum": [
         "EXTERNAL",
         "CUSTOM",
-        "MESSAGE_TEMPLATES"
+        "MESSAGE_TEMPLATES",
+        "MANAGED"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: EXTERNAL | CUSTOM | MESSAGE_TEMPLATES  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: EXTERNAL | CUSTOM | MESSAGE_TEMPLATES | MANAGED  \nUpdate requires: No interruption"
     },
     "RenderingConfiguration": {
       "type": "object",
@@ -66,22 +67,310 @@
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
-    "SourceConfiguration": {
+    "SeedUrl": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "AppIntegrations": {
-          "$ref": "#/definitions/AppIntegrationsConfiguration"
+        "Url": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^https?://[A-Za-z0-9][^\\s]*$  \nUpdate requires: No interruption"
         }
       },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "UrlFilterPattern": {
+      "type": "string",
+      "maxLength": 1000,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1000  \nUpdate requires: No interruption"
+    },
+    "UrlFilterList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/UrlFilterPattern"
+      },
+      "maxItems": 25,
+      "minItems": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "WebCrawlerConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "UrlConfiguration": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "SeedUrls": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/SeedUrl"
+              },
+              "maxItems": 100,
+              "minItems": 1,
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+            }
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nUpdate requires: No interruption"
+        },
+        "CrawlerLimits": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "RateLimit": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 3000,
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+            }
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+        },
+        "InclusionFilters": {
+          "$ref": "#/definitions/UrlFilterList"
+        },
+        "ExclusionFilters": {
+          "$ref": "#/definitions/UrlFilterList"
+        },
+        "Scope": {
+          "type": "string",
+          "enum": [
+            "HOST_ONLY",
+            "SUBDOMAINS"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: HOST_ONLY | SUBDOMAINS  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "UrlConfiguration"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ManagedSourceConfiguration": {
       "oneOf": [
         {
+          "type": "object",
+          "properties": {
+            "WebCrawlerConfiguration": {
+              "$ref": "#/definitions/WebCrawlerConfiguration"
+            }
+          },
+          "required": [
+            "WebCrawlerConfiguration"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "FixedSizeChunkingConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "MaxTokens": {
+          "type": "number",
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
+        },
+        "OverlapPercentage": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 99,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "MaxTokens",
+        "OverlapPercentage"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "HierarchicalChunkingLevelConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "MaxTokens": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 8192,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "MaxTokens"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "HierarchicalChunkingConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "LevelConfigurations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/HierarchicalChunkingLevelConfiguration"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "OverlapTokens": {
+          "type": "number",
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "LevelConfigurations",
+        "OverlapTokens"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "SemanticChunkingConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "MaxTokens": {
+          "type": "number",
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
+        },
+        "BufferSize": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
+        },
+        "BreakpointPercentileThreshold": {
+          "type": "number",
+          "minimum": 50,
+          "maximum": 99,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "MaxTokens",
+        "BufferSize",
+        "BreakpointPercentileThreshold"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "BedrockFoundationModelConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ModelArn": {
+          "type": "string",
+          "maxLength": 2048,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}::foundation-model\\/anthropic.claude-3-haiku-20240307-v1:0$  \nUpdate requires: No interruption"
+        },
+        "ParsingPrompt": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "ParsingPromptText": {
+              "type": "string",
+              "maxLength": 10000,
+              "minLength": 1,
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 10000  \nUpdate requires: No interruption"
+            }
+          },
+          "required": [
+            "ParsingPromptText"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "ModelArn"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "VectorIngestionConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ChunkingConfiguration": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "ChunkingStrategy": {
+              "type": "string",
+              "enum": [
+                "FIXED_SIZE",
+                "NONE",
+                "HIERARCHICAL",
+                "SEMANTIC"
+              ],
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: FIXED_SIZE | NONE | HIERARCHICAL | SEMANTIC  \nUpdate requires: No interruption"
+            },
+            "FixedSizeChunkingConfiguration": {
+              "$ref": "#/definitions/FixedSizeChunkingConfiguration"
+            },
+            "HierarchicalChunkingConfiguration": {
+              "$ref": "#/definitions/HierarchicalChunkingConfiguration"
+            },
+            "SemanticChunkingConfiguration": {
+              "$ref": "#/definitions/SemanticChunkingConfiguration"
+            }
+          },
+          "required": [
+            "ChunkingStrategy"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+        },
+        "ParsingConfiguration": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "ParsingStrategy": {
+              "type": "string",
+              "enum": [
+                "BEDROCK_FOUNDATION_MODEL"
+              ],
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: BEDROCK_FOUNDATION_MODEL  \nUpdate requires: No interruption"
+            },
+            "BedrockFoundationModelConfiguration": {
+              "$ref": "#/definitions/BedrockFoundationModelConfiguration"
+            }
+          },
+          "required": [
+            "ParsingStrategy"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "SourceConfiguration": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "AppIntegrationsConfiguration",
+          "properties": {
+            "AppIntegrations": {
+              "$ref": "#/definitions/AppIntegrationsConfiguration"
+            }
+          },
           "required": [
             "AppIntegrations"
-          ]
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "ManagedSourceConfiguration",
+          "properties": {
+            "ManagedSourceConfiguration": {
+              "$ref": "#/definitions/ManagedSourceConfiguration"
+            }
+          },
+          "required": [
+            "ManagedSourceConfiguration"
+          ],
+          "additionalProperties": false
         }
-      ],
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+      ]
     },
     "Tag": {
       "additionalProperties": false,
@@ -132,6 +421,9 @@
     "SourceConfiguration": {
       "$ref": "#/definitions/SourceConfiguration"
     },
+    "VectorIngestionConfiguration": {
+      "$ref": "#/definitions/VectorIngestionConfiguration"
+    },
     "Tags": {
       "insertionOrder": false,
       "uniqueItems": true,
@@ -167,7 +459,16 @@
     ]
   ],
   "additionalProperties": false,
-  "taggable": false,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "wisdom:TagResource"
+    ]
+  },
   "replacementStrategy": "delete_then_create",
   "handlers": {
     "create": {
