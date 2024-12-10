@@ -29,8 +29,8 @@
           "type": "string",
           "maxLength": 2048,
           "minLength": 1,
-          "description": "ARN or name of a Bedrock model.",
-          "markdownDescription": "ARN or name of a Bedrock model.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^(arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:(([0-9]{12}:custom-model/[a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}/[a-z0-9]{12})|(:foundation-model/[a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}([.:]?[a-z0-9-]{1,63}))|([0-9]{12}:provisioned-model/[a-z0-9]{12})))|([a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}([.:]?[a-z0-9-]{1,63}))|(([0-9a-zA-Z][_-]?)+)$  \nUpdate requires: No interruption"
+          "description": "ARN or Id of a Bedrock Foundational Model or Inference Profile, or the ARN of a imported model, or a provisioned throughput ARN for custom models.",
+          "markdownDescription": "ARN or Id of a Bedrock Foundational Model or Inference Profile, or the ARN of a imported model, or a provisioned throughput ARN for custom models.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^(arn:aws(-[^:]{1,12})?:(bedrock|sagemaker):[a-z0-9-]{1,20}:([0-9]{12})?:([a-z-]+/)?)?([a-zA-Z0-9.-]{1,63}){0,2}(([:][a-z0-9-]{1,63}){0,2})?(/[a-z0-9]{1,12})?$  \nUpdate requires: No interruption"
         },
         "InferenceConfiguration": {
           "$ref": "#/definitions/PromptInferenceConfiguration"
@@ -38,7 +38,8 @@
       },
       "required": [
         "Name",
-        "TemplateType"
+        "TemplateType",
+        "TemplateConfiguration"
       ],
       "additionalProperties": false,
       "markdownDescription": "Prompt variant\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
@@ -143,13 +144,6 @@
           "description": "Cumulative probability cutoff for token selection",
           "markdownDescription": "Cumulative probability cutoff for token selection\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
         },
-        "TopK": {
-          "type": "number",
-          "maximum": 500,
-          "minimum": 0,
-          "description": "Sample from the k most likely next tokens",
-          "markdownDescription": "Sample from the k most likely next tokens\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
-        },
         "MaxTokens": {
           "type": "number",
           "maximum": 4096,
@@ -244,7 +238,7 @@
       "items": {
         "$ref": "#/definitions/PromptVariant"
       },
-      "maxItems": 3,
+      "maxItems": 1,
       "minItems": 0,
       "description": "List of prompt variants",
       "insertionOrder": true,
