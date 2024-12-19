@@ -33,9 +33,10 @@
         "BUILD_GENERAL1_MEDIUM",
         "BUILD_GENERAL1_LARGE",
         "BUILD_GENERAL1_XLARGE",
-        "BUILD_GENERAL1_2XLARGE"
+        "BUILD_GENERAL1_2XLARGE",
+        "ATTRIBUTE_BASED_COMPUTE"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: BUILD_GENERAL1_SMALL | BUILD_GENERAL1_MEDIUM | BUILD_GENERAL1_LARGE | BUILD_GENERAL1_XLARGE | BUILD_GENERAL1_2XLARGE  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: BUILD_GENERAL1_SMALL | BUILD_GENERAL1_MEDIUM | BUILD_GENERAL1_LARGE | BUILD_GENERAL1_XLARGE | BUILD_GENERAL1_2XLARGE | ATTRIBUTE_BASED_COMPUTE  \nUpdate requires: No interruption"
     },
     "OverflowBehavior": {
       "type": "string",
@@ -52,6 +53,9 @@
     "FleetVpcConfig": {
       "$ref": "#/definitions/VpcConfig"
     },
+    "FleetProxyConfiguration": {
+      "$ref": "#/definitions/ProxyConfiguration"
+    },
     "Tags": {
       "type": "array",
       "insertionOrder": false,
@@ -63,6 +67,12 @@
     "ImageId": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^((aws/codebuild/[A-Za-z-]+:[0-9]+(-[0-9._]+)?)|ami-[a-z0-9]{1,1020})$  \nUpdate requires: No interruption"
+    },
+    "ScalingConfiguration": {
+      "$ref": "#/definitions/ScalingConfigurationInput"
+    },
+    "ComputeConfiguration": {
+      "$ref": "#/definitions/ComputeConfiguration"
     }
   },
   "definitions": {
@@ -116,6 +126,132 @@
             "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
           },
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ProxyConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "DefaultBehavior": {
+          "type": "string",
+          "enum": [
+            "ALLOW_ALL",
+            "DENY_ALL"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ALLOW_ALL | DENY_ALL  \nUpdate requires: No interruption"
+        },
+        "OrderedProxyRules": {
+          "type": "array",
+          "insertionOrder": true,
+          "items": {
+            "$ref": "#/definitions/FleetProxyRule"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "FleetProxyRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Type": {
+          "type": "string",
+          "enum": [
+            "DOMAIN",
+            "IP"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DOMAIN | IP  \nUpdate requires: No interruption"
+        },
+        "Effect": {
+          "type": "string",
+          "enum": [
+            "ALLOW",
+            "DENY"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ALLOW | DENY  \nUpdate requires: No interruption"
+        },
+        "Entities": {
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ScalingConfigurationInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "MaxCapacity": {
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "ScalingType": {
+          "type": "string",
+          "enum": [
+            "TARGET_TRACKING_SCALING"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: TARGET_TRACKING_SCALING  \nUpdate requires: No interruption"
+        },
+        "TargetTrackingScalingConfigs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TargetTrackingScalingConfiguration"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "TargetTrackingScalingConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "MetricType": {
+          "type": "string",
+          "enum": [
+            "FLEET_UTILIZATION_RATE"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: FLEET_UTILIZATION_RATE  \nUpdate requires: No interruption"
+        },
+        "TargetValue": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ComputeConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "vCpu": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "memory": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "disk": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "machineType": {
+          "type": "string",
+          "enum": [
+            "GENERAL",
+            "NVME"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: GENERAL | NVME  \nUpdate requires: No interruption"
         }
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
