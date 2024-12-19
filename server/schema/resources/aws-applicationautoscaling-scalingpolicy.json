@@ -35,13 +35,15 @@
     "create": {
       "permissions": [
         "application-autoscaling:DescribeScalingPolicies",
-        "application-autoscaling:PutScalingPolicy"
+        "application-autoscaling:PutScalingPolicy",
+        "cloudwatch:GetMetricData"
       ]
     },
     "update": {
       "permissions": [
         "application-autoscaling:DescribeScalingPolicies",
-        "application-autoscaling:PutScalingPolicy"
+        "application-autoscaling:PutScalingPolicy",
+        "cloudwatch:GetMetricData"
       ]
     },
     "list": {
@@ -74,6 +76,39 @@
   ],
   "additionalProperties": false,
   "definitions": {
+    "PredictiveScalingMetricDataQuery": {
+      "description": "The metric data to return. Also defines whether this call is returning data for one metric only, or whether it is performing a math expression on the values of returned metric statistics to create a new time series. A time series is a series of data points, each of which is associated with a timestamp.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ReturnData": {
+          "description": "Indicates whether to return the timestamps and raw data values of this metric. \n If you use any math expressions, specify ``true`` for this value for only the final math expression that the metric specification is based on. You must specify ``false`` for ``ReturnData`` for all the other metrics and expressions used in the metric specification.\n If you are only retrieving metrics and not performing any math expressions, do not specify anything for ``ReturnData``. This sets it to its default (``true``).",
+          "type": "boolean",
+          "markdownDescription": "Indicates whether to return the timestamps and raw data values of this metric. \n If you use any math expressions, specify ``true`` for this value for only the final math expression that the metric specification is based on. You must specify ``false`` for ``ReturnData`` for all the other metrics and expressions used in the metric specification.\n If you are only retrieving metrics and not performing any math expressions, do not specify anything for ``ReturnData``. This sets it to its default (``true``).\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        },
+        "Expression": {
+          "description": "The math expression to perform on the returned data, if this object is performing a math expression. This expression can use the ``Id`` of the other metrics to refer to those metrics, and can also use the ``Id`` of other expressions to use the result of those expressions. \n Conditional: Within each ``MetricDataQuery`` object, you must specify either ``Expression`` or ``MetricStat``, but not both.",
+          "type": "string",
+          "markdownDescription": "The math expression to perform on the returned data, if this object is performing a math expression. This expression can use the ``Id`` of the other metrics to refer to those metrics, and can also use the ``Id`` of other expressions to use the result of those expressions. \n Conditional: Within each ``MetricDataQuery`` object, you must specify either ``Expression`` or ``MetricStat``, but not both.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Label": {
+          "description": "A human-readable label for this metric or expression. This is especially useful if this is a math expression, so that you know what the value represents.",
+          "type": "string",
+          "markdownDescription": "A human-readable label for this metric or expression. This is especially useful if this is a math expression, so that you know what the value represents.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "MetricStat": {
+          "description": "Information about the metric data to return. \n Conditional: Within each ``MetricDataQuery`` object, you must specify either ``Expression`` or ``MetricStat``, but not both.",
+          "$ref": "#/definitions/PredictiveScalingMetricStat",
+          "markdownDescription": "Information about the metric data to return. \n Conditional: Within each ``MetricDataQuery`` object, you must specify either ``Expression`` or ``MetricStat``, but not both.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        },
+        "Id": {
+          "description": "A short name that identifies the object's results in the response. This name must be unique among all ``MetricDataQuery`` objects specified for a single scaling policy. If you are performing math expressions on this set of data, this name represents that data and can serve as a variable in the mathematical expression. The valid characters are letters, numbers, and underscores. The first character must be a lowercase letter.",
+          "type": "string",
+          "markdownDescription": "A short name that identifies the object's results in the response. This name must be unique among all ``MetricDataQuery`` objects specified for a single scaling policy. If you are performing math expressions on this set of data, this name represents that data and can serve as a variable in the mathematical expression. The valid characters are letters, numbers, and underscores. The first character must be a lowercase letter.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "The metric data to return. Also defines whether this call is returning data for one metric only, or whether it is performing a math expression on the values of returned metric statistics to create a new time series. A time series is a series of data points, each of which is associated with a timestamp.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "TargetTrackingMetricStat": {
       "description": "This structure defines the CloudWatch metric to return, along with the statistic and unit.\n  ``TargetTrackingMetricStat`` is a property of the [AWS::ApplicationAutoScaling::ScalingPolicy TargetTrackingMetricDataQuery](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-applicationautoscaling-scalingpolicy-targettrackingmetricdataquery.html) property type.\n For more information about the CloudWatch terminology below, see [Amazon CloudWatch concepts](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html) in the *Amazon CloudWatch User Guide*.",
       "additionalProperties": false,
@@ -97,6 +132,24 @@
       },
       "markdownDescription": "This structure defines the CloudWatch metric to return, along with the statistic and unit.\n  ``TargetTrackingMetricStat`` is a property of the [AWS::ApplicationAutoScaling::ScalingPolicy TargetTrackingMetricDataQuery](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-applicationautoscaling-scalingpolicy-targettrackingmetricdataquery.html) property type.\n For more information about the CloudWatch terminology below, see [Amazon CloudWatch concepts](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html) in the *Amazon CloudWatch User Guide*.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
+    "PredictiveScalingMetricDimension": {
+      "description": "Describes the dimension of a metric.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "description": "The value of the dimension.",
+          "type": "string",
+          "markdownDescription": "The value of the dimension.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Name": {
+          "description": "The name of the dimension.",
+          "type": "string",
+          "markdownDescription": "The name of the dimension.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "Describes the dimension of a metric.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "TargetTrackingMetricDimension": {
       "description": "``TargetTrackingMetricDimension`` specifies a name/value pair that is part of the identity of a CloudWatch metric for the ``Dimensions`` property of the [AWS::ApplicationAutoScaling::ScalingPolicy TargetTrackingMetric](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-applicationautoscaling-scalingpolicy-targettrackingmetric.html) property type. Duplicate dimensions are not allowed.",
       "additionalProperties": false,
@@ -114,6 +167,27 @@
         }
       },
       "markdownDescription": "``TargetTrackingMetricDimension`` specifies a name/value pair that is part of the identity of a CloudWatch metric for the ``Dimensions`` property of the [AWS::ApplicationAutoScaling::ScalingPolicy TargetTrackingMetric](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-applicationautoscaling-scalingpolicy-targettrackingmetric.html) property type. Duplicate dimensions are not allowed.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PredictiveScalingCustomizedCapacityMetric": {
+      "description": "Represents a CloudWatch metric of your choosing for a predictive scaling policy.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "MetricDataQueries": {
+          "uniqueItems": true,
+          "description": "One or more metric data queries to provide data points for a metric specification.",
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PredictiveScalingMetricDataQuery"
+          },
+          "markdownDescription": "One or more metric data queries to provide data points for a metric specification.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "MetricDataQueries"
+      ],
+      "markdownDescription": "Represents a CloudWatch metric of your choosing for a predictive scaling policy.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "TargetTrackingMetricDataQuery": {
       "description": "The metric data to return. Also defines whether this call is returning data for one metric only, or whether it is performing a math expression on the values of returned metric statistics to create a new time series. A time series is a series of data points, each of which is associated with a timestamp.\n You can call for a single metric or perform math expressions on multiple metrics. Any expressions used in a metric specification must eventually return a single time series.\n For more information and examples, see [Create a target tracking scaling policy for Application Auto Scaling using metric math](https://docs.aws.amazon.com/autoscaling/application/userguide/application-auto-scaling-target-tracking-metric-math.html) in the *Application Auto Scaling User Guide*.\n  ``TargetTrackingMetricDataQuery`` is a property of the [AWS::ApplicationAutoScaling::ScalingPolicy CustomizedMetricSpecification](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-applicationautoscaling-scalingpolicy-customizedmetricspecification.html) property type.",
@@ -147,6 +221,27 @@
         }
       },
       "markdownDescription": "The metric data to return. Also defines whether this call is returning data for one metric only, or whether it is performing a math expression on the values of returned metric statistics to create a new time series. A time series is a series of data points, each of which is associated with a timestamp.\n You can call for a single metric or perform math expressions on multiple metrics. Any expressions used in a metric specification must eventually return a single time series.\n For more information and examples, see [Create a target tracking scaling policy for Application Auto Scaling using metric math](https://docs.aws.amazon.com/autoscaling/application/userguide/application-auto-scaling-target-tracking-metric-math.html) in the *Application Auto Scaling User Guide*.\n  ``TargetTrackingMetricDataQuery`` is a property of the [AWS::ApplicationAutoScaling::ScalingPolicy CustomizedMetricSpecification](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-applicationautoscaling-scalingpolicy-customizedmetricspecification.html) property type.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PredictiveScalingCustomizedScalingMetric": {
+      "description": "One or more metric data queries to provide data points for a metric specification.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "MetricDataQueries": {
+          "uniqueItems": true,
+          "description": "One or more metric data queries to provide data points for a metric specification.",
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PredictiveScalingMetricDataQuery"
+          },
+          "markdownDescription": "One or more metric data queries to provide data points for a metric specification.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "MetricDataQueries"
+      ],
+      "markdownDescription": "One or more metric data queries to provide data points for a metric specification.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "CustomizedMetricSpecification": {
       "description": "Contains customized metric specification information for a target tracking scaling policy for Application Auto Scaling. \n For information about the available metrics for a service, see [services that publish CloudWatch metrics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-services-cloudwatch-metrics.html) in the *Amazon CloudWatch User Guide*.\n To create your customized metric specification:\n  +  Add values for each required parameter from CloudWatch. You can use an existing metric, or a new metric that you create. To use your own metric, you must first publish the metric to CloudWatch. For more information, see [Publish custom metrics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html) in the *Amazon CloudWatch User Guide*.\n  +  Choose a metric that changes proportionally with capacity. The value of the metric should increase or decrease in inverse proportion to the number of capacity units. That is, the value of the metric should decrease when capacity increases, and increase when capacity decreases. \n  \n For an example of how creating new metrics can be useful, see [Scaling based on Amazon SQS](https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-using-sqs-queue.html) in the *Amazon EC2 Auto Scaling User Guide*. This topic mentions Auto Scaling groups, but the same scenario for Amazon SQS can apply to the target tracking scaling policies that you create for a Spot Fleet by using Application Auto Scaling.\n For more information about the CloudWatch terminology below, see [Amazon CloudWatch concepts](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html). \n  ``CustomizedMetricSpecification`` is a property of the [AWS::ApplicationAutoScaling::ScalingPolicy TargetTrackingScalingPolicyConfiguration](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-applicationautoscaling-scalingpolicy-targettrackingscalingpolicyconfiguration.html) property type.",
@@ -196,33 +291,26 @@
       },
       "markdownDescription": "Contains customized metric specification information for a target tracking scaling policy for Application Auto Scaling. \n For information about the available metrics for a service, see [services that publish CloudWatch metrics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-services-cloudwatch-metrics.html) in the *Amazon CloudWatch User Guide*.\n To create your customized metric specification:\n  +  Add values for each required parameter from CloudWatch. You can use an existing metric, or a new metric that you create. To use your own metric, you must first publish the metric to CloudWatch. For more information, see [Publish custom metrics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html) in the *Amazon CloudWatch User Guide*.\n  +  Choose a metric that changes proportionally with capacity. The value of the metric should increase or decrease in inverse proportion to the number of capacity units. That is, the value of the metric should decrease when capacity increases, and increase when capacity decreases. \n  \n For an example of how creating new metrics can be useful, see [Scaling based on Amazon SQS](https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-using-sqs-queue.html) in the *Amazon EC2 Auto Scaling User Guide*. This topic mentions Auto Scaling groups, but the same scenario for Amazon SQS can apply to the target tracking scaling policies that you create for a Spot Fleet by using Application Auto Scaling.\n For more information about the CloudWatch terminology below, see [Amazon CloudWatch concepts](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html). \n  ``CustomizedMetricSpecification`` is a property of the [AWS::ApplicationAutoScaling::ScalingPolicy TargetTrackingScalingPolicyConfiguration](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-applicationautoscaling-scalingpolicy-targettrackingscalingpolicyconfiguration.html) property type.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
-    "TargetTrackingMetric": {
-      "description": "Represents a specific metric for a target tracking scaling policy for Application Auto Scaling.\n Metric is a property of the [AWS::ApplicationAutoScaling::ScalingPolicy TargetTrackingMetricStat](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-applicationautoscaling-scalingpolicy-targettrackingmetricstat.html) property type.",
+    "PredictiveScalingPredefinedLoadMetric": {
+      "description": "Describes a load metric for a predictive scaling policy. \n When returned in the output of ``DescribePolicies``, it indicates that a predictive scaling policy uses individually specified load and scaling metrics instead of a metric pair.",
       "additionalProperties": false,
       "type": "object",
       "properties": {
-        "MetricName": {
-          "description": "The name of the metric.",
+        "PredefinedMetricType": {
+          "description": "The metric type.",
           "type": "string",
-          "markdownDescription": "The name of the metric.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          "markdownDescription": "The metric type.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
         },
-        "Dimensions": {
-          "uniqueItems": false,
-          "description": "The dimensions for the metric. For the list of available dimensions, see the AWS documentation available from the table in [services that publish CloudWatch metrics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-services-cloudwatch-metrics.html) in the *Amazon CloudWatch User Guide*. \n Conditional: If you published your metric with dimensions, you must specify the same dimensions in your scaling policy.",
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/TargetTrackingMetricDimension"
-          },
-          "markdownDescription": "The dimensions for the metric. For the list of available dimensions, see the AWS documentation available from the table in [services that publish CloudWatch metrics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-services-cloudwatch-metrics.html) in the *Amazon CloudWatch User Guide*. \n Conditional: If you published your metric with dimensions, you must specify the same dimensions in your scaling policy.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-        },
-        "Namespace": {
-          "description": "The namespace of the metric. For more information, see the table in [services that publish CloudWatch metrics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-services-cloudwatch-metrics.html) in the *Amazon CloudWatch User Guide*.",
+        "ResourceLabel": {
+          "description": "A label that uniquely identifies a target group.",
           "type": "string",
-          "markdownDescription": "The namespace of the metric. For more information, see the table in [services that publish CloudWatch metrics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-services-cloudwatch-metrics.html) in the *Amazon CloudWatch User Guide*.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          "markdownDescription": "A label that uniquely identifies a target group.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         }
       },
-      "markdownDescription": "Represents a specific metric for a target tracking scaling policy for Application Auto Scaling.\n Metric is a property of the [AWS::ApplicationAutoScaling::ScalingPolicy TargetTrackingMetricStat](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-applicationautoscaling-scalingpolicy-targettrackingmetricstat.html) property type.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+      "required": [
+        "PredefinedMetricType"
+      ],
+      "markdownDescription": "Describes a load metric for a predictive scaling policy. \n When returned in the output of ``DescribePolicies``, it indicates that a predictive scaling policy uses individually specified load and scaling metrics instead of a metric pair.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "TargetTrackingScalingPolicyConfiguration": {
       "description": "``TargetTrackingScalingPolicyConfiguration`` is a property of the [AWS::ApplicationAutoScaling::ScalingPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-applicationautoscaling-scalingpolicy.html) resource that specifies a target tracking scaling policy configuration for Application Auto Scaling. Use a target tracking scaling policy to adjust the capacity of the specified scalable target in response to actual workloads, so that resource utilization remains at or near the target utilization value. \n For more information, see [Target tracking scaling policies](https://docs.aws.amazon.com/autoscaling/application/userguide/application-auto-scaling-target-tracking.html) in the *Application Auto Scaling User Guide*.",
@@ -265,6 +353,27 @@
       ],
       "markdownDescription": "``TargetTrackingScalingPolicyConfiguration`` is a property of the [AWS::ApplicationAutoScaling::ScalingPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-applicationautoscaling-scalingpolicy.html) resource that specifies a target tracking scaling policy configuration for Application Auto Scaling. Use a target tracking scaling policy to adjust the capacity of the specified scalable target in response to actual workloads, so that resource utilization remains at or near the target utilization value. \n For more information, see [Target tracking scaling policies](https://docs.aws.amazon.com/autoscaling/application/userguide/application-auto-scaling-target-tracking.html) in the *Application Auto Scaling User Guide*.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
+    "PredictiveScalingPredefinedMetricPair": {
+      "description": "Represents a metric pair for a predictive scaling policy.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "PredefinedMetricType": {
+          "description": "Indicates which metrics to use. There are two different types of metrics for each metric type: one is a load metric and one is a scaling metric.",
+          "type": "string",
+          "markdownDescription": "Indicates which metrics to use. There are two different types of metrics for each metric type: one is a load metric and one is a scaling metric.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "ResourceLabel": {
+          "description": "A label that uniquely identifies a specific target group from which to determine the total and average request count.",
+          "type": "string",
+          "markdownDescription": "A label that uniquely identifies a specific target group from which to determine the total and average request count.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "PredefinedMetricType"
+      ],
+      "markdownDescription": "Represents a metric pair for a predictive scaling policy.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "StepAdjustment": {
       "description": "``StepAdjustment`` specifies a step adjustment for the ``StepAdjustments`` property of the [AWS::ApplicationAutoScaling::ScalingPolicy StepScalingPolicyConfiguration](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-applicationautoscaling-scalingpolicy-stepscalingpolicyconfiguration.html) property type. \n For the following examples, suppose that you have an alarm with a breach threshold of 50: \n  +  To trigger a step adjustment when the metric is greater than or equal to 50 and less than 60, specify a lower bound of 0 and an upper bound of 10. \n  +  To trigger a step adjustment when the metric is greater than 40 and less than or equal to 50, specify a lower bound of -10 and an upper bound of 0. \n  \n For more information, see [Step adjustments](https://docs.aws.amazon.com/autoscaling/application/userguide/application-auto-scaling-step-scaling-policies.html#as-scaling-steps) in the *Application Auto Scaling User Guide*.\n You can find a sample template snippet in the [Examples](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-applicationautoscaling-scalingpolicy.html#aws-resource-applicationautoscaling-scalingpolicy--examples) section of the ``AWS::ApplicationAutoScaling::ScalingPolicy`` documentation.",
       "additionalProperties": false,
@@ -290,44 +399,6 @@
         "ScalingAdjustment"
       ],
       "markdownDescription": "``StepAdjustment`` specifies a step adjustment for the ``StepAdjustments`` property of the [AWS::ApplicationAutoScaling::ScalingPolicy StepScalingPolicyConfiguration](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-applicationautoscaling-scalingpolicy-stepscalingpolicyconfiguration.html) property type. \n For the following examples, suppose that you have an alarm with a breach threshold of 50: \n  +  To trigger a step adjustment when the metric is greater than or equal to 50 and less than 60, specify a lower bound of 0 and an upper bound of 10. \n  +  To trigger a step adjustment when the metric is greater than 40 and less than or equal to 50, specify a lower bound of -10 and an upper bound of 0. \n  \n For more information, see [Step adjustments](https://docs.aws.amazon.com/autoscaling/application/userguide/application-auto-scaling-step-scaling-policies.html#as-scaling-steps) in the *Application Auto Scaling User Guide*.\n You can find a sample template snippet in the [Examples](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-applicationautoscaling-scalingpolicy.html#aws-resource-applicationautoscaling-scalingpolicy--examples) section of the ``AWS::ApplicationAutoScaling::ScalingPolicy`` documentation.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "StepScalingPolicyConfiguration": {
-      "description": "``StepScalingPolicyConfiguration`` is a property of the [AWS::ApplicationAutoScaling::ScalingPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-applicationautoscaling-scalingpolicy.html) resource that specifies a step scaling policy configuration for Application Auto Scaling. \n For more information, see [Step scaling policies](https://docs.aws.amazon.com/autoscaling/application/userguide/application-auto-scaling-step-scaling-policies.html) in the *Application Auto Scaling User Guide*.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "MetricAggregationType": {
-          "description": "The aggregation type for the CloudWatch metrics. Valid values are ``Minimum``, ``Maximum``, and ``Average``. If the aggregation type is null, the value is treated as ``Average``.",
-          "type": "string",
-          "markdownDescription": "The aggregation type for the CloudWatch metrics. Valid values are ``Minimum``, ``Maximum``, and ``Average``. If the aggregation type is null, the value is treated as ``Average``.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "Cooldown": {
-          "description": "The amount of time, in seconds, to wait for a previous scaling activity to take effect. If not specified, the default value is 300. For more information, see [Cooldown period](https://docs.aws.amazon.com/autoscaling/application/userguide/step-scaling-policy-overview.html#step-scaling-cooldown) in the *Application Auto Scaling User Guide*.",
-          "type": "integer",
-          "markdownDescription": "The amount of time, in seconds, to wait for a previous scaling activity to take effect. If not specified, the default value is 300. For more information, see [Cooldown period](https://docs.aws.amazon.com/autoscaling/application/userguide/step-scaling-policy-overview.html#step-scaling-cooldown) in the *Application Auto Scaling User Guide*.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-        },
-        "StepAdjustments": {
-          "uniqueItems": true,
-          "description": "A set of adjustments that enable you to scale based on the size of the alarm breach.\n At least one step adjustment is required if you are adding a new step scaling policy configuration.",
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/StepAdjustment"
-          },
-          "markdownDescription": "A set of adjustments that enable you to scale based on the size of the alarm breach.\n At least one step adjustment is required if you are adding a new step scaling policy configuration.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-        },
-        "MinAdjustmentMagnitude": {
-          "description": "The minimum value to scale by when the adjustment type is ``PercentChangeInCapacity``. For example, suppose that you create a step scaling policy to scale out an Amazon ECS service by 25 percent and you specify a ``MinAdjustmentMagnitude`` of 2. If the service has 4 tasks and the scaling policy is performed, 25 percent of 4 is 1. However, because you specified a ``MinAdjustmentMagnitude`` of 2, Application Auto Scaling scales out the service by 2 tasks.",
-          "type": "integer",
-          "markdownDescription": "The minimum value to scale by when the adjustment type is ``PercentChangeInCapacity``. For example, suppose that you create a step scaling policy to scale out an Amazon ECS service by 25 percent and you specify a ``MinAdjustmentMagnitude`` of 2. If the service has 4 tasks and the scaling policy is performed, 25 percent of 4 is 1. However, because you specified a ``MinAdjustmentMagnitude`` of 2, Application Auto Scaling scales out the service by 2 tasks.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-        },
-        "AdjustmentType": {
-          "description": "Specifies whether the ``ScalingAdjustment`` value in the ``StepAdjustment`` property is an absolute number or a percentage of the current capacity.",
-          "type": "string",
-          "markdownDescription": "Specifies whether the ``ScalingAdjustment`` value in the ``StepAdjustment`` property is an absolute number or a percentage of the current capacity.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "markdownDescription": "``StepScalingPolicyConfiguration`` is a property of the [AWS::ApplicationAutoScaling::ScalingPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-applicationautoscaling-scalingpolicy.html) resource that specifies a step scaling policy configuration for Application Auto Scaling. \n For more information, see [Step scaling policies](https://docs.aws.amazon.com/autoscaling/application/userguide/application-auto-scaling-step-scaling-policies.html) in the *Application Auto Scaling User Guide*.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "PredefinedMetricSpecification": {
       "description": "Contains predefined metric specification information for a target tracking scaling policy for Application Auto Scaling.\n  ``PredefinedMetricSpecification`` is a property of the [AWS::ApplicationAutoScaling::ScalingPolicy TargetTrackingScalingPolicyConfiguration](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-applicationautoscaling-scalingpolicy-targettrackingscalingpolicyconfiguration.html) property type.",
@@ -371,6 +442,252 @@
         "Name"
       ],
       "markdownDescription": "``MetricDimension`` specifies a name/value pair that is part of the identity of a CloudWatch metric for the ``Dimensions`` property of the [AWS::ApplicationAutoScaling::ScalingPolicy CustomizedMetricSpecification](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-applicationautoscaling-scalingpolicy-customizedmetricspecification.html) property type. Duplicate dimensions are not allowed.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PredictiveScalingPolicyConfiguration": {
+      "description": "Represents a predictive scaling policy configuration.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "MaxCapacityBreachBehavior": {
+          "description": "Defines the behavior that should be applied if the forecast capacity approaches or exceeds the maximum capacity. Defaults to ``HonorMaxCapacity`` if not specified.",
+          "type": "string",
+          "markdownDescription": "Defines the behavior that should be applied if the forecast capacity approaches or exceeds the maximum capacity. Defaults to ``HonorMaxCapacity`` if not specified.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "MaxCapacityBuffer": {
+          "description": "The size of the capacity buffer to use when the forecast capacity is close to or exceeds the maximum capacity. The value is specified as a percentage relative to the forecast capacity. For example, if the buffer is 10, this means a 10 percent buffer, such that if the forecast capacity is 50, and the maximum capacity is 40, then the effective maximum capacity is 55. \n Required if the ``MaxCapacityBreachBehavior`` property is set to ``IncreaseMaxCapacity``, and cannot be used otherwise.",
+          "type": "integer",
+          "markdownDescription": "The size of the capacity buffer to use when the forecast capacity is close to or exceeds the maximum capacity. The value is specified as a percentage relative to the forecast capacity. For example, if the buffer is 10, this means a 10 percent buffer, such that if the forecast capacity is 50, and the maximum capacity is 40, then the effective maximum capacity is 55. \n Required if the ``MaxCapacityBreachBehavior`` property is set to ``IncreaseMaxCapacity``, and cannot be used otherwise.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "Mode": {
+          "description": "The predictive scaling mode. Defaults to ``ForecastOnly`` if not specified.",
+          "type": "string",
+          "markdownDescription": "The predictive scaling mode. Defaults to ``ForecastOnly`` if not specified.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "MetricSpecifications": {
+          "uniqueItems": true,
+          "description": "This structure includes the metrics and target utilization to use for predictive scaling. \n This is an array, but we currently only support a single metric specification. That is, you can specify a target value and a single metric pair, or a target value and one scaling metric and one load metric.",
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PredictiveScalingMetricSpecification"
+          },
+          "markdownDescription": "This structure includes the metrics and target utilization to use for predictive scaling. \n This is an array, but we currently only support a single metric specification. That is, you can specify a target value and a single metric pair, or a target value and one scaling metric and one load metric.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "SchedulingBufferTime": {
+          "description": "The amount of time, in seconds, that the start time can be advanced. \n The value must be less than the forecast interval duration of 3600 seconds (60 minutes). Defaults to 300 seconds if not specified.",
+          "type": "integer",
+          "markdownDescription": "The amount of time, in seconds, that the start time can be advanced. \n The value must be less than the forecast interval duration of 3600 seconds (60 minutes). Defaults to 300 seconds if not specified.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "MetricSpecifications"
+      ],
+      "markdownDescription": "Represents a predictive scaling policy configuration.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PredictiveScalingPredefinedScalingMetric": {
+      "description": "Describes a scaling metric for a predictive scaling policy. \n When returned in the output of ``DescribePolicies``, it indicates that a predictive scaling policy uses individually specified load and scaling metrics instead of a metric pair.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "PredefinedMetricType": {
+          "description": "The metric type.",
+          "type": "string",
+          "markdownDescription": "The metric type.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+        },
+        "ResourceLabel": {
+          "description": "A label that uniquely identifies a specific target group from which to determine the average request count.",
+          "type": "string",
+          "markdownDescription": "A label that uniquely identifies a specific target group from which to determine the average request count.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "PredefinedMetricType"
+      ],
+      "markdownDescription": "Describes a scaling metric for a predictive scaling policy. \n When returned in the output of ``DescribePolicies``, it indicates that a predictive scaling policy uses individually specified load and scaling metrics instead of a metric pair.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PredictiveScalingMetricSpecification": {
+      "description": "This structure specifies the metrics and target utilization settings for a predictive scaling policy. \n You must specify either a metric pair, or a load metric and a scaling metric individually. Specifying a metric pair instead of individual metrics provides a simpler way to configure metrics for a scaling policy. You choose the metric pair, and the policy automatically knows the correct sum and average statistics to use for the load metric and the scaling metric.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "CustomizedLoadMetricSpecification": {
+          "description": "The customized load metric specification.",
+          "$ref": "#/definitions/PredictiveScalingCustomizedLoadMetric",
+          "markdownDescription": "The customized load metric specification.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        },
+        "PredefinedLoadMetricSpecification": {
+          "description": "The predefined load metric specification.",
+          "$ref": "#/definitions/PredictiveScalingPredefinedLoadMetric",
+          "markdownDescription": "The predefined load metric specification.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        },
+        "TargetValue": {
+          "description": "Specifies the target utilization.",
+          "type": "number",
+          "markdownDescription": "Specifies the target utilization.\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption"
+        },
+        "PredefinedScalingMetricSpecification": {
+          "description": "The predefined scaling metric specification.",
+          "$ref": "#/definitions/PredictiveScalingPredefinedScalingMetric",
+          "markdownDescription": "The predefined scaling metric specification.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        },
+        "CustomizedCapacityMetricSpecification": {
+          "description": "The customized capacity metric specification.",
+          "$ref": "#/definitions/PredictiveScalingCustomizedCapacityMetric",
+          "markdownDescription": "The customized capacity metric specification.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        },
+        "CustomizedScalingMetricSpecification": {
+          "description": "The customized scaling metric specification.",
+          "$ref": "#/definitions/PredictiveScalingCustomizedScalingMetric",
+          "markdownDescription": "The customized scaling metric specification.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        },
+        "PredefinedMetricPairSpecification": {
+          "description": "The predefined metric pair specification that determines the appropriate scaling metric and load metric to use.",
+          "$ref": "#/definitions/PredictiveScalingPredefinedMetricPair",
+          "markdownDescription": "The predefined metric pair specification that determines the appropriate scaling metric and load metric to use.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "TargetValue"
+      ],
+      "markdownDescription": "This structure specifies the metrics and target utilization settings for a predictive scaling policy. \n You must specify either a metric pair, or a load metric and a scaling metric individually. Specifying a metric pair instead of individual metrics provides a simpler way to configure metrics for a scaling policy. You choose the metric pair, and the policy automatically knows the correct sum and average statistics to use for the load metric and the scaling metric.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PredictiveScalingMetric": {
+      "description": "Describes the scaling metric.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "MetricName": {
+          "description": "The name of the metric.",
+          "type": "string",
+          "markdownDescription": "The name of the metric.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Dimensions": {
+          "uniqueItems": false,
+          "description": "Describes the dimensions of the metric.",
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PredictiveScalingMetricDimension"
+          },
+          "markdownDescription": "Describes the dimensions of the metric.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Namespace": {
+          "description": "The namespace of the metric.",
+          "type": "string",
+          "markdownDescription": "The namespace of the metric.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "Describes the scaling metric.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PredictiveScalingCustomizedLoadMetric": {
+      "description": "The customized load metric specification.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "MetricDataQueries": {
+          "uniqueItems": true,
+          "description": "",
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PredictiveScalingMetricDataQuery"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "MetricDataQueries"
+      ],
+      "markdownDescription": "The customized load metric specification.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "TargetTrackingMetric": {
+      "description": "Represents a specific metric for a target tracking scaling policy for Application Auto Scaling.\n Metric is a property of the [AWS::ApplicationAutoScaling::ScalingPolicy TargetTrackingMetricStat](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-applicationautoscaling-scalingpolicy-targettrackingmetricstat.html) property type.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "MetricName": {
+          "description": "The name of the metric.",
+          "type": "string",
+          "markdownDescription": "The name of the metric.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Dimensions": {
+          "uniqueItems": false,
+          "description": "The dimensions for the metric. For the list of available dimensions, see the AWS documentation available from the table in [services that publish CloudWatch metrics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-services-cloudwatch-metrics.html) in the *Amazon CloudWatch User Guide*. \n Conditional: If you published your metric with dimensions, you must specify the same dimensions in your scaling policy.",
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TargetTrackingMetricDimension"
+          },
+          "markdownDescription": "The dimensions for the metric. For the list of available dimensions, see the AWS documentation available from the table in [services that publish CloudWatch metrics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-services-cloudwatch-metrics.html) in the *Amazon CloudWatch User Guide*. \n Conditional: If you published your metric with dimensions, you must specify the same dimensions in your scaling policy.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Namespace": {
+          "description": "The namespace of the metric. For more information, see the table in [services that publish CloudWatch metrics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-services-cloudwatch-metrics.html) in the *Amazon CloudWatch User Guide*.",
+          "type": "string",
+          "markdownDescription": "The namespace of the metric. For more information, see the table in [services that publish CloudWatch metrics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-services-cloudwatch-metrics.html) in the *Amazon CloudWatch User Guide*.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "Represents a specific metric for a target tracking scaling policy for Application Auto Scaling.\n Metric is a property of the [AWS::ApplicationAutoScaling::ScalingPolicy TargetTrackingMetricStat](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-applicationautoscaling-scalingpolicy-targettrackingmetricstat.html) property type.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PredictiveScalingMetricStat": {
+      "description": "This structure defines the CloudWatch metric to return, along with the statistic and unit.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Stat": {
+          "description": "The statistic to return. It can include any CloudWatch statistic or extended statistic. For a list of valid values, see the table in [Statistics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html#Statistic) in the *Amazon CloudWatch User Guide*. \n The most commonly used metrics for predictive scaling are ``Average`` and ``Sum``.",
+          "type": "string",
+          "markdownDescription": "The statistic to return. It can include any CloudWatch statistic or extended statistic. For a list of valid values, see the table in [Statistics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html#Statistic) in the *Amazon CloudWatch User Guide*. \n The most commonly used metrics for predictive scaling are ``Average`` and ``Sum``.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Metric": {
+          "description": "The CloudWatch metric to return, including the metric name, namespace, and dimensions. To get the exact metric name, namespace, and dimensions, inspect the [Metric](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_Metric.html) object that is returned by a call to [ListMetrics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_ListMetrics.html).",
+          "$ref": "#/definitions/PredictiveScalingMetric",
+          "markdownDescription": "The CloudWatch metric to return, including the metric name, namespace, and dimensions. To get the exact metric name, namespace, and dimensions, inspect the [Metric](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_Metric.html) object that is returned by a call to [ListMetrics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_ListMetrics.html).\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+        },
+        "Unit": {
+          "description": "The unit to use for the returned data points. For a complete list of the units that CloudWatch supports, see the [MetricDatum](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricDatum.html) data type in the *Amazon CloudWatch API Reference*.",
+          "type": "string",
+          "markdownDescription": "The unit to use for the returned data points. For a complete list of the units that CloudWatch supports, see the [MetricDatum](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricDatum.html) data type in the *Amazon CloudWatch API Reference*.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "This structure defines the CloudWatch metric to return, along with the statistic and unit.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "StepScalingPolicyConfiguration": {
+      "description": "``StepScalingPolicyConfiguration`` is a property of the [AWS::ApplicationAutoScaling::ScalingPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-applicationautoscaling-scalingpolicy.html) resource that specifies a step scaling policy configuration for Application Auto Scaling. \n For more information, see [Step scaling policies](https://docs.aws.amazon.com/autoscaling/application/userguide/application-auto-scaling-step-scaling-policies.html) in the *Application Auto Scaling User Guide*.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "MetricAggregationType": {
+          "description": "The aggregation type for the CloudWatch metrics. Valid values are ``Minimum``, ``Maximum``, and ``Average``. If the aggregation type is null, the value is treated as ``Average``.",
+          "type": "string",
+          "markdownDescription": "The aggregation type for the CloudWatch metrics. Valid values are ``Minimum``, ``Maximum``, and ``Average``. If the aggregation type is null, the value is treated as ``Average``.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "Cooldown": {
+          "description": "The amount of time, in seconds, to wait for a previous scaling activity to take effect. If not specified, the default value is 300. For more information, see [Cooldown period](https://docs.aws.amazon.com/autoscaling/application/userguide/step-scaling-policy-overview.html#step-scaling-cooldown) in the *Application Auto Scaling User Guide*.",
+          "type": "integer",
+          "markdownDescription": "The amount of time, in seconds, to wait for a previous scaling activity to take effect. If not specified, the default value is 300. For more information, see [Cooldown period](https://docs.aws.amazon.com/autoscaling/application/userguide/step-scaling-policy-overview.html#step-scaling-cooldown) in the *Application Auto Scaling User Guide*.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "StepAdjustments": {
+          "uniqueItems": true,
+          "description": "A set of adjustments that enable you to scale based on the size of the alarm breach.\n At least one step adjustment is required if you are adding a new step scaling policy configuration.",
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StepAdjustment"
+          },
+          "markdownDescription": "A set of adjustments that enable you to scale based on the size of the alarm breach.\n At least one step adjustment is required if you are adding a new step scaling policy configuration.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "MinAdjustmentMagnitude": {
+          "description": "The minimum value to scale by when the adjustment type is ``PercentChangeInCapacity``. For example, suppose that you create a step scaling policy to scale out an Amazon ECS service by 25 percent and you specify a ``MinAdjustmentMagnitude`` of 2. If the service has 4 tasks and the scaling policy is performed, 25 percent of 4 is 1. However, because you specified a ``MinAdjustmentMagnitude`` of 2, Application Auto Scaling scales out the service by 2 tasks.",
+          "type": "integer",
+          "markdownDescription": "The minimum value to scale by when the adjustment type is ``PercentChangeInCapacity``. For example, suppose that you create a step scaling policy to scale out an Amazon ECS service by 25 percent and you specify a ``MinAdjustmentMagnitude`` of 2. If the service has 4 tasks and the scaling policy is performed, 25 percent of 4 is 1. However, because you specified a ``MinAdjustmentMagnitude`` of 2, Application Auto Scaling scales out the service by 2 tasks.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "AdjustmentType": {
+          "description": "Specifies whether the ``ScalingAdjustment`` value in the ``StepAdjustment`` property is an absolute number or a percentage of the current capacity.",
+          "type": "string",
+          "markdownDescription": "Specifies whether the ``ScalingAdjustment`` value in the ``StepAdjustment`` property is an absolute number or a percentage of the current capacity.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "``StepScalingPolicyConfiguration`` is a property of the [AWS::ApplicationAutoScaling::ScalingPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-applicationautoscaling-scalingpolicy.html) resource that specifies a step scaling policy configuration for Application Auto Scaling. \n For more information, see [Step scaling policies](https://docs.aws.amazon.com/autoscaling/application/userguide/application-auto-scaling-step-scaling-policies.html) in the *Application Auto Scaling User Guide*.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     }
   },
   "properties": {
@@ -413,6 +730,11 @@
       "description": "A step scaling policy.",
       "$ref": "#/definitions/StepScalingPolicyConfiguration",
       "markdownDescription": "A step scaling policy.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+    },
+    "PredictiveScalingPolicyConfiguration": {
+      "description": "The predictive scaling policy configuration.",
+      "$ref": "#/definitions/PredictiveScalingPolicyConfiguration",
+      "markdownDescription": "The predictive scaling policy configuration.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
     }
   },
   "attributes": {
