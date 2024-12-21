@@ -68,6 +68,22 @@
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
+    "PerformanceTarget": {
+      "type": "object",
+      "properties": {
+        "Status": {
+          "$ref": "#/definitions/PerformanceTargetStatus"
+        },
+        "Level": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "VpcEndpoint": {
       "type": "object",
       "properties": {
@@ -170,6 +186,9 @@
         "CreationDate": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "PricePerformanceTarget": {
+          "$ref": "#/definitions/PerformanceTarget"
         }
       },
       "additionalProperties": false,
@@ -207,6 +226,14 @@
         "DELETING"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | AVAILABLE | MODIFYING | DELETING  \nUpdate requires: No interruption"
+    },
+    "PerformanceTargetStatus": {
+      "type": "string",
+      "enum": [
+        "ENABLED",
+        "DISABLED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption"
     }
   },
   "properties": {
@@ -290,6 +317,12 @@
       "type": "integer",
       "markdownDescription": "The custom port to use when connecting to a workgroup. Valid port ranges are 5431-5455 and 8191-8215. The default is 5439.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
     },
+    "PricePerformanceTarget": {
+      "description": "A property that represents the price performance target settings for the workgroup.",
+      "type": "object",
+      "$ref": "#/definitions/PerformanceTarget",
+      "markdownDescription": "A property that represents the price performance target settings for the workgroup.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "Tags": {
       "description": "The map of the key-value pairs used to tag the workgroup.",
       "type": "array",
@@ -303,7 +336,16 @@
     }
   },
   "tagging": {
-    "taggable": true
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "redshift-serverless:ListTagsForResource",
+      "redshift-serverless:TagResource",
+      "redshift-serverless:UntagResource"
+    ]
   },
   "additionalProperties": false,
   "required": [
@@ -343,10 +385,7 @@
     "/properties/MaxCapacity",
     "/properties/ConfigParameters",
     "/properties/SecurityGroupIds",
-    "/properties/SubnetIds",
-    "/properties/Tags",
-    "/properties/Tags/*/Key",
-    "/properties/Tags/*/Value"
+    "/properties/SubnetIds"
   ],
   "primaryIdentifier": [
     "/properties/WorkgroupName"
@@ -364,7 +403,9 @@
         "redshift-serverless:CreateNamespace",
         "redshift-serverless:CreateWorkgroup",
         "redshift-serverless:GetWorkgroup",
-        "redshift-serverless:GetNamespace"
+        "redshift-serverless:GetNamespace",
+        "redshift-serverless:ListTagsForResource",
+        "redshift-serverless:TagResource"
       ]
     },
     "read": {
@@ -376,7 +417,8 @@
         "ec2:DescribeSubnets",
         "ec2:DescribeAccountAttributes",
         "ec2:DescribeAvailabilityZones",
-        "redshift-serverless:GetWorkgroup"
+        "redshift-serverless:GetWorkgroup",
+        "redshift-serverless:ListTagsForResource"
       ]
     },
     "update": {
@@ -392,7 +434,10 @@
         "redshift-serverless:TagResource",
         "redshift-serverless:UntagResource",
         "redshift-serverless:GetWorkgroup",
-        "redshift-serverless:UpdateWorkgroup"
+        "redshift-serverless:UpdateWorkgroup",
+        "redshift-serverless:ListTagsForResource",
+        "redshift-serverless:TagResource",
+        "redshift-serverless:UntagResource"
       ]
     },
     "delete": {
@@ -406,7 +451,9 @@
         "ec2:DescribeAvailabilityZones",
         "redshift-serverless:GetWorkgroup",
         "redshift-serverless:GetNamespace",
-        "redshift-serverless:DeleteWorkgroup"
+        "redshift-serverless:DeleteWorkgroup",
+        "redshift-serverless:ListTagsForResource",
+        "redshift-serverless:UntagResource"
       ]
     },
     "list": {
@@ -418,7 +465,8 @@
         "ec2:DescribeSubnets",
         "ec2:DescribeAccountAttributes",
         "ec2:DescribeAvailabilityZones",
-        "redshift-serverless:ListWorkgroups"
+        "redshift-serverless:ListWorkgroups",
+        "redshift-serverless:ListTagsForResource"
       ]
     }
   },

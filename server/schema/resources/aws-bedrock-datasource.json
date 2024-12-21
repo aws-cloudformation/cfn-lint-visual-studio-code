@@ -12,10 +12,13 @@
           "maxLength": 2048,
           "minLength": 1,
           "description": "The model's ARN.",
-          "markdownDescription": "The model's ARN.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}::foundation-model/([a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}([.]?[a-z0-9-]{1,63})([:][a-z0-9-]{1,63}){0,2})$  \nUpdate requires: No interruption"
+          "markdownDescription": "The model's ARN.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}::foundation-model/([a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}([.]?[a-z0-9-]{1,63})([:][a-z0-9-]{1,63}){0,2})|(arn:aws(|-us-gov|-cn|-iso|-iso-b):bedrock:(|[0-9a-z-]{1,20}):(|[0-9]{12}):(inference-profile|application-inference-profile)/[a-zA-Z0-9-:.]+)$  \nUpdate requires: No interruption"
         },
         "ParsingPrompt": {
           "$ref": "#/definitions/ParsingPrompt"
+        },
+        "ParsingModality": {
+          "$ref": "#/definitions/ParsingModality"
         }
       },
       "required": [
@@ -110,33 +113,6 @@
       "required": [
         "Type"
       ],
-      "oneOf": [
-        {
-          "required": [
-            "S3Configuration"
-          ]
-        },
-        {
-          "required": [
-            "ConfluenceConfiguration"
-          ]
-        },
-        {
-          "required": [
-            "SalesforceConfiguration"
-          ]
-        },
-        {
-          "required": [
-            "SharePointConfiguration"
-          ]
-        },
-        {
-          "required": [
-            "WebConfiguration"
-          ]
-        }
-      ],
       "additionalProperties": false,
       "markdownDescription": "Specifies a raw data source location to ingest.\n\n---\n\nRequired: No  \nUpdate requires: Replacement"
     },
@@ -158,9 +134,10 @@
         "CONFLUENCE",
         "SALESFORCE",
         "SHAREPOINT",
-        "WEB"
+        "WEB",
+        "CUSTOM"
       ],
-      "markdownDescription": "The type of the data source location.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: S3 | CONFLUENCE | SALESFORCE | SHAREPOINT | WEB  \nUpdate requires: No interruption"
+      "markdownDescription": "The type of the data source location.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: S3 | CONFLUENCE | SALESFORCE | SHAREPOINT | WEB | CUSTOM  \nUpdate requires: No interruption"
     },
     "DataDeletionPolicy": {
       "type": "string",
@@ -266,6 +243,9 @@
         },
         "BedrockFoundationModelConfiguration": {
           "$ref": "#/definitions/BedrockFoundationModelConfiguration"
+        },
+        "BedrockDataAutomationConfiguration": {
+          "$ref": "#/definitions/BedrockDataAutomationConfiguration"
         }
       },
       "required": [
@@ -273,6 +253,25 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "Settings for parsing document contents\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ParsingModality": {
+      "type": "string",
+      "description": "Determine how will parsed content be stored.",
+      "enum": [
+        "MULTIMODAL"
+      ],
+      "markdownDescription": "Determine how will parsed content be stored.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MULTIMODAL  \nUpdate requires: No interruption"
+    },
+    "BedrockDataAutomationConfiguration": {
+      "type": "object",
+      "description": "Settings for a Bedrock Data Automation used to parse documents for a data source.",
+      "properties": {
+        "ParsingModality": {
+          "$ref": "#/definitions/ParsingModality"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Settings for a Bedrock Data Automation used to parse documents for a data source.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "ParsingPrompt": {
       "type": "object",
@@ -296,9 +295,10 @@
       "type": "string",
       "description": "The parsing strategy for the data source.",
       "enum": [
-        "BEDROCK_FOUNDATION_MODEL"
+        "BEDROCK_FOUNDATION_MODEL",
+        "BEDROCK_DATA_AUTOMATION"
       ],
-      "markdownDescription": "The parsing strategy for the data source.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: BEDROCK_FOUNDATION_MODEL  \nUpdate requires: No interruption"
+      "markdownDescription": "The parsing strategy for the data source.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: BEDROCK_FOUNDATION_MODEL | BEDROCK_DATA_AUTOMATION  \nUpdate requires: No interruption"
     },
     "S3DataSourceConfiguration": {
       "type": "object",
