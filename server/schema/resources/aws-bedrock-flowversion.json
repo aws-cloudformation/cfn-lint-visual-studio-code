@@ -547,8 +547,11 @@
           "type": "string",
           "maxLength": 2048,
           "minLength": 1,
-          "description": "ARN or name of a Bedrock model.",
-          "markdownDescription": "ARN or name of a Bedrock model.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:(([0-9]{12}:custom-model/[a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}(([:][a-z0-9-]{1,63}){0,2})?/[a-z0-9]{12})|(:foundation-model/([a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}([.]?[a-z0-9-]{1,63})([:][a-z0-9-]{1,63}){0,2})))|(([a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}([.]?[a-z0-9-]{1,63})([:][a-z0-9-]{1,63}){0,2}))|(([0-9a-zA-Z][_-]?)+)$  \nUpdate requires: No interruption"
+          "description": "ARN or Id of a Bedrock Foundational Model or Inference Profile, or the ARN of a imported model, or a provisioned throughput ARN for custom models.",
+          "markdownDescription": "ARN or Id of a Bedrock Foundational Model or Inference Profile, or the ARN of a imported model, or a provisioned throughput ARN for custom models.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^(arn:aws(-[^:]{1,12})?:(bedrock|sagemaker):[a-z0-9-]{1,20}:([0-9]{12})?:([a-z-]+/)?)?([a-zA-Z0-9.-]{1,63}){0,2}(([:][a-z0-9-]{1,63}){0,2})?(/[a-z0-9]{1,12})?$  \nUpdate requires: No interruption"
+        },
+        "GuardrailConfiguration": {
+          "$ref": "#/definitions/GuardrailConfiguration"
         }
       },
       "required": [
@@ -598,6 +601,9 @@
       "properties": {
         "SourceConfiguration": {
           "$ref": "#/definitions/PromptFlowNodeSourceConfiguration"
+        },
+        "GuardrailConfiguration": {
+          "$ref": "#/definitions/GuardrailConfiguration"
         }
       },
       "required": [
@@ -648,8 +654,8 @@
           "type": "string",
           "maxLength": 2048,
           "minLength": 1,
-          "description": "ARN or name of a Bedrock model.",
-          "markdownDescription": "ARN or name of a Bedrock model.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^(arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:(([0-9]{12}:custom-model/[a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}/[a-z0-9]{12})|(:foundation-model/[a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}([.:]?[a-z0-9-]{1,63}))|([0-9]{12}:provisioned-model/[a-z0-9]{12})))|([a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}([.:]?[a-z0-9-]{1,63}))|(([0-9a-zA-Z][_-]?)+)$  \nUpdate requires: No interruption"
+          "description": "ARN or Id of a Bedrock Foundational Model or Inference Profile, or the ARN of a imported model, or a provisioned throughput ARN for custom models.",
+          "markdownDescription": "ARN or Id of a Bedrock Foundational Model or Inference Profile, or the ARN of a imported model, or a provisioned throughput ARN for custom models.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^(arn:aws(-[^:]{1,12})?:(bedrock|sagemaker):[a-z0-9-]{1,20}:([0-9]{12})?:([a-z-]+/)?)?([a-zA-Z0-9.-]{1,63}){0,2}(([:][a-z0-9-]{1,63}){0,2})?(/[a-z0-9]{1,12})?$  \nUpdate requires: No interruption"
         },
         "InferenceConfiguration": {
           "$ref": "#/definitions/PromptInferenceConfiguration"
@@ -825,13 +831,6 @@
           "description": "Cumulative probability cutoff for token selection",
           "markdownDescription": "Cumulative probability cutoff for token selection\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
         },
-        "TopK": {
-          "type": "number",
-          "maximum": 500,
-          "minimum": 0,
-          "description": "Sample from the k most likely next tokens",
-          "markdownDescription": "Sample from the k most likely next tokens\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
-        },
         "MaxTokens": {
           "type": "number",
           "maximum": 4096,
@@ -910,6 +909,25 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "Configuration for text prompt template\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "GuardrailConfiguration": {
+      "type": "object",
+      "description": "Configuration for a guardrail",
+      "properties": {
+        "GuardrailIdentifier": {
+          "type": "string",
+          "maxLength": 2048,
+          "description": "Identifier for the guardrail, could be the id or the arn",
+          "markdownDescription": "Identifier for the guardrail, could be the id or the arn\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nPattern: ^(([a-z0-9]+)|(arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:guardrail/[a-z0-9]+))$  \nUpdate requires: No interruption"
+        },
+        "GuardrailVersion": {
+          "type": "string",
+          "description": "Version of the guardrail",
+          "markdownDescription": "Version of the guardrail\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(([0-9]{1,8})|(DRAFT))$  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for a guardrail\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     }
   },
   "properties": {
@@ -953,24 +971,31 @@
         "bedrock:CreateFlowVersion",
         "bedrock:GetFlowVersion",
         "kms:GenerateDataKey",
-        "kms:Decrypt"
+        "kms:Decrypt",
+        "bedrock:CreateGuardrail",
+        "bedrock:CreateGuardrailVersion",
+        "bedrock:GetGuardrail"
       ]
     },
     "read": {
       "permissions": [
         "bedrock:GetFlowVersion",
-        "kms:Decrypt"
+        "kms:Decrypt",
+        "bedrock:GetGuardrail"
       ]
     },
     "delete": {
       "permissions": [
         "bedrock:DeleteFlowVersion",
-        "bedrock:GetFlowVersion"
+        "bedrock:GetFlowVersion",
+        "bedrock:DeleteGuardrail",
+        "bedrock:GetGuardrail"
       ]
     },
     "list": {
       "permissions": [
-        "bedrock:ListFlowVersions"
+        "bedrock:ListFlowVersions",
+        "bedrock:ListGuardrails"
       ],
       "handlerSchema": {
         "properties": {

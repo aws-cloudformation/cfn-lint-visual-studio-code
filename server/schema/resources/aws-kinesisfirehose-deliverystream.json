@@ -15,11 +15,12 @@
     "DeliveryStreamType": {
       "type": "string",
       "enum": [
+        "DatabaseAsSource",
         "DirectPut",
         "KinesisStreamAsSource",
         "MSKAsSource"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DirectPut | KinesisStreamAsSource | MSKAsSource  \nUpdate requires: Replacement"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DatabaseAsSource | DirectPut | KinesisStreamAsSource | MSKAsSource  \nUpdate requires: Replacement"
     },
     "ElasticsearchDestinationConfiguration": {
       "$ref": "#/definitions/ElasticsearchDestinationConfiguration"
@@ -32,6 +33,9 @@
     },
     "ExtendedS3DestinationConfiguration": {
       "$ref": "#/definitions/ExtendedS3DestinationConfiguration"
+    },
+    "DatabaseSourceConfiguration": {
+      "$ref": "#/definitions/DatabaseSourceConfiguration"
     },
     "KinesisStreamSourceConfiguration": {
       "$ref": "#/definitions/KinesisStreamSourceConfiguration"
@@ -235,6 +239,204 @@
         "KinesisStreamARN"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "DatabaseSourceConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Type": {
+          "type": "string",
+          "enum": [
+            "MySQL",
+            "PostgreSQL"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: MySQL | PostgreSQL  \nUpdate requires: No interruption"
+        },
+        "Endpoint": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^(?!\\s*$).+  \nUpdate requires: No interruption"
+        },
+        "Port": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 65535,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "SSLMode": {
+          "type": "string",
+          "enum": [
+            "Disabled",
+            "Enabled"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Disabled | Enabled  \nUpdate requires: No interruption"
+        },
+        "Databases": {
+          "$ref": "#/definitions/Databases"
+        },
+        "Tables": {
+          "$ref": "#/definitions/DatabaseTables"
+        },
+        "Columns": {
+          "$ref": "#/definitions/DatabaseColumns"
+        },
+        "SurrogateKeys": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nPattern: ^\\S+$  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "SnapshotWatermarkTable": {
+          "$ref": "#/definitions/DatabaseTableName"
+        },
+        "DatabaseSourceAuthenticationConfiguration": {
+          "$ref": "#/definitions/DatabaseSourceAuthenticationConfiguration"
+        },
+        "DatabaseSourceVPCConfiguration": {
+          "$ref": "#/definitions/DatabaseSourceVPCConfiguration"
+        },
+        "Digest": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: .*  \nUpdate requires: No interruption"
+        },
+        "PublicCertificate": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 4096  \nPattern: .*  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Type",
+        "Endpoint",
+        "Port",
+        "Databases",
+        "Tables",
+        "SnapshotWatermarkTable",
+        "DatabaseSourceAuthenticationConfiguration",
+        "DatabaseSourceVPCConfiguration"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Databases": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Include": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DatabaseName"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Exclude": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DatabaseName"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "DatabaseName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: [\\u0001-\\uFFFF]*  \nUpdate requires: No interruption"
+    },
+    "DatabaseTables": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Include": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DatabaseTableName"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Exclude": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DatabaseTableName"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "DatabaseTableName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 129,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 129  \nPattern: [\\u0001-\\uFFFF]*  \nUpdate requires: No interruption"
+    },
+    "DatabaseColumns": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Include": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DatabaseColumnName"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Exclude": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DatabaseColumnName"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "DatabaseColumnName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 194,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 194  \nPattern: [\\u0001-\\uFFFF]*  \nUpdate requires: No interruption"
+    },
+    "DatabaseSourceAuthenticationConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "SecretsManagerConfiguration": {
+          "$ref": "#/definitions/SecretsManagerConfiguration"
+        }
+      },
+      "required": [
+        "SecretsManagerConfiguration"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "DatabaseSourceVPCConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "VpcEndpointServiceName": {
+          "$ref": "#/definitions/VpcEndpointServiceName"
+        }
+      },
+      "required": [
+        "VpcEndpointServiceName"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "VpcEndpointServiceName": {
+      "type": "string",
+      "minLength": 47,
+      "maxLength": 255,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 47  \nMaximum Length: 255  \nPattern: ([a-zA-Z0-9\\-\\_]+\\.){2,3}vpce\\.[a-zA-Z0-9\\-]*\\.vpce-svc\\-[a-zA-Z0-9\\-]{17}$  \nUpdate requires: No interruption"
     },
     "MSKSourceConfiguration": {
       "type": "object",
@@ -1806,17 +2008,17 @@
             "typeName": "AWS::IAM::Role",
             "propertyPath": "/properties/Arn"
           },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: arn:.*  \nUpdate requires: No interruption"
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: arn:.*:iam::\\d{12}:role/[a-zA-Z_0-9+=,.@\\-_/]+  \nUpdate requires: No interruption"
         },
         "SecretARN": {
           "type": "string",
           "minLength": 1,
-          "maxLength": 512,
+          "maxLength": 2048,
           "relationshipRef": {
             "typeName": "AWS::SecretsManager::Secret",
             "propertyPath": "/properties/Arn"
           },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: arn:.*  \nUpdate requires: No interruption"
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: arn:.*:secretsmanager:[a-zA-Z0-9\\-]+:\\d{12}:secret:[a-zA-Z0-9\\-/_+=.@]+  \nUpdate requires: No interruption"
         }
       },
       "required": [
@@ -1901,6 +2103,7 @@
     "/properties/ElasticsearchDestinationConfiguration/VpcConfiguration",
     "/properties/AmazonopensearchserviceDestinationConfiguration/VpcConfiguration",
     "/properties/AmazonOpenSearchServerlessDestinationConfiguration/VpcConfiguration",
+    "/properties/DatabaseSourceConfiguration",
     "/properties/KinesisStreamSourceConfiguration",
     "/properties/MSKSourceConfiguration",
     "/properties/IcebergDestinationConfiguration",

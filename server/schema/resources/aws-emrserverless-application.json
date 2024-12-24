@@ -56,6 +56,24 @@
       },
       "markdownDescription": "Runtime configuration for batch and interactive JobRun.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     },
+    "SchedulerConfiguration": {
+      "type": "object",
+      "description": "The scheduler configuration for batch and streaming jobs running on this application. Supported with release labels emr-7.0.0 and above.",
+      "additionalProperties": false,
+      "properties": {
+        "QueueTimeoutMinutes": {
+          "description": "The maximum duration in minutes for the job in QUEUED state. If scheduler configuration is enabled on your application, the default value is 360 minutes (6 hours). The valid range is from 15 to 720.",
+          "type": "integer",
+          "markdownDescription": "The maximum duration in minutes for the job in QUEUED state. If scheduler configuration is enabled on your application, the default value is 360 minutes (6 hours). The valid range is from 15 to 720.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        },
+        "MaxConcurrentRuns": {
+          "description": "The maximum concurrent job runs on this application. If scheduler configuration is enabled on your application, the default value is 15. The valid range is 1 to 1000.",
+          "type": "integer",
+          "markdownDescription": "The maximum concurrent job runs on this application. If scheduler configuration is enabled on your application, the default value is 15. The valid range is 1 to 1000.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "The scheduler configuration for batch and streaming jobs running on this application. Supported with release labels emr-7.0.0 and above.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "MonitoringConfiguration": {
       "type": "object",
       "description": "Monitoring configuration for batch and interactive JobRun.",
@@ -600,6 +618,11 @@
       "description": "The key-value pairs that specify worker type to WorkerTypeSpecificationInput. This parameter must contain all valid worker types for a Spark or Hive application. Valid worker types include Driver and Executor for Spark applications and HiveDriver and TezTask for Hive applications. You can either set image details in this parameter for each worker type, or in imageConfiguration for all worker types.",
       "$ref": "#/definitions/WorkerTypeSpecificationInputMap",
       "markdownDescription": "The key-value pairs that specify worker type to WorkerTypeSpecificationInput. This parameter must contain all valid worker types for a Spark or Hive application. Valid worker types include Driver and Executor for Spark applications and HiveDriver and TezTask for Hive applications. You can either set image details in this parameter for each worker type, or in imageConfiguration for all worker types.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Some interruptions"
+    },
+    "SchedulerConfiguration": {
+      "description": "The scheduler configuration for batch and streaming jobs running on this application. Supported with release labels emr-7.0.0 and above.",
+      "$ref": "#/definitions/SchedulerConfiguration",
+      "markdownDescription": "The scheduler configuration for batch and streaming jobs running on this application. Supported with release labels emr-7.0.0 and above.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Some interruptions"
     }
   },
   "additionalProperties": false,
@@ -623,7 +646,8 @@
     "/properties/ImageConfiguration",
     "/properties/MonitoringConfiguration",
     "/properties/RuntimeConfiguration",
-    "/properties/InteractiveConfiguration"
+    "/properties/InteractiveConfiguration",
+    "/properties/SchedulerConfiguration"
   ],
   "readOnlyProperties": [
     "/properties/Arn",
@@ -637,7 +661,13 @@
     "tagOnCreate": true,
     "tagUpdatable": true,
     "cloudFormationSystemTags": false,
-    "tagProperty": "/properties/Tags"
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "emr-serverless:TagResource",
+      "emr-serverless:UntagResource",
+      "kms:TagResource",
+      "kms:UntagResource"
+    ]
   },
   "handlers": {
     "create": {

@@ -6,9 +6,10 @@
       "type": "string",
       "description": "Prompt template type",
       "enum": [
-        "TEXT"
+        "TEXT",
+        "CHAT"
       ],
-      "markdownDescription": "Prompt template type\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: TEXT  \nUpdate requires: No interruption"
+      "markdownDescription": "Prompt template type\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: TEXT | CHAT  \nUpdate requires: No interruption"
     },
     "PromptVariant": {
       "type": "object",
@@ -29,16 +30,20 @@
           "type": "string",
           "maxLength": 2048,
           "minLength": 1,
-          "description": "ARN or name of a Bedrock model.",
-          "markdownDescription": "ARN or name of a Bedrock model.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^(arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:(([0-9]{12}:custom-model/[a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}/[a-z0-9]{12})|(:foundation-model/[a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}([.:]?[a-z0-9-]{1,63}))|([0-9]{12}:provisioned-model/[a-z0-9]{12})))|([a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}([.:]?[a-z0-9-]{1,63}))|(([0-9a-zA-Z][_-]?)+)$  \nUpdate requires: No interruption"
+          "description": "ARN or Id of a Bedrock Foundational Model or Inference Profile, or the ARN of a imported model, or a provisioned throughput ARN for custom models.",
+          "markdownDescription": "ARN or Id of a Bedrock Foundational Model or Inference Profile, or the ARN of a imported model, or a provisioned throughput ARN for custom models.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^(arn:aws(-[^:]{1,12})?:(bedrock|sagemaker):[a-z0-9-]{1,20}:([0-9]{12})?:([a-z-]+/)?)?([a-zA-Z0-9.-]{1,63}){0,2}(([:][a-z0-9-]{1,63}){0,2})?(/[a-z0-9]{1,12})?$  \nUpdate requires: No interruption"
         },
         "InferenceConfiguration": {
           "$ref": "#/definitions/PromptInferenceConfiguration"
+        },
+        "GenAiResource": {
+          "$ref": "#/definitions/PromptGenAiResource"
         }
       },
       "required": [
         "Name",
-        "TemplateType"
+        "TemplateType",
+        "TemplateConfiguration"
       ],
       "additionalProperties": false,
       "markdownDescription": "Prompt variant\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
@@ -73,6 +78,51 @@
       "additionalProperties": false,
       "markdownDescription": "Configuration for text prompt template\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
+    "ChatPromptTemplateConfiguration": {
+      "type": "object",
+      "description": "Configuration for chat prompt template",
+      "properties": {
+        "Messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Message"
+          },
+          "minItems": 0,
+          "description": "List of messages for chat prompt template",
+          "insertionOrder": true,
+          "markdownDescription": "List of messages for chat prompt template\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "System": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SystemContentBlock"
+          },
+          "minItems": 0,
+          "description": "Configuration for chat prompt template",
+          "insertionOrder": true,
+          "markdownDescription": "Configuration for chat prompt template\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ToolConfiguration": {
+          "$ref": "#/definitions/ToolConfiguration"
+        },
+        "InputVariables": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PromptInputVariable"
+          },
+          "maxItems": 5,
+          "minItems": 0,
+          "description": "List of input variables",
+          "insertionOrder": true,
+          "markdownDescription": "List of input variables\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Messages"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for chat prompt template\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "PromptTemplateConfiguration": {
       "description": "Prompt template configuration",
       "oneOf": [
@@ -86,6 +136,19 @@
           },
           "required": [
             "Text"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Chat",
+          "properties": {
+            "Chat": {
+              "$ref": "#/definitions/ChatPromptTemplateConfiguration"
+            }
+          },
+          "required": [
+            "Chat"
           ],
           "additionalProperties": false
         }
@@ -125,6 +188,247 @@
       "additionalProperties": false,
       "markdownDescription": "The identifier for the S3 resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
+    "ConversationRole": {
+      "type": "string",
+      "description": "Conversation roles for the chat prompt",
+      "enum": [
+        "user",
+        "assistant"
+      ],
+      "markdownDescription": "Conversation roles for the chat prompt\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: user | assistant  \nUpdate requires: No interruption"
+    },
+    "ContentBlock": {
+      "description": "Configuration for chat prompt template",
+      "oneOf": [
+        {
+          "title": "Text",
+          "type": "object",
+          "properties": {
+            "Text": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Configuration for chat prompt template"
+            }
+          },
+          "required": [
+            "Text"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "Configuration for chat prompt template\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+    },
+    "SystemContentBlock": {
+      "description": "Configuration for chat prompt template",
+      "oneOf": [
+        {
+          "title": "Text",
+          "type": "object",
+          "properties": {
+            "Text": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Configuration for chat prompt template"
+            }
+          },
+          "required": [
+            "Text"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "Configuration for chat prompt template\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+    },
+    "Message": {
+      "type": "object",
+      "description": "Chat prompt Message",
+      "properties": {
+        "Role": {
+          "$ref": "#/definitions/ConversationRole"
+        },
+        "Content": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ContentBlock"
+          },
+          "minItems": 1,
+          "description": "List of Content Blocks",
+          "insertionOrder": true,
+          "markdownDescription": "List of Content Blocks\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Role",
+        "Content"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Chat prompt Message\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ToolInputSchema": {
+      "description": "Tool input schema",
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "Json",
+          "properties": {
+            "Json": {
+              "type": "object"
+            }
+          },
+          "description": "Tool input schema json",
+          "required": [
+            "Json"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "Tool input schema\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+    },
+    "ToolSpecification": {
+      "type": "object",
+      "description": "Tool specification",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "description": "Tool name",
+          "markdownDescription": "Tool name\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[a-zA-Z][a-zA-Z0-9_]*$  \nUpdate requires: No interruption"
+        },
+        "Description": {
+          "type": "string",
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nUpdate requires: No interruption"
+        },
+        "InputSchema": {
+          "$ref": "#/definitions/ToolInputSchema"
+        }
+      },
+      "required": [
+        "Name",
+        "InputSchema"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Tool specification\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "Tool": {
+      "description": "Tool details",
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "ToolSpec",
+          "properties": {
+            "ToolSpec": {
+              "$ref": "#/definitions/ToolSpecification"
+            }
+          },
+          "required": [
+            "ToolSpec"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "Tool details\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+    },
+    "AutoToolChoice": {
+      "type": "object",
+      "description": "Auto Tool choice",
+      "additionalProperties": false,
+      "markdownDescription": "Auto Tool choice\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "AnyToolChoice": {
+      "type": "object",
+      "description": "Any Tool choice",
+      "additionalProperties": false,
+      "markdownDescription": "Any Tool choice\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "SpecificToolChoice": {
+      "type": "object",
+      "description": "Specific Tool choice",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "description": "Tool name",
+          "markdownDescription": "Tool name\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[a-zA-Z][a-zA-Z0-9_]*$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "Name"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Specific Tool choice\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ToolChoice": {
+      "description": "Tool choice",
+      "oneOf": [
+        {
+          "title": "Auto",
+          "type": "object",
+          "properties": {
+            "Auto": {
+              "$ref": "#/definitions/AutoToolChoice"
+            }
+          },
+          "required": [
+            "Auto"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "title": "Any",
+          "type": "object",
+          "properties": {
+            "Any": {
+              "$ref": "#/definitions/AnyToolChoice"
+            }
+          },
+          "required": [
+            "Any"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "title": "Tool",
+          "type": "object",
+          "properties": {
+            "Tool": {
+              "$ref": "#/definitions/SpecificToolChoice"
+            }
+          },
+          "required": [
+            "Tool"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "Tool choice\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+    },
+    "ToolConfiguration": {
+      "type": "object",
+      "description": "Tool configuration",
+      "properties": {
+        "Tools": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Tool"
+          },
+          "minItems": 1,
+          "description": "List of Tools",
+          "insertionOrder": true,
+          "markdownDescription": "List of Tools\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "ToolChoice": {
+          "$ref": "#/definitions/ToolChoice"
+        }
+      },
+      "required": [
+        "Tools"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Tool configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "PromptModelInferenceConfiguration": {
       "type": "object",
       "description": "Prompt model inference configuration",
@@ -142,13 +446,6 @@
           "minimum": 0,
           "description": "Cumulative probability cutoff for token selection",
           "markdownDescription": "Cumulative probability cutoff for token selection\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
-        },
-        "TopK": {
-          "type": "number",
-          "maximum": 500,
-          "minimum": 0,
-          "description": "Sample from the k most likely next tokens",
-          "markdownDescription": "Sample from the k most likely next tokens\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
         },
         "MaxTokens": {
           "type": "number",
@@ -219,6 +516,42 @@
       },
       "additionalProperties": false,
       "markdownDescription": "A map of tag keys and values\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PromptAgentResource": {
+      "description": "Target Agent to invoke with Prompt",
+      "type": "object",
+      "properties": {
+        "AgentIdentifier": {
+          "type": "string",
+          "maxLength": 2048,
+          "description": "Arn representation of the Agent Alias.",
+          "markdownDescription": "Arn representation of the Agent Alias.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nPattern: ^arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:agent-alias/[0-9a-zA-Z]{10}/[0-9a-zA-Z]{10}$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "AgentIdentifier"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Target Agent to invoke with Prompt\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PromptGenAiResource": {
+      "description": "Target resource to invoke with Prompt",
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "Agent",
+          "properties": {
+            "Agent": {
+              "$ref": "#/definitions/PromptAgentResource"
+            }
+          },
+          "required": [
+            "Agent"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "Target resource to invoke with Prompt\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
     }
   },
   "properties": {
@@ -244,7 +577,7 @@
       "items": {
         "$ref": "#/definitions/PromptVariant"
       },
-      "maxItems": 3,
+      "maxItems": 1,
       "minItems": 0,
       "description": "List of prompt variants",
       "insertionOrder": true,
