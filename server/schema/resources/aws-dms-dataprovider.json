@@ -7,7 +7,12 @@
     "tagOnCreate": true,
     "tagUpdatable": true,
     "cloudFormationSystemTags": false,
-    "tagProperty": "/properties/Tags"
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "dms:AddTagsToResource",
+      "dms:RemoveTagsFromResource",
+      "dms:ListTagsForResource"
+    ]
   },
   "definitions": {
     "Tag": {
@@ -45,6 +50,32 @@
         "verify-full"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: none | require | verify-ca | verify-full  \nUpdate requires: No interruption"
+    },
+    "MongoDbSslModeValue": {
+      "type": "string",
+      "enum": [
+        "none",
+        "require",
+        "verify-full"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: none | require | verify-full  \nUpdate requires: No interruption"
+    },
+    "MongoDbAuthType": {
+      "type": "string",
+      "enum": [
+        "no",
+        "password"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: no | password  \nUpdate requires: No interruption"
+    },
+    "MongoDbAuthMechanism": {
+      "type": "string",
+      "enum": [
+        "default",
+        "mongodb_cr",
+        "scram_sha_1"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: default | mongodb_cr | scram_sha_1  \nUpdate requires: No interruption"
     }
   },
   "properties": {
@@ -73,14 +104,18 @@
       "description": "The property describes a data engine for the data provider.",
       "type": "string",
       "enum": [
-        "postgres",
+        "aurora",
+        "aurora_postgresql",
         "mysql",
         "oracle",
+        "postgres",
         "sqlserver",
-        "aurora",
-        "aurora_postgresql"
+        "redshift",
+        "mariadb",
+        "mongodb",
+        "docdb"
       ],
-      "markdownDescription": "The property describes a data engine for the data provider.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: postgres | mysql | oracle | sqlserver | aurora | aurora_postgresql  \nUpdate requires: No interruption"
+      "markdownDescription": "The property describes a data engine for the data provider.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: aurora | aurora_postgresql | mysql | oracle | postgres | sqlserver | redshift | mariadb | mongodb | docdb  \nUpdate requires: No interruption"
     },
     "ExactSettings": {
       "description": "The property describes the exact settings which can be modified",
@@ -246,6 +281,142 @@
           ],
           "additionalProperties": false,
           "markdownDescription": "MicrosoftSqlServerSettings property identifier.\n\n---\n\nRequired: Conditional  \nUpdate requires: No interruption"
+        },
+        "RedshiftSettings": {
+          "description": "RedshiftSettings property identifier.",
+          "type": "object",
+          "properties": {
+            "ServerName": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+            },
+            "Port": {
+              "type": "integer",
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+            },
+            "DatabaseName": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+            }
+          },
+          "required": [
+            "ServerName",
+            "Port",
+            "DatabaseName"
+          ],
+          "additionalProperties": false,
+          "markdownDescription": "RedshiftSettings property identifier.\n\n---\n\nRequired: Conditional  \nUpdate requires: No interruption"
+        },
+        "MariaDbSettings": {
+          "description": "MariaDbSettings property identifier.",
+          "type": "object",
+          "properties": {
+            "ServerName": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+            },
+            "Port": {
+              "type": "integer",
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+            },
+            "SslMode": {
+              "type": "object",
+              "$ref": "#/definitions/DmsSslModeValue",
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nUpdate requires: No interruption"
+            },
+            "CertificateArn": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+            }
+          },
+          "required": [
+            "ServerName",
+            "Port",
+            "SslMode"
+          ],
+          "additionalProperties": false,
+          "markdownDescription": "MariaDbSettings property identifier.\n\n---\n\nRequired: Conditional  \nUpdate requires: No interruption"
+        },
+        "DocDbSettings": {
+          "description": "DocDbSettings property identifier.",
+          "type": "object",
+          "properties": {
+            "ServerName": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+            },
+            "Port": {
+              "type": "integer",
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+            },
+            "DatabaseName": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+            },
+            "SslMode": {
+              "type": "object",
+              "$ref": "#/definitions/MongoDbSslModeValue",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+            },
+            "CertificateArn": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+            }
+          },
+          "required": [
+            "ServerName",
+            "Port",
+            "DatabaseName"
+          ],
+          "additionalProperties": false,
+          "markdownDescription": "DocDbSettings property identifier.\n\n---\n\nRequired: Conditional  \nUpdate requires: No interruption"
+        },
+        "MongoDbSettings": {
+          "description": "MongoDbSettings property identifier.",
+          "type": "object",
+          "properties": {
+            "ServerName": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+            },
+            "Port": {
+              "type": "integer",
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+            },
+            "DatabaseName": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+            },
+            "SslMode": {
+              "type": "object",
+              "$ref": "#/definitions/MongoDbSslModeValue",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+            },
+            "CertificateArn": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+            },
+            "AuthType": {
+              "type": "object",
+              "$ref": "#/definitions/MongoDbAuthType",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+            },
+            "AuthSource": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+            },
+            "AuthMechanism": {
+              "type": "object",
+              "$ref": "#/definitions/MongoDbAuthMechanism",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+            }
+          },
+          "required": [
+            "ServerName",
+            "Port"
+          ],
+          "additionalProperties": false,
+          "markdownDescription": "MongoDbSettings property identifier.\n\n---\n\nRequired: Conditional  \nUpdate requires: No interruption"
         }
       },
       "anyOf": [
@@ -267,6 +438,26 @@
         {
           "required": [
             "MicrosoftSqlServerSettings"
+          ]
+        },
+        {
+          "required": [
+            "RedshiftSettings"
+          ]
+        },
+        {
+          "required": [
+            "DocDbSettings"
+          ]
+        },
+        {
+          "required": [
+            "MariaDbSettings"
+          ]
+        },
+        {
+          "required": [
+            "MongoDbSettings"
           ]
         }
       ],
@@ -328,7 +519,7 @@
         "dms:UpdateDataProvider",
         "dms:ModifyDataProvider",
         "dms:AddTagsToResource",
-        "dms:RemoveTagsToResource",
+        "dms:RemoveTagsFromResource",
         "dms:ListTagsForResource"
       ]
     },

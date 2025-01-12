@@ -26,6 +26,18 @@
         "EnableOCSPCheck": {
           "type": "boolean",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+        },
+        "OcspLambdaArn": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 170,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 170  \nUpdate requires: No interruption"
+        },
+        "OcspAuthorizedResponderArn": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws(-cn|-us-gov|-iso-b|-iso)?:acm:[a-z]{2}-(gov-|iso-|isob-)?[a-z]{4,9}-\\d{1}:\\d{12}:certificate/[a-zA-Z0-9/-]+$  \nUpdate requires: No interruption"
         }
       },
       "additionalProperties": false,
@@ -63,6 +75,19 @@
           "type": "string",
           "maxLength": 128,
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 128  \nUpdate requires: No interruption"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ClientCertificateConfig": {
+      "type": "object",
+      "properties": {
+        "ClientCertificateCallbackArn": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 170,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 170  \nUpdate requires: No interruption"
         }
       },
       "additionalProperties": false,
@@ -144,6 +169,30 @@
     "TlsConfig": {
       "$ref": "#/definitions/TlsConfig"
     },
+    "AuthenticationType": {
+      "type": "string",
+      "enum": [
+        "AWS_X509",
+        "CUSTOM_AUTH",
+        "AWS_SIGV4",
+        "CUSTOM_AUTH_X509",
+        "DEFAULT"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AWS_X509 | CUSTOM_AUTH | AWS_SIGV4 | CUSTOM_AUTH_X509 | DEFAULT  \nUpdate requires: No interruption"
+    },
+    "ApplicationProtocol": {
+      "type": "string",
+      "enum": [
+        "SECURE_MQTT",
+        "MQTT_WSS",
+        "HTTPS",
+        "DEFAULT"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SECURE_MQTT | MQTT_WSS | HTTPS | DEFAULT  \nUpdate requires: No interruption"
+    },
+    "ClientCertificateConfig": {
+      "$ref": "#/definitions/ClientCertificateConfig"
+    },
     "Tags": {
       "type": "array",
       "uniqueItems": true,
@@ -159,7 +208,12 @@
     "tagOnCreate": true,
     "tagUpdatable": true,
     "cloudFormationSystemTags": true,
-    "tagProperty": "/properties/Tags"
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "iot:ListTagsForResource",
+      "iot:TagResource",
+      "iot:UntagResource"
+    ]
   },
   "additionalProperties": false,
   "required": [],

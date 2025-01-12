@@ -89,6 +89,15 @@
         "$ref": "#/definitions/ResourceToTag"
       },
       "markdownDescription": "List of resources which canary tags should be replicated to.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "ProvisionedResourceCleanup": {
+      "description": "Setting to control if provisioned resources created by Synthetics are deleted alongside the canary. Default is AUTOMATIC.",
+      "type": "string",
+      "enum": [
+        "AUTOMATIC",
+        "OFF"
+      ],
+      "markdownDescription": "Setting to control if provisioned resources created by Synthetics are deleted alongside the canary. Default is AUTOMATIC.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AUTOMATIC | OFF  \nUpdate requires: No interruption"
     }
   },
   "definitions": {
@@ -206,6 +215,11 @@
             "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
           },
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        },
+        "Ipv6AllowedForDualStack": {
+          "description": "Allow outbound IPv6 traffic on VPC canaries that are connected to dual-stack subnets if set to true",
+          "type": "boolean",
+          "markdownDescription": "Allow outbound IPv6 traffic on VPC canaries that are connected to dual-stack subnets if set to true\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
         }
       },
       "required": [
@@ -360,6 +374,7 @@
         "lambda:CreateFunction",
         "lambda:AddPermission",
         "lambda:PublishVersion",
+        "lambda:UpdateFunctionCode",
         "lambda:UpdateFunctionConfiguration",
         "lambda:GetFunctionConfiguration",
         "lambda:GetLayerVersionByArn",
@@ -387,6 +402,7 @@
         "s3:GetBucketLocation",
         "lambda:AddPermission",
         "lambda:PublishVersion",
+        "lambda:UpdateFunctionCode",
         "lambda:UpdateFunctionConfiguration",
         "lambda:GetFunctionConfiguration",
         "lambda:GetLayerVersionByArn",
@@ -395,7 +411,10 @@
         "lambda:ListTags",
         "lambda:TagResource",
         "lambda:UntagResource",
-        "iam:PassRole"
+        "iam:PassRole",
+        "ec2:DescribeVpcs",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeSecurityGroups"
       ]
     },
     "read": {
@@ -411,7 +430,9 @@
     "delete": {
       "permissions": [
         "synthetics:DeleteCanary",
-        "synthetics:GetCanary"
+        "synthetics:GetCanary",
+        "lambda:DeleteFunction",
+        "lambda:DeleteLayerVersion"
       ]
     },
     "list": {

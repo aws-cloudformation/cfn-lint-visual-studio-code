@@ -82,8 +82,8 @@
             "DISABLED",
             "ENABLED"
           ],
-          "description": "The status of the file system's replication overwrite protection.\n  +   ``ENABLED`` \u2013 The file system cannot be used as the destination file system in a replication configuration. The file system is writeable. Replication overwrite protection is ``ENABLED`` by default. \n  +   ``DISABLED`` \u2013 The file system can be used as the destination file system in a replication configuration. The file system is read-only and can only be modified by EFS replication.\n  +   ``REPLICATING`` \u2013 The file system is being used as the destination file system in a replication configuration. The file system is read-only and is only modified only by EFS replication.\n  \n If the replication configuration is deleted, the file system's replication overwrite protection is re-enabled, the file system becomes writeable.",
-          "markdownDescription": "The status of the file system's replication overwrite protection.\n  +   ``ENABLED`` \u2013 The file system cannot be used as the destination file system in a replication configuration. The file system is writeable. Replication overwrite protection is ``ENABLED`` by default. \n  +   ``DISABLED`` \u2013 The file system can be used as the destination file system in a replication configuration. The file system is read-only and can only be modified by EFS replication.\n  +   ``REPLICATING`` \u2013 The file system is being used as the destination file system in a replication configuration. The file system is read-only and is only modified only by EFS replication.\n  \n If the replication configuration is deleted, the file system's replication overwrite protection is re-enabled, the file system becomes writeable.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DISABLED | ENABLED  \nUpdate requires: No interruption"
+          "description": "The status of the file system's replication overwrite protection.\n  +   ``ENABLED`` \u2013 The file system cannot be used as the destination file system in a replication configuration. The file system is writeable. Replication overwrite protection is ``ENABLED`` by default. \n  +   ``DISABLED`` \u2013 The file system can be used as the destination file system in a replication configuration. The file system is read-only and can only be modified by EFS replication.\n  +   ``REPLICATING`` \u2013 The file system is being used as the destination file system in a replication configuration. The file system is read-only and is modified only by EFS replication.\n  \n If the replication configuration is deleted, the file system's replication overwrite protection is re-enabled, the file system becomes writeable.",
+          "markdownDescription": "The status of the file system's replication overwrite protection.\n  +   ``ENABLED`` \u2013 The file system cannot be used as the destination file system in a replication configuration. The file system is writeable. Replication overwrite protection is ``ENABLED`` by default. \n  +   ``DISABLED`` \u2013 The file system can be used as the destination file system in a replication configuration. The file system is read-only and can only be modified by EFS replication.\n  +   ``REPLICATING`` \u2013 The file system is being used as the destination file system in a replication configuration. The file system is read-only and is modified only by EFS replication.\n  \n If the replication configuration is deleted, the file system's replication overwrite protection is re-enabled, the file system becomes writeable.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DISABLED | ENABLED  \nUpdate requires: No interruption"
         }
       },
       "description": "Describes the protection on the file system.",
@@ -93,15 +93,30 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "Status": {
+          "type": "string",
+          "description": "Describes the status of the replication configuration. For more information about replication status, see [Viewing replication details](https://docs.aws.amazon.com//efs/latest/ug/awsbackup.html#restoring-backup-efsmonitoring-replication-status.html) in the *Amazon EFS User Guide*.",
+          "markdownDescription": "Describes the status of the replication configuration. For more information about replication status, see [Viewing replication details](https://docs.aws.amazon.com//efs/latest/ug/awsbackup.html#restoring-backup-efsmonitoring-replication-status.html) in the *Amazon EFS User Guide*.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "StatusMessage": {
+          "type": "string",
+          "description": "Message that provides details about the ``PAUSED`` or ``ERRROR`` state of the replication destination configuration. For more information about replication status messages, see [Viewing replication details](https://docs.aws.amazon.com//efs/latest/ug/awsbackup.html#restoring-backup-efsmonitoring-replication-status.html) in the *Amazon EFS User Guide*.",
+          "markdownDescription": "Message that provides details about the ``PAUSED`` or ``ERRROR`` state of the replication destination configuration. For more information about replication status messages, see [Viewing replication details](https://docs.aws.amazon.com//efs/latest/ug/awsbackup.html#restoring-backup-efsmonitoring-replication-status.html) in the *Amazon EFS User Guide*.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
         "FileSystemId": {
           "type": "string",
           "description": "The ID of the destination Amazon EFS file system.",
-          "markdownDescription": "The ID of the destination Amazon EFS file system.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+          "markdownDescription": "The ID of the destination Amazon EFS file system.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(arn:aws[-a-z]*:elasticfilesystem:[0-9a-z-:]+:file-system/fs-[0-9a-f]{8,40}|fs-[0-9a-f]{8,40})$  \nUpdate requires: No interruption"
         },
         "Region": {
           "type": "string",
           "description": "The AWS-Region in which the destination file system is located.\n  For One Zone file systems, the replication configuration must specify the AWS-Region in which the destination file system is located.",
           "markdownDescription": "The AWS-Region in which the destination file system is located.\n  For One Zone file systems, the replication configuration must specify the AWS-Region in which the destination file system is located.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "RoleArn": {
+          "type": "string",
+          "description": "The Amazon Resource Name (ARN) of the current source file system in the replication configuration.",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the current source file system in the replication configuration.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
         },
         "AvailabilityZoneName": {
           "type": "string",
@@ -215,7 +230,9 @@
   "additionalProperties": false,
   "readOnlyProperties": [
     "/properties/Arn",
-    "/properties/FileSystemId"
+    "/properties/FileSystemId",
+    "/properties/ReplicationConfiguration/Destinations/*/Status",
+    "/properties/ReplicationConfiguration/Destinations/*/StatusMessage"
   ],
   "primaryIdentifier": [
     "/properties/FileSystemId"
@@ -233,14 +250,21 @@
   ],
   "propertyTransform": {
     "/properties/KmsKeyId": "\"arn:aws[-a-z]*:kms:[a-z0-9-]+:[0-9]{12}:key/[a-zA-Z0-9-]+\"",
-    "/properties/FileSystemProtection/ReplicationOverwriteProtection": "$uppercase(FileSystemProtection.ReplicationOverwriteProtection)='DISABLED' ? 'REPLICATING' : $uppercase(FileSystemProtection.ReplicationOverwriteProtection)"
+    "/properties/FileSystemProtection/ReplicationOverwriteProtection": "$uppercase(FileSystemProtection.ReplicationOverwriteProtection)='DISABLED' ? 'REPLICATING' : $uppercase(FileSystemProtection.ReplicationOverwriteProtection)",
+    "/properties/ReplicationConfiguration/Destinations/*/FileSystemId": "$split(FileSystemId, \"/\")[-1]"
   },
   "tagging": {
     "taggable": true,
     "tagOnCreate": true,
     "tagUpdatable": true,
-    "cloudFormationSystemTags": false,
-    "tagProperty": "/properties/FileSystemTags"
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/FileSystemTags",
+    "permissions": [
+      "elasticfilesystem:TagResource",
+      "elasticfilesystem:ListTagsForResource",
+      "elasticfilesystem:UntagResource",
+      "elasticfilesystem:DeleteTags"
+    ]
   },
   "handlers": {
     "create": {
@@ -256,7 +280,9 @@
         "elasticfilesystem:UpdateFileSystemProtection",
         "kms:DescribeKey",
         "kms:GenerateDataKeyWithoutPlaintext",
-        "kms:CreateGrant"
+        "kms:CreateGrant",
+        "iam:PassRole",
+        "iam:CreateServiceLinkedRole"
       ]
     },
     "read": {
@@ -289,7 +315,9 @@
         "elasticfilesystem:UpdateFileSystemProtection",
         "kms:DescribeKey",
         "kms:GenerateDataKeyWithoutPlaintext",
-        "kms:CreateGrant"
+        "kms:CreateGrant",
+        "iam:PassRole",
+        "iam:CreateServiceLinkedRole"
       ]
     },
     "delete": {

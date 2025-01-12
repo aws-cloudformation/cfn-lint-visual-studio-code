@@ -50,9 +50,63 @@
       "type": "string",
       "description": "Config type for security config",
       "enum": [
-        "saml"
+        "saml",
+        "iamidentitycenter"
       ],
-      "markdownDescription": "Config type for security config\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: saml  \nUpdate requires: No interruption"
+      "markdownDescription": "Config type for security config\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: saml | iamidentitycenter  \nUpdate requires: No interruption"
+    },
+    "IamIdentityCenterInstanceArn": {
+      "type": "string",
+      "description": "The ARN of the IAM Identity Center instance used to integrate with OpenSearch Serverless",
+      "markdownDescription": "The ARN of the IAM Identity Center instance used to integrate with OpenSearch Serverless\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "IamIdentityCenterApplicationArn": {
+      "type": "string",
+      "description": "The ARN of the IAM Identity Center application used to integrate with OpenSearch Serverless",
+      "markdownDescription": "The ARN of the IAM Identity Center application used to integrate with OpenSearch Serverless\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "IamIdentityCenterUserAttribute": {
+      "type": "string",
+      "description": "User attribute for this IAM Identity Center integration",
+      "markdownDescription": "User attribute for this IAM Identity Center integration\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "IamIdentityCenterGroupAttribute": {
+      "type": "string",
+      "description": "Group attribute for this IAM Identity Center integration",
+      "markdownDescription": "Group attribute for this IAM Identity Center integration\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+    },
+    "IamIdentityCenterConfigOptions": {
+      "type": "object",
+      "description": "Describes IAM Identity Center options for an OpenSearch Serverless security configuration in the form of a key-value map",
+      "properties": {
+        "InstanceArn": {
+          "$ref": "#/definitions/IamIdentityCenterInstanceArn"
+        },
+        "ApplicationArn": {
+          "$ref": "#/definitions/IamIdentityCenterApplicationArn"
+        },
+        "ApplicationName": {
+          "type": "string",
+          "description": "The name of the IAM Identity Center application used to integrate with OpenSearch Serverless",
+          "markdownDescription": "The name of the IAM Identity Center application used to integrate with OpenSearch Serverless\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "ApplicationDescription": {
+          "type": "string",
+          "description": "The description of the IAM Identity Center application used to integrate with OpenSearch Serverless",
+          "markdownDescription": "The description of the IAM Identity Center application used to integrate with OpenSearch Serverless\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        },
+        "UserAttribute": {
+          "$ref": "#/definitions/IamIdentityCenterUserAttribute"
+        },
+        "GroupAttribute": {
+          "$ref": "#/definitions/IamIdentityCenterGroupAttribute"
+        }
+      },
+      "required": [
+        "InstanceArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Describes IAM Identity Center options for an OpenSearch Serverless security configuration in the form of a key-value map\n\n---\n\nRequired: No  \nUpdate requires: Replacement"
     }
   },
   "properties": {
@@ -73,19 +127,26 @@
     "SamlOptions": {
       "$ref": "#/definitions/SamlConfigOptions"
     },
+    "IamIdentityCenterOptions": {
+      "$ref": "#/definitions/IamIdentityCenterConfigOptions"
+    },
     "Type": {
       "$ref": "#/definitions/SecurityConfigType"
     }
   },
   "readOnlyProperties": [
-    "/properties/Id"
+    "/properties/Id",
+    "/properties/IamIdentityCenterOptions/ApplicationArn",
+    "/properties/IamIdentityCenterOptions/ApplicationName",
+    "/properties/IamIdentityCenterOptions/ApplicationDescription"
   ],
   "writeOnlyProperties": [
     "/properties/Name"
   ],
   "createOnlyProperties": [
     "/properties/Type",
-    "/properties/Name"
+    "/properties/Name",
+    "/properties/IamIdentityCenterOptions/InstanceArn"
   ],
   "primaryIdentifier": [
     "/properties/Id"
@@ -98,7 +159,13 @@
   "handlers": {
     "create": {
       "permissions": [
-        "aoss:CreateSecurityConfig"
+        "aoss:CreateSecurityConfig",
+        "sso:CreateApplication",
+        "sso:ListApplications",
+        "sso:DeleteApplication",
+        "sso:PutApplicationAssignmentConfiguration",
+        "sso:PutApplicationAuthenticationMethod",
+        "sso:PutApplicationGrant"
       ]
     },
     "read": {
@@ -114,7 +181,10 @@
     },
     "delete": {
       "permissions": [
-        "aoss:DeleteSecurityConfig"
+        "aoss:DeleteSecurityConfig",
+        "sso:ListApplicationAssignments",
+        "sso:DeleteApplicationAssignment",
+        "sso:DeleteApplication"
       ]
     },
     "list": {
