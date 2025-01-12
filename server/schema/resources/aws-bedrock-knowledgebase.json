@@ -11,11 +11,13 @@
         },
         "VectorKnowledgeBaseConfiguration": {
           "$ref": "#/definitions/VectorKnowledgeBaseConfiguration"
+        },
+        "KendraKnowledgeBaseConfiguration": {
+          "$ref": "#/definitions/KendraKnowledgeBaseConfiguration"
         }
       },
       "required": [
-        "Type",
-        "VectorKnowledgeBaseConfiguration"
+        "Type"
       ],
       "additionalProperties": false,
       "markdownDescription": "Contains details about the embeddings model used for the knowledge base.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
@@ -48,9 +50,10 @@
       "type": "string",
       "description": "The type of a knowledge base.",
       "enum": [
-        "VECTOR"
+        "VECTOR",
+        "KENDRA"
       ],
-      "markdownDescription": "The type of a knowledge base.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: VECTOR  \nUpdate requires: No interruption"
+      "markdownDescription": "The type of a knowledge base.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: VECTOR | KENDRA  \nUpdate requires: No interruption"
     },
     "OpenSearchServerlessConfiguration": {
       "type": "object",
@@ -60,7 +63,7 @@
           "type": "string",
           "maxLength": 2048,
           "description": "The ARN of the OpenSearch Service vector store.",
-          "markdownDescription": "The ARN of the OpenSearch Service vector store.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nPattern: ^arn:aws:aoss:[a-z]{2}(-gov)?-[a-z]+-\\d{1}:\\d{12}:collection/[a-z0-9-]{3,32}$  \nUpdate requires: No interruption"
+          "markdownDescription": "The ARN of the OpenSearch Service vector store.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nPattern: ^arn:aws(|-cn|-us-gov|-iso):aoss:[a-z]{2}(-gov)?-[a-z]+-\\d{1}:\\d{12}:collection/[a-z0-9-]{3,32}$  \nUpdate requires: No interruption"
         },
         "VectorIndexName": {
           "type": "string",
@@ -498,6 +501,9 @@
         },
         "EmbeddingModelConfiguration": {
           "$ref": "#/definitions/EmbeddingModelConfiguration"
+        },
+        "SupplementalDataStorageConfiguration": {
+          "$ref": "#/definitions/SupplementalDataStorageConfiguration"
         }
       },
       "required": [
@@ -505,6 +511,93 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "Contains details about the model used to create vector embeddings for the knowledge base.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "S3Location": {
+      "type": "object",
+      "description": "An Amazon S3 location.",
+      "properties": {
+        "URI": {
+          "type": "string",
+          "maxLength": 2048,
+          "minLength": 1,
+          "description": "The location's URI",
+          "markdownDescription": "The location's URI\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^s3://.{1,128}$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "URI"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "An Amazon S3 location.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "SupplementalDataStorageLocationType": {
+      "type": "string",
+      "description": "Supplemental data storage location type.",
+      "enum": [
+        "S3"
+      ],
+      "markdownDescription": "Supplemental data storage location type.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: S3  \nUpdate requires: No interruption"
+    },
+    "SupplementalDataStorageLocation": {
+      "type": "object",
+      "description": "Supplemental data storage location.",
+      "properties": {
+        "SupplementalDataStorageLocationType": {
+          "$ref": "#/definitions/SupplementalDataStorageLocationType"
+        },
+        "S3Location": {
+          "$ref": "#/definitions/S3Location"
+        }
+      },
+      "required": [
+        "SupplementalDataStorageLocationType"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Supplemental data storage location.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "SupplementalDataStorageLocations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/SupplementalDataStorageLocation"
+      },
+      "maxItems": 1,
+      "minItems": 1,
+      "description": "List of supplemental data storage locations.",
+      "insertionOrder": false,
+      "markdownDescription": "List of supplemental data storage locations.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "SupplementalDataStorageConfiguration": {
+      "type": "object",
+      "description": "Configurations for supplemental data storage.",
+      "properties": {
+        "SupplementalDataStorageLocations": {
+          "$ref": "#/definitions/SupplementalDataStorageLocations"
+        }
+      },
+      "required": [
+        "SupplementalDataStorageLocations"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configurations for supplemental data storage.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "KendraKnowledgeBaseConfiguration": {
+      "type": "object",
+      "description": "Configurations for a Kendra knowledge base",
+      "properties": {
+        "KendraIndexArn": {
+          "$ref": "#/definitions/KendraIndexArn"
+        }
+      },
+      "required": [
+        "KendraIndexArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configurations for a Kendra knowledge base\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "KendraIndexArn": {
+      "type": "string",
+      "description": "Arn of a Kendra index",
+      "markdownDescription": "Arn of a Kendra index\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws(|-cn|-us-gov):kendra:[a-z0-9-]{1,20}:([0-9]{12}|):index/([a-zA-Z0-9][a-zA-Z0-9-]{35}|[a-zA-Z0-9][a-zA-Z0-9-]{35}-[a-zA-Z0-9][a-zA-Z0-9-]{35})$  \nUpdate requires: No interruption"
     }
   },
   "properties": {
@@ -539,8 +632,7 @@
   "required": [
     "KnowledgeBaseConfiguration",
     "Name",
-    "RoleArn",
-    "StorageConfiguration"
+    "RoleArn"
   ],
   "readOnlyProperties": [
     "/properties/KnowledgeBaseId",

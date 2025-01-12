@@ -3,6 +3,14 @@
   "description": "Represents a collaboration between AWS accounts that allows for secure data collaboration",
   "documentationUrl": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cleanrooms-collaboration.html",
   "definitions": {
+    "AnalyticsEngine": {
+      "type": "string",
+      "enum": [
+        "CLEAN_ROOMS_SQL",
+        "SPARK"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CLEAN_ROOMS_SQL | SPARK  \nUpdate requires: No interruption"
+    },
     "CollaborationQueryLogStatus": {
       "type": "string",
       "enum": [
@@ -57,6 +65,36 @@
       "uniqueItems": true,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
     },
+    "MLMemberAbilities": {
+      "type": "object",
+      "properties": {
+        "CustomMLMemberAbilities": {
+          "$ref": "#/definitions/CustomMLMemberAbilities"
+        }
+      },
+      "required": [
+        "CustomMLMemberAbilities"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "CustomMLMemberAbility": {
+      "type": "string",
+      "enum": [
+        "CAN_RECEIVE_MODEL_OUTPUT",
+        "CAN_RECEIVE_INFERENCE_OUTPUT"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CAN_RECEIVE_MODEL_OUTPUT | CAN_RECEIVE_INFERENCE_OUTPUT  \nUpdate requires: No interruption"
+    },
+    "CustomMLMemberAbilities": {
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/CustomMLMemberAbility"
+      },
+      "uniqueItems": true,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
     "MemberSpecification": {
       "type": "object",
       "properties": {
@@ -68,6 +106,9 @@
         },
         "MemberAbilities": {
           "$ref": "#/definitions/MemberAbilities"
+        },
+        "MLMemberAbilities": {
+          "$ref": "#/definitions/MLMemberAbilities"
         },
         "DisplayName": {
           "$ref": "#/definitions/Name"
@@ -129,6 +170,9 @@
       "properties": {
         "QueryCompute": {
           "$ref": "#/definitions/QueryComputePaymentConfig"
+        },
+        "MachineLearning": {
+          "$ref": "#/definitions/MLPaymentConfig"
         }
       },
       "required": [
@@ -137,6 +181,47 @@
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "QueryComputePaymentConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "IsResponsible": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "IsResponsible"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "MLPaymentConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ModelTraining": {
+          "$ref": "#/definitions/ModelTrainingPaymentConfig"
+        },
+        "ModelInference": {
+          "$ref": "#/definitions/ModelInferencePaymentConfig"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ModelTrainingPaymentConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "IsResponsible": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "IsResponsible"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "ModelInferencePaymentConfig": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
@@ -168,6 +253,9 @@
     "CreatorMemberAbilities": {
       "$ref": "#/definitions/MemberAbilities"
     },
+    "CreatorMLMemberAbilities": {
+      "$ref": "#/definitions/MLMemberAbilities"
+    },
     "DataEncryptionMetadata": {
       "$ref": "#/definitions/DataEncryptionMetadata"
     },
@@ -196,6 +284,9 @@
     "QueryLogStatus": {
       "$ref": "#/definitions/CollaborationQueryLogStatus"
     },
+    "AnalyticsEngine": {
+      "$ref": "#/definitions/AnalyticsEngine"
+    },
     "CreatorPaymentConfiguration": {
       "$ref": "#/definitions/PaymentConfiguration"
     }
@@ -215,10 +306,12 @@
   "createOnlyProperties": [
     "/properties/CreatorDisplayName",
     "/properties/CreatorMemberAbilities",
+    "/properties/CreatorMLMemberAbilities",
     "/properties/DataEncryptionMetadata",
     "/properties/QueryLogStatus",
     "/properties/Members",
-    "/properties/CreatorPaymentConfiguration"
+    "/properties/CreatorPaymentConfiguration",
+    "/properties/AnalyticsEngine"
   ],
   "primaryIdentifier": [
     "/properties/CollaborationIdentifier"

@@ -76,9 +76,31 @@
       "enum": [
         "AWS_IAM_IDP_SAML",
         "AWS_IAM_IDP_OIDC",
-        "AWS_IAM_IDC"
+        "AWS_IAM_IDC",
+        "AWS_QUICKSIGHT_IDP"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AWS_IAM_IDP_SAML | AWS_IAM_IDP_OIDC | AWS_IAM_IDC  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AWS_IAM_IDP_SAML | AWS_IAM_IDP_OIDC | AWS_IAM_IDC | AWS_QUICKSIGHT_IDP  \nUpdate requires: No interruption"
+    },
+    "PersonalizationConfiguration": {
+      "type": "object",
+      "properties": {
+        "PersonalizationControlMode": {
+          "$ref": "#/definitions/PersonalizationControlMode"
+        }
+      },
+      "required": [
+        "PersonalizationControlMode"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
+    "PersonalizationControlMode": {
+      "type": "string",
+      "enum": [
+        "ENABLED",
+        "DISABLED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption"
     },
     "QAppsConfiguration": {
       "type": "object",
@@ -101,6 +123,22 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption"
     },
+    "QuickSightConfiguration": {
+      "type": "object",
+      "properties": {
+        "ClientNamespace": {
+          "type": "string",
+          "maxLength": 64,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[a-zA-Z0-9._-]*$  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "ClientNamespace"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "SubscriptionType": {
       "type": "string",
       "enum": [
@@ -108,27 +146,6 @@
         "Q_BUSINESS"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Q_LITE | Q_BUSINESS  \nUpdate requires: No interruption"
-    },
-    "PersonalizationConfiguration": {
-      "type": "object",
-      "properties": {
-        "PersonalizationControlMode": {
-          "$ref": "#/definitions/PersonalizationControlMode"
-        }
-      },
-      "required": [
-        "PersonalizationControlMode"
-      ],
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "PersonalizationControlMode": {
-      "type": "string",
-      "enum": [
-        "ENABLED",
-        "DISABLED"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption"
     },
     "Tag": {
       "type": "object",
@@ -163,7 +180,6 @@
     },
     "ClientIdsForOIDC": {
       "type": "array",
-      "insertionOrder": false,
       "items": {
         "type": "string",
         "maxLength": 255,
@@ -193,12 +209,6 @@
       "minLength": 20,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:aws:iam::\\d{12}:(oidc-provider|saml-provider)/[a-zA-Z0-9_\\.\\/@\\-]+$  \nUpdate requires: Replacement"
     },
-    "QAppsConfiguration": {
-      "$ref": "#/definitions/QAppsConfiguration"
-    },
-    "PersonalizationConfiguration": {
-      "$ref": "#/definitions/PersonalizationConfiguration"
-    },
     "IdentityCenterInstanceArn": {
       "type": "string",
       "maxLength": 1224,
@@ -208,6 +218,15 @@
     "IdentityType": {
       "$ref": "#/definitions/IdentityType"
     },
+    "PersonalizationConfiguration": {
+      "$ref": "#/definitions/PersonalizationConfiguration"
+    },
+    "QAppsConfiguration": {
+      "$ref": "#/definitions/QAppsConfiguration"
+    },
+    "QuickSightConfiguration": {
+      "$ref": "#/definitions/QuickSightConfiguration"
+    },
     "RoleArn": {
       "type": "string",
       "maxLength": 1284,
@@ -216,7 +235,6 @@
     },
     "Tags": {
       "type": "array",
-      "insertionOrder": false,
       "items": {
         "$ref": "#/definitions/Tag"
       },
@@ -243,7 +261,8 @@
     "/properties/ClientIdsForOIDC",
     "/properties/EncryptionConfiguration",
     "/properties/IamIdentityProviderArn",
-    "/properties/IdentityType"
+    "/properties/IdentityType",
+    "/properties/QuickSightConfiguration"
   ],
   "primaryIdentifier": [
     "/properties/ApplicationId"
@@ -257,9 +276,11 @@
         "kms:DescribeKey",
         "qbusiness:CreateApplication",
         "qbusiness:GetApplication",
-        "qbusiness:UpdateApplication",
         "qbusiness:ListTagsForResource",
         "qbusiness:TagResource",
+        "qbusiness:UpdateApplication",
+        "quicksight:DescribeAccountSubscription",
+        "quicksight:ListNamespaces",
         "sso:CreateApplication",
         "sso:DeleteApplication",
         "sso:DescribeInstance",
@@ -305,7 +326,16 @@
     }
   },
   "tagging": {
-    "taggable": true
+    "taggable": true,
+    "tagUpdatable": true,
+    "tagOnCreate": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "qbusiness:UntagResource",
+      "qbusiness:TagResource",
+      "qbusiness:ListTagsForResource"
+    ]
   },
   "additionalProperties": false,
   "attributes": {

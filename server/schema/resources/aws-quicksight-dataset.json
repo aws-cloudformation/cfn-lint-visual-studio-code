@@ -27,7 +27,10 @@
         "quicksight:TagResource",
         "quicksight:ListTagsForResource",
         "quicksight:DescribeDataSetRefreshProperties",
-        "quicksight:PutDataSetRefreshProperties"
+        "quicksight:PutDataSetRefreshProperties",
+        "quicksight:CreateFolderMembership",
+        "quicksight:DeleteFolderMembership",
+        "quicksight:ListFoldersForResource"
       ]
     },
     "update": {
@@ -617,7 +620,7 @@
           "items": {
             "$ref": "#/definitions/InputColumn"
           },
-          "markdownDescription": "<p>The column schema of the table.</p>\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+          "markdownDescription": "<p>The column schema of the table.</p>\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
         },
         "Schema": {
           "minLength": 0,
@@ -643,7 +646,6 @@
       },
       "required": [
         "DataSourceArn",
-        "InputColumns",
         "Name"
       ],
       "markdownDescription": "<p>A physical table type for relational data sources.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
@@ -655,6 +657,22 @@
         "SINGLE_VALUED"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MULTI_VALUED | SINGLE_VALUED  \nUpdate requires: No interruption"
+    },
+    "PerformanceConfiguration": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "UniqueKeys": {
+          "minItems": 1,
+          "maxItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UniqueKey"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
     "CalculatedColumn": {
       "description": "<p>A calculated column for a dataset.</p>",
@@ -721,9 +739,7 @@
           },
           "markdownDescription": "<p>A physical table type for an S3 data source.</p>\n         <note>\n            <p>For files that aren't JSON, only <code>STRING</code> data types are supported in input columns.</p>\n         </note>\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
         },
-        "UploadSettings": {
-          "$ref": "#/definitions/UploadSettings"
-        }
+        "UploadSettings": {}
       },
       "required": [
         "DataSourceArn",
@@ -1325,6 +1341,28 @@
       ],
       "markdownDescription": "<p>A transform operation that overrides the dataset parameter values that are defined in another dataset.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
+    "UniqueKey": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ColumnNames": {
+          "minItems": 1,
+          "maxItems": 1,
+          "type": "array",
+          "items": {
+            "minLength": 1,
+            "type": "string",
+            "maxLength": 127,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 127  \nUpdate requires: No interruption"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+        }
+      },
+      "required": [
+        "ColumnNames"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+    },
     "GeoSpatialDataRole": {
       "type": "string",
       "enum": [
@@ -1556,7 +1594,7 @@
           "items": {
             "$ref": "#/definitions/InputColumn"
           },
-          "markdownDescription": "<p>The column schema from the SQL query result set.</p>\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
+          "markdownDescription": "<p>The column schema from the SQL query result set.</p>\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
         },
         "Name": {
           "minLength": 1,
@@ -1567,7 +1605,6 @@
         }
       },
       "required": [
-        "Columns",
         "DataSourceArn",
         "Name",
         "SqlQuery"
@@ -1618,6 +1655,9 @@
         "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
       },
       "markdownDescription": "<p>When you create the dataset, Amazon QuickSight adds the dataset to these folders.</p>\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    },
+    "PerformanceConfiguration": {
+      "$ref": "#/definitions/PerformanceConfiguration"
     },
     "RowLevelPermissionDataSet": {
       "$ref": "#/definitions/RowLevelPermissionDataSet"
