@@ -1,0 +1,715 @@
+{
+  "$schema": "https://schema.cloudformation.us-east-1.amazonaws.com/provider.definition.schema.v1.json",
+  "typeName": "AWS::GameLift::ContainerFleet",
+  "description": "The AWS::GameLift::ContainerFleet resource creates an Amazon GameLift (GameLift) container fleet to host game servers.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-gamelift.git",
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "gamelift:ListTagsForResource",
+      "gamelift:TagResource",
+      "gamelift:UntagResource"
+    ]
+  },
+  "definitions": {
+    "ConnectionPortRange": {
+      "description": "Defines the range of ports on the instance that allow inbound traffic to connect with containers in a fleet.",
+      "type": "object",
+      "properties": {
+        "FromPort": {
+          "description": "A starting value for a range of allowed port numbers.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 60000,
+          "markdownDescription": "A starting value for a range of allowed port numbers.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "ToPort": {
+          "description": "An ending value for a range of allowed port numbers. Port numbers are end-inclusive. This value must be higher than FromPort.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 60000,
+          "markdownDescription": "An ending value for a range of allowed port numbers. Port numbers are end-inclusive. This value must be higher than FromPort.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "FromPort",
+        "ToPort"
+      ],
+      "markdownDescription": "Defines the range of ports on the instance that allow inbound traffic to connect with containers in a fleet.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "IpPermission": {
+      "description": "A range of IP addresses and port settings that allow inbound traffic to connect to server processes on an Amazon GameLift hosting resource. New game sessions that are started on the fleet are assigned an IP address/port number combination, which must fall into the fleet's allowed ranges. For fleets created with a custom game server, the ranges reflect the server's game session assignments. For Realtime Servers fleets, Amazon GameLift automatically opens two port ranges, one for TCP messaging and one for UDP, for use by the Realtime servers.",
+      "type": "object",
+      "properties": {
+        "FromPort": {
+          "description": "A starting value for a range of allowed port numbers.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 60000,
+          "markdownDescription": "A starting value for a range of allowed port numbers.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "IpRange": {
+          "description": "A range of allowed IP addresses. This value must be expressed in CIDR notation. Example: \"000.000.000.000/[subnet mask]\" or optionally the shortened version \"0.0.0.0/[subnet mask]\".",
+          "type": "string",
+          "markdownDescription": "A range of allowed IP addresses. This value must be expressed in CIDR notation. Example: \"000.000.000.000/[subnet mask]\" or optionally the shortened version \"0.0.0.0/[subnet mask]\".\n\n---\n\nRequired: Yes  \nType: String  \nPattern: (^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(/([0-9]|[1-2][0-9]|3[0-2]))$)  \nUpdate requires: No interruption\n"
+        },
+        "Protocol": {
+          "description": "The network communication protocol used by the fleet.",
+          "type": "string",
+          "enum": [
+            "TCP",
+            "UDP"
+          ],
+          "markdownDescription": "The network communication protocol used by the fleet.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: TCP | UDP  \nUpdate requires: No interruption\n"
+        },
+        "ToPort": {
+          "description": "An ending value for a range of allowed port numbers. Port numbers are end-inclusive. This value must be higher than FromPort.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 60000,
+          "markdownDescription": "An ending value for a range of allowed port numbers. Port numbers are end-inclusive. This value must be higher than FromPort.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "FromPort",
+        "IpRange",
+        "Protocol",
+        "ToPort"
+      ],
+      "markdownDescription": "A range of IP addresses and port settings that allow inbound traffic to connect to server processes on an Amazon GameLift hosting resource. New game sessions that are started on the fleet are assigned an IP address/port number combination, which must fall into the fleet's allowed ranges. For fleets created with a custom game server, the ranges reflect the server's game session assignments. For Realtime Servers fleets, Amazon GameLift automatically opens two port ranges, one for TCP messaging and one for UDP, for use by the Realtime servers.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "GameSessionCreationLimitPolicy": {
+      "description": "A policy that limits the number of game sessions a player can create on the same fleet. This optional policy gives game owners control over how players can consume available game server resources. A resource creation policy makes the following statement: \"An individual player can create a maximum number of new game sessions within a specified time period\".\n\nThe policy is evaluated when a player tries to create a new game session. For example, assume you have a policy of 10 new game sessions and a time period of 60 minutes. On receiving a CreateGameSession request, Amazon GameLift checks that the player (identified by CreatorId) has created fewer than 10 game sessions in the past 60 minutes.",
+      "type": "object",
+      "properties": {
+        "NewGameSessionsPerCreator": {
+          "description": "The maximum number of game sessions that an individual can create during the policy period.",
+          "type": "integer",
+          "minimum": 0,
+          "markdownDescription": "The maximum number of game sessions that an individual can create during the policy period.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "PolicyPeriodInMinutes": {
+          "description": "The time span used in evaluating the resource creation limit policy.",
+          "type": "integer",
+          "minimum": 0,
+          "markdownDescription": "The time span used in evaluating the resource creation limit policy.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "A policy that limits the number of game sessions a player can create on the same fleet. This optional policy gives game owners control over how players can consume available game server resources. A resource creation policy makes the following statement: \"An individual player can create a maximum number of new game sessions within a specified time period\".\n\nThe policy is evaluated when a player tries to create a new game session. For example, assume you have a policy of 10 new game sessions and a time period of 60 minutes. On receiving a CreateGameSession request, Amazon GameLift checks that the player (identified by CreatorId) has created fewer than 10 game sessions in the past 60 minutes.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LogDestination": {
+      "description": "Configures the service that provides logs.",
+      "type": "string",
+      "enum": [
+        "NONE",
+        "CLOUDWATCH",
+        "S3"
+      ],
+      "markdownDescription": "Configures the service that provides logs.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: NONE | CLOUDWATCH | S3  \nUpdate requires: No interruption\n"
+    },
+    "LogConfiguration": {
+      "description": "A policy the location and provider of logs from the fleet.",
+      "type": "object",
+      "properties": {
+        "LogDestination": {
+          "$ref": "#/definitions/LogDestination"
+        },
+        "S3BucketName": {
+          "description": "The name of the S3 bucket to pull logs from if S3 is the LogDestination",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "markdownDescription": "The name of the S3 bucket to pull logs from if S3 is the LogDestination\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "A policy the location and provider of logs from the fleet.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Location": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[A-Za-z0-9\\-]+  \nUpdate requires: No interruption\n"
+    },
+    "LocationCapacity": {
+      "description": "Current resource capacity settings in a specified fleet or location. The location value might refer to a fleet's remote location or its home Region.",
+      "type": "object",
+      "properties": {
+        "DesiredEC2Instances": {
+          "description": "The number of EC2 instances you want to maintain in the specified fleet location. This value must fall between the minimum and maximum size limits.",
+          "type": "integer",
+          "minimum": 0,
+          "markdownDescription": "The number of EC2 instances you want to maintain in the specified fleet location. This value must fall between the minimum and maximum size limits.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "MinSize": {
+          "description": "The minimum value allowed for the fleet's instance count for a location.",
+          "type": "integer",
+          "minimum": 0,
+          "markdownDescription": "The minimum value allowed for the fleet's instance count for a location.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "MaxSize": {
+          "description": "The maximum value that is allowed for the fleet's instance count for a location.",
+          "type": "integer",
+          "minimum": 0,
+          "markdownDescription": "The maximum value that is allowed for the fleet's instance count for a location.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "DesiredEC2Instances",
+        "MinSize",
+        "MaxSize"
+      ],
+      "markdownDescription": "Current resource capacity settings in a specified fleet or location. The location value might refer to a fleet's remote location or its home Region.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LocationConfiguration": {
+      "description": "A remote location where a multi-location fleet can deploy EC2 instances for game hosting.",
+      "type": "object",
+      "properties": {
+        "Location": {
+          "$ref": "#/definitions/Location"
+        },
+        "LocationCapacity": {
+          "$ref": "#/definitions/LocationCapacity"
+        },
+        "StoppedActions": {
+          "$ref": "#/definitions/StoppedActions"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Location"
+      ],
+      "markdownDescription": "A remote location where a multi-location fleet can deploy EC2 instances for game hosting.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ScalingPolicy": {
+      "description": "Rule that controls how a fleet is scaled. Scaling policies are uniquely identified by the combination of name and fleet ID.",
+      "type": "object",
+      "properties": {
+        "ComparisonOperator": {
+          "description": "Comparison operator to use when measuring a metric against the threshold value.",
+          "type": "string",
+          "enum": [
+            "GreaterThanOrEqualToThreshold",
+            "GreaterThanThreshold",
+            "LessThanThreshold",
+            "LessThanOrEqualToThreshold"
+          ],
+          "markdownDescription": "Comparison operator to use when measuring a metric against the threshold value.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: GreaterThanOrEqualToThreshold | GreaterThanThreshold | LessThanThreshold | LessThanOrEqualToThreshold  \nUpdate requires: No interruption\n"
+        },
+        "EvaluationPeriods": {
+          "description": "Length of time (in minutes) the metric must be at or beyond the threshold before a scaling event is triggered.",
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "Length of time (in minutes) the metric must be at or beyond the threshold before a scaling event is triggered.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "MetricName": {
+          "description": "Name of the Amazon GameLift-defined metric that is used to trigger a scaling adjustment.",
+          "type": "string",
+          "enum": [
+            "ActivatingGameSessions",
+            "ActiveGameSessions",
+            "ActiveInstances",
+            "AvailableGameSessions",
+            "AvailablePlayerSessions",
+            "CurrentPlayerSessions",
+            "IdleInstances",
+            "PercentAvailableGameSessions",
+            "PercentIdleInstances",
+            "QueueDepth",
+            "WaitTime",
+            "ConcurrentActivatableGameSessions"
+          ],
+          "markdownDescription": "Name of the Amazon GameLift-defined metric that is used to trigger a scaling adjustment.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: ActivatingGameSessions | ActiveGameSessions | ActiveInstances | AvailableGameSessions | AvailablePlayerSessions | CurrentPlayerSessions | IdleInstances | PercentAvailableGameSessions | PercentIdleInstances | QueueDepth | WaitTime | ConcurrentActivatableGameSessions  \nUpdate requires: No interruption\n"
+        },
+        "Name": {
+          "description": "A descriptive label that is associated with a fleet's scaling policy. Policy names do not need to be unique.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "markdownDescription": "A descriptive label that is associated with a fleet's scaling policy. Policy names do not need to be unique.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+        },
+        "PolicyType": {
+          "description": "The type of scaling policy to create. For a target-based policy, set the parameter MetricName to 'PercentAvailableGameSessions' and specify a TargetConfiguration. For a rule-based policy set the following parameters: MetricName, ComparisonOperator, Threshold, EvaluationPeriods, ScalingAdjustmentType, and ScalingAdjustment.",
+          "type": "string",
+          "enum": [
+            "RuleBased",
+            "TargetBased"
+          ],
+          "markdownDescription": "The type of scaling policy to create. For a target-based policy, set the parameter MetricName to 'PercentAvailableGameSessions' and specify a TargetConfiguration. For a rule-based policy set the following parameters: MetricName, ComparisonOperator, Threshold, EvaluationPeriods, ScalingAdjustmentType, and ScalingAdjustment.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: RuleBased | TargetBased  \nUpdate requires: No interruption\n"
+        },
+        "ScalingAdjustment": {
+          "description": "Amount of adjustment to make, based on the scaling adjustment type.",
+          "type": "integer",
+          "markdownDescription": "Amount of adjustment to make, based on the scaling adjustment type.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "ScalingAdjustmentType": {
+          "description": "The type of adjustment to make to a fleet's instance count.",
+          "type": "string",
+          "enum": [
+            "ChangeInCapacity",
+            "ExactCapacity",
+            "PercentChangeInCapacity"
+          ],
+          "markdownDescription": "The type of adjustment to make to a fleet's instance count.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ChangeInCapacity | ExactCapacity | PercentChangeInCapacity  \nUpdate requires: No interruption\n"
+        },
+        "TargetConfiguration": {
+          "description": "An object that contains settings for a target-based scaling policy.",
+          "$ref": "#/definitions/TargetConfiguration",
+          "markdownDescription": "An object that contains settings for a target-based scaling policy.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "Threshold": {
+          "description": "Metric value used to trigger a scaling event.",
+          "type": "number",
+          "markdownDescription": "Metric value used to trigger a scaling event.\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "MetricName",
+        "Name"
+      ],
+      "markdownDescription": "Rule that controls how a fleet is scaled. Scaling policies are uniquely identified by the combination of name and fleet ID.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "StoppedActions": {
+      "description": "A list of fleet actions that have been suspended in the fleet location.",
+      "type": "array",
+      "maxItems": 1,
+      "items": {
+        "type": "string",
+        "enum": [
+          "AUTO_SCALING"
+        ],
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AUTO_SCALING  \nUpdate requires: No interruption\n"
+      },
+      "insertionOrder": false,
+      "markdownDescription": "A list of fleet actions that have been suspended in the fleet location.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "TargetConfiguration": {
+      "description": "Settings for a target-based scaling policy. A target-based policy tracks a particular fleet metric specifies a target value for the metric. As player usage changes, the policy triggers Amazon GameLift to adjust capacity so that the metric returns to the target value. The target configuration specifies settings as needed for the target based policy, including the target value.",
+      "type": "object",
+      "properties": {
+        "TargetValue": {
+          "description": "Desired value to use with a target-based scaling policy. The value must be relevant for whatever metric the scaling policy is using. For example, in a policy using the metric PercentAvailableGameSessions, the target value should be the preferred size of the fleet's buffer (the percent of capacity that should be idle and ready for new game sessions).",
+          "type": "number",
+          "markdownDescription": "Desired value to use with a target-based scaling policy. The value must be relevant for whatever metric the scaling policy is using. For example, in a policy using the metric PercentAvailableGameSessions, the target value should be the preferred size of the fleet's buffer (the percent of capacity that should be idle and ready for new game sessions).\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "TargetValue"
+      ],
+      "markdownDescription": "Settings for a target-based scaling policy. A target-based policy tracks a particular fleet metric specifies a target value for the metric. As player usage changes, the policy triggers Amazon GameLift to adjust capacity so that the metric returns to the target value. The target configuration specifies settings as needed for the target based policy, including the target value.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length.",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DeploymentDetails": {
+      "description": "Provides information about the last deployment ID and its status.",
+      "type": "object",
+      "properties": {
+        "LatestDeploymentId": {
+          "description": "The ID of the last deployment on the container fleet. This field will be empty if the container fleet does not have a ContainerGroupDefinition attached.",
+          "type": "string",
+          "maxLength": 1024,
+          "markdownDescription": "The ID of the last deployment on the container fleet. This field will be empty if the container fleet does not have a ContainerGroupDefinition attached.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nPattern: ^[a-zA-Z0-9\\-]+$|^$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [],
+      "additionalProperties": false,
+      "markdownDescription": "Provides information about the last deployment ID and its status.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DeploymentConfiguration": {
+      "description": "Provides details about how to drain old tasks and replace them with new updated tasks.",
+      "type": "object",
+      "properties": {
+        "ProtectionStrategy": {
+          "description": "The protection strategy for deployment on the container fleet; defaults to WITH_PROTECTION.",
+          "type": "string",
+          "enum": [
+            "WITH_PROTECTION",
+            "IGNORE_PROTECTION"
+          ],
+          "markdownDescription": "The protection strategy for deployment on the container fleet; defaults to WITH_PROTECTION.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: WITH_PROTECTION | IGNORE_PROTECTION  \nUpdate requires: No interruption\n"
+        },
+        "MinimumHealthyPercentage": {
+          "description": "The minimum percentage of healthy required; defaults to 75.",
+          "type": "integer",
+          "minimum": 30,
+          "maximum": 75,
+          "markdownDescription": "The minimum percentage of healthy required; defaults to 75.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "ImpairmentStrategy": {
+          "description": "The strategy to apply in case of impairment; defaults to MAINTAIN.",
+          "type": "string",
+          "enum": [
+            "MAINTAIN",
+            "ROLLBACK"
+          ],
+          "markdownDescription": "The strategy to apply in case of impairment; defaults to MAINTAIN.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MAINTAIN | ROLLBACK  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [],
+      "additionalProperties": false,
+      "markdownDescription": "Provides details about how to drain old tasks and replace them with new updated tasks.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "FleetId": {
+      "description": "Unique fleet ID",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "markdownDescription": "Unique fleet ID\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-z]*fleet-[a-zA-Z0-9\\-]+  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "FleetRoleArn": {
+      "description": "A unique identifier for an AWS IAM role that manages access to your AWS services. Create a role or look up a role's ARN from the IAM dashboard in the AWS Management Console.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "markdownDescription": "A unique identifier for an AWS IAM role that manages access to your AWS services. Create a role or look up a role's ARN from the IAM dashboard in the AWS Management Console.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^arn:aws(-.*)?:[a-z-]+:(([a-z]+-)+[0-9])?:([0-9]{12})?:[^.]+$  \nUpdate requires: No interruption\n"
+    },
+    "Description": {
+      "description": "A human-readable description of a fleet.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "markdownDescription": "A human-readable description of a fleet.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+    },
+    "GameServerContainerGroupDefinitionName": {
+      "description": "The name of the container group definition that will be created per game server. You must specify GAME_SERVER container group. You have the option to also specify one PER_INSTANCE container group.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "markdownDescription": "The name of the container group definition that will be created per game server. You must specify GAME_SERVER container group. You have the option to also specify one PER_INSTANCE container group.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^[a-zA-Z0-9\\-]+$|^arn:.*:containergroupdefinition\\/[a-zA-Z0-9\\-]+(:[0-9]+)?$  \nUpdate requires: No interruption\n"
+    },
+    "GameServerContainerGroupDefinitionArn": {
+      "description": "The Amazon Resource Name (ARN) of the game server container group definition. This field will be empty if GameServerContainerGroupDefinitionName is not specified.",
+      "type": "string",
+      "maxLength": 512,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the game server container group definition. This field will be empty if GameServerContainerGroupDefinitionName is not specified.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 512  \nPattern: ^arn:.*:containergroupdefinition\\/[a-zA-Z0-9\\-]+(:[0-9]+)?$|^$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "PerInstanceContainerGroupDefinitionName": {
+      "description": "The name of the container group definition that will be created per instance. This field is optional if you specify GameServerContainerGroupDefinitionName.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "markdownDescription": "The name of the container group definition that will be created per instance. This field is optional if you specify GameServerContainerGroupDefinitionName.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^[a-zA-Z0-9\\-]+$|^arn:.*:containergroupdefinition\\/[a-zA-Z0-9\\-]+(:[0-9]+)?$  \nUpdate requires: No interruption\n"
+    },
+    "PerInstanceContainerGroupDefinitionArn": {
+      "description": "The Amazon Resource Name (ARN) of the per instance container group definition. This field will be empty if PerInstanceContainerGroupDefinitionName is not specified.",
+      "type": "string",
+      "maxLength": 512,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the per instance container group definition. This field will be empty if PerInstanceContainerGroupDefinitionName is not specified.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 512  \nPattern: ^arn:.*:containergroupdefinition\\/[a-zA-Z0-9\\-]+(:[0-9]+)?$|^$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "InstanceConnectionPortRange": {
+      "$ref": "#/definitions/ConnectionPortRange"
+    },
+    "InstanceInboundPermissions": {
+      "description": "A range of IP addresses and port settings that allow inbound traffic to connect to server processes on an Amazon GameLift server.",
+      "type": "array",
+      "maxItems": 50,
+      "items": {
+        "$ref": "#/definitions/IpPermission"
+      },
+      "insertionOrder": false,
+      "markdownDescription": "A range of IP addresses and port settings that allow inbound traffic to connect to server processes on an Amazon GameLift server.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "GameServerContainerGroupsPerInstance": {
+      "description": "The number of desired game server container groups per instance, a number between 1-5000.",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5000,
+      "markdownDescription": "The number of desired game server container groups per instance, a number between 1-5000.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    },
+    "MaximumGameServerContainerGroupsPerInstance": {
+      "description": "The maximum number of game server container groups per instance, a number between 1-5000.",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5000,
+      "markdownDescription": "The maximum number of game server container groups per instance, a number between 1-5000.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreationTime": {
+      "description": "A time stamp indicating when this data object was created. Format is a number expressed in Unix time as milliseconds (for example \"1469498468.057\").",
+      "type": "string",
+      "markdownDescription": "A time stamp indicating when this data object was created. Format is a number expressed in Unix time as milliseconds (for example \"1469498468.057\").\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Status": {
+      "description": "The current status of the container fleet.",
+      "type": "string",
+      "enum": [
+        "PENDING",
+        "CREATING",
+        "CREATED",
+        "ACTIVATING",
+        "ACTIVE",
+        "UPDATING",
+        "DELETING"
+      ],
+      "markdownDescription": "The current status of the container fleet.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PENDING | CREATING | CREATED | ACTIVATING | ACTIVE | UPDATING | DELETING  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "DeploymentDetails": {
+      "$ref": "#/definitions/DeploymentDetails"
+    },
+    "DeploymentConfiguration": {
+      "$ref": "#/definitions/DeploymentConfiguration"
+    },
+    "InstanceType": {
+      "description": "The name of an EC2 instance type that is supported in Amazon GameLift. A fleet instance type determines the computing resources of each instance in the fleet, including CPU, memory, storage, and networking capacity. Amazon GameLift supports the following EC2 instance types. See Amazon EC2 Instance Types for detailed descriptions.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "markdownDescription": "The name of an EC2 instance type that is supported in Amazon GameLift. A fleet instance type determines the computing resources of each instance in the fleet, including CPU, memory, storage, and networking capacity. Amazon GameLift supports the following EC2 instance types. See Amazon EC2 Instance Types for detailed descriptions.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: Replacement\n"
+    },
+    "BillingType": {
+      "description": "Indicates whether to use On-Demand instances or Spot instances for this fleet. If empty, the default is ON_DEMAND. Both categories of instances use identical hardware and configurations based on the instance type selected for this fleet.",
+      "type": "string",
+      "enum": [
+        "ON_DEMAND",
+        "SPOT"
+      ],
+      "markdownDescription": "Indicates whether to use On-Demand instances or Spot instances for this fleet. If empty, the default is ON_DEMAND. Both categories of instances use identical hardware and configurations based on the instance type selected for this fleet.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ON_DEMAND | SPOT  \nUpdate requires: Replacement\n"
+    },
+    "Locations": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "$ref": "#/definitions/LocationConfiguration"
+      },
+      "insertionOrder": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement\n"
+    },
+    "ScalingPolicies": {
+      "description": "A list of rules that control how a fleet is scaled.",
+      "type": "array",
+      "maxItems": 50,
+      "items": {
+        "$ref": "#/definitions/ScalingPolicy"
+      },
+      "insertionOrder": false,
+      "markdownDescription": "A list of rules that control how a fleet is scaled.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "MetricGroups": {
+      "description": "The name of an Amazon CloudWatch metric group. A metric group aggregates the metrics for all fleets in the group. Specify a string containing the metric group name. You can use an existing name or use a new name to create a new metric group. Currently, this parameter can have only one string.",
+      "type": "array",
+      "maxItems": 1,
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      },
+      "insertionOrder": false,
+      "markdownDescription": "The name of an Amazon CloudWatch metric group. A metric group aggregates the metrics for all fleets in the group. Specify a string containing the metric group name. You can use an existing name or use a new name to create a new metric group. Currently, this parameter can have only one string.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "NewGameSessionProtectionPolicy": {
+      "description": "A game session protection policy to apply to all game sessions hosted on instances in this fleet. When protected, active game sessions cannot be terminated during a scale-down event. If this parameter is not set, instances in this fleet default to no protection. You can change a fleet's protection policy to affect future game sessions on the fleet. You can also set protection for individual game sessions.",
+      "type": "string",
+      "enum": [
+        "FullProtection",
+        "NoProtection"
+      ],
+      "markdownDescription": "A game session protection policy to apply to all game sessions hosted on instances in this fleet. When protected, active game sessions cannot be terminated during a scale-down event. If this parameter is not set, instances in this fleet default to no protection. You can change a fleet's protection policy to affect future game sessions on the fleet. You can also set protection for individual game sessions.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: FullProtection | NoProtection  \nUpdate requires: No interruption\n"
+    },
+    "GameSessionCreationLimitPolicy": {
+      "description": "A policy that limits the number of game sessions an individual player can create over a span of time for this fleet.",
+      "$ref": "#/definitions/GameSessionCreationLimitPolicy",
+      "markdownDescription": "A policy that limits the number of game sessions an individual player can create over a span of time for this fleet.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "LogConfiguration": {
+      "$ref": "#/definitions/LogConfiguration"
+    },
+    "Tags": {
+      "description": "An array of key-value pairs to apply to this resource.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "maxItems": 200,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "An array of key-value pairs to apply to this resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "FleetArn": {
+      "description": "The Amazon Resource Name (ARN) that is assigned to a Amazon GameLift container fleet resource and uniquely identifies it across all AWS Regions.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "markdownDescription": "The Amazon Resource Name (ARN) that is assigned to a Amazon GameLift container fleet resource and uniquely identifies it across all AWS Regions.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^arn:.*:[a-z]*fleet\\/[a-z]*fleet-[a-zA-Z0-9\\-]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "FleetRoleArn"
+  ],
+  "createOnlyProperties": [
+    "/properties/InstanceType",
+    "/properties/BillingType",
+    "/properties/Locations"
+  ],
+  "readOnlyProperties": [
+    "/properties/CreationTime",
+    "/properties/Status",
+    "/properties/FleetId",
+    "/properties/FleetArn",
+    "/properties/DeploymentDetails",
+    "/properties/GameServerContainerGroupDefinitionArn",
+    "/properties/PerInstanceContainerGroupDefinitionArn",
+    "/properties/MaximumGameServerContainerGroupsPerInstance"
+  ],
+  "writeOnlyProperties": [
+    "/properties/ScalingPolicies",
+    "/properties/Locations",
+    "/properties/DeploymentConfiguration",
+    "/properties/GameServerContainerGroupsPerInstance",
+    "/properties/GameServerContainerGroupDefinitionName",
+    "/properties/PerInstanceContainerGroupDefinitionName"
+  ],
+  "primaryIdentifier": [
+    "/properties/FleetId"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "gamelift:CreateContainerFleet",
+        "gamelift:DescribeContainerFleet",
+        "gamelift:DescribeFleetDeployment",
+        "gamelift:DescribeFleetLocationAttributes",
+        "gamelift:DescribeFleetLocationCapacity",
+        "gamelift:DescribeScalingPolicies",
+        "gamelift:ListTagsForResource",
+        "gamelift:PutScalingPolicy",
+        "gamelift:StopFleetActions",
+        "gamelift:TagResource",
+        "gamelift:UpdateFleetCapacity",
+        "iam:PassRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "gamelift:DescribeContainerFleet",
+        "gamelift:DescribeFleetLocationAttributes",
+        "gamelift:DescribeFleetLocationCapacity",
+        "gamelift:DescribeScalingPolicies",
+        "gamelift:ListTagsForResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "gamelift:DeleteContainerFleet",
+        "gamelift:DescribeContainerFleet"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "gamelift:ListContainerFleets"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "gamelift:CreateFleetLocations",
+        "gamelift:DeleteFleetLocations",
+        "gamelift:DeleteScalingPolicy",
+        "gamelift:DescribeContainerFleet",
+        "gamelift:DescribeFleetDeployment",
+        "gamelift:DescribeFleetLocationAttributes",
+        "gamelift:DescribeFleetLocationCapacity",
+        "gamelift:DescribeScalingPolicies",
+        "gamelift:ListTagsForResource",
+        "gamelift:PutScalingPolicy",
+        "gamelift:StartFleetActions",
+        "gamelift:StopFleetActions",
+        "gamelift:TagResource",
+        "gamelift:UntagResource",
+        "gamelift:UpdateContainerFleet",
+        "gamelift:UpdateFleetCapacity",
+        "iam:PassRole"
+      ]
+    }
+  },
+  "attributes": {
+    "FleetId": {
+      "description": "Unique fleet ID",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "markdownDescription": "Unique fleet ID\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-z]*fleet-[a-zA-Z0-9\\-]+  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "GameServerContainerGroupDefinitionArn": {
+      "description": "The Amazon Resource Name (ARN) of the game server container group definition. This field will be empty if GameServerContainerGroupDefinitionName is not specified.",
+      "type": "string",
+      "maxLength": 512,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the game server container group definition. This field will be empty if GameServerContainerGroupDefinitionName is not specified.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 512  \nPattern: ^arn:.*:containergroupdefinition\\/[a-zA-Z0-9\\-]+(:[0-9]+)?$|^$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "PerInstanceContainerGroupDefinitionArn": {
+      "description": "The Amazon Resource Name (ARN) of the per instance container group definition. This field will be empty if PerInstanceContainerGroupDefinitionName is not specified.",
+      "type": "string",
+      "maxLength": 512,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the per instance container group definition. This field will be empty if PerInstanceContainerGroupDefinitionName is not specified.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 512  \nPattern: ^arn:.*:containergroupdefinition\\/[a-zA-Z0-9\\-]+(:[0-9]+)?$|^$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "MaximumGameServerContainerGroupsPerInstance": {
+      "description": "The maximum number of game server container groups per instance, a number between 1-5000.",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5000,
+      "markdownDescription": "The maximum number of game server container groups per instance, a number between 1-5000.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreationTime": {
+      "description": "A time stamp indicating when this data object was created. Format is a number expressed in Unix time as milliseconds (for example \"1469498468.057\").",
+      "type": "string",
+      "markdownDescription": "A time stamp indicating when this data object was created. Format is a number expressed in Unix time as milliseconds (for example \"1469498468.057\").\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Status": {
+      "description": "The current status of the container fleet.",
+      "type": "string",
+      "enum": [
+        "PENDING",
+        "CREATING",
+        "CREATED",
+        "ACTIVATING",
+        "ACTIVE",
+        "UPDATING",
+        "DELETING"
+      ],
+      "markdownDescription": "The current status of the container fleet.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PENDING | CREATING | CREATED | ACTIVATING | ACTIVE | UPDATING | DELETING  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "DeploymentDetails": {
+      "$ref": "#/definitions/DeploymentDetails"
+    },
+    "FleetArn": {
+      "description": "The Amazon Resource Name (ARN) that is assigned to a Amazon GameLift container fleet resource and uniquely identifies it across all AWS Regions.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "markdownDescription": "The Amazon Resource Name (ARN) that is assigned to a Amazon GameLift container fleet resource and uniquely identifies it across all AWS Regions.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^arn:.*:[a-z]*fleet\\/[a-z]*fleet-[a-zA-Z0-9\\-]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

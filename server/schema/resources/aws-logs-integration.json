@@ -1,0 +1,185 @@
+{
+  "typeName": "AWS::Logs::Integration",
+  "description": "Resource Schema for Logs Integration Resource",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "replacementStrategy": "delete_then_create",
+  "definitions": {
+    "Arn": {
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 2048,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: [\\w#+=/:,.@-]*\\*?  \nUpdate requires: No interruption\n"
+    },
+    "OpenSearchResourceConfig": {
+      "type": "object",
+      "properties": {
+        "KmsKeyArn": {
+          "$ref": "#/definitions/Arn"
+        },
+        "DataSourceRoleArn": {
+          "$ref": "#/definitions/Arn"
+        },
+        "DashboardViewerPrincipals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Arn"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "ApplicationARN": {
+          "$ref": "#/definitions/Arn"
+        },
+        "RetentionDays": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3650,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "DataSourceRoleArn",
+        "DashboardViewerPrincipals"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "IntegrationName": {
+      "description": "User provided identifier for integration, unique to the user account.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 50,
+      "markdownDescription": "User provided identifier for integration, unique to the user account.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 50  \nPattern: [\\.\\-_/#A-Za-z0-9]+  \nUpdate requires: Replacement\n"
+    },
+    "IntegrationType": {
+      "description": "The type of the Integration.",
+      "type": "string",
+      "enum": [
+        "OPENSEARCH"
+      ],
+      "markdownDescription": "The type of the Integration.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: OPENSEARCH  \nUpdate requires: Replacement\n"
+    },
+    "ResourceConfig": {
+      "description": "OpenSearchResourceConfig for the given Integration",
+      "type": "object",
+      "properties": {
+        "OpenSearchResourceConfig": {
+          "$ref": "#/definitions/OpenSearchResourceConfig"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "OpenSearchResourceConfig for the given Integration\n\n---\n\nRequired: Yes  \nUpdate requires: Replacement\n"
+    },
+    "IntegrationStatus": {
+      "description": "Status of creation for the Integration and its resources",
+      "type": "string",
+      "enum": [
+        "PROVISIONING",
+        "ACTIVE",
+        "FAILED"
+      ],
+      "markdownDescription": "Status of creation for the Integration and its resources\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PROVISIONING | ACTIVE | FAILED  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "IntegrationName",
+    "IntegrationType",
+    "ResourceConfig"
+  ],
+  "createOnlyProperties": [
+    "/properties/IntegrationName",
+    "/properties/IntegrationType",
+    "/properties/ResourceConfig"
+  ],
+  "readOnlyProperties": [
+    "/properties/IntegrationStatus"
+  ],
+  "writeOnlyProperties": [
+    "/properties/ResourceConfig"
+  ],
+  "primaryIdentifier": [
+    "/properties/IntegrationName"
+  ],
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "logs:PutIntegration",
+        "logs:GetIntegration",
+        "aoss:CreateCollection",
+        "aoss:CreateSecurityPolicy",
+        "aoss:CreateAccessPolicy",
+        "aoss:CreateLifeCyclePolicy",
+        "aoss:BatchGetCollection",
+        "aoss:DeleteCollection",
+        "aoss:DeleteSecurityPolicy",
+        "aoss:DeleteAccessPolicy",
+        "aoss:DeleteLifeCyclePolicy",
+        "aoss:GetAccessPolicy",
+        "aoss:GetSecurityPolicy",
+        "aoss:BatchGetLifecyclePolicy",
+        "aoss:TagResource",
+        "aoss:APIAccessAll",
+        "opensearch:AddDirectQueryDataSource",
+        "opensearch:DeleteDirectQueryDataSource",
+        "opensearch:GetDirectQueryDataSource",
+        "opensearch:CreateApplication",
+        "opensearch:GetApplication",
+        "opensearch:UpdateApplication",
+        "opensearch:DeleteApplication",
+        "opensearch:ApplicationAccessAll",
+        "opensearch:DashboardsAccessAll",
+        "opensearch:StartDirectQuery",
+        "opensearch:GetDirectQuery",
+        "iam:PassRole",
+        "iam:CreateServiceLinkedRole",
+        "iam:AttachRolePolicy",
+        "iam:AttachUserPolicy",
+        "es:AddDirectQueryDataSource",
+        "es:CreateApplication",
+        "es:UpdateApplication",
+        "es:GetApplication",
+        "es:DeleteApplication",
+        "es:DeleteDirectQueryDataSource",
+        "es:GetDirectQueryDataSource",
+        "es:AddTags",
+        "es:ListApplications"
+      ],
+      "timeoutInMinutes": 30
+    },
+    "read": {
+      "permissions": [
+        "logs:GetIntegration"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "logs:DeleteIntegration"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "logs:ListIntegrations"
+      ]
+    }
+  },
+  "attributes": {
+    "IntegrationStatus": {
+      "description": "Status of creation for the Integration and its resources",
+      "type": "string",
+      "enum": [
+        "PROVISIONING",
+        "ACTIVE",
+        "FAILED"
+      ],
+      "markdownDescription": "Status of creation for the Integration and its resources\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PROVISIONING | ACTIVE | FAILED  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

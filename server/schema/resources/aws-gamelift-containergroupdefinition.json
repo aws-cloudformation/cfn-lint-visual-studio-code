@@ -1,50 +1,561 @@
 {
+  "$schema": "https://schema.cloudformation.us-east-1.amazonaws.com/provider.definition.schema.v1.json",
+  "typeName": "AWS::GameLift::ContainerGroupDefinition",
+  "description": "The AWS::GameLift::ContainerGroupDefinition resource creates an Amazon GameLift container group definition.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-gamelift.git",
   "tagging": {
+    "taggable": true,
+    "cloudFormationSystemTags": false,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "tagProperty": "/properties/Tags",
     "permissions": [
       "gamelift:ListTagsForResource",
       "gamelift:TagResource",
       "gamelift:UntagResource"
-    ],
-    "taggable": true,
-    "tagOnCreate": true,
-    "tagUpdatable": true,
-    "tagProperty": "/properties/Tags",
-    "cloudFormationSystemTags": false
+    ]
   },
-  "$schema": "https://schema.cloudformation.us-east-1.amazonaws.com/provider.definition.schema.v1.json",
-  "typeName": "AWS::GameLift::ContainerGroupDefinition",
+  "definitions": {
+    "ContainerPortRange": {
+      "description": "A set of one or more port numbers that can be opened on the container.",
+      "type": "object",
+      "properties": {
+        "FromPort": {
+          "description": "A starting value for the range of allowed port numbers.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 60000,
+          "markdownDescription": "A starting value for the range of allowed port numbers.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Protocol": {
+          "description": "Defines the protocol of these ports.",
+          "type": "string",
+          "enum": [
+            "TCP",
+            "UDP"
+          ],
+          "markdownDescription": "Defines the protocol of these ports.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: TCP | UDP  \nUpdate requires: No interruption\n"
+        },
+        "ToPort": {
+          "description": "An ending value for the range of allowed port numbers. Port numbers are end-inclusive. This value must be equal to or greater than FromPort.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 60000,
+          "markdownDescription": "An ending value for the range of allowed port numbers. Port numbers are end-inclusive. This value must be equal to or greater than FromPort.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "FromPort",
+        "Protocol",
+        "ToPort"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A set of one or more port numbers that can be opened on the container.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ContainerHealthCheck": {
+      "description": "Specifies how the process manager checks the health of containers.",
+      "type": "object",
+      "properties": {
+        "Command": {
+          "description": "A string array representing the command that the container runs to determine if it is healthy.",
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": true,
+          "minItems": 1,
+          "maxItems": 20,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^.*$  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "A string array representing the command that the container runs to determine if it is healthy.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "Interval": {
+          "description": "How often (in seconds) the health is checked.",
+          "type": "integer",
+          "minimum": 60,
+          "maximum": 300,
+          "markdownDescription": "How often (in seconds) the health is checked.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Timeout": {
+          "description": "How many seconds the process manager allows the command to run before canceling it.",
+          "type": "integer",
+          "minimum": 30,
+          "maximum": 60,
+          "markdownDescription": "How many seconds the process manager allows the command to run before canceling it.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Retries": {
+          "description": "How many times the process manager will retry the command after a timeout. (The first run of the command does not count as a retry.)",
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 10,
+          "markdownDescription": "How many times the process manager will retry the command after a timeout. (The first run of the command does not count as a retry.)\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "StartPeriod": {
+          "description": "The optional grace period (in seconds) to give a container time to boostrap before teh health check is declared failed.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 300,
+          "markdownDescription": "The optional grace period (in seconds) to give a container time to boostrap before teh health check is declared failed.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Command"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Specifies how the process manager checks the health of containers.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PortConfiguration": {
+      "description": "Defines the ports on a container.",
+      "type": "object",
+      "properties": {
+        "ContainerPortRanges": {
+          "description": "Specifies one or more ranges of ports on a container.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "minItems": 1,
+          "maxItems": 100,
+          "items": {
+            "$ref": "#/definitions/ContainerPortRange"
+          },
+          "markdownDescription": "Specifies one or more ranges of ports on a container.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ContainerPortRanges"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Defines the ports on a container.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ContainerEnvironment": {
+      "description": "An environment variable to set inside a container, in the form of a key-value pair.",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "The environment variable name.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "The environment variable name.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^.*$  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "description": "The environment variable value.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "The environment variable value.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^.*$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Name",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "An environment variable to set inside a container, in the form of a key-value pair.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ContainerMountPoint": {
+      "description": "Defines the mount point configuration within a container.",
+      "type": "object",
+      "properties": {
+        "InstancePath": {
+          "description": "The path on the host that will be mounted in the container.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "markdownDescription": "The path on the host that will be mounted in the container.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nPattern: ^\\/[\\s\\S]*$  \nUpdate requires: No interruption\n"
+        },
+        "ContainerPath": {
+          "description": "The path inside the container where the mount is accessible.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "markdownDescription": "The path inside the container where the mount is accessible.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nPattern: ^(\\/+[^\\/]+\\/*)+$  \nUpdate requires: No interruption\n"
+        },
+        "AccessLevel": {
+          "description": "The access permissions for the mounted path.",
+          "type": "string",
+          "enum": [
+            "READ_ONLY",
+            "READ_AND_WRITE"
+          ],
+          "markdownDescription": "The access permissions for the mounted path.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: READ_ONLY | READ_AND_WRITE  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "InstancePath"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Defines the mount point configuration within a container.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ContainerDependency": {
+      "description": "A dependency that impacts a container's startup and shutdown.",
+      "type": "object",
+      "properties": {
+        "ContainerName": {
+          "description": "A descriptive label for the container definition. The container being defined depends on this container's condition.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "A descriptive label for the container definition. The container being defined depends on this container's condition.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9-]+$  \nUpdate requires: No interruption\n"
+        },
+        "Condition": {
+          "description": "The type of dependency.",
+          "type": "string",
+          "enum": [
+            "START",
+            "COMPLETE",
+            "SUCCESS",
+            "HEALTHY"
+          ],
+          "markdownDescription": "The type of dependency.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: START | COMPLETE | SUCCESS | HEALTHY  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ContainerName",
+        "Condition"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A dependency that impacts a container's startup and shutdown.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^.*$  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length.",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: ^.*$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "GameServerContainerDefinition": {
+      "description": "Specifies the information required to run game servers with this container group",
+      "type": "object",
+      "properties": {
+        "ContainerName": {
+          "description": "A descriptive label for the container definition. Container definition names must be unique with a container group definition.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "A descriptive label for the container definition. Container definition names must be unique with a container group definition.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9-]+$  \nUpdate requires: No interruption\n"
+        },
+        "DependsOn": {
+          "description": "A list of container dependencies that determines when this container starts up and shuts down. For container groups with multiple containers, dependencies let you define a startup/shutdown sequence across the containers.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": true,
+          "minItems": 1,
+          "maxItems": 10,
+          "items": {
+            "$ref": "#/definitions/ContainerDependency"
+          },
+          "markdownDescription": "A list of container dependencies that determines when this container starts up and shuts down. For container groups with multiple containers, dependencies let you define a startup/shutdown sequence across the containers.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "ServerSdkVersion": {
+          "description": "The version of the server SDK used in this container group",
+          "type": "string",
+          "maxLength": 128,
+          "markdownDescription": "The version of the server SDK used in this container group\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 128  \nPattern: ^\\d+\\.\\d+\\.\\d+$  \nUpdate requires: No interruption\n"
+        },
+        "ImageUri": {
+          "description": "Specifies the image URI of this container.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "Specifies the image URI of this container.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[a-zA-Z0-9-_\\.@\\/:]+$  \nUpdate requires: No interruption\n"
+        },
+        "ResolvedImageDigest": {
+          "description": "The digest of the container image.",
+          "type": "string",
+          "markdownDescription": "The digest of the container image.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^sha256:[a-fA-F0-9]{64}$  \nUpdate requires: No interruption\n"
+        },
+        "EnvironmentOverride": {
+          "description": "The environment variables to pass to a container.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "minItems": 1,
+          "maxItems": 20,
+          "items": {
+            "$ref": "#/definitions/ContainerEnvironment"
+          },
+          "markdownDescription": "The environment variables to pass to a container.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "PortConfiguration": {
+          "description": "Defines the ports on the container.",
+          "$ref": "#/definitions/PortConfiguration",
+          "markdownDescription": "Defines the ports on the container.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "MountPoints": {
+          "description": "A list of mount point configurations to be used in a container.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "minItems": 1,
+          "maxItems": 10,
+          "items": {
+            "$ref": "#/definitions/ContainerMountPoint"
+          },
+          "markdownDescription": "A list of mount point configurations to be used in a container.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ContainerName",
+        "ImageUri",
+        "ServerSdkVersion"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Specifies the information required to run game servers with this container group\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SupportContainerDefinition": {
+      "description": "Supports the function of the main container group",
+      "type": "object",
+      "properties": {
+        "ContainerName": {
+          "description": "A descriptive label for the container definition.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "A descriptive label for the container definition.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9-]+$  \nUpdate requires: No interruption\n"
+        },
+        "Vcpu": {
+          "description": "The number of virtual CPUs to give to the support group",
+          "type": "number",
+          "minimum": 0.125,
+          "maximum": 10,
+          "markdownDescription": "The number of virtual CPUs to give to the support group\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "DependsOn": {
+          "description": "A list of container dependencies that determines when this container starts up and shuts down. For container groups with multiple containers, dependencies let you define a startup/shutdown sequence across the containers.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": true,
+          "minItems": 1,
+          "maxItems": 10,
+          "items": {
+            "$ref": "#/definitions/ContainerDependency"
+          },
+          "markdownDescription": "A list of container dependencies that determines when this container starts up and shuts down. For container groups with multiple containers, dependencies let you define a startup/shutdown sequence across the containers.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "Essential": {
+          "description": "Specifies if the container is essential. If an essential container fails a health check, then all containers in the container group will be restarted. You must specify exactly 1 essential container in a container group.",
+          "type": "boolean",
+          "markdownDescription": "Specifies if the container is essential. If an essential container fails a health check, then all containers in the container group will be restarted. You must specify exactly 1 essential container in a container group.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "ImageUri": {
+          "description": "Specifies the image URI of this container.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "Specifies the image URI of this container.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[a-zA-Z0-9-_\\.@\\/:]+$  \nUpdate requires: No interruption\n"
+        },
+        "ResolvedImageDigest": {
+          "description": "The digest of the container image.",
+          "type": "string",
+          "markdownDescription": "The digest of the container image.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^sha256:[a-fA-F0-9]{64}$  \nUpdate requires: No interruption\n"
+        },
+        "MemoryHardLimitMebibytes": {
+          "description": "The total memory limit of container groups following this definition in MiB",
+          "type": "integer",
+          "minimum": 4,
+          "maximum": 1024000,
+          "markdownDescription": "The total memory limit of container groups following this definition in MiB\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "EnvironmentOverride": {
+          "description": "The environment variables to pass to a container.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "minItems": 1,
+          "maxItems": 20,
+          "items": {
+            "$ref": "#/definitions/ContainerEnvironment"
+          },
+          "markdownDescription": "The environment variables to pass to a container.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "PortConfiguration": {
+          "description": "Defines the ports on the container.",
+          "$ref": "#/definitions/PortConfiguration",
+          "markdownDescription": "Defines the ports on the container.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "HealthCheck": {
+          "description": "Specifies how the health of the containers will be checked.",
+          "$ref": "#/definitions/ContainerHealthCheck",
+          "markdownDescription": "Specifies how the health of the containers will be checked.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "MountPoints": {
+          "description": "A list of mount point configurations to be used in a container.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "minItems": 1,
+          "maxItems": 10,
+          "items": {
+            "$ref": "#/definitions/ContainerMountPoint"
+          },
+          "markdownDescription": "A list of mount point configurations to be used in a container.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ContainerName",
+        "ImageUri"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Supports the function of the main container group\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "ContainerGroupDefinitionArn": {
+      "description": "The Amazon Resource Name (ARN) that is assigned to a Amazon GameLift container group resource and uniquely identifies it across all AWS Regions.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "markdownDescription": "The Amazon Resource Name (ARN) that is assigned to a Amazon GameLift container group resource and uniquely identifies it across all AWS Regions.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^arn:.*:containergroupdefinition\\/[a-zA-Z0-9\\-]+(:[0-9]+)?$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreationTime": {
+      "description": "A time stamp indicating when this data object was created. Format is a number expressed in Unix time as milliseconds (for example \"1469498468.057\").",
+      "type": "string",
+      "markdownDescription": "A time stamp indicating when this data object was created. Format is a number expressed in Unix time as milliseconds (for example \"1469498468.057\").\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "OperatingSystem": {
+      "description": "The operating system of the container group",
+      "type": "string",
+      "enum": [
+        "AMAZON_LINUX_2023"
+      ],
+      "markdownDescription": "The operating system of the container group\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: AMAZON_LINUX_2023  \nUpdate requires: No interruption\n"
+    },
+    "Name": {
+      "description": "A descriptive label for the container group definition.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "markdownDescription": "A descriptive label for the container group definition.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9-]+$  \nUpdate requires: Replacement\n"
+    },
+    "ContainerGroupType": {
+      "description": "The scope of the container group",
+      "type": "string",
+      "enum": [
+        "GAME_SERVER",
+        "PER_INSTANCE"
+      ],
+      "markdownDescription": "The scope of the container group\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: GAME_SERVER | PER_INSTANCE  \nUpdate requires: Replacement\n"
+    },
+    "TotalMemoryLimitMebibytes": {
+      "description": "The total memory limit of container groups following this definition in MiB",
+      "type": "integer",
+      "minimum": 4,
+      "maximum": 1024000,
+      "markdownDescription": "The total memory limit of container groups following this definition in MiB\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+    },
+    "TotalVcpuLimit": {
+      "description": "The total amount of virtual CPUs on the container group definition",
+      "type": "number",
+      "minimum": 0.125,
+      "maximum": 10,
+      "markdownDescription": "The total amount of virtual CPUs on the container group definition\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption\n"
+    },
+    "GameServerContainerDefinition": {
+      "$ref": "#/definitions/GameServerContainerDefinition"
+    },
+    "SupportContainerDefinitions": {
+      "description": "A collection of support container definitions that define the containers in this group.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "minItems": 1,
+      "maxItems": 10,
+      "items": {
+        "$ref": "#/definitions/SupportContainerDefinition"
+      },
+      "markdownDescription": "A collection of support container definitions that define the containers in this group.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "VersionNumber": {
+      "description": "The version of this ContainerGroupDefinition",
+      "type": "integer",
+      "minimum": 0,
+      "markdownDescription": "The version of this ContainerGroupDefinition\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SourceVersionNumber": {
+      "description": "A specific ContainerGroupDefinition version to be updated",
+      "type": "integer",
+      "minimum": 0,
+      "markdownDescription": "A specific ContainerGroupDefinition version to be updated\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    },
+    "VersionDescription": {
+      "description": "The description of this version",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "markdownDescription": "The description of this version\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+    },
+    "Status": {
+      "description": "A string indicating ContainerGroupDefinition status.",
+      "type": "string",
+      "enum": [
+        "READY",
+        "COPYING",
+        "FAILED"
+      ],
+      "markdownDescription": "A string indicating ContainerGroupDefinition status.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: READY | COPYING | FAILED  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "StatusReason": {
+      "description": "A string indicating the reason for ContainerGroupDefinition status.",
+      "type": "string",
+      "markdownDescription": "A string indicating the reason for ContainerGroupDefinition status.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Tags": {
+      "description": "An array of key-value pairs to apply to this resource.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "minItems": 0,
+      "maxItems": 200,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "An array of key-value pairs to apply to this resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "Name",
+    "OperatingSystem",
+    "TotalMemoryLimitMebibytes",
+    "TotalVcpuLimit"
+  ],
+  "createOnlyProperties": [
+    "/properties/Name",
+    "/properties/ContainerGroupType"
+  ],
   "readOnlyProperties": [
     "/properties/ContainerGroupDefinitionArn",
     "/properties/CreationTime",
-    "/properties/ContainerDefinitions/*/ResolvedImageDigest"
-  ],
-  "description": "The AWS::GameLift::ContainerGroupDefinition resource creates an Amazon GameLift container group definition.",
-  "createOnlyProperties": [
-    "/properties/Name",
-    "/properties/SchedulingStrategy",
-    "/properties/TotalMemoryLimit",
-    "/properties/TotalCpuLimit",
-    "/properties/ContainerDefinitions",
-    "/properties/OperatingSystem"
+    "/properties/VersionNumber",
+    "/properties/Status",
+    "/properties/StatusReason"
   ],
   "primaryIdentifier": [
     "/properties/Name"
   ],
-  "required": [
-    "Name",
-    "TotalMemoryLimit",
-    "TotalCpuLimit",
-    "ContainerDefinitions",
-    "OperatingSystem"
-  ],
-  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-gamelift.git",
   "handlers": {
-    "read": {
-      "permissions": [
-        "gamelift:DescribeContainerGroupDefinition",
-        "gamelift:ListTagsForResource"
-      ]
-    },
     "create": {
       "permissions": [
         "gamelift:CreateContainerGroupDefinition",
@@ -57,16 +568,18 @@
         "ecr:DescribeImages"
       ]
     },
+    "read": {
+      "permissions": [
+        "gamelift:DescribeContainerGroupDefinition",
+        "gamelift:ListTagsForResource"
+      ]
+    },
     "update": {
       "permissions": [
+        "gamelift:UpdateContainerGroupDefinition",
         "gamelift:ListTagsForResource",
         "gamelift:TagResource",
         "gamelift:UntagResource"
-      ]
-    },
-    "list": {
-      "permissions": [
-        "gamelift:ListContainerGroupDefinitions"
       ]
     },
     "delete": {
@@ -74,423 +587,46 @@
         "gamelift:DescribeContainerGroupDefinition",
         "gamelift:DeleteContainerGroupDefinition"
       ]
-    }
-  },
-  "additionalProperties": false,
-  "definitions": {
-    "ContainerPortRange": {
-      "description": "A set of one or more port numbers that can be opened on the container.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "FromPort": {
-          "description": "A starting value for the range of allowed port numbers.",
-          "maximum": 60000,
-          "type": "integer",
-          "minimum": 1,
-          "markdownDescription": "A starting value for the range of allowed port numbers.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
-        },
-        "ToPort": {
-          "description": "An ending value for the range of allowed port numbers. Port numbers are end-inclusive. This value must be equal to or greater than FromPort.",
-          "maximum": 60000,
-          "type": "integer",
-          "minimum": 1,
-          "markdownDescription": "An ending value for the range of allowed port numbers. Port numbers are end-inclusive. This value must be equal to or greater than FromPort.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
-        },
-        "Protocol": {
-          "description": "Defines the protocol of these ports.",
-          "type": "string",
-          "enum": [
-            "TCP",
-            "UDP"
-          ],
-          "markdownDescription": "Defines the protocol of these ports.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: TCP | UDP  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "FromPort",
-        "Protocol",
-        "ToPort"
-      ],
-      "markdownDescription": "A set of one or more port numbers that can be opened on the container.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
-    "MemoryLimits": {
-      "description": "Specifies how much memory is available to the container.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "SoftLimit": {
-          "description": "The amount of memory that is reserved for the container.",
-          "maximum": 1024000,
-          "type": "integer",
-          "minimum": 4,
-          "markdownDescription": "The amount of memory that is reserved for the container.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-        },
-        "HardLimit": {
-          "description": "The hard limit of memory to reserve for the container.",
-          "maximum": 1024000,
-          "type": "integer",
-          "minimum": 4,
-          "markdownDescription": "The hard limit of memory to reserve for the container.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-        }
-      },
-      "markdownDescription": "Specifies how much memory is available to the container.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "ContainerDependency": {
-      "description": "A dependency that impacts a container's startup and shutdown.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Condition": {
-          "description": "The type of dependency.",
-          "type": "string",
-          "enum": [
-            "START",
-            "COMPLETE",
-            "SUCCESS",
-            "HEALTHY"
-          ],
-          "markdownDescription": "The type of dependency.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: START | COMPLETE | SUCCESS | HEALTHY  \nUpdate requires: No interruption"
-        },
-        "ContainerName": {
-          "minLength": 1,
-          "description": "A descriptive label for the container definition. The container being defined depends on this container's condition.",
-          "type": "string",
-          "maxLength": 128,
-          "markdownDescription": "A descriptive label for the container definition. The container being defined depends on this container's condition.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9-]+$  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "ContainerName",
-        "Condition"
-      ],
-      "markdownDescription": "A dependency that impacts a container's startup and shutdown.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "ContainerEnvironment": {
-      "description": "An environment variable to set inside a container, in the form of a key-value pair.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Value": {
-          "minLength": 1,
-          "description": "The environment variable value.",
-          "type": "string",
-          "maxLength": 255,
-          "markdownDescription": "The environment variable value.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^.*$  \nUpdate requires: No interruption"
-        },
-        "Name": {
-          "minLength": 1,
-          "description": "The environment variable name.",
-          "type": "string",
-          "maxLength": 255,
-          "markdownDescription": "The environment variable name.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^.*$  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "Name",
-        "Value"
-      ],
-      "markdownDescription": "An environment variable to set inside a container, in the form of a key-value pair.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "ContainerDefinition": {
-      "description": "Details about a container that is used in a container fleet",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "WorkingDirectory": {
-          "minLength": 1,
-          "description": "The working directory to run commands inside the container in.",
-          "type": "string",
-          "maxLength": 255,
-          "markdownDescription": "The working directory to run commands inside the container in.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^.*$  \nUpdate requires: No interruption"
-        },
-        "MemoryLimits": {
-          "description": "Specifies how much memory is available to the container. You must specify at least this parameter or the TotalMemoryLimit parameter of the ContainerGroupDefinition.",
-          "$ref": "#/definitions/MemoryLimits",
-          "markdownDescription": "Specifies how much memory is available to the container. You must specify at least this parameter or the TotalMemoryLimit parameter of the ContainerGroupDefinition.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
-        },
-        "HealthCheck": {
-          "description": "Specifies how the health of the containers will be checked.",
-          "$ref": "#/definitions/ContainerHealthCheck",
-          "markdownDescription": "Specifies how the health of the containers will be checked.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
-        },
-        "Cpu": {
-          "description": "The maximum number of CPU units reserved for this container. The value is expressed as an integer amount of CPU units. 1 vCPU is equal to 1024 CPU units",
-          "maximum": 10240,
-          "type": "integer",
-          "minimum": 1,
-          "markdownDescription": "The maximum number of CPU units reserved for this container. The value is expressed as an integer amount of CPU units. 1 vCPU is equal to 1024 CPU units\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-        },
-        "EntryPoint": {
-          "minItems": 1,
-          "maxItems": 20,
-          "uniqueItems": false,
-          "description": "The entry point that's passed to the container so that it will run as an executable. If there are multiple arguments, each argument is a string in the array.",
-          "insertionOrder": true,
-          "type": "array",
-          "items": {
-            "minLength": 1,
-            "type": "string",
-            "maxLength": 1024,
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption"
-          },
-          "markdownDescription": "The entry point that's passed to the container so that it will run as an executable. If there are multiple arguments, each argument is a string in the array.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-        },
-        "ImageUri": {
-          "minLength": 1,
-          "description": "Specifies the image URI of this container.",
-          "type": "string",
-          "maxLength": 255,
-          "markdownDescription": "Specifies the image URI of this container.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[a-zA-Z0-9-_\\.@\\/:]+$  \nUpdate requires: No interruption"
-        },
-        "ResolvedImageDigest": {
-          "description": "The digest of the container image.",
-          "type": "string",
-          "markdownDescription": "The digest of the container image.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^sha256:[a-fA-F0-9]{64}$  \nUpdate requires: No interruption"
-        },
-        "Essential": {
-          "description": "Specifies if the container is essential. If an essential container fails a health check, then all containers in the container group will be restarted. You must specify exactly 1 essential container in a container group.",
-          "type": "boolean",
-          "markdownDescription": "Specifies if the container is essential. If an essential container fails a health check, then all containers in the container group will be restarted. You must specify exactly 1 essential container in a container group.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
-        },
-        "PortConfiguration": {
-          "description": "Defines the ports on the container.",
-          "$ref": "#/definitions/PortConfiguration",
-          "markdownDescription": "Defines the ports on the container.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
-        },
-        "DependsOn": {
-          "minItems": 1,
-          "maxItems": 10,
-          "uniqueItems": true,
-          "description": "A list of container dependencies that determines when this container starts up and shuts down. For container groups with multiple containers, dependencies let you define a startup/shutdown sequence across the containers.",
-          "insertionOrder": true,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ContainerDependency"
-          },
-          "markdownDescription": "A list of container dependencies that determines when this container starts up and shuts down. For container groups with multiple containers, dependencies let you define a startup/shutdown sequence across the containers.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-        },
-        "ContainerName": {
-          "minLength": 1,
-          "description": "A descriptive label for the container definition. Container definition names must be unique with a container group definition.",
-          "type": "string",
-          "maxLength": 128,
-          "markdownDescription": "A descriptive label for the container definition. Container definition names must be unique with a container group definition.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9-]+$  \nUpdate requires: No interruption"
-        },
-        "Command": {
-          "minItems": 1,
-          "maxItems": 20,
-          "uniqueItems": false,
-          "description": "The command that's passed to the container.",
-          "insertionOrder": true,
-          "type": "array",
-          "items": {
-            "minLength": 1,
-            "type": "string",
-            "maxLength": 255,
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^.*$  \nUpdate requires: No interruption"
-          },
-          "markdownDescription": "The command that's passed to the container.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-        },
-        "Environment": {
-          "minItems": 1,
-          "maxItems": 20,
-          "uniqueItems": true,
-          "description": "The environment variables to pass to a container.",
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ContainerEnvironment"
-          },
-          "markdownDescription": "The environment variables to pass to a container.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "ContainerName",
-        "ImageUri"
-      ],
-      "markdownDescription": "Details about a container that is used in a container fleet\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "Tag": {
-      "description": "A key-value pair to associate with a resource.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Value": {
-          "minLength": 0,
-          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length.",
-          "type": "string",
-          "maxLength": 256,
-          "markdownDescription": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: ^.*$  \nUpdate requires: No interruption"
-        },
-        "Key": {
-          "minLength": 1,
-          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length.",
-          "type": "string",
-          "maxLength": 128,
-          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^.*$  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "Key",
-        "Value"
-      ],
-      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "PortConfiguration": {
-      "description": "Defines the ports on a container.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "ContainerPortRanges": {
-          "minItems": 1,
-          "maxItems": 100,
-          "uniqueItems": true,
-          "description": "Specifies one or more ranges of ports on a container.",
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ContainerPortRange"
-          },
-          "markdownDescription": "Specifies one or more ranges of ports on a container.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "ContainerPortRanges"
-      ],
-      "markdownDescription": "Defines the ports on a container.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "ContainerHealthCheck": {
-      "description": "Specifies how the process manager checks the health of containers.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Command": {
-          "minItems": 1,
-          "maxItems": 20,
-          "uniqueItems": false,
-          "description": "A string array representing the command that the container runs to determine if it is healthy.",
-          "insertionOrder": true,
-          "type": "array",
-          "items": {
-            "minLength": 1,
-            "type": "string",
-            "maxLength": 255,
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^.*$  \nUpdate requires: No interruption"
-          },
-          "markdownDescription": "A string array representing the command that the container runs to determine if it is healthy.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
-        },
-        "Timeout": {
-          "description": "How many seconds the process manager allows the command to run before canceling it.",
-          "maximum": 60,
-          "type": "integer",
-          "minimum": 30,
-          "markdownDescription": "How many seconds the process manager allows the command to run before canceling it.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-        },
-        "Retries": {
-          "description": "How many times the process manager will retry the command after a timeout. (The first run of the command does not count as a retry.)",
-          "maximum": 10,
-          "type": "integer",
-          "minimum": 5,
-          "markdownDescription": "How many times the process manager will retry the command after a timeout. (The first run of the command does not count as a retry.)\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-        },
-        "Interval": {
-          "description": "How often (in seconds) the health is checked.",
-          "maximum": 300,
-          "type": "integer",
-          "minimum": 60,
-          "markdownDescription": "How often (in seconds) the health is checked.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-        },
-        "StartPeriod": {
-          "description": "The optional grace period (in seconds) to give a container time to boostrap before teh health check is declared failed.",
-          "maximum": 300,
-          "type": "integer",
-          "minimum": 0,
-          "markdownDescription": "The optional grace period (in seconds) to give a container time to boostrap before teh health check is declared failed.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "Command"
-      ],
-      "markdownDescription": "Specifies how the process manager checks the health of containers.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    }
-  },
-  "properties": {
-    "OperatingSystem": {
-      "description": "The operating system of the container group",
-      "type": "string",
-      "enum": [
-        "AMAZON_LINUX_2023"
-      ],
-      "markdownDescription": "The operating system of the container group\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: AMAZON_LINUX_2023  \nUpdate requires: Replacement"
-    },
-    "Name": {
-      "minLength": 1,
-      "description": "A descriptive label for the container group definition.",
-      "type": "string",
-      "maxLength": 128,
-      "markdownDescription": "A descriptive label for the container group definition.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9-]+$  \nUpdate requires: Replacement"
-    },
-    "SchedulingStrategy": {
-      "description": "Specifies whether the container group includes replica or daemon containers.",
-      "type": "string",
-      "enum": [
-        "REPLICA",
-        "DAEMON"
-      ],
-      "markdownDescription": "Specifies whether the container group includes replica or daemon containers.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: REPLICA | DAEMON  \nUpdate requires: Replacement"
-    },
-    "TotalMemoryLimit": {
-      "description": "The maximum amount of memory (in MiB) to allocate for this container group.",
-      "maximum": 1024000,
-      "type": "integer",
-      "minimum": 4,
-      "markdownDescription": "The maximum amount of memory (in MiB) to allocate for this container group.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: Replacement"
-    },
-    "ContainerDefinitions": {
-      "minItems": 1,
-      "maxItems": 10,
-      "uniqueItems": true,
-      "description": "A collection of container definitions that define the containers in this group.",
-      "insertionOrder": false,
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/ContainerDefinition"
-      },
-      "markdownDescription": "A collection of container definitions that define the containers in this group.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: Replacement"
-    },
-    "Tags": {
-      "minItems": 0,
-      "maxItems": 200,
-      "uniqueItems": true,
-      "description": "An array of key-value pairs to apply to this resource.",
-      "insertionOrder": false,
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/Tag"
-      },
-      "markdownDescription": "An array of key-value pairs to apply to this resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-    },
-    "TotalCpuLimit": {
-      "description": "The maximum number of CPU units reserved for this container group. The value is expressed as an integer amount of CPU units. (1 vCPU is equal to 1024 CPU units.)",
-      "maximum": 10240,
-      "type": "integer",
-      "minimum": 128,
-      "markdownDescription": "The maximum number of CPU units reserved for this container group. The value is expressed as an integer amount of CPU units. (1 vCPU is equal to 1024 CPU units.)\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: Replacement"
+    "list": {
+      "permissions": [
+        "gamelift:ListContainerGroupDefinitions"
+      ]
     }
   },
   "attributes": {
     "ContainerGroupDefinitionArn": {
-      "minLength": 1,
       "description": "The Amazon Resource Name (ARN) that is assigned to a Amazon GameLift container group resource and uniquely identifies it across all AWS Regions.",
       "type": "string",
+      "minLength": 1,
       "maxLength": 512,
-      "markdownDescription": "The Amazon Resource Name (ARN) that is assigned to a Amazon GameLift container group resource and uniquely identifies it across all AWS Regions.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^arn:.*:containergroupdefinition/containergroupdefinition-[a-zA-Z0-9-]+$|^arn:.*:containergroupdefinition/[a-zA-Z0-9-\\:]+$  \nUpdate requires: No interruption"
+      "markdownDescription": "The Amazon Resource Name (ARN) that is assigned to a Amazon GameLift container group resource and uniquely identifies it across all AWS Regions.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^arn:.*:containergroupdefinition\\/[a-zA-Z0-9\\-]+(:[0-9]+)?$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "CreationTime": {
       "description": "A time stamp indicating when this data object was created. Format is a number expressed in Unix time as milliseconds (for example \"1469498468.057\").",
       "type": "string",
-      "markdownDescription": "A time stamp indicating when this data object was created. Format is a number expressed in Unix time as milliseconds (for example \"1469498468.057\").\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "markdownDescription": "A time stamp indicating when this data object was created. Format is a number expressed in Unix time as milliseconds (for example \"1469498468.057\").\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "VersionNumber": {
+      "description": "The version of this ContainerGroupDefinition",
+      "type": "integer",
+      "minimum": 0,
+      "markdownDescription": "The version of this ContainerGroupDefinition\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Status": {
+      "description": "A string indicating ContainerGroupDefinition status.",
+      "type": "string",
+      "enum": [
+        "READY",
+        "COPYING",
+        "FAILED"
+      ],
+      "markdownDescription": "A string indicating ContainerGroupDefinition status.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: READY | COPYING | FAILED  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "StatusReason": {
+      "description": "A string indicating the reason for ContainerGroupDefinition status.",
+      "type": "string",
+      "markdownDescription": "A string indicating the reason for ContainerGroupDefinition status.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

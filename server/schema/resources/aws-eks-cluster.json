@@ -1,16 +1,596 @@
 {
+  "typeName": "AWS::EKS::Cluster",
+  "description": "An object representing an Amazon EKS cluster.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-eks.git",
+  "definitions": {
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "KeyArn": {
+          "description": "Amazon Resource Name (ARN) or alias of the KMS key. The KMS key must be symmetric, created in the same region as the cluster, and if the KMS key was created in a different account, the user must have access to the KMS key.",
+          "type": "string",
+          "markdownDescription": "Amazon Resource Name (ARN) or alias of the KMS key. The KMS key must be symmetric, created in the same region as the cluster, and if the KMS key was created in a different account, the user must have access to the KMS key.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EncryptionConfig": {
+      "description": "The encryption configuration for the cluster",
+      "type": "object",
+      "properties": {
+        "Provider": {
+          "description": "The encryption provider for the cluster.",
+          "$ref": "#/definitions/Provider",
+          "markdownDescription": "The encryption provider for the cluster.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "Resources": {
+          "description": "Specifies the resources to be encrypted. The only supported value is \"secrets\".",
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "Specifies the resources to be encrypted. The only supported value is \"secrets\".\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The encryption configuration for the cluster\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ResourcesVpcConfig": {
+      "description": "An object representing the VPC configuration to use for an Amazon EKS cluster.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "EndpointPrivateAccess": {
+          "description": "Set this value to true to enable private access for your cluster's Kubernetes API server endpoint. If you enable private access, Kubernetes API requests from within your cluster's VPC use the private VPC endpoint. The default value for this parameter is false, which disables private access for your Kubernetes API server. If you disable private access and you have nodes or AWS Fargate pods in the cluster, then ensure that publicAccessCidrs includes the necessary CIDR blocks for communication with the nodes or Fargate pods.",
+          "type": "boolean",
+          "markdownDescription": "Set this value to true to enable private access for your cluster's Kubernetes API server endpoint. If you enable private access, Kubernetes API requests from within your cluster's VPC use the private VPC endpoint. The default value for this parameter is false, which disables private access for your Kubernetes API server. If you disable private access and you have nodes or AWS Fargate pods in the cluster, then ensure that publicAccessCidrs includes the necessary CIDR blocks for communication with the nodes or Fargate pods.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "EndpointPublicAccess": {
+          "description": "Set this value to false to disable public access to your cluster's Kubernetes API server endpoint. If you disable public access, your cluster's Kubernetes API server can only receive requests from within the cluster VPC. The default value for this parameter is true, which enables public access for your Kubernetes API server.",
+          "type": "boolean",
+          "markdownDescription": "Set this value to false to disable public access to your cluster's Kubernetes API server endpoint. If you disable public access, your cluster's Kubernetes API server can only receive requests from within the cluster VPC. The default value for this parameter is true, which enables public access for your Kubernetes API server.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "PublicAccessCidrs": {
+          "description": "The CIDR blocks that are allowed access to your cluster's public Kubernetes API server endpoint. Communication to the endpoint from addresses outside of the CIDR blocks that you specify is denied. The default value is 0.0.0.0/0. If you've disabled private endpoint access and you have nodes or AWS Fargate pods in the cluster, then ensure that you specify the necessary CIDR blocks.",
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "minItems": 1,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "The CIDR blocks that are allowed access to your cluster's public Kubernetes API server endpoint. Communication to the endpoint from addresses outside of the CIDR blocks that you specify is denied. The default value is 0.0.0.0/0. If you've disabled private endpoint access and you have nodes or AWS Fargate pods in the cluster, then ensure that you specify the necessary CIDR blocks.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "SecurityGroupIds": {
+          "description": "Specify one or more security groups for the cross-account elastic network interfaces that Amazon EKS creates to use to allow communication between your worker nodes and the Kubernetes control plane. If you don't specify a security group, the default security group for your VPC is used.",
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "minItems": 1,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "Specify one or more security groups for the cross-account elastic network interfaces that Amazon EKS creates to use to allow communication between your worker nodes and the Kubernetes control plane. If you don't specify a security group, the default security group for your VPC is used.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "SubnetIds": {
+          "description": "Specify subnets for your Amazon EKS nodes. Amazon EKS creates cross-account elastic network interfaces in these subnets to allow communication between your nodes and the Kubernetes control plane.",
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "minItems": 1,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "Specify subnets for your Amazon EKS nodes. Amazon EKS creates cross-account elastic network interfaces in these subnets to allow communication between your nodes and the Kubernetes control plane.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "SubnetIds"
+      ],
+      "markdownDescription": "An object representing the VPC configuration to use for an Amazon EKS cluster.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LoggingTypeConfig": {
+      "description": "Enabled Logging Type",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "description": "name of the log type",
+          "type": "string",
+          "enum": [
+            "api",
+            "audit",
+            "authenticator",
+            "controllerManager",
+            "scheduler"
+          ],
+          "markdownDescription": "name of the log type\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: api | audit | authenticator | controllerManager | scheduler  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Enabled Logging Type\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EnabledTypes": {
+      "description": "Enable control plane logs for your cluster, all log types will be disabled if the array is empty",
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/LoggingTypeConfig"
+      },
+      "markdownDescription": "Enable control plane logs for your cluster, all log types will be disabled if the array is empty\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "ClusterLogging": {
+      "description": "The cluster control plane logging configuration for your cluster. ",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "EnabledTypes": {
+          "$ref": "#/definitions/EnabledTypes"
+        }
+      },
+      "markdownDescription": "The cluster control plane logging configuration for your cluster. \n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Logging": {
+      "description": "Enable exporting the Kubernetes control plane logs for your cluster to CloudWatch Logs based on log types. By default, cluster control plane logs aren't exported to CloudWatch Logs.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ClusterLogging": {
+          "description": "The cluster control plane logging configuration for your cluster. ",
+          "$ref": "#/definitions/ClusterLogging",
+          "markdownDescription": "The cluster control plane logging configuration for your cluster. \n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Enable exporting the Kubernetes control plane logs for your cluster to CloudWatch Logs based on log types. By default, cluster control plane logs aren't exported to CloudWatch Logs.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RemoteNodeNetwork": {
+      "description": "Network configuration of nodes run on-premises with EKS Hybrid Nodes.",
+      "type": "object",
+      "properties": {
+        "Cidrs": {
+          "description": "Specifies the list of remote node CIDRs.",
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "minItems": 1,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "Specifies the list of remote node CIDRs.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Cidrs"
+      ],
+      "markdownDescription": "Network configuration of nodes run on-premises with EKS Hybrid Nodes.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RemoteNodeNetworks": {
+      "description": "Network configuration of nodes run on-premises with EKS Hybrid Nodes.",
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/RemoteNodeNetwork"
+      },
+      "markdownDescription": "Network configuration of nodes run on-premises with EKS Hybrid Nodes.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "RemotePodNetwork": {
+      "description": "Network configuration of pods run on-premises with EKS Hybrid Nodes.",
+      "type": "object",
+      "properties": {
+        "Cidrs": {
+          "description": "Specifies the list of remote pod CIDRs.",
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "minItems": 1,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "Specifies the list of remote pod CIDRs.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Cidrs"
+      ],
+      "markdownDescription": "Network configuration of pods run on-premises with EKS Hybrid Nodes.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RemotePodNetworks": {
+      "description": "Network configuration of pods run on-premises with EKS Hybrid Nodes.",
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/RemotePodNetwork"
+      },
+      "markdownDescription": "Network configuration of pods run on-premises with EKS Hybrid Nodes.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "RemoteNetworkConfig": {
+      "description": "Configuration fields for specifying on-premises node and pod CIDRs that are external to the VPC passed during cluster creation.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "RemoteNodeNetworks": {
+          "description": "Network configuration of nodes run on-premises with EKS Hybrid Nodes.",
+          "$ref": "#/definitions/RemoteNodeNetworks",
+          "markdownDescription": "Network configuration of nodes run on-premises with EKS Hybrid Nodes.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "RemotePodNetworks": {
+          "description": "Network configuration of pods run on-premises with EKS Hybrid Nodes.",
+          "$ref": "#/definitions/RemotePodNetworks",
+          "markdownDescription": "Network configuration of pods run on-premises with EKS Hybrid Nodes.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "RemoteNodeNetworks"
+      ],
+      "markdownDescription": "Configuration fields for specifying on-premises node and pod CIDRs that are external to the VPC passed during cluster creation.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ComputeConfig": {
+      "description": "Todo: add description",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Enabled": {
+          "description": "Todo: add description",
+          "type": "boolean",
+          "markdownDescription": "Todo: add description\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "NodeRoleArn": {
+          "description": "Todo: add description",
+          "type": "string",
+          "markdownDescription": "Todo: add description\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "NodePools": {
+          "description": "Todo: add description",
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "Todo: add description\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Todo: add description\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "BlockStorage": {
+      "description": "Todo: add description",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Enabled": {
+          "description": "Todo: add description",
+          "type": "boolean",
+          "markdownDescription": "Todo: add description\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Todo: add description\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "StorageConfig": {
+      "description": "Todo: add description",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "BlockStorage": {
+          "description": "Todo: add description",
+          "$ref": "#/definitions/BlockStorage",
+          "markdownDescription": "Todo: add description\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Todo: add description\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ElasticLoadBalancing": {
+      "description": "Todo: add description",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Enabled": {
+          "description": "Todo: add description",
+          "type": "boolean",
+          "markdownDescription": "Todo: add description\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Todo: add description\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "KubernetesNetworkConfig": {
+      "description": "The Kubernetes network configuration for the cluster.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ServiceIpv4Cidr": {
+          "description": "The CIDR block to assign Kubernetes service IP addresses from. If you don't specify a block, Kubernetes assigns addresses from either the 10.100.0.0/16 or 172.20.0.0/16 CIDR blocks. We recommend that you specify a block that does not overlap with resources in other networks that are peered or connected to your VPC. ",
+          "type": "string",
+          "markdownDescription": "The CIDR block to assign Kubernetes service IP addresses from. If you don't specify a block, Kubernetes assigns addresses from either the 10.100.0.0/16 or 172.20.0.0/16 CIDR blocks. We recommend that you specify a block that does not overlap with resources in other networks that are peered or connected to your VPC. \n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ServiceIpv6Cidr": {
+          "description": "The CIDR block to assign Kubernetes service IP addresses from.",
+          "type": "string",
+          "markdownDescription": "The CIDR block to assign Kubernetes service IP addresses from.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "IpFamily": {
+          "description": "Ipv4 or Ipv6. You can only specify ipv6 for 1.21 and later clusters that use version 1.10.1 or later of the Amazon VPC CNI add-on",
+          "type": "string",
+          "enum": [
+            "ipv4",
+            "ipv6"
+          ],
+          "markdownDescription": "Ipv4 or Ipv6. You can only specify ipv6 for 1.21 and later clusters that use version 1.10.1 or later of the Amazon VPC CNI add-on\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ipv4 | ipv6  \nUpdate requires: No interruption\n"
+        },
+        "ElasticLoadBalancing": {
+          "description": "Todo: add description",
+          "$ref": "#/definitions/ElasticLoadBalancing",
+          "markdownDescription": "Todo: add description\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "The Kubernetes network configuration for the cluster.\n\n---\n\nRequired: No  \nUpdate requires: Replacement\nRead only property: Yes"
+    },
+    "ControlPlanePlacement": {
+      "description": "Specify the placement group of the control plane machines for your cluster.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "GroupName": {
+          "description": "Specify the placement group name of the control place machines for your cluster.",
+          "type": "string",
+          "markdownDescription": "Specify the placement group name of the control place machines for your cluster.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Specify the placement group of the control plane machines for your cluster.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "OutpostConfig": {
+      "description": "An object representing the Outpost configuration to use for AWS EKS outpost cluster.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "OutpostArns": {
+          "description": "Specify one or more Arn(s) of Outpost(s) on which you would like to create your cluster.",
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "minItems": 1,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "Specify one or more Arn(s) of Outpost(s) on which you would like to create your cluster.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "ControlPlaneInstanceType": {
+          "description": "Specify the Instance type of the machines that should be used to create your cluster.",
+          "type": "string",
+          "markdownDescription": "Specify the Instance type of the machines that should be used to create your cluster.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ControlPlanePlacement": {
+          "description": "Specify the placement group of the control plane machines for your cluster.",
+          "$ref": "#/definitions/ControlPlanePlacement",
+          "markdownDescription": "Specify the placement group of the control plane machines for your cluster.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "OutpostArns",
+        "ControlPlaneInstanceType"
+      ],
+      "markdownDescription": "An object representing the Outpost configuration to use for AWS EKS outpost cluster.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AccessConfig": {
+      "description": "An object representing the Access Config to use for the cluster.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "BootstrapClusterCreatorAdminPermissions": {
+          "description": "Set this value to false to avoid creating a default cluster admin Access Entry using the IAM principal used to create the cluster.",
+          "type": "boolean",
+          "markdownDescription": "Set this value to false to avoid creating a default cluster admin Access Entry using the IAM principal used to create the cluster.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "AuthenticationMode": {
+          "description": "Specify the authentication mode that should be used to create your cluster.",
+          "type": "string",
+          "enum": [
+            "CONFIG_MAP",
+            "API_AND_CONFIG_MAP",
+            "API"
+          ],
+          "markdownDescription": "Specify the authentication mode that should be used to create your cluster.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CONFIG_MAP | API_AND_CONFIG_MAP | API  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "An object representing the Access Config to use for the cluster.\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
+    },
+    "UpgradePolicy": {
+      "description": "An object representing the Upgrade Policy to use for the cluster.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "SupportType": {
+          "description": "Specify the support type for your cluster.",
+          "type": "string",
+          "enum": [
+            "STANDARD",
+            "EXTENDED"
+          ],
+          "markdownDescription": "Specify the support type for your cluster.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: STANDARD | EXTENDED  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "An object representing the Upgrade Policy to use for the cluster.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ZonalShiftConfig": {
+      "description": "The current zonal shift configuration to use for the cluster.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Enabled": {
+          "description": "Set this value to true to enable zonal shift for the cluster.",
+          "type": "boolean",
+          "markdownDescription": "Set this value to true to enable zonal shift for the cluster.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "The current zonal shift configuration to use for the cluster.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "EncryptionConfig": {
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/EncryptionConfig",
+        "maxItems": 1
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement\n"
+    },
+    "KubernetesNetworkConfig": {
+      "$ref": "#/definitions/KubernetesNetworkConfig"
+    },
+    "Logging": {
+      "$ref": "#/definitions/Logging"
+    },
+    "Name": {
+      "description": "The unique name to give to your cluster.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "markdownDescription": "The unique name to give to your cluster.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: ^[0-9A-Za-z][A-Za-z0-9\\-_]*  \nUpdate requires: Replacement\n"
+    },
+    "Id": {
+      "description": "The unique ID given to your cluster.",
+      "type": "string",
+      "markdownDescription": "The unique ID given to your cluster.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ResourcesVpcConfig": {
+      "$ref": "#/definitions/ResourcesVpcConfig"
+    },
+    "OutpostConfig": {
+      "$ref": "#/definitions/OutpostConfig"
+    },
+    "AccessConfig": {
+      "$ref": "#/definitions/AccessConfig"
+    },
+    "UpgradePolicy": {
+      "$ref": "#/definitions/UpgradePolicy"
+    },
+    "RemoteNetworkConfig": {
+      "$ref": "#/definitions/RemoteNetworkConfig"
+    },
+    "ComputeConfig": {
+      "$ref": "#/definitions/ComputeConfig"
+    },
+    "StorageConfig": {
+      "$ref": "#/definitions/StorageConfig"
+    },
+    "RoleArn": {
+      "description": "The Amazon Resource Name (ARN) of the IAM role that provides permissions for the Kubernetes control plane to make calls to AWS API operations on your behalf.",
+      "type": "string",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the IAM role that provides permissions for the Kubernetes control plane to make calls to AWS API operations on your behalf.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "Version": {
+      "description": "The desired Kubernetes version for your cluster. If you don't specify a value here, the latest version available in Amazon EKS is used.",
+      "type": "string",
+      "markdownDescription": "The desired Kubernetes version for your cluster. If you don't specify a value here, the latest version available in Amazon EKS is used.\n\n---\n\nRequired: No  \nType: String  \nPattern: 1\\.\\d\\d  \nUpdate requires: No interruption\n"
+    },
+    "Tags": {
+      "description": "An array of key-value pairs to apply to this resource.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "An array of key-value pairs to apply to this resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "Arn": {
+      "description": "The ARN of the cluster, such as arn:aws:eks:us-west-2:666666666666:cluster/prod.",
+      "type": "string",
+      "markdownDescription": "The ARN of the cluster, such as arn:aws:eks:us-west-2:666666666666:cluster/prod.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Endpoint": {
+      "description": "The endpoint for your Kubernetes API server, such as https://5E1D0CEXAMPLEA591B746AFC5AB30262.yl4.us-west-2.eks.amazonaws.com.",
+      "type": "string",
+      "markdownDescription": "The endpoint for your Kubernetes API server, such as https://5E1D0CEXAMPLEA591B746AFC5AB30262.yl4.us-west-2.eks.amazonaws.com.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CertificateAuthorityData": {
+      "description": "The certificate-authority-data for your cluster.",
+      "type": "string",
+      "markdownDescription": "The certificate-authority-data for your cluster.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ClusterSecurityGroupId": {
+      "description": "The cluster security group that was created by Amazon EKS for the cluster. Managed node groups use this security group for control plane to data plane communication.",
+      "type": "string",
+      "markdownDescription": "The cluster security group that was created by Amazon EKS for the cluster. Managed node groups use this security group for control plane to data plane communication.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "EncryptionConfigKeyArn": {
+      "description": "Amazon Resource Name (ARN) or alias of the customer master key (CMK).",
+      "type": "string",
+      "markdownDescription": "Amazon Resource Name (ARN) or alias of the customer master key (CMK).\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "OpenIdConnectIssuerUrl": {
+      "description": "The issuer URL for the cluster's OIDC identity provider, such as https://oidc.eks.us-west-2.amazonaws.com/id/EXAMPLED539D4633E53DE1B716D3041E. If you need to remove https:// from this output value, you can include the following code in your template.",
+      "type": "string",
+      "markdownDescription": "The issuer URL for the cluster's OIDC identity provider, such as https://oidc.eks.us-west-2.amazonaws.com/id/EXAMPLED539D4633E53DE1B716D3041E. If you need to remove https:// from this output value, you can include the following code in your template.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "BootstrapSelfManagedAddons": {
+      "description": "Set this value to false to avoid creating the default networking add-ons when the cluster is created.",
+      "type": "boolean",
+      "markdownDescription": "Set this value to false to avoid creating the default networking add-ons when the cluster is created.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: Replacement\n"
+    },
+    "ZonalShiftConfig": {
+      "$ref": "#/definitions/ZonalShiftConfig"
+    }
+  },
   "tagging": {
-    "permissions": [
-      "eks:TagResource",
-      "eks:UntagResource"
-    ],
     "taggable": true,
     "tagOnCreate": true,
     "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
     "tagProperty": "/properties/Tags",
-    "cloudFormationSystemTags": true
+    "permissions": [
+      "eks:TagResource",
+      "eks:UntagResource"
+    ]
   },
-  "typeName": "AWS::EKS::Cluster",
+  "additionalProperties": false,
+  "required": [
+    "RoleArn",
+    "ResourcesVpcConfig"
+  ],
+  "primaryIdentifier": [
+    "/properties/Name"
+  ],
+  "createOnlyProperties": [
+    "/properties/OutpostConfig",
+    "/properties/EncryptionConfig",
+    "/properties/KubernetesNetworkConfig/IpFamily",
+    "/properties/KubernetesNetworkConfig/ServiceIpv4Cidr",
+    "/properties/AccessConfig/BootstrapClusterCreatorAdminPermissions",
+    "/properties/Name",
+    "/properties/RoleArn",
+    "/properties/BootstrapSelfManagedAddons",
+    "/properties/RemoteNetworkConfig"
+  ],
   "readOnlyProperties": [
     "/properties/Id",
     "/properties/Arn",
@@ -21,35 +601,17 @@
     "/properties/OpenIdConnectIssuerUrl",
     "/properties/KubernetesNetworkConfig/ServiceIpv6Cidr"
   ],
-  "description": "An object representing an Amazon EKS cluster.",
-  "createOnlyProperties": [
-    "/properties/OutpostConfig",
-    "/properties/EncryptionConfig",
-    "/properties/KubernetesNetworkConfig",
+  "writeOnlyProperties": [
     "/properties/AccessConfig/BootstrapClusterCreatorAdminPermissions",
-    "/properties/Name",
-    "/properties/RoleArn",
     "/properties/BootstrapSelfManagedAddons"
   ],
-  "primaryIdentifier": [
-    "/properties/Name"
-  ],
-  "required": [
-    "RoleArn",
-    "ResourcesVpcConfig"
-  ],
-  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-eks.git",
   "handlers": {
-    "read": {
-      "permissions": [
-        "eks:DescribeCluster"
-      ]
-    },
     "create": {
       "permissions": [
         "eks:CreateCluster",
         "eks:DescribeCluster",
         "eks:TagResource",
+        "eks:CreateAccessEntry",
         "iam:PassRole",
         "iam:GetRole",
         "iam:ListAttachedRolePolicies",
@@ -66,6 +628,11 @@
         "kms:CreateGrant"
       ]
     },
+    "read": {
+      "permissions": [
+        "eks:DescribeCluster"
+      ]
+    },
     "update": {
       "permissions": [
         "iam:PassRole",
@@ -78,480 +645,53 @@
       ],
       "timeoutInMinutes": 180
     },
-    "list": {
-      "permissions": [
-        "eks:ListClusters"
-      ]
-    },
     "delete": {
       "permissions": [
         "eks:DeleteCluster",
         "eks:DescribeCluster"
       ]
-    }
-  },
-  "writeOnlyProperties": [
-    "/properties/AccessConfig/BootstrapClusterCreatorAdminPermissions",
-    "/properties/BootstrapSelfManagedAddons"
-  ],
-  "additionalProperties": false,
-  "definitions": {
-    "Logging": {
-      "description": "Enable exporting the Kubernetes control plane logs for your cluster to CloudWatch Logs based on log types. By default, cluster control plane logs aren't exported to CloudWatch Logs.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "ClusterLogging": {
-          "description": "The cluster control plane logging configuration for your cluster. ",
-          "$ref": "#/definitions/ClusterLogging",
-          "markdownDescription": "The cluster control plane logging configuration for your cluster. \n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
-        }
-      },
-      "markdownDescription": "Enable exporting the Kubernetes control plane logs for your cluster to CloudWatch Logs based on log types. By default, cluster control plane logs aren't exported to CloudWatch Logs.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
     },
-    "RemoteNodeNetworks": {
-      "description": "Network configuration of nodes run on-premises with EKS Hybrid Nodes.",
-      "insertionOrder": false,
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/RemoteNodeNetwork"
-      },
-      "markdownDescription": "Network configuration of nodes run on-premises with EKS Hybrid Nodes.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-    },
-    "EnabledTypes": {
-      "description": "Enable control plane logs for your cluster, all log types will be disabled if the array is empty",
-      "insertionOrder": false,
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/LoggingTypeConfig"
-      },
-      "markdownDescription": "Enable control plane logs for your cluster, all log types will be disabled if the array is empty\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-    },
-    "ControlPlanePlacement": {
-      "description": "Specify the placement group of the control plane machines for your cluster.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "GroupName": {
-          "description": "Specify the placement group name of the control place machines for your cluster.",
-          "type": "string",
-          "markdownDescription": "Specify the placement group name of the control place machines for your cluster.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "markdownDescription": "Specify the placement group of the control plane machines for your cluster.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "ZonalShiftConfig": {
-      "description": "The current zonal shift configuration to use for the cluster.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Enabled": {
-          "description": "Set this value to true to enable zonal shift for the cluster.",
-          "type": "boolean",
-          "markdownDescription": "Set this value to true to enable zonal shift for the cluster.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
-        }
-      },
-      "markdownDescription": "The current zonal shift configuration to use for the cluster.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "AccessConfig": {
-      "description": "An object representing the Access Config to use for the cluster.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "AuthenticationMode": {
-          "description": "Specify the authentication mode that should be used to create your cluster.",
-          "type": "string",
-          "enum": [
-            "CONFIG_MAP",
-            "API_AND_CONFIG_MAP",
-            "API"
-          ],
-          "markdownDescription": "Specify the authentication mode that should be used to create your cluster.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CONFIG_MAP | API_AND_CONFIG_MAP | API  \nUpdate requires: No interruption"
-        },
-        "BootstrapClusterCreatorAdminPermissions": {
-          "description": "Set this value to false to avoid creating a default cluster admin Access Entry using the IAM principal used to create the cluster.",
-          "type": "boolean",
-          "markdownDescription": "Set this value to false to avoid creating a default cluster admin Access Entry using the IAM principal used to create the cluster.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
-        }
-      },
-      "markdownDescription": "An object representing the Access Config to use for the cluster.\n\n---\n\nRequired: No  \nUpdate requires: Replacement"
-    },
-    "EncryptionConfig": {
-      "description": "The encryption configuration for the cluster",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Resources": {
-          "description": "Specifies the resources to be encrypted. The only supported value is \"secrets\".",
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-          },
-          "markdownDescription": "Specifies the resources to be encrypted. The only supported value is \"secrets\".\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-        },
-        "Provider": {
-          "description": "The encryption provider for the cluster.",
-          "$ref": "#/definitions/Provider",
-          "markdownDescription": "The encryption provider for the cluster.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
-        }
-      },
-      "markdownDescription": "The encryption configuration for the cluster\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "LoggingTypeConfig": {
-      "description": "Enabled Logging Type",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Type": {
-          "description": "name of the log type",
-          "type": "string",
-          "enum": [
-            "api",
-            "audit",
-            "authenticator",
-            "controllerManager",
-            "scheduler"
-          ],
-          "markdownDescription": "name of the log type\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: api | audit | authenticator | controllerManager | scheduler  \nUpdate requires: No interruption"
-        }
-      },
-      "markdownDescription": "Enabled Logging Type\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "ClusterLogging": {
-      "description": "The cluster control plane logging configuration for your cluster. ",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "EnabledTypes": {
-          "$ref": "#/definitions/EnabledTypes"
-        }
-      },
-      "markdownDescription": "The cluster control plane logging configuration for your cluster. \n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "KubernetesNetworkConfig": {
-      "description": "The Kubernetes network configuration for the cluster.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "ServiceIpv4Cidr": {
-          "description": "The CIDR block to assign Kubernetes service IP addresses from. If you don't specify a block, Kubernetes assigns addresses from either the 10.100.0.0/16 or 172.20.0.0/16 CIDR blocks. We recommend that you specify a block that does not overlap with resources in other networks that are peered or connected to your VPC. ",
-          "type": "string",
-          "markdownDescription": "The CIDR block to assign Kubernetes service IP addresses from. If you don't specify a block, Kubernetes assigns addresses from either the 10.100.0.0/16 or 172.20.0.0/16 CIDR blocks. We recommend that you specify a block that does not overlap with resources in other networks that are peered or connected to your VPC. \n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "ServiceIpv6Cidr": {
-          "description": "The CIDR block to assign Kubernetes service IP addresses from.",
-          "type": "string",
-          "markdownDescription": "The CIDR block to assign Kubernetes service IP addresses from.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "IpFamily": {
-          "description": "Ipv4 or Ipv6. You can only specify ipv6 for 1.21 and later clusters that use version 1.10.1 or later of the Amazon VPC CNI add-on",
-          "type": "string",
-          "enum": [
-            "ipv4",
-            "ipv6"
-          ],
-          "markdownDescription": "Ipv4 or Ipv6. You can only specify ipv6 for 1.21 and later clusters that use version 1.10.1 or later of the Amazon VPC CNI add-on\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ipv4 | ipv6  \nUpdate requires: No interruption"
-        }
-      },
-      "markdownDescription": "The Kubernetes network configuration for the cluster.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "Provider": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "KeyArn": {
-          "description": "Amazon Resource Name (ARN) or alias of the KMS key. The KMS key must be symmetric, created in the same region as the cluster, and if the KMS key was created in a different account, the user must have access to the KMS key.",
-          "type": "string",
-          "markdownDescription": "Amazon Resource Name (ARN) or alias of the KMS key. The KMS key must be symmetric, created in the same region as the cluster, and if the KMS key was created in a different account, the user must have access to the KMS key.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "RemoteNodeNetwork": {
-      "description": "Network configuration of nodes run on-premises with EKS Hybrid Nodes.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Cidrs": {
-          "description": "Specifies the list of remote node CIDRs.",
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "minItems": 1,
-            "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-          },
-          "markdownDescription": "Specifies the list of remote node CIDRs.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "Cidrs"
-      ],
-      "markdownDescription": "Network configuration of nodes run on-premises with EKS Hybrid Nodes.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "UpgradePolicy": {
-      "description": "An object representing the Upgrade Policy to use for the cluster.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "SupportType": {
-          "description": "Specify the support type for your cluster.",
-          "type": "string",
-          "enum": [
-            "STANDARD",
-            "EXTENDED"
-          ],
-          "markdownDescription": "Specify the support type for your cluster.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: STANDARD | EXTENDED  \nUpdate requires: No interruption"
-        }
-      },
-      "markdownDescription": "An object representing the Upgrade Policy to use for the cluster.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "RemotePodNetworks": {
-      "description": "Network configuration of pods run on-premises with EKS Hybrid Nodes.",
-      "insertionOrder": false,
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/RemotePodNetwork"
-      },
-      "markdownDescription": "Network configuration of pods run on-premises with EKS Hybrid Nodes.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-    },
-    "Tag": {
-      "description": "A key-value pair to associate with a resource.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Value": {
-          "minLength": 0,
-          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
-          "type": "string",
-          "maxLength": 256,
-          "markdownDescription": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption"
-        },
-        "Key": {
-          "minLength": 1,
-          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
-          "type": "string",
-          "maxLength": 128,
-          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "Key",
-        "Value"
-      ],
-      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "OutpostConfig": {
-      "description": "An object representing the Outpost configuration to use for AWS EKS outpost cluster.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "OutpostArns": {
-          "description": "Specify one or more Arn(s) of Outpost(s) on which you would like to create your cluster.",
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "minItems": 1,
-            "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-          },
-          "markdownDescription": "Specify one or more Arn(s) of Outpost(s) on which you would like to create your cluster.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
-        },
-        "ControlPlanePlacement": {
-          "description": "Specify the placement group of the control plane machines for your cluster.",
-          "$ref": "#/definitions/ControlPlanePlacement",
-          "markdownDescription": "Specify the placement group of the control plane machines for your cluster.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
-        },
-        "ControlPlaneInstanceType": {
-          "description": "Specify the Instance type of the machines that should be used to create your cluster.",
-          "type": "string",
-          "markdownDescription": "Specify the Instance type of the machines that should be used to create your cluster.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "OutpostArns",
-        "ControlPlaneInstanceType"
-      ],
-      "markdownDescription": "An object representing the Outpost configuration to use for AWS EKS outpost cluster.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "ResourcesVpcConfig": {
-      "description": "An object representing the VPC configuration to use for an Amazon EKS cluster.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "EndpointPublicAccess": {
-          "description": "Set this value to false to disable public access to your cluster's Kubernetes API server endpoint. If you disable public access, your cluster's Kubernetes API server can only receive requests from within the cluster VPC. The default value for this parameter is true, which enables public access for your Kubernetes API server.",
-          "type": "boolean",
-          "markdownDescription": "Set this value to false to disable public access to your cluster's Kubernetes API server endpoint. If you disable public access, your cluster's Kubernetes API server can only receive requests from within the cluster VPC. The default value for this parameter is true, which enables public access for your Kubernetes API server.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
-        },
-        "PublicAccessCidrs": {
-          "description": "The CIDR blocks that are allowed access to your cluster's public Kubernetes API server endpoint. Communication to the endpoint from addresses outside of the CIDR blocks that you specify is denied. The default value is 0.0.0.0/0. If you've disabled private endpoint access and you have nodes or AWS Fargate pods in the cluster, then ensure that you specify the necessary CIDR blocks.",
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "minItems": 1,
-            "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-          },
-          "markdownDescription": "The CIDR blocks that are allowed access to your cluster's public Kubernetes API server endpoint. Communication to the endpoint from addresses outside of the CIDR blocks that you specify is denied. The default value is 0.0.0.0/0. If you've disabled private endpoint access and you have nodes or AWS Fargate pods in the cluster, then ensure that you specify the necessary CIDR blocks.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-        },
-        "EndpointPrivateAccess": {
-          "description": "Set this value to true to enable private access for your cluster's Kubernetes API server endpoint. If you enable private access, Kubernetes API requests from within your cluster's VPC use the private VPC endpoint. The default value for this parameter is false, which disables private access for your Kubernetes API server. If you disable private access and you have nodes or AWS Fargate pods in the cluster, then ensure that publicAccessCidrs includes the necessary CIDR blocks for communication with the nodes or Fargate pods.",
-          "type": "boolean",
-          "markdownDescription": "Set this value to true to enable private access for your cluster's Kubernetes API server endpoint. If you enable private access, Kubernetes API requests from within your cluster's VPC use the private VPC endpoint. The default value for this parameter is false, which disables private access for your Kubernetes API server. If you disable private access and you have nodes or AWS Fargate pods in the cluster, then ensure that publicAccessCidrs includes the necessary CIDR blocks for communication with the nodes or Fargate pods.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
-        },
-        "SecurityGroupIds": {
-          "description": "Specify one or more security groups for the cross-account elastic network interfaces that Amazon EKS creates to use to allow communication between your worker nodes and the Kubernetes control plane. If you don't specify a security group, the default security group for your VPC is used.",
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "minItems": 1,
-            "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-          },
-          "markdownDescription": "Specify one or more security groups for the cross-account elastic network interfaces that Amazon EKS creates to use to allow communication between your worker nodes and the Kubernetes control plane. If you don't specify a security group, the default security group for your VPC is used.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-        },
-        "SubnetIds": {
-          "description": "Specify subnets for your Amazon EKS nodes. Amazon EKS creates cross-account elastic network interfaces in these subnets to allow communication between your nodes and the Kubernetes control plane.",
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "minItems": 1,
-            "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-          },
-          "markdownDescription": "Specify subnets for your Amazon EKS nodes. Amazon EKS creates cross-account elastic network interfaces in these subnets to allow communication between your nodes and the Kubernetes control plane.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "SubnetIds"
-      ],
-      "markdownDescription": "An object representing the VPC configuration to use for an Amazon EKS cluster.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "RemotePodNetwork": {
-      "description": "Network configuration of pods run on-premises with EKS Hybrid Nodes.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Cidrs": {
-          "description": "Specifies the list of remote pod CIDRs.",
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "minItems": 1,
-            "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-          },
-          "markdownDescription": "Specifies the list of remote pod CIDRs.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "Cidrs"
-      ],
-      "markdownDescription": "Network configuration of pods run on-premises with EKS Hybrid Nodes.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    }
-  },
-  "properties": {
-    "Logging": {
-      "$ref": "#/definitions/Logging"
-    },
-    "BootstrapSelfManagedAddons": {
-      "description": "Set this value to false to avoid creating the default networking add-ons when the cluster is created.",
-      "type": "boolean",
-      "markdownDescription": "Set this value to false to avoid creating the default networking add-ons when the cluster is created.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: Replacement"
-    },
-    "ZonalShiftConfig": {
-      "$ref": "#/definitions/ZonalShiftConfig"
-    },
-    "AccessConfig": {
-      "$ref": "#/definitions/AccessConfig"
-    },
-    "EncryptionConfig": {
-      "insertionOrder": false,
-      "type": "array",
-      "items": {
-        "maxItems": 1,
-        "$ref": "#/definitions/EncryptionConfig"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement"
-    },
-    "KubernetesNetworkConfig": {
-      "$ref": "#/definitions/KubernetesNetworkConfig"
-    },
-    "RoleArn": {
-      "description": "The Amazon Resource Name (ARN) of the IAM role that provides permissions for the Kubernetes control plane to make calls to AWS API operations on your behalf.",
-      "type": "string",
-      "markdownDescription": "The Amazon Resource Name (ARN) of the IAM role that provides permissions for the Kubernetes control plane to make calls to AWS API operations on your behalf.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
-    },
-    "Name": {
-      "minLength": 1,
-      "description": "The unique name to give to your cluster.",
-      "type": "string",
-      "maxLength": 100,
-      "markdownDescription": "The unique name to give to your cluster.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: ^[0-9A-Za-z][A-Za-z0-9\\-_]*  \nUpdate requires: Replacement"
-    },
-    "UpgradePolicy": {
-      "$ref": "#/definitions/UpgradePolicy"
-    },
-    "Version": {
-      "description": "The desired Kubernetes version for your cluster. If you don't specify a value here, the latest version available in Amazon EKS is used.",
-      "type": "string",
-      "markdownDescription": "The desired Kubernetes version for your cluster. If you don't specify a value here, the latest version available in Amazon EKS is used.\n\n---\n\nRequired: No  \nType: String  \nPattern: 1\\.\\d\\d  \nUpdate requires: No interruption"
-    },
-    "OutpostConfig": {
-      "$ref": "#/definitions/OutpostConfig"
-    },
-    "ResourcesVpcConfig": {
-      "$ref": "#/definitions/ResourcesVpcConfig"
-    },
-    "Tags": {
-      "uniqueItems": true,
-      "description": "An array of key-value pairs to apply to this resource.",
-      "insertionOrder": false,
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/Tag"
-      },
-      "markdownDescription": "An array of key-value pairs to apply to this resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    "list": {
+      "permissions": [
+        "eks:ListClusters"
+      ]
     }
   },
   "attributes": {
-    "EncryptionConfigKeyArn": {
-      "description": "Amazon Resource Name (ARN) or alias of the customer master key (CMK).",
-      "type": "string",
-      "markdownDescription": "Amazon Resource Name (ARN) or alias of the customer master key (CMK).\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-    },
-    "CertificateAuthorityData": {
-      "description": "The certificate-authority-data for your cluster.",
-      "type": "string",
-      "markdownDescription": "The certificate-authority-data for your cluster.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-    },
-    "Endpoint": {
-      "description": "The endpoint for your Kubernetes API server, such as https://5E1D0CEXAMPLEA591B746AFC5AB30262.yl4.us-west-2.eks.amazonaws.com.",
-      "type": "string",
-      "markdownDescription": "The endpoint for your Kubernetes API server, such as https://5E1D0CEXAMPLEA591B746AFC5AB30262.yl4.us-west-2.eks.amazonaws.com.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-    },
-    "ClusterSecurityGroupId": {
-      "description": "The cluster security group that was created by Amazon EKS for the cluster. Managed node groups use this security group for control plane to data plane communication.",
-      "type": "string",
-      "markdownDescription": "The cluster security group that was created by Amazon EKS for the cluster. Managed node groups use this security group for control plane to data plane communication.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-    },
     "Id": {
       "description": "The unique ID given to your cluster.",
       "type": "string",
-      "markdownDescription": "The unique ID given to your cluster.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "markdownDescription": "The unique ID given to your cluster.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Arn": {
       "description": "The ARN of the cluster, such as arn:aws:eks:us-west-2:666666666666:cluster/prod.",
       "type": "string",
-      "markdownDescription": "The ARN of the cluster, such as arn:aws:eks:us-west-2:666666666666:cluster/prod.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "markdownDescription": "The ARN of the cluster, such as arn:aws:eks:us-west-2:666666666666:cluster/prod.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Endpoint": {
+      "description": "The endpoint for your Kubernetes API server, such as https://5E1D0CEXAMPLEA591B746AFC5AB30262.yl4.us-west-2.eks.amazonaws.com.",
+      "type": "string",
+      "markdownDescription": "The endpoint for your Kubernetes API server, such as https://5E1D0CEXAMPLEA591B746AFC5AB30262.yl4.us-west-2.eks.amazonaws.com.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CertificateAuthorityData": {
+      "description": "The certificate-authority-data for your cluster.",
+      "type": "string",
+      "markdownDescription": "The certificate-authority-data for your cluster.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ClusterSecurityGroupId": {
+      "description": "The cluster security group that was created by Amazon EKS for the cluster. Managed node groups use this security group for control plane to data plane communication.",
+      "type": "string",
+      "markdownDescription": "The cluster security group that was created by Amazon EKS for the cluster. Managed node groups use this security group for control plane to data plane communication.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "EncryptionConfigKeyArn": {
+      "description": "Amazon Resource Name (ARN) or alias of the customer master key (CMK).",
+      "type": "string",
+      "markdownDescription": "Amazon Resource Name (ARN) or alias of the customer master key (CMK).\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "OpenIdConnectIssuerUrl": {
       "description": "The issuer URL for the cluster's OIDC identity provider, such as https://oidc.eks.us-west-2.amazonaws.com/id/EXAMPLED539D4633E53DE1B716D3041E. If you need to remove https:// from this output value, you can include the following code in your template.",
       "type": "string",
-      "markdownDescription": "The issuer URL for the cluster's OIDC identity provider, such as https://oidc.eks.us-west-2.amazonaws.com/id/EXAMPLED539D4633E53DE1B716D3041E. If you need to remove https:// from this output value, you can include the following code in your template.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "markdownDescription": "The issuer URL for the cluster's OIDC identity provider, such as https://oidc.eks.us-west-2.amazonaws.com/id/EXAMPLED539D4633E53DE1B716D3041E. If you need to remove https:// from this output value, you can include the following code in your template.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

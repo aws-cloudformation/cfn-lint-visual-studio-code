@@ -1,38 +1,264 @@
 {
+  "typeName": "AWS::S3Express::DirectoryBucket",
+  "description": "Resource Type definition for AWS::S3Express::DirectoryBucket.",
+  "additionalProperties": false,
+  "properties": {
+    "BucketName": {
+      "description": "Specifies a name for the bucket. The bucket name must contain only lowercase letters, numbers, and hyphens (-). A directory bucket name must be unique in the chosen Availability Zone or Local Zone. The bucket name must also follow the format 'bucket_base_name--zone_id--x-s3'. The zone_id can be the ID of an Availability Zone or a Local Zone. If you don't specify a name, AWS CloudFormation generates a unique physical ID and uses that ID for the bucket name.",
+      "maxLength": 63,
+      "type": "string",
+      "markdownDescription": "Specifies a name for the bucket. The bucket name must contain only lowercase letters, numbers, and hyphens (-). A directory bucket name must be unique in the chosen Availability Zone or Local Zone. The bucket name must also follow the format 'bucket_base_name--zone_id--x-s3'. The zone_id can be the ID of an Availability Zone or a Local Zone. If you don't specify a name, AWS CloudFormation generates a unique physical ID and uses that ID for the bucket name.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 63  \nPattern: ^[a-z0-9][a-z0-9//.//-]*[a-z0-9]$  \nUpdate requires: Replacement\n"
+    },
+    "LocationName": {
+      "description": "Specifies the Zone ID of the Availability Zone or Local Zone where the directory bucket will be created. An example Availability Zone ID value is 'use1-az5'.",
+      "type": "string",
+      "markdownDescription": "Specifies the Zone ID of the Availability Zone or Local Zone where the directory bucket will be created. An example Availability Zone ID value is 'use1-az5'.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "AvailabilityZoneName": {
+      "description": "Returns the code for the Availability Zone or Local Zone where the directory bucket was created. An example for the code of an Availability Zone is 'us-east-1f'.",
+      "examples": [
+        "us-east-1f"
+      ],
+      "type": "string",
+      "markdownDescription": "Returns the code for the Availability Zone or Local Zone where the directory bucket was created. An example for the code of an Availability Zone is 'us-east-1f'.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "DataRedundancy": {
+      "description": "Specifies the number of Availability Zone or Local Zone that's used for redundancy for the bucket.",
+      "type": "string",
+      "enum": [
+        "SingleAvailabilityZone",
+        "SingleLocalZone"
+      ],
+      "markdownDescription": "Specifies the number of Availability Zone or Local Zone that's used for redundancy for the bucket.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: SingleAvailabilityZone | SingleLocalZone  \nUpdate requires: Replacement\n"
+    },
+    "Arn": {
+      "$ref": "#/definitions/Arn",
+      "description": "Returns the Amazon Resource Name (ARN) of the specified bucket.",
+      "examples": [
+        "arn:aws:s3express:us-west-2:123456789123:bucket/DOC-EXAMPLE-BUCKET--usw2-az1--x-s3"
+      ],
+      "markdownDescription": "Returns the Amazon Resource Name (ARN) of the specified bucket.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "BucketEncryption": {
+      "$ref": "#/definitions/BucketEncryption"
+    },
+    "LifecycleConfiguration": {
+      "$ref": "#/definitions/LifecycleConfiguration",
+      "description": "Lifecycle rules that define how Amazon S3 Express manages objects during their lifetime.",
+      "markdownDescription": "Lifecycle rules that define how Amazon S3 Express manages objects during their lifetime.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    }
+  },
+  "definitions": {
+    "Arn": {
+      "description": "The Amazon Resource Name (ARN) of the specified bucket.",
+      "type": "string",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the specified bucket.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "BucketEncryption": {
+      "description": "Specifies default encryption for a bucket using server-side encryption with Amazon S3 managed keys (SSE-S3) or AWS KMS keys (SSE-KMS).",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ServerSideEncryptionConfiguration": {
+          "description": "Specifies the default server-side-encryption configuration.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": true,
+          "items": {
+            "$ref": "#/definitions/ServerSideEncryptionRule"
+          },
+          "markdownDescription": "Specifies the default server-side-encryption configuration.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ServerSideEncryptionConfiguration"
+      ],
+      "markdownDescription": "Specifies default encryption for a bucket using server-side encryption with Amazon S3 managed keys (SSE-S3) or AWS KMS keys (SSE-KMS).\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ServerSideEncryptionRule": {
+      "description": "Specifies the default server-side encryption configuration.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "BucketKeyEnabled": {
+          "description": "Specifies whether Amazon S3 should use an S3 Bucket Key with server-side encryption using KMS (SSE-KMS) for new objects in the bucket. Existing objects are not affected. Amazon S3 Express One Zone uses an S3 Bucket Key with SSE-KMS and S3 Bucket Key cannot be disabled. It's only allowed to set the BucketKeyEnabled element to true.",
+          "type": "boolean",
+          "markdownDescription": "Specifies whether Amazon S3 should use an S3 Bucket Key with server-side encryption using KMS (SSE-KMS) for new objects in the bucket. Existing objects are not affected. Amazon S3 Express One Zone uses an S3 Bucket Key with SSE-KMS and S3 Bucket Key cannot be disabled. It's only allowed to set the BucketKeyEnabled element to true.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "ServerSideEncryptionByDefault": {
+          "$ref": "#/definitions/ServerSideEncryptionByDefault"
+        }
+      },
+      "markdownDescription": "Specifies the default server-side encryption configuration.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ServerSideEncryptionByDefault": {
+      "description": "Specifies the default server-side encryption to apply to new objects in the bucket. If a PUT Object request doesn't specify any server-side encryption, this default encryption will be applied.",
+      "type": "object",
+      "properties": {
+        "KMSMasterKeyID": {
+          "description": "AWS Key Management Service (KMS) customer managed key ID to use for the default encryption. This parameter is allowed only if SSEAlgorithm is set to aws:kms. You can specify this parameter with the key ID or the Amazon Resource Name (ARN) of the KMS key",
+          "type": "string",
+          "anyOf": [
+            {
+              "relationshipRef": {
+                "typeName": "AWS::KMS::Key",
+                "propertyPath": "/properties/KeyId"
+              }
+            },
+            {
+              "relationshipRef": {
+                "typeName": "AWS::KMS::Key",
+                "propertyPath": "/properties/Arn"
+              }
+            }
+          ],
+          "markdownDescription": "AWS Key Management Service (KMS) customer managed key ID to use for the default encryption. This parameter is allowed only if SSEAlgorithm is set to aws:kms. You can specify this parameter with the key ID or the Amazon Resource Name (ARN) of the KMS key\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "SSEAlgorithm": {
+          "type": "string",
+          "enum": [
+            "aws:kms",
+            "AES256"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: aws:kms | AES256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "SSEAlgorithm"
+      ],
+      "markdownDescription": "Specifies the default server-side encryption to apply to new objects in the bucket. If a PUT Object request doesn't specify any server-side encryption, this default encryption will be applied.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LifecycleConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Rules": {
+          "description": "A lifecycle rule for individual objects in an Amazon S3 Express bucket.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": true,
+          "items": {
+            "$ref": "#/definitions/Rule"
+          },
+          "markdownDescription": "A lifecycle rule for individual objects in an Amazon S3 Express bucket.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Rules"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Rule": {
+      "type": "object",
+      "description": "You must specify at least one of the following properties: AbortIncompleteMultipartUpload, or ExpirationInDays.",
+      "additionalProperties": false,
+      "properties": {
+        "AbortIncompleteMultipartUpload": {
+          "$ref": "#/definitions/AbortIncompleteMultipartUpload"
+        },
+        "ExpirationInDays": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Id": {
+          "type": "string",
+          "maxLength": 255,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+        },
+        "Prefix": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Status": {
+          "type": "string",
+          "enum": [
+            "Enabled",
+            "Disabled"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: Enabled | Disabled  \nUpdate requires: No interruption\n"
+        },
+        "ObjectSizeGreaterThan": {
+          "type": "string",
+          "maxLength": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 20  \nPattern: [0-9]+  \nUpdate requires: No interruption\n"
+        },
+        "ObjectSizeLessThan": {
+          "type": "string",
+          "maxLength": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 20  \nPattern: [0-9]+  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Status"
+      ],
+      "markdownDescription": "You must specify at least one of the following properties: AbortIncompleteMultipartUpload, or ExpirationInDays.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AbortIncompleteMultipartUpload": {
+      "description": "Specifies the days since the initiation of an incomplete multipart upload that Amazon S3 will wait before permanently removing all parts of the upload.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "DaysAfterInitiation": {
+          "description": "Specifies the number of days after which Amazon S3 aborts an incomplete multipart upload.",
+          "type": "integer",
+          "minimum": 0,
+          "markdownDescription": "Specifies the number of days after which Amazon S3 aborts an incomplete multipart upload.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "DaysAfterInitiation"
+      ],
+      "markdownDescription": "Specifies the days since the initiation of an incomplete multipart upload that Amazon S3 will wait before permanently removing all parts of the upload.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "createOnlyProperties": [
+    "/properties/BucketName",
+    "/properties/LocationName",
+    "/properties/DataRedundancy"
+  ],
+  "primaryIdentifier": [
+    "/properties/BucketName"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/AvailabilityZoneName"
+  ],
   "tagging": {
     "taggable": false,
     "tagOnCreate": false,
     "tagUpdatable": false,
     "cloudFormationSystemTags": false
   },
+  "required": [
+    "LocationName",
+    "DataRedundancy"
+  ],
   "handlers": {
-    "read": {
-      "permissions": [
-        "s3express:ListAllMyDirectoryBuckets",
-        "ec2:DescribeAvailabilityZones",
-        "s3express:GetEncryptionConfiguration",
-        "s3express:ListAllMyDirectoryBuckets"
-      ]
-    },
     "create": {
       "permissions": [
         "kms:GenerateDataKey",
         "kms:Decrypt",
         "s3express:CreateBucket",
         "s3express:ListAllMyDirectoryBuckets",
-        "s3express:PutEncryptionConfiguration"
+        "s3express:PutEncryptionConfiguration",
+        "s3express:PutLifecycleConfiguration"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "s3express:ListAllMyDirectoryBuckets",
+        "ec2:DescribeAvailabilityZones",
+        "s3express:GetEncryptionConfiguration",
+        "s3express:GetLifecycleConfiguration"
       ]
     },
     "update": {
       "permissions": [
         "kms:GenerateDataKey",
         "kms:Decrypt",
-        "s3express:PutEncryptionConfiguration"
-      ]
-    },
-    "list": {
-      "permissions": [
-        "s3express:ListAllMyDirectoryBuckets"
+        "s3express:PutEncryptionConfiguration",
+        "s3express:PutLifecycleConfiguration"
       ]
     },
     "delete": {
@@ -40,72 +266,29 @@
         "s3express:DeleteBucket",
         "s3express:ListAllMyDirectoryBuckets"
       ]
-    }
-  },
-  "typeName": "AWS::S3Express::DirectoryBucket",
-  "readOnlyProperties": [
-    "/properties/Arn",
-    "/properties/AvailabilityZoneName"
-  ],
-  "description": "Resource Type definition for AWS::S3Express::DirectoryBucket.",
-  "createOnlyProperties": [
-    "/properties/BucketName",
-    "/properties/LocationName",
-    "/properties/DataRedundancy"
-  ],
-  "additionalProperties": false,
-  "primaryIdentifier": [
-    "/properties/BucketName"
-  ],
-  "definitions": {
-    "Arn": {
-      "description": "The Amazon Resource Name (ARN) of the specified bucket.",
-      "type": "string",
-      "markdownDescription": "The Amazon Resource Name (ARN) of the specified bucket.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-    }
-  },
-  "properties": {
-    "BucketName": {
-      "description": "Specifies a name for the bucket. The bucket name must contain only lowercase letters, numbers, and hyphens (-). A directory bucket name must be unique in the chosen Availability Zone. The bucket name must also follow the format 'bucket_base_name--az_id--x-s3' (for example, 'DOC-EXAMPLE-BUCKET--usw2-az1--x-s3'). If you don't specify a name, AWS CloudFormation generates a unique physical ID and uses that ID for the bucket name.",
-      "type": "string",
-      "maxLength": 63,
-      "markdownDescription": "Specifies a name for the bucket. The bucket name must contain only lowercase letters, numbers, and hyphens (-). A directory bucket name must be unique in the chosen Availability Zone. The bucket name must also follow the format 'bucket_base_name--az_id--x-s3' (for example, 'DOC-EXAMPLE-BUCKET--usw2-az1--x-s3'). If you don't specify a name, AWS CloudFormation generates a unique physical ID and uses that ID for the bucket name.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 63  \nPattern: ^[a-z0-9][a-z0-9//.//-]*[a-z0-9]$  \nUpdate requires: Replacement"
     },
-    "BucketEncryption": {},
-    "DataRedundancy": {
-      "description": "Specifies the number of Availability Zone that's used for redundancy for the bucket.",
-      "type": "string",
-      "enum": [
-        "SingleAvailabilityZone"
-      ],
-      "markdownDescription": "Specifies the number of Availability Zone that's used for redundancy for the bucket.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: SingleAvailabilityZone  \nUpdate requires: Replacement"
-    },
-    "LocationName": {
-      "description": "Specifies the AZ ID of the Availability Zone where the directory bucket will be created. An example AZ ID value is 'use1-az5'.",
-      "type": "string",
-      "markdownDescription": "Specifies the AZ ID of the Availability Zone where the directory bucket will be created. An example AZ ID value is 'use1-az5'.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
+    "list": {
+      "permissions": [
+        "s3express:ListAllMyDirectoryBuckets"
+      ]
     }
   },
-  "required": [
-    "LocationName",
-    "DataRedundancy"
-  ],
   "attributes": {
     "AvailabilityZoneName": {
+      "description": "Returns the code for the Availability Zone or Local Zone where the directory bucket was created. An example for the code of an Availability Zone is 'us-east-1f'.",
       "examples": [
         "us-east-1f"
       ],
-      "description": "Returns the code for the Availability Zone where the directory bucket was created.",
       "type": "string",
-      "markdownDescription": "Returns the code for the Availability Zone where the directory bucket was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "markdownDescription": "Returns the code for the Availability Zone or Local Zone where the directory bucket was created. An example for the code of an Availability Zone is 'us-east-1f'.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Arn": {
+      "$ref": "#/definitions/Arn",
+      "description": "Returns the Amazon Resource Name (ARN) of the specified bucket.",
       "examples": [
         "arn:aws:s3express:us-west-2:123456789123:bucket/DOC-EXAMPLE-BUCKET--usw2-az1--x-s3"
       ],
-      "description": "Returns the Amazon Resource Name (ARN) of the specified bucket.",
-      "$ref": "#/definitions/Arn",
-      "markdownDescription": "Returns the Amazon Resource Name (ARN) of the specified bucket.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+      "markdownDescription": "Returns the Amazon Resource Name (ARN) of the specified bucket.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

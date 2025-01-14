@@ -3,18 +3,29 @@
   "description": "You can use organizational units (OUs) to group accounts together to administer as a single unit. This greatly simplifies the management of your accounts. For example, you can attach a policy-based control to an OU, and all accounts within the OU automatically inherit the policy. You can create multiple OUs within a single organization, and you can create OUs within other OUs. Each OU can contain multiple accounts, and you can move accounts from one OU to another. However, OU names must be unique within a parent OU or root.",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-organizations",
   "properties": {
+    "Arn": {
+      "description": "The Amazon Resource Name (ARN) of this OU.",
+      "type": "string",
+      "markdownDescription": "The Amazon Resource Name (ARN) of this OU.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws.*:organizations::\\d{12}:ou/o-[a-z0-9]{10,32}/ou-[0-9a-z]{4,32}-[0-9a-z]{8,32}  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Id": {
+      "description": "The unique identifier (ID) associated with this OU.",
+      "type": "string",
+      "maxLength": 68,
+      "markdownDescription": "The unique identifier (ID) associated with this OU.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 68  \nPattern: ^ou-[0-9a-z]{4,32}-[a-z0-9]{8,32}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
     "Name": {
       "description": "The friendly name of this OU.",
       "type": "string",
       "minLength": 1,
       "maxLength": 128,
-      "markdownDescription": "The friendly name of this OU.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: [\\s\\S]*  \nUpdate requires: No interruption"
+      "markdownDescription": "The friendly name of this OU.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: [\\s\\S]*  \nUpdate requires: No interruption\n"
     },
     "ParentId": {
       "description": "The unique identifier (ID) of the parent root or OU that you want to create the new OU in.",
       "type": "string",
       "maxLength": 100,
-      "markdownDescription": "The unique identifier (ID) of the parent root or OU that you want to create the new OU in.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 100  \nPattern: ^(r-[0-9a-z]{4,32})|(ou-[0-9a-z]{4,32}-[a-z0-9]{8,32})$  \nUpdate requires: Replacement"
+      "markdownDescription": "The unique identifier (ID) of the parent root or OU that you want to create the new OU in.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 100  \nPattern: ^(r-[0-9a-z]{4,32})|(ou-[0-9a-z]{4,32}-[a-z0-9]{8,32})$  \nUpdate requires: Replacement\n"
     },
     "Tags": {
       "description": "A list of tags that you want to attach to the newly created OU.",
@@ -24,7 +35,7 @@
       "items": {
         "$ref": "#/definitions/Tag"
       },
-      "markdownDescription": "A list of tags that you want to attach to the newly created OU.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+      "markdownDescription": "A list of tags that you want to attach to the newly created OU.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "definitions": {
@@ -37,14 +48,14 @@
           "description": "The key identifier, or name, of the tag.",
           "minLength": 1,
           "maxLength": 128,
-          "markdownDescription": "The key identifier, or name, of the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+          "markdownDescription": "The key identifier, or name, of the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
         },
         "Value": {
           "type": "string",
           "description": "The string value that's associated with the key of the tag. You can set the value of a tag to an empty string, but you can't set the value of a tag to null.",
           "minLength": 0,
           "maxLength": 256,
-          "markdownDescription": "The string value that's associated with the key of the tag. You can set the value of a tag to an empty string, but you can't set the value of a tag to null.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption"
+          "markdownDescription": "The string value that's associated with the key of the tag. You can set the value of a tag to an empty string, but you can't set the value of a tag to null.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
@@ -52,7 +63,7 @@
         "Value"
       ],
       "additionalProperties": false,
-      "markdownDescription": "A custom key-value pair associated with a resource within your organization.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+      "markdownDescription": "A custom key-value pair associated with a resource within your organization.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "handlers": {
@@ -108,7 +119,12 @@
     "tagOnCreate": true,
     "tagUpdatable": true,
     "cloudFormationSystemTags": false,
-    "tagProperty": "/properties/Tags"
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "organizations:TagResource",
+      "organizations:UntagResource",
+      "organizations:ListTagsForResource"
+    ]
   },
   "required": [
     "Name",
@@ -129,13 +145,13 @@
     "Arn": {
       "description": "The Amazon Resource Name (ARN) of this OU.",
       "type": "string",
-      "markdownDescription": "The Amazon Resource Name (ARN) of this OU.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws.*:organizations::\\d{12}:ou/o-[a-z0-9]{10,32}/ou-[0-9a-z]{4,32}-[0-9a-z]{8,32}  \nUpdate requires: No interruption"
+      "markdownDescription": "The Amazon Resource Name (ARN) of this OU.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws.*:organizations::\\d{12}:ou/o-[a-z0-9]{10,32}/ou-[0-9a-z]{4,32}-[0-9a-z]{8,32}  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Id": {
       "description": "The unique identifier (ID) associated with this OU.",
       "type": "string",
       "maxLength": 68,
-      "markdownDescription": "The unique identifier (ID) associated with this OU.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 68  \nPattern: ^ou-[0-9a-z]{4,32}-[a-z0-9]{8,32}$  \nUpdate requires: No interruption"
+      "markdownDescription": "The unique identifier (ID) associated with this OU.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 68  \nPattern: ^ou-[0-9a-z]{4,32}-[a-z0-9]{8,32}$  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

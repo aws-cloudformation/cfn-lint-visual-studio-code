@@ -10,28 +10,35 @@
   },
   "replacementStrategy": "delete_then_create",
   "properties": {
+    "AccountId": {
+      "description": "User account id",
+      "type": "string",
+      "markdownDescription": "User account id\n\n---\n\nRequired: No  \nType: String  \nPattern: ^\\d{12}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
     "PolicyName": {
       "description": "The name of the account policy",
       "type": "string",
       "minLength": 1,
       "maxLength": 256,
-      "markdownDescription": "The name of the account policy\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^[^:*]{1,256}$  \nUpdate requires: Replacement"
+      "markdownDescription": "The name of the account policy\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^[^:*]{1,256}$  \nUpdate requires: Replacement\n"
     },
     "PolicyDocument": {
       "description": "The body of the policy document you want to use for this topic.\n\nYou can only add one policy per PolicyType.\n\nThe policy must be in JSON string format.\n\nLength Constraints: Maximum length of 30720",
       "type": "string",
       "minLength": 1,
       "maxLength": 30720,
-      "markdownDescription": "The body of the policy document you want to use for this topic.\n\nYou can only add one policy per PolicyType.\n\nThe policy must be in JSON string format.\n\nLength Constraints: Maximum length of 30720\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 30720  \nUpdate requires: No interruption"
+      "markdownDescription": "The body of the policy document you want to use for this topic.\n\nYou can only add one policy per PolicyType.\n\nThe policy must be in JSON string format.\n\nLength Constraints: Maximum length of 30720\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 30720  \nUpdate requires: No interruption\n"
     },
     "PolicyType": {
       "description": "Type of the policy.",
       "type": "string",
       "enum": [
         "DATA_PROTECTION_POLICY",
-        "SUBSCRIPTION_FILTER_POLICY"
+        "SUBSCRIPTION_FILTER_POLICY",
+        "FIELD_INDEX_POLICY",
+        "TRANSFORMER_POLICY"
       ],
-      "markdownDescription": "Type of the policy.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: DATA_PROTECTION_POLICY | SUBSCRIPTION_FILTER_POLICY  \nUpdate requires: Replacement"
+      "markdownDescription": "Type of the policy.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: DATA_PROTECTION_POLICY | SUBSCRIPTION_FILTER_POLICY | FIELD_INDEX_POLICY | TRANSFORMER_POLICY  \nUpdate requires: Replacement\n"
     },
     "Scope": {
       "description": "Scope for policy application",
@@ -39,18 +46,19 @@
       "enum": [
         "ALL"
       ],
-      "markdownDescription": "Scope for policy application\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ALL  \nUpdate requires: No interruption"
+      "markdownDescription": "Scope for policy application\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ALL  \nUpdate requires: No interruption\n"
     },
     "SelectionCriteria": {
       "description": "Log group  selection criteria to apply policy only to a subset of log groups. SelectionCriteria string can be up to 25KB and cloudwatchlogs determines the length of selectionCriteria by using its UTF-8 bytes",
       "type": "string",
-      "markdownDescription": "Log group  selection criteria to apply policy only to a subset of log groups. SelectionCriteria string can be up to 25KB and cloudwatchlogs determines the length of selectionCriteria by using its UTF-8 bytes\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "markdownDescription": "Log group  selection criteria to apply policy only to a subset of log groups. SelectionCriteria string can be up to 25KB and cloudwatchlogs determines the length of selectionCriteria by using its UTF-8 bytes\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
     }
   },
   "handlers": {
     "create": {
       "permissions": [
         "logs:PutAccountPolicy",
+        "logs:PutIndexPolicy",
         "logs:PutDataProtectionPolicy",
         "logs:DescribeAccountPolicies",
         "logs:CreateLogDelivery",
@@ -58,24 +66,30 @@
         "firehose:TagDeliveryStream",
         "logs:PutSubscriptionFilter",
         "logs:DeleteSubscriptionFilter",
+        "logs:PutTransformer",
         "iam:PassRole"
       ]
     },
     "read": {
       "permissions": [
-        "logs:DescribeAccountPolicies"
+        "logs:DescribeAccountPolicies",
+        "logs:GetTransformer"
       ]
     },
     "update": {
       "permissions": [
         "logs:PutAccountPolicy",
+        "logs:PutIndexPolicy",
         "logs:PutDataProtectionPolicy",
         "logs:DescribeAccountPolicies",
         "logs:DeleteAccountPolicy",
+        "logs:DeleteIndexPolicy",
         "logs:DeleteDataProtectionPolicy",
         "logs:CreateLogDelivery",
         "logs:PutSubscriptionFilter",
         "logs:DeleteSubscriptionFilter",
+        "logs:PutTransformer",
+        "logs:DeleteTransformer",
         "s3:REST.PUT.OBJECT",
         "firehose:TagDeliveryStream",
         "iam:PassRole"
@@ -84,15 +98,18 @@
     "delete": {
       "permissions": [
         "logs:DeleteAccountPolicy",
+        "logs:DeleteIndexPolicy",
         "logs:DeleteDataProtectionPolicy",
         "logs:DescribeAccountPolicies",
         "logs:DeleteSubscriptionFilter",
+        "logs:DeleteTransformer",
         "iam:PassRole"
       ]
     },
     "list": {
       "permissions": [
-        "logs:DescribeAccountPolicies"
+        "logs:DescribeAccountPolicies",
+        "logs:GetTransformer"
       ],
       "handlerSchema": {
         "properties": {
@@ -128,7 +145,7 @@
     "AccountId": {
       "description": "User account id",
       "type": "string",
-      "markdownDescription": "User account id\n\n---\n\nRequired: No  \nType: String  \nPattern: ^\\d{12}$  \nUpdate requires: No interruption"
+      "markdownDescription": "User account id\n\n---\n\nRequired: No  \nType: String  \nPattern: ^\\d{12}$  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

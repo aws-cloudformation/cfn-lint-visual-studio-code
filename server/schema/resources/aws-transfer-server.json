@@ -1,284 +1,553 @@
 {
   "typeName": "AWS::Transfer::Server",
-  "description": "Resource Type definition for AWS::Transfer::Server",
-  "additionalProperties": false,
-  "properties": {
-    "LoggingRole": {
+  "description": "Definition of AWS::Transfer::Server Resource Type",
+  "definitions": {
+    "As2Transport": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "enum": [
+        "HTTP"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: HTTP  \nUpdate requires: No interruption\n"
     },
-    "Protocols": {
-      "type": "array",
-      "uniqueItems": false,
-      "items": {
-        "$ref": "#/definitions/Protocol"
+    "DirectoryListingOptimization": {
+      "type": "string",
+      "description": "Indicates whether optimization to directory listing on S3 servers is used. Disabled by default for compatibility.",
+      "enum": [
+        "ENABLED",
+        "DISABLED"
+      ],
+      "markdownDescription": "Indicates whether optimization to directory listing on S3 servers is used. Disabled by default for compatibility.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption\n"
+    },
+    "Domain": {
+      "type": "string",
+      "enum": [
+        "S3",
+        "EFS"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: S3 | EFS  \nUpdate requires: No interruption\n"
+    },
+    "EndpointDetails": {
+      "type": "object",
+      "properties": {
+        "AddressAllocationIds": {
+          "type": "array",
+          "insertionOrder": true,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "SubnetIds": {
+          "type": "array",
+          "insertionOrder": true,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "VpcEndpointId": {
+          "type": "string",
+          "maxLength": 22,
+          "minLength": 22,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 22  \nMaximum Length: 22  \nPattern: ^vpce-[0-9a-f]{17}$  \nUpdate requires: No interruption\n"
+        },
+        "VpcId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "SecurityGroupIds": {
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "maxLength": 20,
+            "minLength": 11,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 11  \nMaximum Length: 20  \nPattern: ^sg-[0-9a-f]{8,17}$  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
       },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: Some interruptions\n"
+    },
+    "EndpointType": {
+      "type": "string",
+      "enum": [
+        "PUBLIC",
+        "VPC",
+        "VPC_ENDPOINT"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PUBLIC | VPC | VPC_ENDPOINT  \nUpdate requires: No interruption\n"
     },
     "IdentityProviderDetails": {
-      "$ref": "#/definitions/IdentityProviderDetails"
+      "type": "object",
+      "properties": {
+        "Url": {
+          "type": "string",
+          "maxLength": 255,
+          "minLength": 0,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+        },
+        "InvocationRole": {
+          "type": "string",
+          "maxLength": 2048,
+          "minLength": 20,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:.*role/\\S+$  \nUpdate requires: No interruption\n"
+        },
+        "DirectoryId": {
+          "type": "string",
+          "maxLength": 12,
+          "minLength": 12,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 12  \nMaximum Length: 12  \nPattern: ^d-[0-9a-f]{10}$  \nUpdate requires: No interruption\n"
+        },
+        "Function": {
+          "type": "string",
+          "maxLength": 170,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 170  \nPattern: ^arn:[a-z-]+:lambda:.*$  \nUpdate requires: No interruption\n"
+        },
+        "SftpAuthenticationMethods": {
+          "$ref": "#/definitions/SftpAuthenticationMethods"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "IdentityProviderType": {
+      "type": "string",
+      "enum": [
+        "SERVICE_MANAGED",
+        "API_GATEWAY",
+        "AWS_DIRECTORY_SERVICE",
+        "AWS_LAMBDA"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SERVICE_MANAGED | API_GATEWAY | AWS_DIRECTORY_SERVICE | AWS_LAMBDA  \nUpdate requires: No interruption\n"
+    },
+    "Protocol": {
+      "type": "string",
+      "enum": [
+        "SFTP",
+        "FTP",
+        "FTPS",
+        "AS2"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SFTP | FTP | FTPS | AS2  \nUpdate requires: No interruption\n"
+    },
+    "ProtocolDetails": {
+      "type": "object",
+      "properties": {
+        "PassiveIp": {
+          "type": "string",
+          "maxLength": 15,
+          "minLength": 0,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 15  \nUpdate requires: No interruption\n"
+        },
+        "TlsSessionResumptionMode": {
+          "$ref": "#/definitions/TlsSessionResumptionMode"
+        },
+        "SetStatOption": {
+          "$ref": "#/definitions/SetStatOption"
+        },
+        "As2Transports": {
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/As2Transport"
+          },
+          "maxItems": 1,
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "S3StorageOptions": {
+      "type": "object",
+      "properties": {
+        "DirectoryListingOptimization": {
+          "$ref": "#/definitions/DirectoryListingOptimization"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SetStatOption": {
+      "type": "string",
+      "enum": [
+        "DEFAULT",
+        "ENABLE_NO_OP"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DEFAULT | ENABLE_NO_OP  \nUpdate requires: No interruption\n"
+    },
+    "SftpAuthenticationMethods": {
+      "type": "string",
+      "enum": [
+        "PASSWORD",
+        "PUBLIC_KEY",
+        "PUBLIC_KEY_OR_PASSWORD",
+        "PUBLIC_KEY_AND_PASSWORD"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PASSWORD | PUBLIC_KEY | PUBLIC_KEY_OR_PASSWORD | PUBLIC_KEY_AND_PASSWORD  \nUpdate requires: No interruption\n"
+    },
+    "State": {
+      "type": "string",
+      "enum": [
+        "OFFLINE",
+        "ONLINE",
+        "STARTING",
+        "STOPPING",
+        "START_FAILED",
+        "STOP_FAILED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: OFFLINE | ONLINE | STARTING | STOPPING | START_FAILED | STOP_FAILED  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 0,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 0,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "TlsSessionResumptionMode": {
+      "type": "string",
+      "enum": [
+        "DISABLED",
+        "ENABLED",
+        "ENFORCED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DISABLED | ENABLED | ENFORCED  \nUpdate requires: No interruption\n"
+    },
+    "WorkflowDetail": {
+      "type": "object",
+      "properties": {
+        "WorkflowId": {
+          "type": "string",
+          "maxLength": 19,
+          "minLength": 19,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 19  \nMaximum Length: 19  \nPattern: ^w-([a-z0-9]{17})$  \nUpdate requires: No interruption\n"
+        },
+        "ExecutionRole": {
+          "type": "string",
+          "maxLength": 2048,
+          "minLength": 20,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:.*role/\\S+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ExecutionRole",
+        "WorkflowId"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "WorkflowDetails": {
+      "type": "object",
+      "properties": {
+        "OnUpload": {
+          "type": "array",
+          "insertionOrder": true,
+          "items": {
+            "$ref": "#/definitions/WorkflowDetail"
+          },
+          "maxItems": 1,
+          "minItems": 0,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "OnPartialUpload": {
+          "type": "array",
+          "insertionOrder": true,
+          "items": {
+            "$ref": "#/definitions/WorkflowDetail"
+          },
+          "maxItems": 1,
+          "minItems": 0,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "Arn": {
+      "type": "string",
+      "maxLength": 1600,
+      "minLength": 20,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 1600  \nPattern: ^arn:\\S+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "As2ServiceManagedEgressIpAddresses": {
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$  \nUpdate requires: No interruption\n"
+      },
+      "description": "The list of egress IP addresses of this server. These IP addresses are only relevant for servers that use the AS2 protocol. They are used for sending asynchronous MDNs. These IP addresses are assigned automatically when you create an AS2 server. Additionally, if you update an existing server and add the AS2 protocol, static IP addresses are assigned as well.",
+      "markdownDescription": "The list of egress IP addresses of this server. These IP addresses are only relevant for servers that use the AS2 protocol. They are used for sending asynchronous MDNs. These IP addresses are assigned automatically when you create an AS2 server. Additionally, if you update an existing server and add the AS2 protocol, static IP addresses are assigned as well.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Certificate": {
+      "type": "string",
+      "maxLength": 1600,
+      "minLength": 0,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1600  \nUpdate requires: No interruption\n"
+    },
+    "Domain": {
+      "$ref": "#/definitions/Domain"
     },
     "EndpointDetails": {
       "$ref": "#/definitions/EndpointDetails"
     },
-    "StructuredLogDestinations": {
-      "type": "array",
-      "uniqueItems": false,
-      "items": {
-        "$ref": "#/definitions/StructuredLogDestination"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+    "EndpointType": {
+      "$ref": "#/definitions/EndpointType"
     },
-    "PreAuthenticationLoginBanner": {
+    "IdentityProviderDetails": {
+      "$ref": "#/definitions/IdentityProviderDetails"
+    },
+    "IdentityProviderType": {
+      "$ref": "#/definitions/IdentityProviderType"
+    },
+    "LoggingRole": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "maxLength": 2048,
+      "minLength": 0,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nPattern: ^(|arn:.*role/\\S+)$  \nUpdate requires: No interruption\n"
     },
     "PostAuthenticationLoginBanner": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "maxLength": 4096,
+      "minLength": 0,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 4096  \nPattern: ^[\\x09-\\x0D\\x20-\\x7E]*$  \nUpdate requires: No interruption\n"
     },
-    "EndpointType": {
+    "PreAuthenticationLoginBanner": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-    },
-    "SecurityPolicyName": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "maxLength": 4096,
+      "minLength": 0,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 4096  \nPattern: ^[\\x09-\\x0D\\x20-\\x7E]*$  \nUpdate requires: No interruption\n"
     },
     "ProtocolDetails": {
       "$ref": "#/definitions/ProtocolDetails"
     },
+    "Protocols": {
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Protocol"
+      },
+      "maxItems": 4,
+      "minItems": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
     "S3StorageOptions": {
       "$ref": "#/definitions/S3StorageOptions"
     },
-    "WorkflowDetails": {
-      "$ref": "#/definitions/WorkflowDetails"
-    },
-    "Domain": {
+    "SecurityPolicyName": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+      "maxLength": 100,
+      "minLength": 0,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 100  \nPattern: ^TransferSecurityPolicy-.+$  \nUpdate requires: No interruption\n"
     },
-    "IdentityProviderType": {
+    "ServerId": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement"
+      "maxLength": 19,
+      "minLength": 19,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 19  \nMaximum Length: 19  \nPattern: ^s-([0-9a-f]{17})$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "State": {
+      "$ref": "#/definitions/State"
+    },
+    "StructuredLogDestinations": {
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "type": "string",
+        "maxLength": 1600,
+        "minLength": 20,
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 1600  \nPattern: ^arn:\\S+$  \nUpdate requires: No interruption\n"
+      },
+      "maxItems": 1,
+      "minItems": 0,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     },
     "Tags": {
       "type": "array",
-      "uniqueItems": false,
+      "insertionOrder": false,
       "items": {
         "$ref": "#/definitions/Tag"
       },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-    },
-    "Certificate": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-    }
-  },
-  "definitions": {
-    "StructuredLogDestination": {
-      "type": "object",
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "IdentityProviderDetails": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "Function": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "DirectoryId": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "Url": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "InvocationRole": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "SftpAuthenticationMethods": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "ProtocolDetails": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "As2Transports": {
-          "type": "array",
-          "uniqueItems": false,
-          "items": {
-            "$ref": "#/definitions/As2Transport"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-        },
-        "PassiveIp": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "SetStatOption": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "TlsSessionResumptionMode": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "S3StorageOptions": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "DirectoryListingOptimization": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+      "maxItems": 50,
+      "minItems": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     },
     "WorkflowDetails": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "OnUpload": {
-          "type": "array",
-          "uniqueItems": false,
-          "items": {
-            "$ref": "#/definitions/WorkflowDetail"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-        },
-        "OnPartialUpload": {
-          "type": "array",
-          "uniqueItems": false,
-          "items": {
-            "$ref": "#/definitions/WorkflowDetail"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "WorkflowDetail": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "WorkflowId": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
-        },
-        "ExecutionRole": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "WorkflowId",
-        "ExecutionRole"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "Tag": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "Value": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
-        },
-        "Key": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "Value",
-        "Key"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "Protocol": {
-      "type": "object",
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "EndpointDetails": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "AddressAllocationIds": {
-          "type": "array",
-          "uniqueItems": false,
-          "items": {
-            "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-        },
-        "VpcId": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "VpcEndpointId": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-        },
-        "SecurityGroupIds": {
-          "type": "array",
-          "uniqueItems": false,
-          "items": {
-            "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-        },
-        "SubnetIds": {
-          "type": "array",
-          "uniqueItems": false,
-          "items": {
-            "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "As2Transport": {
-      "type": "object",
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+      "$ref": "#/definitions/WorkflowDetails"
     }
   },
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/As2ServiceManagedEgressIpAddresses",
+    "/properties/ServerId",
+    "/properties/State"
+  ],
+  "writeOnlyProperties": [
+    "/properties/IdentityProviderType"
+  ],
   "createOnlyProperties": [
-    "/properties/IdentityProviderType",
-    "/properties/Domain"
+    "/properties/Domain",
+    "/properties/IdentityProviderType"
   ],
   "primaryIdentifier": [
-    "/properties/ServerId"
-  ],
-  "readOnlyProperties": [
-    "/properties/ServerId",
     "/properties/Arn"
   ],
-  "attributes": {
-    "ServerId": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+  "additionalIdentifiers": [
+    [
+      "/properties/ServerId"
+    ]
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "apigateway:GET",
+        "ds:AuthorizeApplication",
+        "ds:DescribeDirectories",
+        "ec2:AssociateAddress",
+        "ec2:CreateVpcEndpoint",
+        "ec2:DescribeAddresses",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DescribeVpcEndpoints",
+        "iam:PassRole",
+        "logs:CreateLogDelivery",
+        "logs:DeleteLogDelivery",
+        "logs:DescribeLogGroups",
+        "logs:DescribeResourcePolicies",
+        "logs:GetLogDelivery",
+        "logs:ListLogDeliveries",
+        "logs:PutResourcePolicy",
+        "logs:UpdateLogDelivery",
+        "transfer:CreateServer",
+        "transfer:DescribeServer",
+        "transfer:StartServer",
+        "transfer:StopServer",
+        "transfer:TagResource",
+        "transfer:UpdateServer"
+      ]
     },
+    "read": {
+      "permissions": [
+        "ec2:DescribeVpcEndpoints",
+        "transfer:DescribeServer"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "apigateway:GET",
+        "ec2:AssociateAddress",
+        "ec2:CreateVpcEndpoint",
+        "ec2:DeleteVpcEndpoints",
+        "ec2:DescribeAddresses",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DescribeVpcEndpoints",
+        "ec2:DisassociateAddress",
+        "ec2:ModifyVpcEndpoint",
+        "iam:PassRole",
+        "logs:CreateLogDelivery",
+        "logs:DeleteLogDelivery",
+        "logs:DescribeLogGroups",
+        "logs:DescribeResourcePolicies",
+        "logs:GetLogDelivery",
+        "logs:ListLogDeliveries",
+        "logs:PutResourcePolicy",
+        "logs:UpdateLogDelivery",
+        "transfer:DescribeServer",
+        "transfer:StartServer",
+        "transfer:StopServer",
+        "transfer:TagResource",
+        "transfer:UnTagResource",
+        "transfer:UpdateServer"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ds:DescribeDirectories",
+        "ds:UnauthorizeApplication",
+        "ec2:DeleteVpcEndpoints",
+        "ec2:DescribeAddresses",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DescribeVpcEndpoints",
+        "ec2:DisassociateAddress",
+        "logs:DeleteLogDelivery",
+        "logs:GetLogDelivery",
+        "logs:ListLogDeliveries",
+        "transfer:DeleteServer"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "transfer:ListServers"
+      ]
+    }
+  },
+  "tagging": {
+    "cloudFormationSystemTags": true,
+    "permissions": [
+      "transfer:TagResource",
+      "transfer:UnTagResource",
+      "transfer:ListTagsForResource"
+    ],
+    "tagOnCreate": true,
+    "tagProperty": "/properties/Tags",
+    "tagUpdatable": true,
+    "taggable": true
+  },
+  "additionalProperties": false,
+  "conditionalCreateOnlyProperties": [
+    "/properties/EndpointDetails",
+    "/properties/EndpointDetails/AddressAllocationIds"
+  ],
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-transfer",
+  "attributes": {
     "Arn": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "maxLength": 1600,
+      "minLength": 20,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 1600  \nPattern: ^arn:\\S+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "As2ServiceManagedEgressIpAddresses": {
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$  \nUpdate requires: No interruption\n"
+      },
+      "description": "The list of egress IP addresses of this server. These IP addresses are only relevant for servers that use the AS2 protocol. They are used for sending asynchronous MDNs. These IP addresses are assigned automatically when you create an AS2 server. Additionally, if you update an existing server and add the AS2 protocol, static IP addresses are assigned as well.",
+      "markdownDescription": "The list of egress IP addresses of this server. These IP addresses are only relevant for servers that use the AS2 protocol. They are used for sending asynchronous MDNs. These IP addresses are assigned automatically when you create an AS2 server. Additionally, if you update an existing server and add the AS2 protocol, static IP addresses are assigned as well.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ServerId": {
+      "type": "string",
+      "maxLength": 19,
+      "minLength": 19,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 19  \nMaximum Length: 19  \nPattern: ^s-([0-9a-f]{17})$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "State": {
+      "$ref": "#/definitions/State"
     }
   }
 }

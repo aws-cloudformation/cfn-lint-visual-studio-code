@@ -1,0 +1,207 @@
+{
+  "tagging": {
+    "permissions": [
+      "vpc-lattice:UntagResource",
+      "vpc-lattice:TagResource",
+      "vpc-lattice:ListTagsForResource"
+    ],
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "tagProperty": "/properties/Tags",
+    "cloudFormationSystemTags": false
+  },
+  "handlers": {
+    "read": {
+      "permissions": [
+        "vpc-lattice:GetResourceGateway",
+        "vpc-lattice:ListTagsForResource"
+      ]
+    },
+    "create": {
+      "permissions": [
+        "vpc-lattice:CreateResourceGateway",
+        "vpc-lattice:GetResourceGateway",
+        "vpc-lattice:TagResource",
+        "vpc-lattice:ListTagsForResource",
+        "ec2:DescribeVpcs",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeSecurityGroups"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "vpc-lattice:UpdateResourceGateway",
+        "vpc-lattice:GetResourceGateway",
+        "vpc-lattice:TagResource",
+        "vpc-lattice:UntagResource",
+        "vpc-lattice:ListTagsForResource",
+        "ec2:DescribeVpcs",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeSecurityGroups"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "vpc-lattice:ListResourceGateways"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "vpc-lattice:DeleteResourceGateway",
+        "vpc-lattice:GetResourceGateway"
+      ]
+    }
+  },
+  "typeName": "AWS::VpcLattice::ResourceGateway",
+  "readOnlyProperties": [
+    "/properties/Id",
+    "/properties/Arn"
+  ],
+  "description": "Creates a resource gateway for a service. ",
+  "additionalIdentifiers": [
+    [
+      "/properties/Id"
+    ]
+  ],
+  "createOnlyProperties": [
+    "/properties/VpcIdentifier",
+    "/properties/SubnetIds",
+    "/properties/IpAddressType",
+    "/properties/Name"
+  ],
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "definitions": {
+    "Tag": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "minLength": 1,
+          "type": "string",
+          "maxLength": 256,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        },
+        "Key": {
+          "minLength": 1,
+          "type": "string",
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "IpAddressType": {
+      "type": "string",
+      "enum": [
+        "IPV4",
+        "IPV6",
+        "DUALSTACK"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: IPV4 | IPV6 | DUALSTACK  \nUpdate requires: Replacement\n"
+    },
+    "VpcIdentifier": {
+      "minLength": 5,
+      "type": "string",
+      "maxLength": 50,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 5  \nMaximum Length: 50  \nUpdate requires: Replacement\n"
+    },
+    "Id": {
+      "minLength": 17,
+      "type": "string",
+      "maxLength": 2048,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 17  \nMaximum Length: 2048  \nPattern: ^((rgw-[0-9a-z]{17})|(arn:[a-z0-9\\-]+:vpc-lattice:[a-zA-Z0-9\\-]+:\\d{12}:resourcegateway/rgw-[0-9a-z]{17}))$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Arn": {
+      "minLength": 20,
+      "type": "string",
+      "maxLength": 2048,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:[a-z0-9\\-]+:vpc-lattice:[a-zA-Z0-9\\-]+:\\d{12}:resourcegateway/rgw-[0-9a-z]{17}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SubnetIds": {
+      "uniqueItems": true,
+      "description": "The ID of one or more subnets in which to create an endpoint network interface.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "relationshipRef": {
+          "typeName": "AWS::EC2::Subnet",
+          "propertyPath": "/properties/SubnetId"
+        },
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "The ID of one or more subnets in which to create an endpoint network interface.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement\n"
+    },
+    "SecurityGroupIds": {
+      "uniqueItems": true,
+      "description": "The ID of one or more security groups to associate with the endpoint network interface.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "relationshipRef": {
+              "typeName": "AWS::EC2::SecurityGroup",
+              "propertyPath": "/properties/GroupId"
+            }
+          },
+          {
+            "relationshipRef": {
+              "typeName": "AWS::EC2::SecurityGroup",
+              "propertyPath": "/properties/Id"
+            }
+          },
+          {
+            "relationshipRef": {
+              "typeName": "AWS::EC2::VPC",
+              "propertyPath": "/properties/DefaultSecurityGroup"
+            }
+          }
+        ],
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "The ID of one or more security groups to associate with the endpoint network interface.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "Tags": {
+      "minItems": 0,
+      "maxItems": 50,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "Name": {
+      "minLength": 3,
+      "type": "string",
+      "maxLength": 40,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 40  \nPattern: ^(?!rgw-)(?![-])(?!.*[-]$)(?!.*[-]{2})[a-z0-9-]+$  \nUpdate requires: Replacement\n"
+    }
+  },
+  "attributes": {
+    "Id": {
+      "minLength": 17,
+      "type": "string",
+      "maxLength": 2048,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 17  \nMaximum Length: 2048  \nPattern: ^((rgw-[0-9a-z]{17})|(arn:[a-z0-9\\-]+:vpc-lattice:[a-zA-Z0-9\\-]+:\\d{12}:resourcegateway/rgw-[0-9a-z]{17}))$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Arn": {
+      "minLength": 20,
+      "type": "string",
+      "maxLength": 2048,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:[a-z0-9\\-]+:vpc-lattice:[a-zA-Z0-9\\-]+:\\d{12}:resourcegateway/rgw-[0-9a-z]{17}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}
