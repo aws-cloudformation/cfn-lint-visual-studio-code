@@ -94,6 +94,7 @@ export class NotificationHandler {
       const response = await fetch(url);
       const data = await response.json();
 
+      // @ts-ignore
       return data["tag_name"].replace("v", "");
     } catch (error) {
       return Promise.reject(error);
