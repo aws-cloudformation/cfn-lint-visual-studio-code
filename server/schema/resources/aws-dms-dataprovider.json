@@ -7,7 +7,12 @@
     "tagOnCreate": true,
     "tagUpdatable": true,
     "cloudFormationSystemTags": false,
-    "tagProperty": "/properties/Tags"
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "dms:AddTagsToResource",
+      "dms:RemoveTagsFromResource",
+      "dms:ListTagsForResource"
+    ]
   },
   "definitions": {
     "Tag": {
@@ -19,14 +24,14 @@
           "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
           "minLength": 1,
           "maxLength": 128,
-          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
+          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
         },
         "Value": {
           "type": "string",
           "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
           "minLength": 0,
           "maxLength": 256,
-          "markdownDescription": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption"
+          "markdownDescription": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
@@ -34,7 +39,7 @@
         "Value"
       ],
       "additionalProperties": false,
-      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "DmsSslModeValue": {
       "type": "string",
@@ -44,7 +49,33 @@
         "verify-ca",
         "verify-full"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: none | require | verify-ca | verify-full  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: none | require | verify-ca | verify-full  \nUpdate requires: No interruption\n"
+    },
+    "MongoDbSslModeValue": {
+      "type": "string",
+      "enum": [
+        "none",
+        "require",
+        "verify-full"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: none | require | verify-full  \nUpdate requires: No interruption\n"
+    },
+    "MongoDbAuthType": {
+      "type": "string",
+      "enum": [
+        "no",
+        "password"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: no | password  \nUpdate requires: No interruption\n"
+    },
+    "MongoDbAuthMechanism": {
+      "type": "string",
+      "enum": [
+        "default",
+        "mongodb_cr",
+        "scram_sha_1"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: default | mongodb_cr | scram_sha_1  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -53,40 +84,58 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 255,
-      "markdownDescription": "The property describes a name to identify the data provider.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption"
+      "markdownDescription": "The property describes a name to identify the data provider.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
     },
     "DataProviderIdentifier": {
       "description": "The property describes an identifier for the data provider. It is used for describing/deleting/modifying can be name/arn",
       "type": "string",
       "minLength": 1,
       "maxLength": 255,
-      "markdownDescription": "The property describes an identifier for the data provider. It is used for describing/deleting/modifying can be name/arn\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption"
+      "markdownDescription": "The property describes an identifier for the data provider. It is used for describing/deleting/modifying can be name/arn\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+    },
+    "DataProviderArn": {
+      "description": "The data provider ARN.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "markdownDescription": "The data provider ARN.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "DataProviderCreationTime": {
+      "description": "The data provider creation time.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 40,
+      "markdownDescription": "The data provider creation time.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 40  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Description": {
       "description": "The optional description of the data provider.",
       "type": "string",
       "minLength": 1,
       "maxLength": 255,
-      "markdownDescription": "The optional description of the data provider.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption"
+      "markdownDescription": "The optional description of the data provider.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
     },
     "Engine": {
       "description": "The property describes a data engine for the data provider.",
       "type": "string",
       "enum": [
-        "postgres",
+        "aurora",
+        "aurora_postgresql",
         "mysql",
         "oracle",
+        "postgres",
         "sqlserver",
-        "aurora",
-        "aurora_postgresql"
+        "redshift",
+        "mariadb",
+        "mongodb",
+        "docdb"
       ],
-      "markdownDescription": "The property describes a data engine for the data provider.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: postgres | mysql | oracle | sqlserver | aurora | aurora_postgresql  \nUpdate requires: No interruption"
+      "markdownDescription": "The property describes a data engine for the data provider.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: aurora | aurora_postgresql | mysql | oracle | postgres | sqlserver | redshift | mariadb | mongodb | docdb  \nUpdate requires: No interruption\n"
     },
     "ExactSettings": {
       "description": "The property describes the exact settings which can be modified",
       "type": "boolean",
       "default": false,
-      "markdownDescription": "The property describes the exact settings which can be modified\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+      "markdownDescription": "The property describes the exact settings which can be modified\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
     },
     "Settings": {
       "description": "The property identifies the exact type of settings for the data provider.",
@@ -98,24 +147,24 @@
           "properties": {
             "ServerName": {
               "type": "string",
-              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
             },
             "Port": {
               "type": "integer",
-              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
             },
             "DatabaseName": {
               "type": "string",
-              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
             },
             "SslMode": {
               "type": "object",
               "$ref": "#/definitions/DmsSslModeValue",
-              "markdownDescription": "\n\n---\n\nRequired: Yes  \nUpdate requires: No interruption"
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nUpdate requires: No interruption\n"
             },
             "CertificateArn": {
               "type": "string",
-              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
             }
           },
           "required": [
@@ -125,7 +174,7 @@
             "DatabaseName"
           ],
           "additionalProperties": false,
-          "markdownDescription": "PostgreSqlSettings property identifier.\n\n---\n\nRequired: Conditional  \nUpdate requires: No interruption"
+          "markdownDescription": "PostgreSqlSettings property identifier.\n\n---\n\nRequired: Conditional  \nUpdate requires: No interruption\n"
         },
         "MySqlSettings": {
           "description": "MySqlSettings property identifier.",
@@ -133,20 +182,20 @@
           "properties": {
             "ServerName": {
               "type": "string",
-              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
             },
             "Port": {
               "type": "integer",
-              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
             },
             "SslMode": {
               "type": "object",
               "$ref": "#/definitions/DmsSslModeValue",
-              "markdownDescription": "\n\n---\n\nRequired: Yes  \nUpdate requires: No interruption"
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nUpdate requires: No interruption\n"
             },
             "CertificateArn": {
               "type": "string",
-              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
             }
           },
           "required": [
@@ -155,7 +204,7 @@
             "SslMode"
           ],
           "additionalProperties": false,
-          "markdownDescription": "MySqlSettings property identifier.\n\n---\n\nRequired: Conditional  \nUpdate requires: No interruption"
+          "markdownDescription": "MySqlSettings property identifier.\n\n---\n\nRequired: Conditional  \nUpdate requires: No interruption\n"
         },
         "OracleSettings": {
           "description": "OracleSettings property identifier.",
@@ -163,44 +212,44 @@
           "properties": {
             "ServerName": {
               "type": "string",
-              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
             },
             "Port": {
               "type": "integer",
-              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
             },
             "DatabaseName": {
               "type": "string",
-              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
             },
             "SslMode": {
               "type": "object",
               "$ref": "#/definitions/DmsSslModeValue",
-              "markdownDescription": "\n\n---\n\nRequired: Yes  \nUpdate requires: No interruption"
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nUpdate requires: No interruption\n"
             },
             "CertificateArn": {
               "type": "string",
-              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
             },
             "AsmServer": {
               "type": "string",
-              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
             },
             "SecretsManagerOracleAsmSecretId": {
               "type": "string",
-              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
             },
             "SecretsManagerOracleAsmAccessRoleArn": {
               "type": "string",
-              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
             },
             "SecretsManagerSecurityDbEncryptionSecretId": {
               "type": "string",
-              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
             },
             "SecretsManagerSecurityDbEncryptionAccessRoleArn": {
               "type": "string",
-              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
             }
           },
           "required": [
@@ -210,7 +259,7 @@
             "DatabaseName"
           ],
           "additionalProperties": false,
-          "markdownDescription": "OracleSettings property identifier.\n\n---\n\nRequired: Conditional  \nUpdate requires: No interruption"
+          "markdownDescription": "OracleSettings property identifier.\n\n---\n\nRequired: Conditional  \nUpdate requires: No interruption\n"
         },
         "MicrosoftSqlServerSettings": {
           "description": "MicrosoftSqlServerSettings property identifier.",
@@ -218,24 +267,24 @@
           "properties": {
             "ServerName": {
               "type": "string",
-              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
             },
             "Port": {
               "type": "integer",
-              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption"
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
             },
             "DatabaseName": {
               "type": "string",
-              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption"
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
             },
             "SslMode": {
               "type": "object",
               "$ref": "#/definitions/DmsSslModeValue",
-              "markdownDescription": "\n\n---\n\nRequired: Yes  \nUpdate requires: No interruption"
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nUpdate requires: No interruption\n"
             },
             "CertificateArn": {
               "type": "string",
-              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
             }
           },
           "required": [
@@ -245,7 +294,143 @@
             "DatabaseName"
           ],
           "additionalProperties": false,
-          "markdownDescription": "MicrosoftSqlServerSettings property identifier.\n\n---\n\nRequired: Conditional  \nUpdate requires: No interruption"
+          "markdownDescription": "MicrosoftSqlServerSettings property identifier.\n\n---\n\nRequired: Conditional  \nUpdate requires: No interruption\n"
+        },
+        "RedshiftSettings": {
+          "description": "RedshiftSettings property identifier.",
+          "type": "object",
+          "properties": {
+            "ServerName": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+            },
+            "Port": {
+              "type": "integer",
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+            },
+            "DatabaseName": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+            }
+          },
+          "required": [
+            "ServerName",
+            "Port",
+            "DatabaseName"
+          ],
+          "additionalProperties": false,
+          "markdownDescription": "RedshiftSettings property identifier.\n\n---\n\nRequired: Conditional  \nUpdate requires: No interruption\n"
+        },
+        "MariaDbSettings": {
+          "description": "MariaDbSettings property identifier.",
+          "type": "object",
+          "properties": {
+            "ServerName": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+            },
+            "Port": {
+              "type": "integer",
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+            },
+            "SslMode": {
+              "type": "object",
+              "$ref": "#/definitions/DmsSslModeValue",
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nUpdate requires: No interruption\n"
+            },
+            "CertificateArn": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            }
+          },
+          "required": [
+            "ServerName",
+            "Port",
+            "SslMode"
+          ],
+          "additionalProperties": false,
+          "markdownDescription": "MariaDbSettings property identifier.\n\n---\n\nRequired: Conditional  \nUpdate requires: No interruption\n"
+        },
+        "DocDbSettings": {
+          "description": "DocDbSettings property identifier.",
+          "type": "object",
+          "properties": {
+            "ServerName": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+            },
+            "Port": {
+              "type": "integer",
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+            },
+            "DatabaseName": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+            },
+            "SslMode": {
+              "type": "object",
+              "$ref": "#/definitions/MongoDbSslModeValue",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+            },
+            "CertificateArn": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            }
+          },
+          "required": [
+            "ServerName",
+            "Port",
+            "DatabaseName"
+          ],
+          "additionalProperties": false,
+          "markdownDescription": "DocDbSettings property identifier.\n\n---\n\nRequired: Conditional  \nUpdate requires: No interruption\n"
+        },
+        "MongoDbSettings": {
+          "description": "MongoDbSettings property identifier.",
+          "type": "object",
+          "properties": {
+            "ServerName": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+            },
+            "Port": {
+              "type": "integer",
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+            },
+            "DatabaseName": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            },
+            "SslMode": {
+              "type": "object",
+              "$ref": "#/definitions/MongoDbSslModeValue",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+            },
+            "CertificateArn": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            },
+            "AuthType": {
+              "type": "object",
+              "$ref": "#/definitions/MongoDbAuthType",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+            },
+            "AuthSource": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            },
+            "AuthMechanism": {
+              "type": "object",
+              "$ref": "#/definitions/MongoDbAuthMechanism",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+            }
+          },
+          "required": [
+            "ServerName",
+            "Port"
+          ],
+          "additionalProperties": false,
+          "markdownDescription": "MongoDbSettings property identifier.\n\n---\n\nRequired: Conditional  \nUpdate requires: No interruption\n"
         }
       },
       "anyOf": [
@@ -268,10 +453,30 @@
           "required": [
             "MicrosoftSqlServerSettings"
           ]
+        },
+        {
+          "required": [
+            "RedshiftSettings"
+          ]
+        },
+        {
+          "required": [
+            "DocDbSettings"
+          ]
+        },
+        {
+          "required": [
+            "MariaDbSettings"
+          ]
+        },
+        {
+          "required": [
+            "MongoDbSettings"
+          ]
         }
       ],
       "additionalProperties": false,
-      "markdownDescription": "The property identifies the exact type of settings for the data provider.\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+      "markdownDescription": "The property identifies the exact type of settings for the data provider.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Tags": {
       "description": "An array of key-value pairs to apply to this resource.",
@@ -281,7 +486,7 @@
       "items": {
         "$ref": "#/definitions/Tag"
       },
-      "markdownDescription": "An array of key-value pairs to apply to this resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+      "markdownDescription": "An array of key-value pairs to apply to this resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "additionalProperties": false,
@@ -328,7 +533,7 @@
         "dms:UpdateDataProvider",
         "dms:ModifyDataProvider",
         "dms:AddTagsToResource",
-        "dms:RemoveTagsToResource",
+        "dms:RemoveTagsFromResource",
         "dms:ListTagsForResource"
       ]
     },
@@ -351,14 +556,14 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 255,
-      "markdownDescription": "The data provider ARN.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption"
+      "markdownDescription": "The data provider ARN.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "DataProviderCreationTime": {
       "description": "The data provider creation time.",
       "type": "string",
       "minLength": 1,
       "maxLength": 40,
-      "markdownDescription": "The data provider creation time.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 40  \nUpdate requires: No interruption"
+      "markdownDescription": "The data provider creation time.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 40  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

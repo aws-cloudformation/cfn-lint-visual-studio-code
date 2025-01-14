@@ -1,0 +1,726 @@
+{
+  "typeName": "AWS::Logs::Transformer",
+  "description": "Specifies a transformer on the log group to transform logs into consistent structured and information rich format.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs.git",
+  "properties": {
+    "LogGroupIdentifier": {
+      "description": "Existing log group that you want to associate with this transformer.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048,
+      "markdownDescription": "Existing log group that you want to associate with this transformer.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: [\\w#+=/:,.@-]*  \nUpdate requires: Replacement\n"
+    },
+    "TransformerConfig": {
+      "description": "List of processors in a transformer",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Processor"
+      },
+      "minItems": 1,
+      "maxItems": 20,
+      "insertionOrder": false,
+      "markdownDescription": "List of processors in a transformer\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "required": [
+    "LogGroupIdentifier",
+    "TransformerConfig"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "Processor": {
+      "description": "Individual processor configuration",
+      "type": "object",
+      "properties": {
+        "ParseCloudfront": {
+          "$ref": "#/definitions/ParseCloudfront"
+        },
+        "ParseVPC": {
+          "$ref": "#/definitions/ParseVPC"
+        },
+        "ParseWAF": {
+          "$ref": "#/definitions/ParseWAF"
+        },
+        "ParseJSON": {
+          "type": "object",
+          "properties": {
+            "Source": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            },
+            "Destination": {
+              "$ref": "#/definitions/NonEmptyAndMaxLengthString"
+            }
+          },
+          "additionalProperties": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "ParseRoute53": {
+          "$ref": "#/definitions/ParseRoute53"
+        },
+        "ParsePostgres": {
+          "$ref": "#/definitions/ParsePostgres"
+        },
+        "ParseKeyValue": {
+          "type": "object",
+          "properties": {
+            "Source": {
+              "$ref": "#/definitions/NonEmptyString"
+            },
+            "Destination": {
+              "$ref": "#/definitions/NonEmptyString"
+            },
+            "FieldDelimiter": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            },
+            "KeyValueDelimiter": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            },
+            "KeyPrefix": {
+              "$ref": "#/definitions/NonEmptyString"
+            },
+            "NonMatchValue": {
+              "$ref": "#/definitions/NonEmptyString"
+            },
+            "OverwriteIfExists": {
+              "type": "boolean",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+            }
+          },
+          "additionalProperties": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "CopyValue": {
+          "type": "object",
+          "properties": {
+            "Entries": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CopyValueEntry"
+              },
+              "minItems": 1,
+              "maxItems": 5,
+              "insertionOrder": false,
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+            }
+          },
+          "required": [
+            "Entries"
+          ],
+          "additionalProperties": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "Csv": {
+          "type": "object",
+          "properties": {
+            "QuoteCharacter": {
+              "type": "string",
+              "maxLength": 1,
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1  \nUpdate requires: No interruption\n"
+            },
+            "Delimiter": {
+              "type": "string",
+              "maxLength": 1,
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1  \nUpdate requires: No interruption\n"
+            },
+            "Source": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            },
+            "Columns": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Column"
+              },
+              "minItems": 1,
+              "maxItems": 100,
+              "insertionOrder": false,
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+            }
+          },
+          "additionalProperties": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "DateTimeConverter": {
+          "type": "object",
+          "properties": {
+            "Source": {
+              "$ref": "#/definitions/NonEmptyString"
+            },
+            "Target": {
+              "$ref": "#/definitions/NonEmptyAndMaxLengthString"
+            },
+            "TargetFormat": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            },
+            "MatchPatterns": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/MatchPattern"
+              },
+              "minItems": 1,
+              "maxItems": 5,
+              "uniqueItems": true,
+              "insertionOrder": false,
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+            },
+            "SourceTimezone": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            },
+            "TargetTimezone": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            },
+            "Locale": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            }
+          },
+          "required": [
+            "Source",
+            "Target",
+            "MatchPatterns"
+          ],
+          "additionalProperties": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "DeleteKeys": {
+          "type": "object",
+          "properties": {
+            "WithKeys": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/WithKey"
+              },
+              "minItems": 1,
+              "maxItems": 5,
+              "uniqueItems": true,
+              "insertionOrder": false,
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+            }
+          },
+          "required": [
+            "WithKeys"
+          ],
+          "additionalProperties": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "Grok": {
+          "type": "object",
+          "properties": {
+            "Source": {
+              "$ref": "#/definitions/NonEmptyString"
+            },
+            "Match": {
+              "type": "string",
+              "maxLength": 128,
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+            }
+          },
+          "required": [
+            "Match"
+          ],
+          "additionalProperties": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "ListToMap": {
+          "type": "object",
+          "properties": {
+            "Source": {
+              "$ref": "#/definitions/NonEmptyString"
+            },
+            "Key": {
+              "$ref": "#/definitions/NonEmptyString"
+            },
+            "ValueKey": {
+              "$ref": "#/definitions/NonEmptyString"
+            },
+            "Target": {
+              "$ref": "#/definitions/NonEmptyAndMaxLengthString"
+            },
+            "Flatten": {
+              "type": "boolean",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+            },
+            "FlattenedElement": {
+              "type": "string",
+              "enum": [
+                "first",
+                "last"
+              ],
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: first | last  \nUpdate requires: No interruption\n"
+            }
+          },
+          "required": [
+            "Source",
+            "Key"
+          ],
+          "additionalProperties": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "AddKeys": {
+          "type": "object",
+          "properties": {
+            "Entries": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/AddKeyEntry"
+              },
+              "minItems": 1,
+              "maxItems": 5,
+              "uniqueItems": true,
+              "insertionOrder": false,
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+            }
+          },
+          "required": [
+            "Entries"
+          ],
+          "additionalProperties": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "MoveKeys": {
+          "type": "object",
+          "properties": {
+            "Entries": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/MoveKeyEntry"
+              },
+              "minItems": 1,
+              "maxItems": 5,
+              "insertionOrder": false,
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+            }
+          },
+          "required": [
+            "Entries"
+          ],
+          "additionalProperties": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "RenameKeys": {
+          "type": "object",
+          "properties": {
+            "Entries": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/RenameKeyEntry"
+              },
+              "minItems": 1,
+              "maxItems": 5,
+              "insertionOrder": false,
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+            }
+          },
+          "required": [
+            "Entries"
+          ],
+          "additionalProperties": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "LowerCaseString": {
+          "type": "object",
+          "properties": {
+            "WithKeys": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/WithKey"
+              },
+              "minItems": 1,
+              "maxItems": 10,
+              "uniqueItems": true,
+              "insertionOrder": false,
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+            }
+          },
+          "required": [
+            "WithKeys"
+          ],
+          "additionalProperties": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "SplitString": {
+          "type": "object",
+          "properties": {
+            "Entries": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/SplitStringEntry"
+              },
+              "minItems": 1,
+              "maxItems": 10,
+              "insertionOrder": false,
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+            }
+          },
+          "required": [
+            "Entries"
+          ],
+          "additionalProperties": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "SubstituteString": {
+          "type": "object",
+          "properties": {
+            "Entries": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/SubstituteStringEntry"
+              },
+              "minItems": 1,
+              "maxItems": 10,
+              "insertionOrder": false,
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+            }
+          },
+          "required": [
+            "Entries"
+          ],
+          "additionalProperties": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "TrimString": {
+          "type": "object",
+          "properties": {
+            "WithKeys": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/WithKey"
+              },
+              "minItems": 1,
+              "maxItems": 10,
+              "uniqueItems": true,
+              "insertionOrder": false,
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+            }
+          },
+          "required": [
+            "WithKeys"
+          ],
+          "additionalProperties": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "UpperCaseString": {
+          "type": "object",
+          "properties": {
+            "WithKeys": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/WithKey"
+              },
+              "minItems": 1,
+              "maxItems": 10,
+              "uniqueItems": true,
+              "insertionOrder": false,
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+            }
+          },
+          "required": [
+            "WithKeys"
+          ],
+          "additionalProperties": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "TypeConverter": {
+          "type": "object",
+          "properties": {
+            "Entries": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TypeConverterEntry"
+              },
+              "minItems": 1,
+              "maxItems": 5,
+              "insertionOrder": false,
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+            }
+          },
+          "required": [
+            "Entries"
+          ],
+          "additionalProperties": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "minProperties": 1,
+      "maxProperties": 1,
+      "markdownDescription": "Individual processor configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ParseCloudfront": {
+      "type": "object",
+      "properties": {
+        "Source": {
+          "$ref": "#/definitions/NonEmptyString"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ParseVPC": {
+      "type": "object",
+      "properties": {
+        "Source": {
+          "$ref": "#/definitions/NonEmptyString"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ParseWAF": {
+      "type": "object",
+      "properties": {
+        "Source": {
+          "$ref": "#/definitions/NonEmptyString"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ParseRoute53": {
+      "type": "object",
+      "properties": {
+        "Source": {
+          "$ref": "#/definitions/NonEmptyString"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ParsePostgres": {
+      "type": "object",
+      "properties": {
+        "Source": {
+          "$ref": "#/definitions/NonEmptyString"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AddKeyEntry": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "$ref": "#/definitions/NonEmptyAndMaxLengthString"
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        },
+        "OverwriteIfExists": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CopyValueEntry": {
+      "type": "object",
+      "properties": {
+        "Source": {
+          "$ref": "#/definitions/NonEmptyString"
+        },
+        "Target": {
+          "$ref": "#/definitions/NonEmptyAndMaxLengthString"
+        },
+        "OverwriteIfExists": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Source",
+        "Target"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Column": {
+      "$ref": "#/definitions/NonEmptyAndMaxLengthString"
+    },
+    "WithKey": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+    },
+    "MatchPattern": {
+      "$ref": "#/definitions/NonEmptyString"
+    },
+    "MoveKeyEntry": {
+      "type": "object",
+      "properties": {
+        "Source": {
+          "$ref": "#/definitions/NonEmptyString"
+        },
+        "Target": {
+          "$ref": "#/definitions/NonEmptyString"
+        },
+        "OverwriteIfExists": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Source",
+        "Target"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RenameKeyEntry": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "$ref": "#/definitions/NonEmptyString"
+        },
+        "RenameTo": {
+          "$ref": "#/definitions/NonEmptyString"
+        },
+        "OverwriteIfExists": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "RenameTo"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SplitStringEntry": {
+      "type": "object",
+      "properties": {
+        "Source": {
+          "$ref": "#/definitions/NonEmptyString"
+        },
+        "Delimiter": {
+          "type": "string",
+          "maxLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 1  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Source",
+        "Delimiter"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SubstituteStringEntry": {
+      "type": "object",
+      "properties": {
+        "Source": {
+          "$ref": "#/definitions/NonEmptyString"
+        },
+        "From": {
+          "$ref": "#/definitions/NonEmptyAndMaxLengthString"
+        },
+        "To": {
+          "$ref": "#/definitions/NonEmptyAndMaxLengthString"
+        }
+      },
+      "required": [
+        "Source",
+        "From",
+        "To"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "TypeConverterEntry": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "$ref": "#/definitions/NonEmptyString"
+        },
+        "Type": {
+          "type": "string",
+          "enum": [
+            "boolean",
+            "integer",
+            "double",
+            "string"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: boolean | integer | double | string  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Type"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "NonEmptyAndMaxLengthString": {
+      "type": "string",
+      "maxLength": 128,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 128  \nPattern: ^.*[a-zA-Z0-9]+.*$  \nUpdate requires: No interruption\n"
+    },
+    "NonEmptyString": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^.*[a-zA-Z0-9]+.*$  \nUpdate requires: No interruption\n"
+    },
+    "MaxLengthString": {
+      "type": "string",
+      "maxLength": 128,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+    }
+  },
+  "primaryIdentifier": [
+    "/properties/LogGroupIdentifier"
+  ],
+  "createOnlyProperties": [
+    "/properties/LogGroupIdentifier"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "logs:PutTransformer",
+        "logs:GetTransformer"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "logs:GetTransformer"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "logs:GetTransformer",
+        "logs:PutTransformer"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "logs:DeleteTransformer"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "logs:DescribeLogGroups",
+        "logs:GetTransformer"
+      ]
+    }
+  },
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "attributes": {}
+}

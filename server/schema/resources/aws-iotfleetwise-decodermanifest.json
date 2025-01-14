@@ -1,25 +1,613 @@
 {
-  "tagging": {
-    "permissions": [
-      "iotfleetwise:UntagResource",
-      "iotfleetwise:TagResource",
-      "iotfleetwise:ListTagsForResource"
-    ],
-    "taggable": true,
-    "tagOnCreate": true,
-    "tagUpdatable": true,
-    "tagProperty": "/properties/Tags",
-    "cloudFormationSystemTags": true
-  },
-  "handlers": {
-    "read": {
-      "permissions": [
-        "iotfleetwise:GetDecoderManifest",
-        "iotfleetwise:ListDecoderManifestSignals",
-        "iotfleetwise:ListDecoderManifestNetworkInterfaces",
-        "iotfleetwise:ListTagsForResource"
-      ]
+  "typeName": "AWS::IoTFleetWise::DecoderManifest",
+  "description": "Definition of AWS::IoTFleetWise::DecoderManifest Resource Type",
+  "definitions": {
+    "CanInterface": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "maxLength": 100,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nUpdate requires: No interruption\n"
+        },
+        "ProtocolName": {
+          "type": "string",
+          "maxLength": 50,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 50  \nUpdate requires: No interruption\n"
+        },
+        "ProtocolVersion": {
+          "type": "string",
+          "maxLength": 50,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 50  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Name"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "CanSignal": {
+      "type": "object",
+      "properties": {
+        "MessageId": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['integer', 'string']  \nUpdate requires: No interruption\n"
+        },
+        "IsBigEndian": {
+          "type": [
+            "boolean",
+            "string"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['boolean', 'string']  \nUpdate requires: No interruption\n"
+        },
+        "IsSigned": {
+          "type": [
+            "boolean",
+            "string"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['boolean', 'string']  \nUpdate requires: No interruption\n"
+        },
+        "StartBit": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['integer', 'string']  \nUpdate requires: No interruption\n"
+        },
+        "Offset": {
+          "type": [
+            "number",
+            "string"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['number', 'string']  \nUpdate requires: No interruption\n"
+        },
+        "Factor": {
+          "type": [
+            "number",
+            "string"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['number', 'string']  \nUpdate requires: No interruption\n"
+        },
+        "Length": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['integer', 'string']  \nUpdate requires: No interruption\n"
+        },
+        "Name": {
+          "type": "string",
+          "maxLength": 100,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Factor",
+        "IsBigEndian",
+        "IsSigned",
+        "Length",
+        "MessageId",
+        "Offset",
+        "StartBit"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ManifestStatus": {
+      "type": "string",
+      "enum": [
+        "ACTIVE",
+        "DRAFT"
+      ],
+      "default": "DRAFT",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ACTIVE | DRAFT  \nUpdate requires: No interruption\n"
+    },
+    "CanNetworkInterface": {
+      "type": "object",
+      "properties": {
+        "InterfaceId": {
+          "type": "string",
+          "maxLength": 50,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 50  \nUpdate requires: No interruption\n"
+        },
+        "Type": {
+          "type": "string",
+          "enum": [
+            "CAN_INTERFACE"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: CAN_INTERFACE  \nUpdate requires: No interruption\n"
+        },
+        "CanInterface": {
+          "$ref": "#/definitions/CanInterface"
+        }
+      },
+      "required": [
+        "InterfaceId",
+        "Type",
+        "CanInterface"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ObdNetworkInterface": {
+      "type": "object",
+      "properties": {
+        "InterfaceId": {
+          "type": "string",
+          "maxLength": 50,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 50  \nUpdate requires: No interruption\n"
+        },
+        "Type": {
+          "type": "string",
+          "enum": [
+            "OBD_INTERFACE"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: OBD_INTERFACE  \nUpdate requires: No interruption\n"
+        },
+        "ObdInterface": {
+          "$ref": "#/definitions/ObdInterface"
+        }
+      },
+      "required": [
+        "InterfaceId",
+        "Type",
+        "ObdInterface"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ObdInterface": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "maxLength": 100,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nUpdate requires: No interruption\n"
+        },
+        "RequestMessageId": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['integer', 'string']  \nUpdate requires: No interruption\n"
+        },
+        "ObdStandard": {
+          "type": "string",
+          "maxLength": 50,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 50  \nUpdate requires: No interruption\n"
+        },
+        "PidRequestIntervalSeconds": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: ['integer', 'string']  \nUpdate requires: No interruption\n"
+        },
+        "DtcRequestIntervalSeconds": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: ['integer', 'string']  \nUpdate requires: No interruption\n"
+        },
+        "UseExtendedIds": {
+          "type": [
+            "boolean",
+            "string"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: ['boolean', 'string']  \nUpdate requires: No interruption\n"
+        },
+        "HasTransmissionEcu": {
+          "type": [
+            "boolean",
+            "string"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: ['boolean', 'string']  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Name",
+        "RequestMessageId"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ObdSignal": {
+      "type": "object",
+      "properties": {
+        "PidResponseLength": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['integer', 'string']  \nUpdate requires: No interruption\n"
+        },
+        "ServiceMode": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['integer', 'string']  \nUpdate requires: No interruption\n"
+        },
+        "Pid": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['integer', 'string']  \nUpdate requires: No interruption\n"
+        },
+        "Scaling": {
+          "type": [
+            "number",
+            "string"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['number', 'string']  \nUpdate requires: No interruption\n"
+        },
+        "Offset": {
+          "type": [
+            "number",
+            "string"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['number', 'string']  \nUpdate requires: No interruption\n"
+        },
+        "StartByte": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['integer', 'string']  \nUpdate requires: No interruption\n"
+        },
+        "ByteLength": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['integer', 'string']  \nUpdate requires: No interruption\n"
+        },
+        "BitRightShift": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: ['integer', 'string']  \nUpdate requires: No interruption\n"
+        },
+        "BitMaskLength": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: ['integer', 'string']  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ByteLength",
+        "Offset",
+        "Pid",
+        "PidResponseLength",
+        "Scaling",
+        "ServiceMode",
+        "StartByte"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CanSignalDecoder": {
+      "type": "object",
+      "properties": {
+        "FullyQualifiedName": {
+          "type": "string",
+          "maxLength": 150,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 150  \nUpdate requires: No interruption\n"
+        },
+        "Type": {
+          "type": "string",
+          "enum": [
+            "CAN_SIGNAL"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: CAN_SIGNAL  \nUpdate requires: No interruption\n"
+        },
+        "InterfaceId": {
+          "type": "string",
+          "maxLength": 50,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 50  \nUpdate requires: No interruption\n"
+        },
+        "CanSignal": {
+          "$ref": "#/definitions/CanSignal"
+        }
+      },
+      "required": [
+        "FullyQualifiedName",
+        "InterfaceId",
+        "Type",
+        "CanSignal"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ObdSignalDecoder": {
+      "type": "object",
+      "properties": {
+        "FullyQualifiedName": {
+          "type": "string",
+          "maxLength": 150,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 150  \nUpdate requires: No interruption\n"
+        },
+        "Type": {
+          "type": "string",
+          "enum": [
+            "OBD_SIGNAL"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: OBD_SIGNAL  \nUpdate requires: No interruption\n"
+        },
+        "InterfaceId": {
+          "type": "string",
+          "maxLength": 50,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 50  \nUpdate requires: No interruption\n"
+        },
+        "ObdSignal": {
+          "$ref": "#/definitions/ObdSignal"
+        }
+      },
+      "required": [
+        "FullyQualifiedName",
+        "InterfaceId",
+        "Type",
+        "ObdSignal"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 0,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CustomDecodingNetworkInterface": {
+      "type": "object",
+      "properties": {
+        "InterfaceId": {
+          "type": "string",
+          "maxLength": 50,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 50  \nUpdate requires: No interruption\n"
+        },
+        "Type": {
+          "type": "string",
+          "enum": [
+            "CUSTOM_DECODING_INTERFACE"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: CUSTOM_DECODING_INTERFACE  \nUpdate requires: No interruption\n"
+        },
+        "CustomDecodingInterface": {
+          "$ref": "#/definitions/CustomDecodingInterface"
+        }
+      },
+      "required": [
+        "InterfaceId",
+        "Type",
+        "CustomDecodingInterface"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CustomDecodingInterface": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "maxLength": 100,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: ^[a-zA-Z\\d\\-_:]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Name"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CustomDecodingSignal": {
+      "type": "object",
+      "properties": {
+        "Id": {
+          "type": "string",
+          "maxLength": 150,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 150  \nPattern: ^(?!.*\\.\\.)[a-zA-Z0-9_\\-#:.]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Id"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CustomDecodingSignalDecoder": {
+      "type": "object",
+      "properties": {
+        "FullyQualifiedName": {
+          "type": "string",
+          "maxLength": 150,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 150  \nUpdate requires: No interruption\n"
+        },
+        "Type": {
+          "type": "string",
+          "enum": [
+            "CUSTOM_DECODING_SIGNAL"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: CUSTOM_DECODING_SIGNAL  \nUpdate requires: No interruption\n"
+        },
+        "InterfaceId": {
+          "type": "string",
+          "maxLength": 50,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 50  \nUpdate requires: No interruption\n"
+        },
+        "CustomDecodingSignal": {
+          "$ref": "#/definitions/CustomDecodingSignal"
+        }
+      },
+      "required": [
+        "FullyQualifiedName",
+        "InterfaceId",
+        "Type",
+        "CustomDecodingSignal"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DefaultForUnmappedSignalsType": {
+      "type": "string",
+      "enum": [
+        "CUSTOM_DECODING"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CUSTOM_DECODING  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "Arn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreationTime": {
+      "type": "string",
+      "format": "date-time",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Description": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^[^\\u0000-\\u001F\\u007F]+$  \nUpdate requires: No interruption\n"
+    },
+    "LastModificationTime": {
+      "type": "string",
+      "format": "date-time",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ModelManifestArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "Name": {
+      "type": "string",
+      "maxLength": 100,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: ^[a-zA-Z\\d\\-_:]+$  \nUpdate requires: Replacement\n"
+    },
+    "NetworkInterfaces": {
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/CanNetworkInterface"
+          },
+          {
+            "$ref": "#/definitions/ObdNetworkInterface"
+          },
+          {
+            "$ref": "#/definitions/CustomDecodingNetworkInterface"
+          }
+        ]
+      },
+      "maxItems": 5000,
+      "minItems": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "SignalDecoders": {
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/CanSignalDecoder"
+          },
+          {
+            "$ref": "#/definitions/ObdSignalDecoder"
+          },
+          {
+            "$ref": "#/definitions/CustomDecodingSignalDecoder"
+          }
+        ]
+      },
+      "maxItems": 5000,
+      "minItems": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "Status": {
+      "$ref": "#/definitions/ManifestStatus"
+    },
+    "DefaultForUnmappedSignals": {
+      "$ref": "#/definitions/DefaultForUnmappedSignalsType"
+    },
+    "Tags": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "maxItems": 50,
+      "minItems": 0,
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "required": [
+    "Name",
+    "ModelManifestArn"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/CreationTime",
+    "/properties/LastModificationTime"
+  ],
+  "createOnlyProperties": [
+    "/properties/Name",
+    "/properties/ModelManifestArn"
+  ],
+  "writeOnlyProperties": [
+    "/properties/DefaultForUnmappedSignals"
+  ],
+  "primaryIdentifier": [
+    "/properties/Name"
+  ],
+  "handlers": {
     "create": {
       "permissions": [
         "iotfleetwise:CreateDecoderManifest",
@@ -29,6 +617,14 @@
         "iotfleetwise:ListDecoderManifestNetworkInterfaces",
         "iotfleetwise:ListTagsForResource",
         "iotfleetwise:TagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "iotfleetwise:GetDecoderManifest",
+        "iotfleetwise:ListDecoderManifestSignals",
+        "iotfleetwise:ListDecoderManifestNetworkInterfaces",
+        "iotfleetwise:ListTagsForResource"
       ]
     },
     "update": {
@@ -42,513 +638,45 @@
         "iotfleetwise:UntagResource"
       ]
     },
-    "list": {
-      "permissions": [
-        "iotfleetwise:ListDecoderManifests"
-      ]
-    },
     "delete": {
       "permissions": [
         "iotfleetwise:DeleteDecoderManifest",
         "iotfleetwise:GetDecoderManifest"
       ]
+    },
+    "list": {
+      "permissions": [
+        "iotfleetwise:ListDecoderManifests"
+      ]
     }
   },
-  "typeName": "AWS::IoTFleetWise::DecoderManifest",
-  "readOnlyProperties": [
-    "/properties/Arn",
-    "/properties/CreationTime",
-    "/properties/LastModificationTime"
-  ],
-  "description": "Definition of AWS::IoTFleetWise::DecoderManifest Resource Type",
-  "createOnlyProperties": [
-    "/properties/Name",
-    "/properties/ModelManifestArn"
-  ],
   "additionalProperties": false,
-  "primaryIdentifier": [
-    "/properties/Name"
-  ],
-  "definitions": {
-    "ObdSignal": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "BitRightShift": {
-          "type": [
-            "integer",
-            "string"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: ['integer', 'string']  \nUpdate requires: No interruption"
-        },
-        "BitMaskLength": {
-          "type": [
-            "integer",
-            "string"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: ['integer', 'string']  \nUpdate requires: No interruption"
-        },
-        "StartByte": {
-          "type": [
-            "integer",
-            "string"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['integer', 'string']  \nUpdate requires: No interruption"
-        },
-        "ByteLength": {
-          "type": [
-            "integer",
-            "string"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['integer', 'string']  \nUpdate requires: No interruption"
-        },
-        "PidResponseLength": {
-          "type": [
-            "integer",
-            "string"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['integer', 'string']  \nUpdate requires: No interruption"
-        },
-        "Scaling": {
-          "type": [
-            "number",
-            "string"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['number', 'string']  \nUpdate requires: No interruption"
-        },
-        "Pid": {
-          "type": [
-            "integer",
-            "string"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['integer', 'string']  \nUpdate requires: No interruption"
-        },
-        "ServiceMode": {
-          "type": [
-            "integer",
-            "string"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['integer', 'string']  \nUpdate requires: No interruption"
-        },
-        "Offset": {
-          "type": [
-            "number",
-            "string"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['number', 'string']  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "ByteLength",
-        "Offset",
-        "Pid",
-        "PidResponseLength",
-        "Scaling",
-        "ServiceMode",
-        "StartByte"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "CanNetworkInterface": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Type": {
-          "type": "string",
-          "enum": [
-            "CAN_INTERFACE"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: CAN_INTERFACE  \nUpdate requires: No interruption"
-        },
-        "CanInterface": {
-          "$ref": "#/definitions/CanInterface"
-        },
-        "InterfaceId": {
-          "minLength": 1,
-          "type": "string",
-          "maxLength": 50,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 50  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "InterfaceId",
-        "Type",
-        "CanInterface"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "ManifestStatus": {
-      "default": "DRAFT",
-      "type": "string",
-      "enum": [
-        "ACTIVE",
-        "DRAFT"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ACTIVE | DRAFT  \nUpdate requires: No interruption"
-    },
-    "ObdSignalDecoder": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Type": {
-          "type": "string",
-          "enum": [
-            "OBD_SIGNAL"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: OBD_SIGNAL  \nUpdate requires: No interruption"
-        },
-        "ObdSignal": {
-          "$ref": "#/definitions/ObdSignal"
-        },
-        "FullyQualifiedName": {
-          "minLength": 1,
-          "type": "string",
-          "maxLength": 150,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 150  \nUpdate requires: No interruption"
-        },
-        "InterfaceId": {
-          "minLength": 1,
-          "type": "string",
-          "maxLength": 50,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 50  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "FullyQualifiedName",
-        "InterfaceId",
-        "Type",
-        "ObdSignal"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "CanSignalDecoder": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Type": {
-          "type": "string",
-          "enum": [
-            "CAN_SIGNAL"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: CAN_SIGNAL  \nUpdate requires: No interruption"
-        },
-        "FullyQualifiedName": {
-          "minLength": 1,
-          "type": "string",
-          "maxLength": 150,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 150  \nUpdate requires: No interruption"
-        },
-        "CanSignal": {
-          "$ref": "#/definitions/CanSignal"
-        },
-        "InterfaceId": {
-          "minLength": 1,
-          "type": "string",
-          "maxLength": 50,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 50  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "FullyQualifiedName",
-        "InterfaceId",
-        "Type",
-        "CanSignal"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "CanInterface": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "ProtocolName": {
-          "minLength": 1,
-          "type": "string",
-          "maxLength": 50,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 50  \nUpdate requires: No interruption"
-        },
-        "ProtocolVersion": {
-          "minLength": 1,
-          "type": "string",
-          "maxLength": 50,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 50  \nUpdate requires: No interruption"
-        },
-        "Name": {
-          "minLength": 1,
-          "type": "string",
-          "maxLength": 100,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "Name"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "ObdNetworkInterface": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Type": {
-          "type": "string",
-          "enum": [
-            "OBD_INTERFACE"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: OBD_INTERFACE  \nUpdate requires: No interruption"
-        },
-        "InterfaceId": {
-          "minLength": 1,
-          "type": "string",
-          "maxLength": 50,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 50  \nUpdate requires: No interruption"
-        },
-        "ObdInterface": {
-          "$ref": "#/definitions/ObdInterface"
-        }
-      },
-      "required": [
-        "InterfaceId",
-        "Type",
-        "ObdInterface"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "CanSignal": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "IsBigEndian": {
-          "type": [
-            "boolean",
-            "string"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['boolean', 'string']  \nUpdate requires: No interruption"
-        },
-        "Length": {
-          "type": [
-            "integer",
-            "string"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['integer', 'string']  \nUpdate requires: No interruption"
-        },
-        "Factor": {
-          "type": [
-            "number",
-            "string"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['number', 'string']  \nUpdate requires: No interruption"
-        },
-        "IsSigned": {
-          "type": [
-            "boolean",
-            "string"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['boolean', 'string']  \nUpdate requires: No interruption"
-        },
-        "StartBit": {
-          "type": [
-            "integer",
-            "string"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['integer', 'string']  \nUpdate requires: No interruption"
-        },
-        "MessageId": {
-          "type": [
-            "integer",
-            "string"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['integer', 'string']  \nUpdate requires: No interruption"
-        },
-        "Offset": {
-          "type": [
-            "number",
-            "string"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['number', 'string']  \nUpdate requires: No interruption"
-        },
-        "Name": {
-          "minLength": 1,
-          "type": "string",
-          "maxLength": 100,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "Factor",
-        "IsBigEndian",
-        "IsSigned",
-        "Length",
-        "MessageId",
-        "Offset",
-        "StartBit"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "Tag": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Value": {
-          "minLength": 0,
-          "type": "string",
-          "maxLength": 256,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption"
-        },
-        "Key": {
-          "minLength": 1,
-          "type": "string",
-          "maxLength": 128,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "Key",
-        "Value"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    },
-    "ObdInterface": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "HasTransmissionEcu": {
-          "type": [
-            "boolean",
-            "string"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: ['boolean', 'string']  \nUpdate requires: No interruption"
-        },
-        "PidRequestIntervalSeconds": {
-          "type": [
-            "integer",
-            "string"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: ['integer', 'string']  \nUpdate requires: No interruption"
-        },
-        "UseExtendedIds": {
-          "type": [
-            "boolean",
-            "string"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: ['boolean', 'string']  \nUpdate requires: No interruption"
-        },
-        "RequestMessageId": {
-          "type": [
-            "integer",
-            "string"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: ['integer', 'string']  \nUpdate requires: No interruption"
-        },
-        "ObdStandard": {
-          "minLength": 1,
-          "type": "string",
-          "maxLength": 50,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 50  \nUpdate requires: No interruption"
-        },
-        "Name": {
-          "minLength": 1,
-          "type": "string",
-          "maxLength": 100,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nUpdate requires: No interruption"
-        },
-        "DtcRequestIntervalSeconds": {
-          "type": [
-            "integer",
-            "string"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: ['integer', 'string']  \nUpdate requires: No interruption"
-        }
-      },
-      "required": [
-        "Name",
-        "RequestMessageId"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
-    }
-  },
-  "required": [
-    "Name",
-    "ModelManifestArn"
-  ],
-  "properties": {
-    "SignalDecoders": {
-      "minItems": 1,
-      "maxItems": 5000,
-      "insertionOrder": false,
-      "type": "array",
-      "items": {
-        "oneOf": [
-          {
-            "$ref": "#/definitions/CanSignalDecoder"
-          },
-          {
-            "$ref": "#/definitions/ObdSignalDecoder"
-          }
-        ]
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-    },
-    "Status": {
-      "$ref": "#/definitions/ManifestStatus"
-    },
-    "Description": {
-      "minLength": 1,
-      "type": "string",
-      "maxLength": 2048,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^[^\\u0000-\\u001F\\u007F]+$  \nUpdate requires: No interruption"
-    },
-    "NetworkInterfaces": {
-      "minItems": 1,
-      "maxItems": 5000,
-      "insertionOrder": false,
-      "type": "array",
-      "items": {
-        "oneOf": [
-          {
-            "$ref": "#/definitions/CanNetworkInterface"
-          },
-          {
-            "$ref": "#/definitions/ObdNetworkInterface"
-          }
-        ]
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-    },
-    "ModelManifestArn": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement"
-    },
-    "Tags": {
-      "minItems": 0,
-      "maxItems": 50,
-      "uniqueItems": true,
-      "insertionOrder": false,
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/Tag"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
-    },
-    "Name": {
-      "minLength": 1,
-      "type": "string",
-      "maxLength": 100,
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: ^[a-zA-Z\\d\\-_:]+$  \nUpdate requires: Replacement"
-    }
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "iotfleetwise:UntagResource",
+      "iotfleetwise:TagResource",
+      "iotfleetwise:ListTagsForResource"
+    ]
   },
   "attributes": {
-    "LastModificationTime": {
-      "format": "date-time",
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-    },
-    "CreationTime": {
-      "format": "date-time",
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
-    },
     "Arn": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreationTime": {
+      "type": "string",
+      "format": "date-time",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "LastModificationTime": {
+      "type": "string",
+      "format": "date-time",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

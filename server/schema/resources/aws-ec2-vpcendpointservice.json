@@ -2,36 +2,75 @@
   "typeName": "AWS::EC2::VPCEndpointService",
   "description": "Resource Type definition for AWS::EC2::VPCEndpointService",
   "additionalProperties": false,
+  "definitions": {
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Value": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Key": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
   "properties": {
     "NetworkLoadBalancerArns": {
       "type": "array",
       "uniqueItems": false,
       "items": {
         "type": "string",
-        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        "relationshipRef": {
+          "typeName": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+          "propertyPath": "/properties/LoadBalancerArn"
+        },
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
       },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     },
     "ContributorInsightsEnabled": {
       "type": "boolean",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
     },
     "PayerResponsibility": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "ServiceId": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "AcceptanceRequired": {
       "type": "boolean",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
     },
     "GatewayLoadBalancerArns": {
       "type": "array",
       "uniqueItems": false,
       "items": {
         "type": "string",
-        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
       },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "Tags": {
+      "type": "array",
+      "description": "The tags to add to the VPC endpoint service.",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "The tags to add to the VPC endpoint service.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "primaryIdentifier": [
@@ -44,32 +83,38 @@
     "/properties/ContributorInsightsEnabled"
   ],
   "tagging": {
-    "taggable": false,
-    "tagOnCreate": false,
-    "tagUpdatable": false,
-    "cloudFormationSystemTags": false
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "ec2:CreateTags",
+      "ec2:DeleteTags"
+    ]
   },
   "handlers": {
     "create": {
       "permissions": [
         "ec2:CreateVpcEndpointServiceConfiguration",
-        "ec2:ModifyVpcEndpointServiceConfiguration",
         "ec2:ModifyVpcEndpointServicePayerResponsibility",
         "cloudwatch:ListManagedInsightRules",
         "cloudwatch:DeleteInsightRules",
         "cloudwatch:PutManagedInsightRules",
-        "ec2:DescribeVpcEndpointServiceConfigurations"
+        "ec2:DescribeVpcEndpointServiceConfigurations",
+        "ec2:CreateTags"
       ]
     },
     "update": {
       "permissions": [
         "ec2:ModifyVpcEndpointServiceConfiguration",
-        "ec2:DeleteVpcEndpointServiceConfigurations",
         "ec2:DescribeVpcEndpointServiceConfigurations",
         "ec2:ModifyVpcEndpointServicePayerResponsibility",
         "cloudwatch:ListManagedInsightRules",
         "cloudwatch:DeleteInsightRules",
-        "cloudwatch:PutManagedInsightRules"
+        "cloudwatch:PutManagedInsightRules",
+        "ec2:CreateTags",
+        "ec2:DeleteTags"
       ]
     },
     "read": {
@@ -83,7 +128,8 @@
         "ec2:DeleteVpcEndpointServiceConfigurations",
         "ec2:DescribeVpcEndpointServiceConfigurations",
         "cloudwatch:ListManagedInsightRules",
-        "cloudwatch:DeleteInsightRules"
+        "cloudwatch:DeleteInsightRules",
+        "ec2:DeleteTags"
       ]
     },
     "list": {
@@ -96,7 +142,7 @@
   "attributes": {
     "ServiceId": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

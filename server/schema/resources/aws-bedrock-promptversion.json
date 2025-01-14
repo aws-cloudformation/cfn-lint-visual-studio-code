@@ -9,7 +9,7 @@
       "enum": [
         "TEXT"
       ],
-      "markdownDescription": "Prompt template type\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: TEXT  \nUpdate requires: No interruption"
+      "markdownDescription": "Prompt template type\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: TEXT  \nUpdate requires: No interruption\n"
     },
     "PromptVariant": {
       "type": "object",
@@ -18,7 +18,7 @@
         "Name": {
           "type": "string",
           "description": "Name for a variant.",
-          "markdownDescription": "Name for a variant.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^([0-9a-zA-Z][_-]?){1,100}$  \nUpdate requires: No interruption"
+          "markdownDescription": "Name for a variant.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^([0-9a-zA-Z][_-]?){1,100}$  \nUpdate requires: No interruption\n"
         },
         "TemplateType": {
           "$ref": "#/definitions/PromptTemplateType"
@@ -30,8 +30,8 @@
           "type": "string",
           "maxLength": 2048,
           "minLength": 1,
-          "description": "ARN or name of a Bedrock model.",
-          "markdownDescription": "ARN or name of a Bedrock model.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^(arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:(([0-9]{12}:custom-model/[a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}/[a-z0-9]{12})|(:foundation-model/[a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}([.:]?[a-z0-9-]{1,63}))|([0-9]{12}:provisioned-model/[a-z0-9]{12})))|([a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}([.:]?[a-z0-9-]{1,63}))|(([0-9a-zA-Z][_-]?)+)$  \nUpdate requires: No interruption"
+          "description": "ARN or Id of a Bedrock Foundational Model or Inference Profile, or the ARN of a imported model, or a provisioned throughput ARN for custom models.",
+          "markdownDescription": "ARN or Id of a Bedrock Foundational Model or Inference Profile, or the ARN of a imported model, or a provisioned throughput ARN for custom models.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^(arn:aws(-[^:]{1,12})?:(bedrock|sagemaker):[a-z0-9-]{1,20}:([0-9]{12})?:([a-z-]+/)?)?([a-zA-Z0-9.-]{1,63}){0,2}(([:][a-z0-9-]{1,63}){0,2})?(/[a-z0-9]{1,12})?$  \nUpdate requires: No interruption\n"
         },
         "InferenceConfiguration": {
           "$ref": "#/definitions/PromptInferenceConfiguration"
@@ -39,10 +39,11 @@
       },
       "required": [
         "Name",
-        "TemplateType"
+        "TemplateType",
+        "TemplateConfiguration"
       ],
       "additionalProperties": false,
-      "markdownDescription": "Prompt variant\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+      "markdownDescription": "Prompt variant\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "TextPromptTemplateConfiguration": {
       "type": "object",
@@ -53,7 +54,7 @@
           "maxLength": 200000,
           "minLength": 1,
           "description": "Prompt content for String prompt template",
-          "markdownDescription": "Prompt content for String prompt template\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 200000  \nUpdate requires: No interruption"
+          "markdownDescription": "Prompt content for String prompt template\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 200000  \nUpdate requires: No interruption\n"
         },
         "InputVariables": {
           "type": "array",
@@ -61,17 +62,17 @@
             "$ref": "#/definitions/PromptInputVariable"
           },
           "maxItems": 5,
-          "minItems": 1,
+          "minItems": 0,
           "description": "List of input variables",
           "insertionOrder": true,
-          "markdownDescription": "List of input variables\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+          "markdownDescription": "List of input variables\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
         "Text"
       ],
       "additionalProperties": false,
-      "markdownDescription": "Configuration for text prompt template\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+      "markdownDescription": "Configuration for text prompt template\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "PromptTemplateConfiguration": {
       "description": "Prompt template configuration",
@@ -90,7 +91,7 @@
           "additionalProperties": false
         }
       ],
-      "markdownDescription": "Prompt template configuration\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+      "markdownDescription": "Prompt template configuration\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
     },
     "PromptModelInferenceConfiguration": {
       "type": "object",
@@ -101,44 +102,37 @@
           "maximum": 1,
           "minimum": 0,
           "description": "Controls randomness, higher values increase diversity",
-          "markdownDescription": "Controls randomness, higher values increase diversity\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+          "markdownDescription": "Controls randomness, higher values increase diversity\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
         },
         "TopP": {
           "type": "number",
           "maximum": 1,
           "minimum": 0,
           "description": "Cumulative probability cutoff for token selection",
-          "markdownDescription": "Cumulative probability cutoff for token selection\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
-        },
-        "TopK": {
-          "type": "number",
-          "maximum": 500,
-          "minimum": 0,
-          "description": "Sample from the k most likely next tokens",
-          "markdownDescription": "Sample from the k most likely next tokens\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+          "markdownDescription": "Cumulative probability cutoff for token selection\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
         },
         "MaxTokens": {
           "type": "number",
           "maximum": 4096,
           "minimum": 0,
           "description": "Maximum length of output",
-          "markdownDescription": "Maximum length of output\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption"
+          "markdownDescription": "Maximum length of output\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
         },
         "StopSequences": {
           "type": "array",
           "items": {
             "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
           },
           "maxItems": 4,
           "minItems": 0,
           "description": "List of stop sequences",
           "insertionOrder": true,
-          "markdownDescription": "List of stop sequences\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+          "markdownDescription": "List of stop sequences\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         }
       },
       "additionalProperties": false,
-      "markdownDescription": "Prompt model inference configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+      "markdownDescription": "Prompt model inference configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "PromptInferenceConfiguration": {
       "description": "Model inference configuration",
@@ -157,7 +151,7 @@
           "additionalProperties": false
         }
       ],
-      "markdownDescription": "Model inference configuration\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption"
+      "markdownDescription": "Model inference configuration\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
     },
     "PromptInputVariable": {
       "type": "object",
@@ -166,11 +160,11 @@
         "Name": {
           "type": "string",
           "description": "Name for an input variable",
-          "markdownDescription": "Name for an input variable\n\n---\n\nRequired: No  \nType: String  \nPattern: ^([0-9a-zA-Z][_-]?){1,100}$  \nUpdate requires: No interruption"
+          "markdownDescription": "Name for an input variable\n\n---\n\nRequired: No  \nType: String  \nPattern: ^([0-9a-zA-Z][_-]?){1,100}$  \nUpdate requires: No interruption\n"
         }
       },
       "additionalProperties": false,
-      "markdownDescription": "Input variable\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+      "markdownDescription": "Input variable\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "TagsMap": {
       "type": "object",
@@ -181,11 +175,11 @@
           "maxLength": 256,
           "minLength": 0,
           "description": "Value of a tag",
-          "markdownDescription": "Value of a tag\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nPattern: ^[a-zA-Z0-9\\s._:/=+@-]*$  \nUpdate requires: No interruption"
+          "markdownDescription": "Value of a tag\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nPattern: ^[a-zA-Z0-9\\s._:/=+@-]*$  \nUpdate requires: No interruption\n"
         }
       },
       "additionalProperties": false,
-      "markdownDescription": "A map of tag keys and values\n\n---\n\nRequired: No  \nUpdate requires: No interruption"
+      "markdownDescription": "A map of tag keys and values\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -194,14 +188,73 @@
       "maxLength": 2048,
       "minLength": 1,
       "description": "ARN of a prompt resource possibly with a version",
-      "markdownDescription": "ARN of a prompt resource possibly with a version\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^(arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:prompt/[0-9a-zA-Z]{10})$  \nUpdate requires: Replacement"
+      "markdownDescription": "ARN of a prompt resource possibly with a version\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^(arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:prompt/[0-9a-zA-Z]{10})$  \nUpdate requires: Replacement\n"
+    },
+    "Arn": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 1,
+      "description": "ARN of a prompt version resource",
+      "markdownDescription": "ARN of a prompt version resource\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^(arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:prompt/[0-9a-zA-Z]{10}:[0-9]{1,20})$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreatedAt": {
+      "type": "string",
+      "description": "Time Stamp.",
+      "format": "date-time",
+      "markdownDescription": "Time Stamp.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "PromptId": {
+      "type": "string",
+      "description": "Identifier for a Prompt",
+      "markdownDescription": "Identifier for a Prompt\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[0-9a-zA-Z]{10}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "UpdatedAt": {
+      "type": "string",
+      "description": "Time Stamp.",
+      "format": "date-time",
+      "markdownDescription": "Time Stamp.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Version": {
+      "type": "string",
+      "maxLength": 5,
+      "minLength": 1,
+      "description": "Version.",
+      "markdownDescription": "Version.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 5  \nPattern: ^(DRAFT|[0-9]{0,4}[1-9][0-9]{0,4})$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Variants": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PromptVariant"
+      },
+      "maxItems": 1,
+      "minItems": 1,
+      "description": "List of prompt variants",
+      "insertionOrder": true,
+      "markdownDescription": "List of prompt variants\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "DefaultVariant": {
+      "type": "string",
+      "description": "Name for a variant.",
+      "markdownDescription": "Name for a variant.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^([0-9a-zA-Z][_-]?){1,100}$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Description": {
       "type": "string",
       "maxLength": 200,
       "minLength": 1,
       "description": "Description for a prompt version resource.",
-      "markdownDescription": "Description for a prompt version resource.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 200  \nUpdate requires: Replacement"
+      "markdownDescription": "Description for a prompt version resource.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 200  \nUpdate requires: Replacement\n"
+    },
+    "CustomerEncryptionKeyArn": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 1,
+      "description": "A KMS key ARN",
+      "markdownDescription": "A KMS key ARN\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws(|-cn|-us-gov):kms:[a-zA-Z0-9-]*:[0-9]{12}:key/[a-zA-Z0-9-]{36}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Name": {
+      "type": "string",
+      "description": "Name for a prompt resource.",
+      "markdownDescription": "Name for a prompt resource.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^([0-9a-zA-Z][_-]?){1,100}$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Tags": {
       "$ref": "#/definitions/TagsMap"
@@ -226,7 +279,8 @@
   ],
   "createOnlyProperties": [
     "/properties/PromptArn",
-    "/properties/Description"
+    "/properties/Description",
+    "/properties/Tags"
   ],
   "handlers": {
     "create": {
@@ -244,11 +298,6 @@
         "bedrock:GetPrompt",
         "bedrock:ListTagsForResource",
         "kms:Decrypt"
-      ]
-    },
-    "update": {
-      "permissions": [
-        "noservice:NoAction"
       ]
     },
     "delete": {
@@ -291,59 +340,59 @@
       "maxLength": 2048,
       "minLength": 1,
       "description": "ARN of a prompt version resource",
-      "markdownDescription": "ARN of a prompt version resource\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^(arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:prompt/[0-9a-zA-Z]{10}:[0-9]{1,20})$  \nUpdate requires: No interruption"
+      "markdownDescription": "ARN of a prompt version resource\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^(arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:prompt/[0-9a-zA-Z]{10}:[0-9]{1,20})$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "CreatedAt": {
       "type": "string",
       "description": "Time Stamp.",
       "format": "date-time",
-      "markdownDescription": "Time Stamp.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "markdownDescription": "Time Stamp.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "PromptId": {
       "type": "string",
       "description": "Identifier for a Prompt",
-      "markdownDescription": "Identifier for a Prompt\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[0-9a-zA-Z]{10}$  \nUpdate requires: No interruption"
+      "markdownDescription": "Identifier for a Prompt\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[0-9a-zA-Z]{10}$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "UpdatedAt": {
       "type": "string",
       "description": "Time Stamp.",
       "format": "date-time",
-      "markdownDescription": "Time Stamp.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption"
+      "markdownDescription": "Time Stamp.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Version": {
       "type": "string",
       "maxLength": 5,
       "minLength": 1,
       "description": "Version.",
-      "markdownDescription": "Version.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 5  \nPattern: ^(DRAFT|[0-9]{0,4}[1-9][0-9]{0,4})$  \nUpdate requires: No interruption"
+      "markdownDescription": "Version.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 5  \nPattern: ^(DRAFT|[0-9]{0,4}[1-9][0-9]{0,4})$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Variants": {
       "type": "array",
       "items": {
         "$ref": "#/definitions/PromptVariant"
       },
-      "maxItems": 3,
+      "maxItems": 1,
       "minItems": 1,
       "description": "List of prompt variants",
       "insertionOrder": true,
-      "markdownDescription": "List of prompt variants\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption"
+      "markdownDescription": "List of prompt variants\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "DefaultVariant": {
       "type": "string",
       "description": "Name for a variant.",
-      "markdownDescription": "Name for a variant.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^([0-9a-zA-Z][_-]?){1,100}$  \nUpdate requires: No interruption"
+      "markdownDescription": "Name for a variant.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^([0-9a-zA-Z][_-]?){1,100}$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "CustomerEncryptionKeyArn": {
       "type": "string",
       "maxLength": 2048,
       "minLength": 1,
       "description": "A KMS key ARN",
-      "markdownDescription": "A KMS key ARN\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws(|-cn|-us-gov):kms:[a-zA-Z0-9-]*:[0-9]{12}:key/[a-zA-Z0-9-]{36}$  \nUpdate requires: No interruption"
+      "markdownDescription": "A KMS key ARN\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws(|-cn|-us-gov):kms:[a-zA-Z0-9-]*:[0-9]{12}:key/[a-zA-Z0-9-]{36}$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Name": {
       "type": "string",
       "description": "Name for a prompt resource.",
-      "markdownDescription": "Name for a prompt resource.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^([0-9a-zA-Z][_-]?){1,100}$  \nUpdate requires: No interruption"
+      "markdownDescription": "Name for a prompt resource.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^([0-9a-zA-Z][_-]?){1,100}$  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }
