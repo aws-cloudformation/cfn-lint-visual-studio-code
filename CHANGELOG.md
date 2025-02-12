@@ -1,6 +1,18 @@
 # Change Log
 All notable changes to the "vscode-cfn-lint" extension will be documented in this file.
 
+## 0.26.2
+## What's Changed
+* Update mocha to 11 by @kddejong in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/437
+* CloudFormation Template Schema upgrade by @github-actions in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/423
+* Bump mocha from 11.0.1 to 11.1.0 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/446
+* Bump glob from 9.3.5 to 11.0.1 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/445
+* Bump @types/lodash from 4.17.14 to 4.17.15 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/444
+* Bump semver from 7.6.3 to 7.7.1 in /server by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/448
+* CloudFormation Template Schema upgrade by @github-actions in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/439
+
+**Full Changelog**: https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/compare/v0.26.1...v0.26.2
+
 ## 0.26.1
 ## What's Changed
 * Switch to node 20.x by @kddejong in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/424
