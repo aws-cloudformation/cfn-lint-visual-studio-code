@@ -71,7 +71,7 @@
         "db.influx.16xlarge"
       ],
       "description": "The compute instance of the InfluxDB instance.",
-      "markdownDescription": "The compute instance of the InfluxDB instance.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: db.influx.medium | db.influx.large | db.influx.xlarge | db.influx.2xlarge | db.influx.4xlarge | db.influx.8xlarge | db.influx.12xlarge | db.influx.16xlarge  \nUpdate requires: Replacement\n"
+      "markdownDescription": "The compute instance of the InfluxDB instance.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: db.influx.medium | db.influx.large | db.influx.xlarge | db.influx.2xlarge | db.influx.4xlarge | db.influx.8xlarge | db.influx.12xlarge | db.influx.16xlarge  \nUpdate requires: No interruption\n"
     },
     "VpcSubnetIds": {
       "type": "array",
@@ -127,6 +127,22 @@
       "description": "The name of an existing InfluxDB parameter group.",
       "markdownDescription": "The name of an existing InfluxDB parameter group.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 64  \nPattern: ^[a-zA-Z0-9]+$  \nUpdate requires: No interruption\n"
     },
+    "Port": {
+      "type": "integer",
+      "minimum": 1024,
+      "maximum": 65535,
+      "description": "The port number on which InfluxDB accepts connections.",
+      "markdownDescription": "The port number on which InfluxDB accepts connections.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    },
+    "NetworkType": {
+      "type": "string",
+      "description": "Network type of the InfluxDB Instance.",
+      "enum": [
+        "IPV4",
+        "DUAL"
+      ],
+      "markdownDescription": "Network type of the InfluxDB Instance.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: IPV4 | DUAL  \nUpdate requires: Replacement\n"
+    },
     "LogDeliveryConfiguration": {
       "type": "object",
       "description": "Configuration for sending logs to customer account from the InfluxDB instance.",
@@ -171,10 +187,12 @@
         "DELETING",
         "MODIFYING",
         "UPDATING",
+        "UPDATING_DEPLOYMENT_TYPE",
+        "UPDATING_INSTANCE_TYPE",
         "DELETED",
         "FAILED"
       ],
-      "markdownDescription": "Status of the InfluxDB Instance.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | AVAILABLE | DELETING | MODIFYING | UPDATING | DELETED | FAILED  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "Status of the InfluxDB Instance.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | AVAILABLE | DELETING | MODIFYING | UPDATING | UPDATING_DEPLOYMENT_TYPE | UPDATING_INSTANCE_TYPE | DELETED | FAILED  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Arn": {
       "type": "string",
@@ -188,7 +206,7 @@
       "minLength": 3,
       "maxLength": 40,
       "description": "The unique name that is associated with the InfluxDB instance.",
-      "markdownDescription": "The unique name that is associated with the InfluxDB instance.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 40  \nPattern: ^[a-zA-z][a-zA-Z0-9]*(-[a-zA-Z0-9]+)*$  \nUpdate requires: Replacement\n"
+      "markdownDescription": "The unique name that is associated with the InfluxDB instance.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 40  \nPattern: ^[a-zA-Z][a-zA-Z0-9]*(-[a-zA-Z0-9]+)*$  \nUpdate requires: Replacement\n"
     },
     "AvailabilityZone": {
       "type": "string",
@@ -224,7 +242,7 @@
         "SINGLE_AZ",
         "WITH_MULTIAZ_STANDBY"
       ],
-      "markdownDescription": "Deployment type of the InfluxDB Instance.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SINGLE_AZ | WITH_MULTIAZ_STANDBY  \nUpdate requires: Replacement\n"
+      "markdownDescription": "Deployment type of the InfluxDB Instance.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SINGLE_AZ | WITH_MULTIAZ_STANDBY  \nUpdate requires: No interruption\n"
     },
     "Tags": {
       "type": "array",
@@ -248,7 +266,12 @@
     "tagOnCreate": true,
     "tagUpdatable": true,
     "cloudFormationSystemTags": true,
-    "tagProperty": "/properties/Tags"
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "timestream-influxdb:TagResource",
+      "timestream-influxdb:ListTagsForResource",
+      "timestream-influxdb:UntagResource"
+    ]
   },
   "createOnlyProperties": [
     "/properties/Name",
@@ -256,13 +279,12 @@
     "/properties/Password",
     "/properties/Organization",
     "/properties/Bucket",
-    "/properties/DbInstanceType",
     "/properties/VpcSubnetIds",
     "/properties/VpcSecurityGroupIds",
     "/properties/PubliclyAccessible",
     "/properties/DbStorageType",
     "/properties/AllocatedStorage",
-    "/properties/DeploymentType"
+    "/properties/NetworkType"
   ],
   "writeOnlyProperties": [
     "/properties/Username",
@@ -314,7 +336,9 @@
         "timestream-influxdb:UpdateDbInstance",
         "timestream-influxdb:TagResource",
         "timestream-influxdb:UntagResource",
-        "timestream-influxdb:ListTagsForResource"
+        "timestream-influxdb:ListTagsForResource",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeVpcs"
       ],
       "timeoutInMinutes": 2160
     },
@@ -343,10 +367,12 @@
         "DELETING",
         "MODIFYING",
         "UPDATING",
+        "UPDATING_DEPLOYMENT_TYPE",
+        "UPDATING_INSTANCE_TYPE",
         "DELETED",
         "FAILED"
       ],
-      "markdownDescription": "Status of the InfluxDB Instance.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | AVAILABLE | DELETING | MODIFYING | UPDATING | DELETED | FAILED  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "Status of the InfluxDB Instance.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | AVAILABLE | DELETING | MODIFYING | UPDATING | UPDATING_DEPLOYMENT_TYPE | UPDATING_INSTANCE_TYPE | DELETED | FAILED  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Arn": {
       "type": "string",

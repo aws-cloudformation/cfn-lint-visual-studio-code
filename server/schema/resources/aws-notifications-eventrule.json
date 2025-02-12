@@ -1,0 +1,194 @@
+{
+  "typeName": "AWS::Notifications::EventRule",
+  "description": "Definition of AWS::Notifications::EventRule Resource Type",
+  "definitions": {
+    "EventRuleStatus": {
+      "type": "string",
+      "enum": [
+        "ACTIVE",
+        "INACTIVE",
+        "CREATING",
+        "UPDATING",
+        "DELETING"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ACTIVE | INACTIVE | CREATING | UPDATING | DELETING  \nUpdate requires: No interruption\n"
+    },
+    "EventRuleStatusSummary": {
+      "type": "object",
+      "properties": {
+        "Status": {
+          "$ref": "#/definitions/EventRuleStatus"
+        },
+        "Reason": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Reason",
+        "Status"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "StatusSummaryByRegion": {
+      "type": "object",
+      "patternProperties": {
+        "^([a-z]{1,2})-([a-z]{1,15}-)+([0-9])$": {
+          "$ref": "#/definitions/EventRuleStatusSummary"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Unit": {
+      "type": "object",
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "Arn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws:notifications::[0-9]{12}:configuration/[a-z0-9]{27}/rule/[a-z0-9]{27}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreationTime": {
+      "type": "string",
+      "format": "date-time",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "EventPattern": {
+      "type": "string",
+      "maxLength": 4096,
+      "minLength": 0,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 4096  \nUpdate requires: No interruption\n"
+    },
+    "EventType": {
+      "type": "string",
+      "maxLength": 128,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^([a-zA-Z0-9 \\-\\(\\)])+$  \nUpdate requires: Replacement\n"
+    },
+    "ManagedRules": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws:events:[a-z-\\d]{2,25}:\\d{12}:rule\\/[a-zA-Z-\\d]{1,1024}$  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "NotificationConfigurationArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:aws:notifications::[0-9]{12}:configuration/[a-z0-9]{27}$  \nUpdate requires: Replacement\n"
+    },
+    "Regions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 25,
+        "minLength": 2,
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 2  \nMaximum Length: 25  \nPattern: ^([a-z]{1,2})-([a-z]{1,15}-)+([0-9])$  \nUpdate requires: No interruption\n"
+      },
+      "minItems": 1,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "Source": {
+      "type": "string",
+      "maxLength": 36,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 36  \nPattern: ^aws.([a-z0-9\\-])+$  \nUpdate requires: Replacement\n"
+    },
+    "StatusSummaryByRegion": {
+      "$ref": "#/definitions/StatusSummaryByRegion"
+    }
+  },
+  "required": [
+    "EventType",
+    "NotificationConfigurationArn",
+    "Regions",
+    "Source"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/CreationTime",
+    "/properties/ManagedRules",
+    "/properties/StatusSummaryByRegion"
+  ],
+  "createOnlyProperties": [
+    "/properties/EventType",
+    "/properties/NotificationConfigurationArn",
+    "/properties/Source"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "notifications:CreateEventRule",
+        "notifications:UpdateEventRule",
+        "notifications:GetEventRule"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "notifications:GetEventRule"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "notifications:UpdateEventRule",
+        "notifications:GetEventRule"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "notifications:DeleteEventRule",
+        "notifications:GetEventRule"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "NotificationConfigurationArn": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:aws:notifications::[0-9]{12}:configuration\\/[a-z0-9]{27}$  \nUpdate requires: No interruption\n"
+          }
+        },
+        "required": [
+          "NotificationConfigurationArn"
+        ]
+      },
+      "permissions": [
+        "notifications:ListEventRules",
+        "notifications:GetEventRule"
+      ]
+    }
+  },
+  "tagging": {
+    "taggable": false
+  },
+  "additionalProperties": false,
+  "attributes": {
+    "Arn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws:notifications::[0-9]{12}:configuration/[a-z0-9]{27}/rule/[a-z0-9]{27}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreationTime": {
+      "type": "string",
+      "format": "date-time",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ManagedRules": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws:events:[a-z-\\d]{2,25}:\\d{12}:rule\\/[a-zA-Z-\\d]{1,1024}$  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "StatusSummaryByRegion": {
+      "$ref": "#/definitions/StatusSummaryByRegion"
+    }
+  }
+}

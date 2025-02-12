@@ -61,7 +61,7 @@
       "description": "A subdirectory in the Amazon S3 bucket. This subdirectory in Amazon S3 is used to read data from the S3 source location or write data to the S3 destination.",
       "type": "string",
       "maxLength": 1024,
-      "markdownDescription": "A subdirectory in the Amazon S3 bucket. This subdirectory in Amazon S3 is used to read data from the S3 source location or write data to the S3 destination.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nPattern: ^[\\p{L}\\p{M}\\p{Z}\\p{S}\\p{N}\\p{P}\\p{C}]*$  \nUpdate requires: Replacement\n"
+      "markdownDescription": "A subdirectory in the Amazon S3 bucket. This subdirectory in Amazon S3 is used to read data from the S3 source location or write data to the S3 destination.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nPattern: ^[\\p{L}\\p{M}\\p{Z}\\p{S}\\p{N}\\p{P}\\p{C}]*$  \nUpdate requires: No interruption\n"
     },
     "S3StorageClass": {
       "description": "The Amazon S3 storage class you want to store your files in when this location is used as a task destination.",
@@ -76,7 +76,7 @@
         "DEEP_ARCHIVE"
       ],
       "default": "STANDARD",
-      "markdownDescription": "The Amazon S3 storage class you want to store your files in when this location is used as a task destination.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: STANDARD | STANDARD_IA | ONEZONE_IA | INTELLIGENT_TIERING | GLACIER | GLACIER_INSTANT_RETRIEVAL | DEEP_ARCHIVE  \nUpdate requires: Replacement\n"
+      "markdownDescription": "The Amazon S3 storage class you want to store your files in when this location is used as a task destination.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: STANDARD | STANDARD_IA | ONEZONE_IA | INTELLIGENT_TIERING | GLACIER | GLACIER_INSTANT_RETRIEVAL | DEEP_ARCHIVE  \nUpdate requires: No interruption\n"
     },
     "Tags": {
       "description": "An array of key-value pairs to apply to this resource.",
@@ -108,7 +108,12 @@
     "tagOnCreate": true,
     "tagUpdatable": true,
     "cloudFormationSystemTags": true,
-    "tagProperty": "/properties/Tags"
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "datasync:TagResource",
+      "datasync:UntagResource",
+      "datasync:ListTagsForResource"
+    ]
   },
   "required": [
     "S3Config"
@@ -121,9 +126,6 @@
     "/properties/LocationArn"
   ],
   "createOnlyProperties": [
-    "/properties/S3Config",
-    "/properties/S3StorageClass",
-    "/properties/Subdirectory",
     "/properties/S3BucketArn"
   ],
   "writeOnlyProperties": [
@@ -154,7 +156,8 @@
         "datasync:DescribeLocationS3",
         "datasync:ListTagsForResource",
         "datasync:TagResource",
-        "datasync:UntagResource"
+        "datasync:UntagResource",
+        "datasync:UpdateLocationS3"
       ]
     },
     "delete": {
