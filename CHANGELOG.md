@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to the "vscode-cfn-lint" extension will be documented in this file.
 
+## 0.26.3
+## What's Changed
+* Remove `__metadata` from `package.json` by @kddejong in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/450
+
+**Full Changelog**: https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/compare/v0.26.2...v0.26.3
+
 ## 0.26.2
 ## What's Changed
 * Update mocha to 11 by @kddejong in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/437
