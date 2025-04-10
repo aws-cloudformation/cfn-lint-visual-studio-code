@@ -1,6 +1,15 @@
 # Change Log
 All notable changes to the "vscode-cfn-lint" extension will be documented in this file.
 
+## 0.26.5
+## What's Changed
+* Redo the order of autcompletion by @kddejong in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/461
+* Bump HaaLeo/publish-vscode-extension from 1 to 2 by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/455
+* CloudFormation Template Schema upgrade by @github-actions in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/449
+* Bump @types/vscode from 1.96.0 to 1.98.0 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/459
+
+**Full Changelog**: https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/compare/v0.26.4...v0.26.5
+
 ## 0.26.4
 ## What's Changed
 
