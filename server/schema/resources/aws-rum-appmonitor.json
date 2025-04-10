@@ -258,6 +258,29 @@
       ],
       "markdownDescription": "A single metric definition\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "ResourcePolicy": {
+      "description": "A structure that defines resource policy attached to your app monitor.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "PolicyDocument": {
+          "type": "string",
+          "description": "The JSON to use as the resource policy. The document can be up to 4 KB in size. ",
+          "markdownDescription": "The JSON to use as the resource policy. The document can be up to 4 KB in size. \n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "PolicyRevisionId": {
+          "type": "string",
+          "description": "A string value that you can use to conditionally update your policy. You can provide the revision ID of your existing policy to make mutating requests against that policy. \n\n When you assign a policy revision ID, then later requests about that policy will be rejected with an InvalidPolicyRevisionIdException error if they don't provide the correct current revision ID.",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "A string value that you can use to conditionally update your policy. You can provide the revision ID of your existing policy to make mutating requests against that policy. \n\n When you assign a policy revision ID, then later requests about that policy will be rejected with an InvalidPolicyRevisionIdException error if they don't provide the correct current revision ID.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "PolicyDocument"
+      ],
+      "markdownDescription": "A structure that defines resource policy attached to your app monitor.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "CustomEventsStatus": {
       "type": "string",
       "enum": [
@@ -278,6 +301,39 @@
         }
       },
       "markdownDescription": "AppMonitor custom events configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DeobfuscationConfiguration": {
+      "description": "A structure that contains the configuration for how an app monitor can deobfuscate stack traces.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "JavaScriptSourceMaps": {
+          "description": "A structure that contains the configuration for how an app monitor can unminify JavaScript error stack traces using source maps.",
+          "additionalProperties": false,
+          "type": "object",
+          "properties": {
+            "Status": {
+              "description": "Specifies whether JavaScript error stack traces should be unminified for this app monitor. The default is for JavaScript error stack trace unminification to be DISABLED",
+              "type": "string",
+              "enum": [
+                "ENABLED",
+                "DISABLED"
+              ],
+              "markdownDescription": "Specifies whether JavaScript error stack traces should be unminified for this app monitor. The default is for JavaScript error stack trace unminification to be DISABLED\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption\n"
+            },
+            "S3Uri": {
+              "description": "The S3Uri of the bucket or folder that stores the source map files. It is required if status is ENABLED.",
+              "type": "string",
+              "markdownDescription": "The S3Uri of the bucket or folder that stores the source map files. It is required if status is ENABLED.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^s3://[a-z0-9][-.a-z0-9]{1,61}(?:/[-!_*'().a-z0-9A-Z]+(?:/[-!_*'().a-z0-9A-Z]+)*)?/?$  \nUpdate requires: No interruption\n"
+            }
+          },
+          "required": [
+            "Status"
+          ],
+          "markdownDescription": "A structure that contains the configuration for how an app monitor can unminify JavaScript error stack traces using source maps.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "A structure that contains the configuration for how an app monitor can deobfuscate stack traces.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -293,14 +349,27 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 255,
-      "markdownDescription": "A name for the app monitor\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: [\\.\\-_/#A-Za-z0-9]+  \nUpdate requires: Replacement\n"
+      "markdownDescription": "A name for the app monitor\n\n---\n\nRequired: Conditional  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: [\\.\\-_/#A-Za-z0-9]+  \nUpdate requires: Replacement\n"
     },
     "Domain": {
-      "description": "The top-level internet domain name for which your application has administrative authority.",
+      "description": "The top-level internet domain name for which your application has administrative authority. The CreateAppMonitor requires either the domain or the domain list.",
       "type": "string",
       "minLength": 1,
       "maxLength": 253,
-      "markdownDescription": "The top-level internet domain name for which your application has administrative authority.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 253  \nPattern: ^(localhost)|^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$|^(?![-.])([A-Za-z0-9-\\.\\-]{0,63})((?![-])([a-zA-Z0-9]{1}|^[a-zA-Z0-9]{0,1}))\\.(?![-])[A-Za-z-0-9]{1,63}((?![-])([a-zA-Z0-9]{1}|^[a-zA-Z0-9]{0,1}))|^(\\*\\.)(?![-.])([A-Za-z0-9-\\.\\-]{0,63})((?![-])([a-zA-Z0-9]{1}|^[a-zA-Z0-9]{0,1}))\\.(?![-])[A-Za-z-0-9]{1,63}((?![-])([a-zA-Z0-9]{1}|^[a-zA-Z0-9]{0,1}))  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The top-level internet domain name for which your application has administrative authority. The CreateAppMonitor requires either the domain or the domain list.\n\n---\n\nRequired: Conditional  \nType: String  \nMinimum Length: 1  \nMaximum Length: 253  \nPattern: ^(localhost)|^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$|^(?![-.])([A-Za-z0-9-\\.\\-]{0,63})((?![-])([a-zA-Z0-9]{1}|^[a-zA-Z0-9]{0,1}))\\.(?![-])[A-Za-z-0-9]{1,63}((?![-])([a-zA-Z0-9]{1}|^[a-zA-Z0-9]{0,1}))|^(\\*\\.)(?![-.])([A-Za-z0-9-\\.\\-]{0,63})((?![-])([a-zA-Z0-9]{1}|^[a-zA-Z0-9]{0,1}))\\.(?![-])[A-Za-z-0-9]{1,63}((?![-])([a-zA-Z0-9]{1}|^[a-zA-Z0-9]{0,1}))  \nUpdate requires: No interruption\n"
+    },
+    "DomainList": {
+      "description": "The top-level internet domain names for which your application has administrative authority. The CreateAppMonitor requires either the domain or the domain list.",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 5,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 253,
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 253  \nPattern: ^(localhost)|^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$|^(?![-.])([A-Za-z0-9-\\.\\-]{0,63})((?![-])([a-zA-Z0-9]{1}|^[a-zA-Z0-9]{0,1}))\\.(?![-])[A-Za-z-0-9]{1,63}((?![-])([a-zA-Z0-9]{1}|^[a-zA-Z0-9]{0,1}))|^(\\*\\.)(?![-.])([A-Za-z0-9-\\.\\-]{0,63})((?![-])([a-zA-Z0-9]{1}|^[a-zA-Z0-9]{0,1}))\\.(?![-])[A-Za-z-0-9]{1,63}((?![-])([a-zA-Z0-9]{1}|^[a-zA-Z0-9]{0,1}))  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "The top-level internet domain names for which your application has administrative authority. The CreateAppMonitor requires either the domain or the domain list.\n\n---\n\nRequired: Conditional  \nType: Array  \nUpdate requires: No interruption\n"
     },
     "CwLogEnabled": {
       "description": "Data collected by RUM is kept by RUM for 30 days and then deleted. This parameter specifies whether RUM sends a copy of this telemetry data to CWLlong in your account. This enables you to keep the telemetry data for more than 30 days, but it does incur CWLlong charges. If you omit this parameter, the default is false",
@@ -315,6 +384,12 @@
     },
     "CustomEvents": {
       "$ref": "#/definitions/CustomEvents"
+    },
+    "ResourcePolicy": {
+      "$ref": "#/definitions/ResourcePolicy"
+    },
+    "DeobfuscationConfiguration": {
+      "$ref": "#/definitions/DeobfuscationConfiguration"
     }
   },
   "additionalProperties": false,
@@ -333,8 +408,19 @@
     ]
   ],
   "required": [
-    "Name",
-    "Domain"
+    "Name"
+  ],
+  "oneOf": [
+    {
+      "required": [
+        "Domain"
+      ]
+    },
+    {
+      "required": [
+        "DomainList"
+      ]
+    }
   ],
   "tagging": {
     "taggable": true,
@@ -376,7 +462,9 @@
         "rum:PutRumMetricsDestination",
         "rum:BatchCreateRumMetricDefinitions",
         "rum:ListRumMetricsDestinations",
-        "rum:BatchGetRumMetricDefinitions"
+        "rum:BatchGetRumMetricDefinitions",
+        "rum:GetResourcePolicy",
+        "rum:PutResourcePolicy"
       ]
     },
     "read": {
@@ -388,7 +476,8 @@
         "s3:GetObjectAcl",
         "rum:ListTagsForResource",
         "rum:ListRumMetricsDestinations",
-        "rum:BatchGetRumMetricDefinitions"
+        "rum:BatchGetRumMetricDefinitions",
+        "rum:GetResourcePolicy"
       ]
     },
     "update": {
@@ -423,7 +512,10 @@
         "rum:BatchCreateRumMetricDefinitions",
         "rum:BatchDeleteRumMetricDefinitions",
         "rum:BatchGetRumMetricDefinitions",
-        "rum:UpdateRumMetricDefinition"
+        "rum:UpdateRumMetricDefinition",
+        "rum:GetResourcePolicy",
+        "rum:PutResourcePolicy",
+        "rum:DeleteResourcePolicy"
       ]
     },
     "delete": {
@@ -440,7 +532,10 @@
         "rum:DeleteRumMetricsDestination",
         "rum:BatchDeleteRumMetricDefinitions",
         "rum:ListRumMetricsDestinations",
-        "rum:BatchGetRumMetricDefinitions"
+        "rum:BatchGetRumMetricDefinitions",
+        "rum:GetResourcePolicy",
+        "rum:PutResourcePolicy",
+        "rum:DeleteResourcePolicy"
       ]
     },
     "list": {

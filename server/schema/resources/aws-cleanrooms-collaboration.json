@@ -11,6 +11,14 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CLEAN_ROOMS_SQL | SPARK  \nUpdate requires: No interruption\n"
     },
+    "CollaborationJobLogStatus": {
+      "type": "string",
+      "enum": [
+        "ENABLED",
+        "DISABLED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption\n"
+    },
     "CollaborationQueryLogStatus": {
       "type": "string",
       "enum": [
@@ -52,9 +60,10 @@
       "type": "string",
       "enum": [
         "CAN_QUERY",
+        "CAN_RUN_JOB",
         "CAN_RECEIVE_RESULTS"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CAN_QUERY | CAN_RECEIVE_RESULTS  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CAN_QUERY | CAN_RUN_JOB | CAN_RECEIVE_RESULTS  \nUpdate requires: No interruption\n"
     },
     "MemberAbilities": {
       "type": "array",
@@ -168,6 +177,9 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "JobCompute": {
+          "$ref": "#/definitions/JobComputePaymentConfig"
+        },
         "QueryCompute": {
           "$ref": "#/definitions/QueryComputePaymentConfig"
         },
@@ -177,6 +189,20 @@
       },
       "required": [
         "QueryCompute"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "JobComputePaymentConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "IsResponsible": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "IsResponsible"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
@@ -292,6 +318,9 @@
       "minLength": 1,
       "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: ^(?!\\s*$)[\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDBFF-\\uDC00\\uDFFF\\t]*$  \nUpdate requires: No interruption\n"
     },
+    "JobLogStatus": {
+      "$ref": "#/definitions/CollaborationJobLogStatus"
+    },
     "QueryLogStatus": {
       "$ref": "#/definitions/CollaborationQueryLogStatus"
     },
@@ -319,6 +348,7 @@
     "/properties/CreatorMemberAbilities",
     "/properties/CreatorMLMemberAbilities",
     "/properties/DataEncryptionMetadata",
+    "/properties/JobLogStatus",
     "/properties/QueryLogStatus",
     "/properties/Members",
     "/properties/CreatorPaymentConfiguration",
@@ -332,7 +362,12 @@
     "tagOnCreate": true,
     "tagUpdatable": true,
     "cloudFormationSystemTags": true,
-    "tagProperty": "/properties/Tags"
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "cleanrooms:ListTagsForResource",
+      "cleanrooms:UntagResource",
+      "cleanrooms:TagResource"
+    ]
   },
   "handlers": {
     "create": {

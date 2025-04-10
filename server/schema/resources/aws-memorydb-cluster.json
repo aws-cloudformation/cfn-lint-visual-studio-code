@@ -53,6 +53,23 @@
         "false"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: true | false  \nUpdate requires: No interruption\n"
+    },
+    "SupportedNetworkTypes": {
+      "type": "string",
+      "enum": [
+        "ipv4",
+        "ipv6",
+        "dual_stack"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ipv4 | ipv6 | dual_stack  \nUpdate requires: No interruption\n"
+    },
+    "SupportedIpDiscoveryTypes": {
+      "type": "string",
+      "enum": [
+        "ipv4",
+        "ipv6"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ipv4 | ipv6  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -163,6 +180,18 @@
       "$ref": "#/definitions/DataTieringStatus",
       "markdownDescription": "Enables data tiering. Data tiering is only supported for clusters using the r6gd node type. This parameter must be set when using r6gd nodes.\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
     },
+    "NetworkType": {
+      "type": "object",
+      "description": "Must be either ipv4 | ipv6 | dual_stack.",
+      "$ref": "#/definitions/SupportedNetworkTypes",
+      "markdownDescription": "Must be either ipv4 | ipv6 | dual_stack.\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
+    },
+    "IpDiscovery": {
+      "type": "object",
+      "description": "For clusters wth dual stack NetworkType, IpDiscovery controls the Ip protocol (ipv4 or ipv6) returned by the engine commands such as `cluster info` and `cluster nodes` which are used by clients to connect to the nodes in the cluster.",
+      "$ref": "#/definitions/SupportedIpDiscoveryTypes",
+      "markdownDescription": "For clusters wth dual stack NetworkType, IpDiscovery controls the Ip protocol (ipv4 or ipv6) returned by the engine commands such as `cluster info` and `cluster nodes` which are used by clients to connect to the nodes in the cluster.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "KmsKeyId": {
       "description": "The ID of the KMS key used to encrypt the cluster.",
       "type": "string",
@@ -260,7 +289,8 @@
     "/properties/SubnetGroupName",
     "/properties/SnapshotArns",
     "/properties/MultiRegionClusterName",
-    "/properties/SnapshotName"
+    "/properties/SnapshotName",
+    "/properties/NetworkType"
   ],
   "writeOnlyProperties": [
     "/properties/SnapshotArns",
@@ -279,8 +309,10 @@
         "memorydb:CreateCluster",
         "memorydb:DescribeClusters",
         "memorydb:TagResource",
-        "memorydb:ListTags"
-      ]
+        "memorydb:ListTags",
+        "iam:CreateServiceLinkedRole"
+      ],
+      "timeoutInMinutes": 720
     },
     "read": {
       "permissions": [

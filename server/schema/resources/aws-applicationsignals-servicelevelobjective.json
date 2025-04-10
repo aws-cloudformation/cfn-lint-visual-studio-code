@@ -57,6 +57,9 @@
     },
     "BurnRateConfigurations": {
       "$ref": "#/definitions/BurnRateConfigurations"
+    },
+    "ExclusionWindows": {
+      "$ref": "#/definitions/ExclusionWindows"
     }
   },
   "required": [
@@ -198,6 +201,9 @@
         },
         "MetricDataQueries": {
           "$ref": "#/definitions/MetricDataQueries"
+        },
+        "DependencyConfig": {
+          "$ref": "#/definitions/DependencyConfig"
         }
       },
       "markdownDescription": "A structure that contains information about the metric that the SLO monitors.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
@@ -233,6 +239,9 @@
         },
         "MonitoredRequestCountMetric": {
           "$ref": "#/definitions/MonitoredRequestCountMetric"
+        },
+        "DependencyConfig": {
+          "$ref": "#/definitions/DependencyConfig"
         }
       },
       "markdownDescription": "This structure contains the information about the metric that is used for a request-based SLO.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
@@ -324,19 +333,21 @@
       "markdownDescription": "If the interval for this service level objective is a calendar interval, this structure contains the interval specifications.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "DurationUnit": {
-      "description": "Specifies the calendar interval unit.",
+      "description": "Specifies the interval unit.",
       "type": "string",
       "enum": [
+        "MINUTE",
+        "HOUR",
         "DAY",
         "MONTH"
       ],
-      "markdownDescription": "Specifies the calendar interval unit.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DAY | MONTH  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Specifies the interval unit.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MINUTE | HOUR | DAY | MONTH  \nUpdate requires: No interruption\n"
     },
     "Duration": {
-      "description": "Specifies the duration of each calendar interval. For example, if `Duration` is 1 and `DurationUnit` is `MONTH`, each interval is one month, aligned with the calendar.",
+      "description": "Specifies the duration of each interval. For example, if `Duration` is 1 and `DurationUnit` is `MONTH`, each interval is one month, aligned with the calendar.",
       "type": "integer",
       "minimum": 1,
-      "markdownDescription": "Specifies the duration of each calendar interval. For example, if `Duration` is 1 and `DurationUnit` is `MONTH`, each interval is one month, aligned with the calendar.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Specifies the duration of each interval. For example, if `Duration` is 1 and `DurationUnit` is `MONTH`, each interval is one month, aligned with the calendar.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
     },
     "MetricDataQueries": {
       "description": "If this SLO monitors a CloudWatch metric or the result of a CloudWatch metric math expression, this structure includes the information about that metric or expression.",
@@ -531,6 +542,117 @@
         "LookBackWindowMinutes"
       ],
       "markdownDescription": "This object defines the length of the look-back window used to calculate one burn rate metric for this SLO. The burn rate measures how fast the service is consuming the error budget, relative to the attainment goal of the SLO. A burn rate of exactly 1 indicates that the SLO goal will be met exactly.\nFor example, if you specify 60 as the number of minutes in the look-back window, the burn rate is calculated as the following:\nburn rate = error rate over the look-back window / (1 - attainment goal percentage)\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ExclusionWindows": {
+      "description": "Each object in this array defines a time exclusion window for this SLO. The time exclusion window is used to exclude breaching data points from affecting attainment rate, error budget, and burn rate metrics.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/ExclusionWindow"
+      },
+      "minItems": 0,
+      "maxItems": 10,
+      "markdownDescription": "Each object in this array defines a time exclusion window for this SLO. The time exclusion window is used to exclude breaching data points from affecting attainment rate, error budget, and burn rate metrics.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "ExclusionWindow": {
+      "description": "This object defines a time exclusion window for this SLO. The time exclusion window is used to exclude breaching data points from affecting attainment rate, error budget, and burn rate metrics.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Window": {
+          "$ref": "#/definitions/Window"
+        },
+        "StartTime": {
+          "type": "string",
+          "description": "The time you want the exclusion window to start at. Note that time exclusion windows can only be scheduled in the future, not the past.",
+          "markdownDescription": "The time you want the exclusion window to start at. Note that time exclusion windows can only be scheduled in the future, not the past.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "RecurrenceRule": {
+          "$ref": "#/definitions/RecurrenceRule"
+        },
+        "Reason": {
+          "description": "An optional reason for scheduling this time exclusion window. Default is 'No reason'.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "default": "No reason",
+          "markdownDescription": "An optional reason for scheduling this time exclusion window. Default is 'No reason'.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Window"
+      ],
+      "markdownDescription": "This object defines a time exclusion window for this SLO. The time exclusion window is used to exclude breaching data points from affecting attainment rate, error budget, and burn rate metrics.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Window": {
+      "description": "This object defines the length of time an exclusion window should span.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "DurationUnit": {
+          "$ref": "#/definitions/DurationUnit"
+        },
+        "Duration": {
+          "$ref": "#/definitions/Duration"
+        }
+      },
+      "required": [
+        "DurationUnit",
+        "Duration"
+      ],
+      "markdownDescription": "This object defines the length of time an exclusion window should span.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RecurrenceRule": {
+      "description": "This object defines how often to repeat a time exclusion window.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Expression": {
+          "description": "A cron or rate expression denoting how often to repeat this exclusion window.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "markdownDescription": "A cron or rate expression denoting how often to repeat this exclusion window.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Expression"
+      ],
+      "markdownDescription": "This object defines how often to repeat a time exclusion window.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DependencyConfig": {
+      "description": "Configuration for identifying a dependency and its operation",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "DependencyKeyAttributes": {
+          "$ref": "#/definitions/DependencyKeyAttributes"
+        },
+        "DependencyOperationName": {
+          "type": "string",
+          "description": "When the SLO monitors a specific operation of the dependency, this field specifies the name of that operation in the dependency.",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "When the SLO monitors a specific operation of the dependency, this field specifies the name of that operation in the dependency.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "DependencyKeyAttributes",
+        "DependencyOperationName"
+      ],
+      "markdownDescription": "Configuration for identifying a dependency and its operation\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DependencyKeyAttributes": {
+      "description": "If this SLO is related to a metric collected by Application Signals, you must use this field to specify which dependency the SLO metric is related to.",
+      "patternProperties": {
+        "^.+$": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "If this SLO is related to a metric collected by Application Signals, you must use this field to specify which dependency the SLO metric is related to.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
     }
   },
   "handlers": {
@@ -542,13 +664,16 @@
         "application-signals:GetServiceLevelObjective",
         "application-signals:ListTagsForResource",
         "iam:GetRole",
-        "iam:CreateServiceLinkedRole"
+        "iam:CreateServiceLinkedRole",
+        "application-signals:ListServiceLevelObjectiveExclusionWindows",
+        "application-signals:BatchUpdateExclusionWindows"
       ]
     },
     "read": {
       "permissions": [
         "application-signals:GetServiceLevelObjective",
-        "application-signals:ListTagsForResource"
+        "application-signals:ListTagsForResource",
+        "application-signals:ListServiceLevelObjectiveExclusionWindows"
       ]
     },
     "update": {
@@ -558,7 +683,9 @@
         "application-signals:TagResource",
         "application-signals:UntagResource",
         "application-signals:GetServiceLevelObjective",
-        "application-signals:ListTagsForResource"
+        "application-signals:ListTagsForResource",
+        "application-signals:ListServiceLevelObjectiveExclusionWindows",
+        "application-signals:BatchUpdateExclusionWindows"
       ]
     },
     "delete": {
@@ -571,7 +698,8 @@
     "list": {
       "permissions": [
         "application-signals:ListServiceLevelObjectives",
-        "application-signals:ListTagsForResource"
+        "application-signals:ListTagsForResource",
+        "application-signals:ListServiceLevelObjectiveExclusionWindows"
       ]
     }
   },

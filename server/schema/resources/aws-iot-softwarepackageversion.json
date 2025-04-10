@@ -1,5 +1,6 @@
 {
   "typeName": "AWS::IoT::SoftwarePackageVersion",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-iot",
   "description": "resource definition",
   "definitions": {
     "PackageVersionStatus": {
@@ -10,6 +11,20 @@
         "DEPRECATED"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DRAFT | PUBLISHED | DEPRECATED  \nUpdate requires: No interruption\n"
+    },
+    "PackageVersionArtifact": {
+      "description": "The artifact location of the package version",
+      "type": "object",
+      "properties": {
+        "S3Location": {
+          "$ref": "#/definitions/S3Location"
+        }
+      },
+      "required": [
+        "S3Location"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The artifact location of the package version\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "ResourceAttributes": {
       "type": "object",
@@ -48,11 +63,69 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Sbom": {
+      "description": "The sbom zip archive location of the package version",
+      "type": "object",
+      "properties": {
+        "S3Location": {
+          "$ref": "#/definitions/S3Location"
+        }
+      },
+      "required": [
+        "S3Location"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The sbom zip archive location of the package version\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "S3Location": {
+      "description": "The Amazon S3 location",
+      "type": "object",
+      "properties": {
+        "Bucket": {
+          "type": "string",
+          "description": "The S3 bucket",
+          "minLength": 1,
+          "markdownDescription": "The S3 bucket\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nUpdate requires: No interruption\n"
+        },
+        "Key": {
+          "type": "string",
+          "description": "The S3 key",
+          "minLength": 1,
+          "markdownDescription": "The S3 key\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nUpdate requires: No interruption\n"
+        },
+        "Version": {
+          "type": "string",
+          "description": "The S3 version",
+          "markdownDescription": "The S3 version\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Bucket",
+        "Key",
+        "Version"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The Amazon S3 location\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SbomValidationStatus": {
+      "description": "The validation status of the Sbom file",
+      "type": "string",
+      "enum": [
+        "IN_PROGRESS",
+        "FAILED",
+        "SUCCEEDED",
+        ""
+      ],
+      "markdownDescription": "The validation status of the Sbom file\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: IN_PROGRESS | FAILED | SUCCEEDED |   \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
     "Attributes": {
       "$ref": "#/definitions/ResourceAttributes"
+    },
+    "Artifact": {
+      "$ref": "#/definitions/PackageVersionArtifact"
     },
     "Description": {
       "type": "string",
@@ -73,6 +146,17 @@
     "PackageVersionArn": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:[!-~]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Recipe": {
+      "description": "The inline json job document associated with a software package version",
+      "type": "string",
+      "markdownDescription": "The inline json job document associated with a software package version\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "Sbom": {
+      "$ref": "#/definitions/Sbom"
+    },
+    "SbomValidationStatus": {
+      "$ref": "#/definitions/SbomValidationStatus"
     },
     "Status": {
       "$ref": "#/definitions/PackageVersionStatus"
@@ -99,7 +183,7 @@
     "taggable": true,
     "tagOnCreate": true,
     "tagUpdatable": true,
-    "cloudFormationSystemTags": true,
+    "cloudFormationSystemTags": false,
     "tagProperty": "/properties/Tags",
     "permissions": [
       "iot:TagResource",
@@ -113,7 +197,8 @@
   "readOnlyProperties": [
     "/properties/ErrorReason",
     "/properties/PackageVersionArn",
-    "/properties/Status"
+    "/properties/Status",
+    "/properties/SbomValidationStatus"
   ],
   "createOnlyProperties": [
     "/properties/PackageName",
@@ -128,8 +213,11 @@
       "permissions": [
         "iot:CreatePackageVersion",
         "iot:GetPackageVersion",
+        "iot:ListTagsForResource",
         "iot:TagResource",
-        "iot:GetIndexingConfiguration"
+        "iot:GetIndexingConfiguration",
+        "s3:GetObjectVersion",
+        "iot:AssociateSbomWithPackageVersion"
       ]
     },
     "read": {
@@ -145,7 +233,10 @@
         "iot:ListTagsForResource",
         "iot:TagResource",
         "iot:UntagResource",
-        "iot:GetIndexingConfiguration"
+        "iot:GetIndexingConfiguration",
+        "s3:GetObjectVersion",
+        "iot:AssociateSbomWithPackageVersion",
+        "iot:DisassociateSbomFromPackageVersion"
       ]
     },
     "delete": {
@@ -157,6 +248,16 @@
       ]
     },
     "list": {
+      "handlerSchema": {
+        "properties": {
+          "PackageName": {
+            "$ref": "resource-schema.json#/properties/PackageName"
+          }
+        },
+        "required": [
+          "PackageName"
+        ]
+      },
       "permissions": [
         "iot:ListPackageVersions"
       ]
@@ -171,6 +272,9 @@
     "PackageVersionArn": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:[!-~]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SbomValidationStatus": {
+      "$ref": "#/definitions/SbomValidationStatus"
     },
     "Status": {
       "$ref": "#/definitions/PackageVersionStatus"
