@@ -42,6 +42,24 @@ export class LanguageHandlers extends YamlLanguageHandlers {
   private cfnLanguageService: LanguageService;
   private cfnSettings: SettingsState;
   private cfnConnection: Connection;
+  private customTags: string[] = [
+    "!And",
+    "!Base64",
+    "!Cidr",
+    "!Equals",
+    "!FindInMap",
+    "!GetAtt",
+    "!GetAZs",
+    "!If",
+    "!ImportValue",
+    "!Join",
+    "!Not",
+    "!Or",
+    "!Ref",
+    "!Select",
+    "!Split",
+    "!Sub",
+  ];
 
   pendingLimitExceededWarnings: {
     [uri: string]: {
@@ -119,6 +137,15 @@ export class LanguageHandlers extends YamlLanguageHandlers {
     }
 
     if (this.cfnSettings.yamlShouldCompletion) {
+      for (var fn of this.customTags) {
+        results.items.push({
+          label: fn,
+          sortText: "zzzzzzzzzz",
+          insertText: fn + " ",
+          insertTextFormat: 2,
+          kind: 12,
+        });
+      }
       try {
         if (node !== null && template !== null) {
           if (isNode(node.internalNode)) {
@@ -162,7 +189,9 @@ export class LanguageHandlers extends YamlLanguageHandlers {
    * Called when the formatter is invoked
    * Returns the formatted document content using prettier
    */
-  formatterHandler(formatParams: DocumentFormattingParams): TextEdit[] {
+  formatterHandler(
+    formatParams: DocumentFormattingParams
+  ): Promise<TextEdit[]> {
     const uri = formatParams.textDocument.uri;
     const document = this.cfnSettings.documents.get(uri);
 
