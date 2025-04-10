@@ -189,7 +189,7 @@ export class LanguageHandlers extends YamlLanguageHandlers {
    * Called when the formatter is invoked
    * Returns the formatted document content using prettier
    */
-  formatterHandler(formatParams: DocumentFormattingParams): TextEdit[] {
+  formatterHandler(formatParams: DocumentFormattingParams): Promise<TextEdit[]> {
     const uri = formatParams.textDocument.uri;
     const document = this.cfnSettings.documents.get(uri);
 
