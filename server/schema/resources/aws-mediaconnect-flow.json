@@ -63,6 +63,25 @@
       "description": "The source monitoring config of the flow.",
       "$ref": "#/definitions/SourceMonitoringConfig",
       "markdownDescription": "The source monitoring config of the flow.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "FlowSize": {
+      "type": "string",
+      "description": "Determines the processing capacity and feature set of the flow. Set this optional parameter to LARGE if you want to enable NDI outputs on the flow.",
+      "enum": [
+        "MEDIUM",
+        "LARGE"
+      ],
+      "markdownDescription": "Determines the processing capacity and feature set of the flow. Set this optional parameter to LARGE if you want to enable NDI outputs on the flow.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MEDIUM | LARGE  \nUpdate requires: No interruption\n"
+    },
+    "NdiConfig": {
+      "description": "Specifies the configuration settings for NDI outputs. Required when the flow includes NDI outputs.",
+      "$ref": "#/definitions/NdiConfig",
+      "markdownDescription": "Specifies the configuration settings for NDI outputs. Required when the flow includes NDI outputs.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "FlowNdiMachineName": {
+      "type": "string",
+      "description": "A prefix for the names of the NDI sources that the flow creates.(ReadOnly)",
+      "markdownDescription": "A prefix for the names of the NDI sources that the flow creates.(ReadOnly)\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   },
   "definitions": {
@@ -794,6 +813,64 @@
       },
       "additionalProperties": false,
       "markdownDescription": "Configures settings for the FrozenFrames metric.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "NdiConfig": {
+      "type": "object",
+      "description": "Specifies the configuration settings for NDI outputs. Required when the flow includes NDI outputs.",
+      "properties": {
+        "NdiDiscoveryServers": {
+          "type": "array",
+          "description": "A list of up to three NDI discovery server configurations. While not required by the API, this configuration is necessary for NDI functionality to work properly.",
+          "items": {
+            "$ref": "#/definitions/NdiDiscoveryServerConfig"
+          },
+          "markdownDescription": "A list of up to three NDI discovery server configurations. While not required by the API, this configuration is necessary for NDI functionality to work properly.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "NdiState": {
+          "type": "string",
+          "description": "A setting that controls whether NDI outputs can be used in the flow. Must be ENABLED to add NDI outputs. Default is DISABLED.",
+          "enum": [
+            "ENABLED",
+            "DISABLED"
+          ],
+          "markdownDescription": "A setting that controls whether NDI outputs can be used in the flow. Must be ENABLED to add NDI outputs. Default is DISABLED.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption\n"
+        },
+        "MachineName": {
+          "type": "string",
+          "description": "A prefix for the names of the NDI sources that the flow creates. If a custom name isn't specified, MediaConnect generates a unique 12-character ID as the prefix.",
+          "markdownDescription": "A prefix for the names of the NDI sources that the flow creates. If a custom name isn't specified, MediaConnect generates a unique 12-character ID as the prefix.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Specifies the configuration settings for NDI outputs. Required when the flow includes NDI outputs.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "NdiDiscoveryServerConfig": {
+      "type": "object",
+      "description": "Specifies the configuration settings for individual NDI discovery servers. A maximum of 3 servers is allowed.",
+      "properties": {
+        "VpcInterfaceAdapter": {
+          "type": "string",
+          "description": "The identifier for the Virtual Private Cloud (VPC) network interface used by the flow.",
+          "markdownDescription": "The identifier for the Virtual Private Cloud (VPC) network interface used by the flow.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "DiscoveryServerAddress": {
+          "type": "string",
+          "description": "The unique network address of the NDI discovery server.",
+          "markdownDescription": "The unique network address of the NDI discovery server.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "DiscoveryServerPort": {
+          "type": "integer",
+          "description": "The port for the NDI discovery server. Defaults to 5959 if a custom port isn't specified.",
+          "format": "int32",
+          "markdownDescription": "The port for the NDI discovery server. Defaults to 5959 if a custom port isn't specified.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "DiscoveryServerAddress",
+        "VpcInterfaceAdapter"
+      ],
+      "markdownDescription": "Specifies the configuration settings for individual NDI discovery servers. A maximum of 3 servers is allowed.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "required": [
@@ -814,7 +891,8 @@
     "/properties/Source/SourceIngestPort",
     "/properties/VpcInterfaces/*/NetworkInterfaceIds",
     "/properties/MediaStreams/*/Fmt",
-    "/properties/EgressIp"
+    "/properties/EgressIp",
+    "/properties/FlowNdiMachineName"
   ],
   "primaryIdentifier": [
     "/properties/FlowArn"
@@ -829,6 +907,9 @@
     "create": {
       "permissions": [
         "mediaconnect:CreateFlow",
+        "mediaconnect:AddFlowMediaStreams",
+        "mediaconnect:AddFlowSources",
+        "mediaconnect:AddFlowVpcInterfaces",
         "iam:PassRole"
       ]
     },
@@ -852,7 +933,12 @@
     "delete": {
       "permissions": [
         "mediaconnect:DescribeFlow",
-        "mediaconnect:DeleteFlow"
+        "mediaconnect:DeleteFlow",
+        "mediaconnect:RemoveFlowMediaStream",
+        "mediaconnect:RemoveFlowOutput",
+        "mediaconnect:RemoveFlowSource",
+        "mediaconnect:RemoveFlowVpcInterface",
+        "mediaconnect:RevokeFlowEntitlement"
       ]
     },
     "list": {
@@ -876,6 +962,11 @@
       "description": "The Availability Zone that you want to create the flow in. These options are limited to the Availability Zones within the current AWS.(ReadOnly)",
       "type": "string",
       "markdownDescription": "The Availability Zone that you want to create the flow in. These options are limited to the Availability Zones within the current AWS.(ReadOnly)\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "FlowNdiMachineName": {
+      "type": "string",
+      "description": "A prefix for the names of the NDI sources that the flow creates.(ReadOnly)",
+      "markdownDescription": "A prefix for the names of the NDI sources that the flow creates.(ReadOnly)\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

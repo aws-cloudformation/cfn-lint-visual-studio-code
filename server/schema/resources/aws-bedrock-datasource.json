@@ -3,16 +3,77 @@
   "description": "Definition of AWS::Bedrock::DataSource Resource Type",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-aps",
   "definitions": {
+    "ContextEnrichmentConfiguration": {
+      "type": "object",
+      "description": "Additional Enrichment Configuration for example when using GraphRag.",
+      "properties": {
+        "Type": {
+          "$ref": "#/definitions/ContextEnrichmentType"
+        },
+        "BedrockFoundationModelConfiguration": {
+          "$ref": "#/definitions/BedrockFoundationModelContextEnrichmentConfiguration"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Additional Enrichment Configuration for example when using GraphRag.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ContextEnrichmentType": {
+      "type": "string",
+      "description": "Enrichment type to be used for the vector database.",
+      "enum": [
+        "BEDROCK_FOUNDATION_MODEL"
+      ],
+      "markdownDescription": "Enrichment type to be used for the vector database.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: BEDROCK_FOUNDATION_MODEL  \nUpdate requires: No interruption\n"
+    },
+    "BedrockFoundationModelContextEnrichmentConfiguration": {
+      "type": "object",
+      "description": "Bedrock Foundation Model configuration to be used for Context Enrichment.",
+      "properties": {
+        "EnrichmentStrategyConfiguration": {
+          "$ref": "#/definitions/EnrichmentStrategyConfiguration"
+        },
+        "ModelArn": {
+          "$ref": "#/definitions/ModelArn"
+        }
+      },
+      "required": [
+        "EnrichmentStrategyConfiguration",
+        "ModelArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Bedrock Foundation Model configuration to be used for Context Enrichment.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EnrichmentStrategyConfiguration": {
+      "type": "object",
+      "description": "Strategy to be used when using Bedrock Foundation Model for Context Enrichment.",
+      "properties": {
+        "Method": {
+          "$ref": "#/definitions/EnrichmentStrategyMethod"
+        }
+      },
+      "required": [
+        "Method"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Strategy to be used when using Bedrock Foundation Model for Context Enrichment.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EnrichmentStrategyMethod": {
+      "type": "string",
+      "description": "Enrichment Strategy method.",
+      "enum": [
+        "CHUNK_ENTITY_EXTRACTION"
+      ],
+      "markdownDescription": "Enrichment Strategy method.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CHUNK_ENTITY_EXTRACTION  \nUpdate requires: No interruption\n"
+    },
     "BedrockFoundationModelConfiguration": {
       "type": "object",
       "description": "Settings for a foundation model used to parse documents for a data source.",
       "properties": {
         "ModelArn": {
-          "type": "string",
-          "maxLength": 2048,
-          "minLength": 1,
-          "description": "The model's ARN.",
-          "markdownDescription": "The model's ARN.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}::foundation-model/([a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}([.]?[a-z0-9-]{1,63})([:][a-z0-9-]{1,63}){0,2})|(arn:aws(|-us-gov|-cn|-iso|-iso-b):bedrock:(|[0-9a-z-]{1,20}):(|[0-9]{12}):(inference-profile|application-inference-profile)/[a-zA-Z0-9-:.]+)$  \nUpdate requires: No interruption\n"
+          "$ref": "#/definitions/ModelArn"
         },
         "ParsingPrompt": {
           "$ref": "#/definitions/ParsingPrompt"
@@ -26,6 +87,13 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "Settings for a foundation model used to parse documents for a data source.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ModelArn": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 1,
+      "description": "The model's ARN.",
+      "markdownDescription": "The model's ARN.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}::foundation-model/([a-z0-9-]{1,63}[.]{1}[a-z0-9-]{1,63}([.]?[a-z0-9-]{1,63})([:][a-z0-9-]{1,63}){0,2})|(arn:aws(|-us-gov|-cn|-iso|-iso-b):bedrock:(|[0-9a-z-]{1,20}):(|[0-9]{12}):(inference-profile|application-inference-profile)/[a-zA-Z0-9-:.]+)$  \nUpdate requires: No interruption\n"
     },
     "ChunkingConfiguration": {
       "type": "object",
@@ -114,7 +182,7 @@
         "Type"
       ],
       "additionalProperties": false,
-      "markdownDescription": "Specifies a raw data source location to ingest.\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
+      "markdownDescription": "Specifies a raw data source location to ingest.\n\n---\n\nRequired: No  \nUpdate requires: Replacement\nRead only property: Yes"
     },
     "DataSourceStatus": {
       "type": "string",
@@ -542,6 +610,9 @@
         },
         "ParsingConfiguration": {
           "$ref": "#/definitions/ParsingConfiguration"
+        },
+        "ContextEnrichmentConfiguration": {
+          "$ref": "#/definitions/ContextEnrichmentConfiguration"
         }
       },
       "additionalProperties": false,
@@ -674,9 +745,10 @@
           "type": "string",
           "description": "The supported authentication type to authenticate and connect to your SharePoint site/sites.",
           "enum": [
-            "OAUTH2_CLIENT_CREDENTIALS"
+            "OAUTH2_CLIENT_CREDENTIALS",
+            "OAUTH2_SHAREPOINT_APP_ONLY_CLIENT_CREDENTIALS"
           ],
-          "markdownDescription": "The supported authentication type to authenticate and connect to your SharePoint site/sites.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: OAUTH2_CLIENT_CREDENTIALS  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The supported authentication type to authenticate and connect to your SharePoint site/sites.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: OAUTH2_CLIENT_CREDENTIALS | OAUTH2_SHAREPOINT_APP_ONLY_CLIENT_CREDENTIALS  \nUpdate requires: No interruption\n"
         },
         "CredentialsSecretArn": {
           "type": "string",
@@ -787,6 +859,20 @@
         },
         "Scope": {
           "$ref": "#/definitions/WebScopeType"
+        },
+        "UserAgent": {
+          "type": "string",
+          "description": "The suffix that will be included in the user agent header.",
+          "maxLength": 40,
+          "minLength": 15,
+          "markdownDescription": "The suffix that will be included in the user agent header.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 15  \nMaximum Length: 40  \nUpdate requires: No interruption\n"
+        },
+        "UserAgentHeader": {
+          "type": "string",
+          "description": "The full user agent header, including UUID and suffix.",
+          "maxLength": 86,
+          "minLength": 61,
+          "markdownDescription": "The full user agent header, including UUID and suffix.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 61  \nMaximum Length: 86  \nUpdate requires: No interruption\n"
         }
       },
       "additionalProperties": false,
@@ -802,6 +888,12 @@
           "maximum": 300,
           "description": "Rate of web URLs retrieved per minute.",
           "markdownDescription": "Rate of web URLs retrieved per minute.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "MaxPages": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum number of pages the crawler can crawl.",
+          "markdownDescription": "Maximum number of pages the crawler can crawl.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
         }
       },
       "additionalProperties": false,
@@ -973,7 +1065,8 @@
     "/properties/DataSourceStatus",
     "/properties/CreatedAt",
     "/properties/UpdatedAt",
-    "/properties/FailureReasons"
+    "/properties/FailureReasons",
+    "/properties/DataSourceConfiguration/WebConfiguration/CrawlerConfiguration/UserAgentHeader"
   ],
   "createOnlyProperties": [
     "/properties/KnowledgeBaseId",
@@ -994,7 +1087,8 @@
       "permissions": [
         "bedrock:CreateDataSource",
         "bedrock:GetDataSource",
-        "bedrock:GetKnowledgeBase"
+        "bedrock:GetKnowledgeBase",
+        "kms:GenerateDataKey"
       ]
     },
     "read": {
@@ -1005,7 +1099,8 @@
     "update": {
       "permissions": [
         "bedrock:GetDataSource",
-        "bedrock:UpdateDataSource"
+        "bedrock:UpdateDataSource",
+        "kms:GenerateDataKey"
       ]
     },
     "delete": {

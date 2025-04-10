@@ -1,6 +1,6 @@
 {
   "typeName": "AWS::ECR::PullThroughCacheRule",
-  "description": "The AWS::ECR::PullThroughCacheRule resource configures the upstream registry configuration details for an Amazon Elastic Container Registry (Amazon Private ECR) pull-through cache.",
+  "description": "The ``AWS::ECR::PullThroughCacheRule`` resource creates or updates a pull through cache rule. A pull through cache rule provides a way to cache images from an upstream registry in your Amazon ECR private registry.",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-ecr.git",
   "definitions": {
     "PullThroughCacheRule": {
@@ -22,6 +22,12 @@
         },
         "UpstreamRegistry": {
           "$ref": "#/definitions/UpstreamRegistry"
+        },
+        "CustomRoleArn": {
+          "$ref": "#/definitions/CustomRoleArn"
+        },
+        "UpstreamRepositoryPrefix": {
+          "$ref": "#/definitions/UpstreamRepositoryPrefix"
         }
       },
       "required": [
@@ -29,6 +35,7 @@
         "UpstreamRegistryUrl"
       ],
       "additionalProperties": false,
+      "description": "",
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "RegistryId": {
@@ -41,7 +48,7 @@
       "description": "The ECRRepositoryPrefix is a custom alias for upstream registry url.",
       "minLength": 2,
       "maxLength": 30,
-      "markdownDescription": "The ECRRepositoryPrefix is a custom alias for upstream registry url.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 2  \nMaximum Length: 30  \nPattern: (?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The ECRRepositoryPrefix is a custom alias for upstream registry url.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 2  \nMaximum Length: 30  \nPattern: ^((?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*/?|ROOT)$  \nUpdate requires: No interruption\n"
     },
     "UpstreamRegistryUrl": {
       "type": "string",
@@ -59,32 +66,51 @@
       "type": "string",
       "description": "The name of the upstream registry.",
       "markdownDescription": "The name of the upstream registry.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "CustomRoleArn": {
+      "type": "string",
+      "description": "The ARN of the IAM role to be assumed by Amazon ECR to authenticate to ECR upstream registry. This role must be in the same account as the registry that you are configuring.",
+      "maxLength": 2048,
+      "markdownDescription": "The ARN of the IAM role to be assumed by Amazon ECR to authenticate to ECR upstream registry. This role must be in the same account as the registry that you are configuring.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nUpdate requires: No interruption\n"
+    },
+    "UpstreamRepositoryPrefix": {
+      "type": "string",
+      "description": "The repository name prefix of upstream registry to match with the upstream repository name. When this field isn't specified, Amazon ECR will use the `ROOT`.",
+      "minLength": 2,
+      "maxLength": 30,
+      "markdownDescription": "The repository name prefix of upstream registry to match with the upstream repository name. When this field isn't specified, Amazon ECR will use the `ROOT`.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 2  \nMaximum Length: 30  \nPattern: ^((?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*/?|ROOT)$  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
     "EcrRepositoryPrefix": {
-      "type": "string",
-      "description": "The ECRRepositoryPrefix is a custom alias for upstream registry url.",
-      "minLength": 2,
-      "maxLength": 30,
-      "markdownDescription": "The ECRRepositoryPrefix is a custom alias for upstream registry url.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 2  \nMaximum Length: 30  \nPattern: (?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*  \nUpdate requires: Replacement\n"
+      "$ref": "#/definitions/EcrRepositoryPrefix",
+      "description": "The Amazon ECR repository prefix associated with the pull through cache rule.",
+      "markdownDescription": "The Amazon ECR repository prefix associated with the pull through cache rule.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
     },
     "UpstreamRegistryUrl": {
-      "type": "string",
-      "description": "The upstreamRegistryUrl is the endpoint of upstream registry url of the public repository to be cached",
-      "markdownDescription": "The upstreamRegistryUrl is the endpoint of upstream registry url of the public repository to be cached\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+      "$ref": "#/definitions/UpstreamRegistryUrl",
+      "description": "The upstream registry URL associated with the pull through cache rule.",
+      "markdownDescription": "The upstream registry URL associated with the pull through cache rule.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
     },
     "CredentialArn": {
-      "type": "string",
-      "description": "The Amazon Resource Name (ARN) of the AWS Secrets Manager secret that identifies the credentials to authenticate to the upstream registry.",
-      "minLength": 50,
-      "maxLength": 612,
-      "markdownDescription": "The Amazon Resource Name (ARN) of the AWS Secrets Manager secret that identifies the credentials to authenticate to the upstream registry.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 50  \nMaximum Length: 612  \nPattern: ^arn:aws:secretsmanager:[a-zA-Z0-9-:]+:secret:ecr\\-pullthroughcache\\/[a-zA-Z0-9\\/_+=.@-]+$  \nUpdate requires: Replacement\n"
+      "$ref": "#/definitions/CredentialArn",
+      "description": "The ARN of the Secrets Manager secret associated with the pull through cache rule.",
+      "markdownDescription": "The ARN of the Secrets Manager secret associated with the pull through cache rule.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
     },
     "UpstreamRegistry": {
-      "type": "string",
-      "description": "The name of the upstream registry.",
-      "markdownDescription": "The name of the upstream registry.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+      "$ref": "#/definitions/UpstreamRegistry",
+      "description": "The name of the upstream source registry associated with the pull through cache rule.",
+      "markdownDescription": "The name of the upstream source registry associated with the pull through cache rule.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
+    },
+    "CustomRoleArn": {
+      "$ref": "#/definitions/CustomRoleArn",
+      "description": "The ARN of the IAM role associated with the pull through cache rule.",
+      "markdownDescription": "The ARN of the IAM role associated with the pull through cache rule.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
+    },
+    "UpstreamRepositoryPrefix": {
+      "$ref": "#/definitions/UpstreamRepositoryPrefix",
+      "description": "The upstream repository prefix associated with the pull through cache rule.",
+      "markdownDescription": "The upstream repository prefix associated with the pull through cache rule.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
     }
   },
   "tagging": {
@@ -97,11 +123,14 @@
     "/properties/EcrRepositoryPrefix",
     "/properties/UpstreamRegistryUrl",
     "/properties/CredentialArn",
-    "/properties/UpstreamRegistry"
+    "/properties/UpstreamRegistry",
+    "/properties/CustomRoleArn",
+    "/properties/UpstreamRepositoryPrefix"
   ],
   "writeOnlyProperties": [
     "/properties/CredentialArn",
-    "/properties/UpstreamRegistry"
+    "/properties/UpstreamRegistry",
+    "/properties/CustomRoleArn"
   ],
   "handlers": {
     "create": {
@@ -110,7 +139,8 @@
         "ecr:CreatePullThroughCacheRule",
         "ecr:DeletePullThroughCacheRule",
         "iam:CreateServiceLinkedRole",
-        "secretsmanager:GetSecretValue"
+        "secretsmanager:GetSecretValue",
+        "iam:PassRole"
       ]
     },
     "read": {
@@ -124,7 +154,8 @@
         "ecr:CreatePullThroughCacheRule",
         "ecr:DeletePullThroughCacheRule",
         "iam:CreateServiceLinkedRole",
-        "secretsmanager:GetSecretValue"
+        "secretsmanager:GetSecretValue",
+        "iam:PassRole"
       ]
     },
     "delete": {

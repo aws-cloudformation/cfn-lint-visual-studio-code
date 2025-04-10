@@ -1,5 +1,10 @@
 {
   "tagging": {
+    "permissions": [
+      "quicksight:TagResource",
+      "quicksight:UntagResource",
+      "quicksight:ListTagsForResource"
+    ],
     "taggable": true,
     "tagOnCreate": true,
     "tagUpdatable": true,
@@ -96,39 +101,6 @@
     "/properties/DataSetId"
   ],
   "definitions": {
-    "IntegerDatasetParameter": {
-      "description": "<p>An integer parameter for a dataset.</p>",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "ValueType": {
-          "$ref": "#/definitions/DatasetParameterValueType"
-        },
-        "DefaultValues": {
-          "$ref": "#/definitions/IntegerDatasetParameterDefaultValues"
-        },
-        "Id": {
-          "minLength": 1,
-          "description": "<p>An identifier for the integer parameter created in the dataset.</p>",
-          "type": "string",
-          "maxLength": 128,
-          "markdownDescription": "<p>An identifier for the integer parameter created in the dataset.</p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9-]+$  \nUpdate requires: No interruption\n"
-        },
-        "Name": {
-          "minLength": 1,
-          "description": "<p>The name of the integer parameter that is created in the dataset.</p>",
-          "type": "string",
-          "maxLength": 2048,
-          "markdownDescription": "<p>The name of the integer parameter that is created in the dataset.</p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^[a-zA-Z0-9]+$  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Id",
-        "Name",
-        "ValueType"
-      ],
-      "markdownDescription": "<p>An integer parameter for a dataset.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
     "RowLevelPermissionPolicy": {
       "type": "string",
       "enum": [
@@ -175,6 +147,555 @@
       ],
       "markdownDescription": "<p>A set of rules associated with a tag.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "FileFormat": {
+      "type": "string",
+      "enum": [
+        "CSV",
+        "TSV",
+        "CLF",
+        "ELF",
+        "XLSX",
+        "JSON"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CSV | TSV | CLF | ELF | XLSX | JSON  \nUpdate requires: No interruption\n"
+    },
+    "JoinKeyProperties": {
+      "description": "<p>Properties associated with the columns participating in a join.</p>",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "UniqueKey": {
+          "description": "<p>A value that indicates that a row in a table is uniquely identified by the columns in\n            a join key. This is used by Amazon QuickSight to optimize query performance.</p>",
+          "type": "boolean",
+          "markdownDescription": "<p>A value that indicates that a row in a table is uniquely identified by the columns in\n            a join key. This is used by Amazon QuickSight to optimize query performance.</p>\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "<p>Properties associated with the columns participating in a join.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DecimalDatasetParameterDefaultValues": {
+      "description": "<p>The default values of a decimal parameter.</p>",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "StaticValues": {
+          "minItems": 0,
+          "maxItems": 32,
+          "description": "<p>A list of static default values for a given decimal parameter.</p>",
+          "type": "array",
+          "items": {
+            "default": 0,
+            "description": "<p>The default value for the decimal parameter.</p>",
+            "type": "number",
+            "markdownDescription": "<p>The default value for the decimal parameter.</p>\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "<p>A list of static default values for a given decimal parameter.</p>\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "<p>The default values of a decimal parameter.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Status": {
+      "type": "string",
+      "enum": [
+        "ENABLED",
+        "DISABLED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption\n"
+    },
+    "PhysicalTableMap": {
+      "patternProperties": {
+        "^[0-9a-zA-Z-]*$": {
+          "$ref": "#/definitions/PhysicalTable"
+        }
+      },
+      "maxProperties": 32,
+      "additionalProperties": false,
+      "type": "object",
+      "minProperties": 0,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RefreshConfiguration": {
+      "description": "<p>The refresh configuration of a dataset.</p>",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "IncrementalRefresh": {
+          "$ref": "#/definitions/IncrementalRefresh"
+        }
+      },
+      "required": [
+        "IncrementalRefresh"
+      ],
+      "markdownDescription": "<p>The refresh configuration of a dataset.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RelationalTable": {
+      "description": "<p>A physical table type for relational data sources.</p>",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "DataSourceArn": {
+          "description": "<p>The Amazon Resource Name (ARN) for the data source.</p>",
+          "type": "string",
+          "markdownDescription": "<p>The Amazon Resource Name (ARN) for the data source.</p>\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "InputColumns": {
+          "minItems": 1,
+          "maxItems": 2048,
+          "description": "<p>The column schema of the table.</p>",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/InputColumn"
+          },
+          "markdownDescription": "<p>The column schema of the table.</p>\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "Schema": {
+          "minLength": 0,
+          "description": "<p>The schema name. This name applies to certain relational database engines.</p>",
+          "type": "string",
+          "maxLength": 256,
+          "markdownDescription": "<p>The schema name. This name applies to certain relational database engines.</p>\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        },
+        "Catalog": {
+          "minLength": 0,
+          "description": "<p>The catalog associated with a table.</p>",
+          "type": "string",
+          "maxLength": 256,
+          "markdownDescription": "<p>The catalog associated with a table.</p>\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        },
+        "Name": {
+          "minLength": 1,
+          "description": "<p>The name of the relational table.</p>",
+          "type": "string",
+          "maxLength": 256,
+          "markdownDescription": "<p>The name of the relational table.</p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "DataSourceArn",
+        "Name"
+      ],
+      "markdownDescription": "<p>A physical table type for relational data sources.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PerformanceConfiguration": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "UniqueKeys": {
+          "minItems": 1,
+          "maxItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UniqueKey"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "InputColumn": {
+      "description": "<p>Metadata for a column that is used as the input of a transform operation.</p>",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Type": {
+          "$ref": "#/definitions/InputColumnDataType"
+        },
+        "SubType": {
+          "$ref": "#/definitions/ColumnDataSubType"
+        },
+        "Name": {
+          "minLength": 1,
+          "description": "<p>The name of this column in the underlying data source.</p>",
+          "type": "string",
+          "maxLength": 127,
+          "markdownDescription": "<p>The name of this column in the underlying data source.</p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 127  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Name",
+        "Type"
+      ],
+      "markdownDescription": "<p>Metadata for a column that is used as the input of a transform operation.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LogicalTableMap": {
+      "patternProperties": {
+        "^[0-9a-zA-Z-]*$": {
+          "$ref": "#/definitions/LogicalTable"
+        }
+      },
+      "maxProperties": 64,
+      "additionalProperties": false,
+      "type": "object",
+      "minProperties": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DateTimeDatasetParameterDefaultValues": {
+      "description": "<p>The default values of a date time parameter.</p>",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "StaticValues": {
+          "minItems": 0,
+          "maxItems": 32,
+          "description": "<p>A list of static default values for a given date time parameter.</p>",
+          "type": "array",
+          "items": {
+            "description": "<p>The default value for the date time parameter.</p>",
+            "type": "string",
+            "markdownDescription": "<p>The default value for the date time parameter.</p>\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "<p>A list of static default values for a given date time parameter.</p>\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "<p>The default values of a date time parameter.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LogicalTableSource": {
+      "description": "<p>Information about the source of a logical table. This is a variant type structure. For\n            this structure to be valid, only one of the attributes can be non-null.</p>",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "PhysicalTableId": {
+          "minLength": 1,
+          "description": "<p>Physical table ID.</p>",
+          "type": "string",
+          "maxLength": 64,
+          "markdownDescription": "<p>Physical table ID.</p>\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[0-9a-zA-Z-]*$  \nUpdate requires: No interruption\n"
+        },
+        "JoinInstruction": {
+          "$ref": "#/definitions/JoinInstruction"
+        },
+        "DataSetArn": {
+          "description": "<p>The Amazon Resource Number (ARN) of the parent dataset.</p>",
+          "type": "string",
+          "markdownDescription": "<p>The Amazon Resource Number (ARN) of the parent dataset.</p>\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "<p>Information about the source of a logical table. This is a variant type structure. For\n            this structure to be valid, only one of the attributes can be non-null.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "TextQualifier": {
+      "type": "string",
+      "enum": [
+        "DOUBLE_QUOTE",
+        "SINGLE_QUOTE"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DOUBLE_QUOTE | SINGLE_QUOTE  \nUpdate requires: No interruption\n"
+    },
+    "DecimalDatasetParameter": {
+      "description": "<p>A decimal parameter for a dataset.</p>",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ValueType": {
+          "$ref": "#/definitions/DatasetParameterValueType"
+        },
+        "DefaultValues": {
+          "$ref": "#/definitions/DecimalDatasetParameterDefaultValues"
+        },
+        "Id": {
+          "minLength": 1,
+          "description": "<p>An identifier for the decimal parameter created in the dataset.</p>",
+          "type": "string",
+          "maxLength": 128,
+          "markdownDescription": "<p>An identifier for the decimal parameter created in the dataset.</p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9-]+$  \nUpdate requires: No interruption\n"
+        },
+        "Name": {
+          "minLength": 1,
+          "description": "<p>The name of the decimal parameter that is created in the dataset.</p>",
+          "type": "string",
+          "maxLength": 2048,
+          "markdownDescription": "<p>The name of the decimal parameter that is created in the dataset.</p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^[a-zA-Z0-9]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Id",
+        "Name",
+        "ValueType"
+      ],
+      "markdownDescription": "<p>A decimal parameter for a dataset.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DateTimeDatasetParameter": {
+      "description": "<p>A date time parameter for a dataset.</p>",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ValueType": {
+          "$ref": "#/definitions/DatasetParameterValueType"
+        },
+        "TimeGranularity": {
+          "$ref": "#/definitions/TimeGranularity"
+        },
+        "DefaultValues": {
+          "$ref": "#/definitions/DateTimeDatasetParameterDefaultValues"
+        },
+        "Id": {
+          "minLength": 1,
+          "description": "<p>An identifier for the parameter that is created in the dataset.</p>",
+          "type": "string",
+          "maxLength": 128,
+          "markdownDescription": "<p>An identifier for the parameter that is created in the dataset.</p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9-]+$  \nUpdate requires: No interruption\n"
+        },
+        "Name": {
+          "minLength": 1,
+          "description": "<p>The name of the date time parameter that is created in the dataset.</p>",
+          "type": "string",
+          "maxLength": 2048,
+          "markdownDescription": "<p>The name of the date time parameter that is created in the dataset.</p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^[a-zA-Z0-9]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Id",
+        "Name",
+        "ValueType"
+      ],
+      "markdownDescription": "<p>A date time parameter for a dataset.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RefreshFailureAlertStatus": {
+      "type": "string",
+      "enum": [
+        "ENABLED",
+        "DISABLED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption\n"
+    },
+    "GeoSpatialColumnGroup": {
+      "description": "<p>Geospatial column group that denotes a hierarchy.</p>",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Columns": {
+          "minItems": 1,
+          "maxItems": 16,
+          "description": "<p>Columns in this hierarchy.</p>",
+          "type": "array",
+          "items": {
+            "minLength": 1,
+            "type": "string",
+            "maxLength": 127,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 127  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "<p>Columns in this hierarchy.</p>\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "CountryCode": {
+          "$ref": "#/definitions/GeoSpatialCountryCode"
+        },
+        "Name": {
+          "minLength": 1,
+          "description": "<p>A display name for the hierarchy.</p>",
+          "type": "string",
+          "maxLength": 64,
+          "markdownDescription": "<p>A display name for the hierarchy.</p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Columns",
+        "Name"
+      ],
+      "markdownDescription": "<p>Geospatial column group that denotes a hierarchy.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "GeoSpatialCountryCode": {
+      "type": "string",
+      "enum": [
+        "US"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: US  \nUpdate requires: No interruption\n"
+    },
+    "OverrideDatasetParameterOperation": {
+      "description": "<p>A transform operation that overrides the dataset parameter values that are defined in another dataset.</p>",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "NewDefaultValues": {
+          "$ref": "#/definitions/NewDefaultValues"
+        },
+        "ParameterName": {
+          "minLength": 1,
+          "description": "<p>The name of the parameter to be overridden with different values.</p>",
+          "type": "string",
+          "maxLength": 2048,
+          "markdownDescription": "<p>The name of the parameter to be overridden with different values.</p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^[a-zA-Z0-9]+$  \nUpdate requires: No interruption\n"
+        },
+        "NewParameterName": {
+          "minLength": 1,
+          "description": "<p>The new name for the parameter.</p>",
+          "type": "string",
+          "maxLength": 2048,
+          "markdownDescription": "<p>The new name for the parameter.</p>\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^[a-zA-Z0-9]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ParameterName"
+      ],
+      "markdownDescription": "<p>A transform operation that overrides the dataset parameter values that are defined in another dataset.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DatasetParameter": {
+      "description": "<p>A dataset parameter.</p>",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "IntegerDatasetParameter": {
+          "$ref": "#/definitions/IntegerDatasetParameter"
+        },
+        "DateTimeDatasetParameter": {
+          "$ref": "#/definitions/DateTimeDatasetParameter"
+        },
+        "DecimalDatasetParameter": {
+          "$ref": "#/definitions/DecimalDatasetParameter"
+        },
+        "StringDatasetParameter": {
+          "$ref": "#/definitions/StringDatasetParameter"
+        }
+      },
+      "markdownDescription": "<p>A dataset parameter.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "IntegerDatasetParameterDefaultValues": {
+      "description": "<p>The default values of an integer parameter.</p>",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "StaticValues": {
+          "minItems": 0,
+          "maxItems": 32,
+          "description": "<p>A list of static default values for a given integer parameter.</p>",
+          "type": "array",
+          "items": {
+            "default": 0,
+            "description": "<p>The default value for the integer parameter.</p>",
+            "type": "number",
+            "markdownDescription": "<p>The default value for the integer parameter.</p>\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "<p>A list of static default values for a given integer parameter.</p>\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "<p>The default values of an integer parameter.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DataSetUseAs": {
+      "type": "string",
+      "enum": [
+        "RLS_RULES"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: RLS_RULES  \nUpdate requires: No interruption\n"
+    },
+    "StringDatasetParameterDefaultValues": {
+      "description": "<p>The default values of a string parameter.</p>",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "StaticValues": {
+          "minItems": 0,
+          "maxItems": 32,
+          "description": "<p>A list of static default values for a given string parameter.</p>",
+          "type": "array",
+          "items": {
+            "minLength": 0,
+            "description": "<p>The default value for the string parameter.</p>",
+            "type": "string",
+            "maxLength": 512,
+            "markdownDescription": "<p>The default value for the string parameter.</p>\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 512  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "<p>A list of static default values for a given string parameter.</p>\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "<p>The default values of a string parameter.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LookbackWindowSizeUnit": {
+      "type": "string",
+      "enum": [
+        "HOUR",
+        "DAY",
+        "WEEK"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: HOUR | DAY | WEEK  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "description": "<p>The key or keys of the key-value pairs for the resource tag or tags assigned to the\n            resource.</p>",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "minLength": 1,
+          "description": "<p>Tag value.</p>",
+          "type": "string",
+          "maxLength": 256,
+          "markdownDescription": "<p>Tag value.</p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        },
+        "Key": {
+          "minLength": 1,
+          "description": "<p>Tag key.</p>",
+          "type": "string",
+          "maxLength": 128,
+          "markdownDescription": "<p>Tag key.</p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "<p>The key or keys of the key-value pairs for the resource tag or tags assigned to the\n            resource.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ProjectOperation": {
+      "description": "<p>A transform operation that projects columns. Operations that come after a projection\n            can only refer to projected columns.</p>",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ProjectedColumns": {
+          "minItems": 0,
+          "maxItems": 2000,
+          "description": "<p>Projected columns.</p>",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "<p>Projected columns.</p>\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ProjectedColumns"
+      ],
+      "markdownDescription": "<p>A transform operation that projects columns. Operations that come after a projection\n            can only refer to projected columns.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "IntegerDatasetParameter": {
+      "description": "<p>An integer parameter for a dataset.</p>",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ValueType": {
+          "$ref": "#/definitions/DatasetParameterValueType"
+        },
+        "DefaultValues": {
+          "$ref": "#/definitions/IntegerDatasetParameterDefaultValues"
+        },
+        "Id": {
+          "minLength": 1,
+          "description": "<p>An identifier for the integer parameter created in the dataset.</p>",
+          "type": "string",
+          "maxLength": 128,
+          "markdownDescription": "<p>An identifier for the integer parameter created in the dataset.</p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9-]+$  \nUpdate requires: No interruption\n"
+        },
+        "Name": {
+          "minLength": 1,
+          "description": "<p>The name of the integer parameter that is created in the dataset.</p>",
+          "type": "string",
+          "maxLength": 2048,
+          "markdownDescription": "<p>The name of the integer parameter that is created in the dataset.</p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^[a-zA-Z0-9]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Id",
+        "Name",
+        "ValueType"
+      ],
+      "markdownDescription": "<p>An integer parameter for a dataset.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RefreshFailureConfiguration": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "EmailAlert": {
+          "$ref": "#/definitions/RefreshFailureEmailAlert"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "LogicalTable": {
       "description": "<p>A <i>logical table</i> is a unit that joins and that data\n            transformations operate on. A logical table has a source, which can be either a physical\n            table or result of a join. When a logical table points to a physical table, the logical\n            table acts as a mutable copy of that physical table through transform operations.</p>",
       "additionalProperties": false,
@@ -205,18 +726,6 @@
         "Alias"
       ],
       "markdownDescription": "<p>A <i>logical table</i> is a unit that joins and that data\n            transformations operate on. A logical table has a source, which can be either a physical\n            table or result of a join. When a logical table points to a physical table, the logical\n            table acts as a mutable copy of that physical table through transform operations.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "FileFormat": {
-      "type": "string",
-      "enum": [
-        "CSV",
-        "TSV",
-        "CLF",
-        "ELF",
-        "XLSX",
-        "JSON"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CSV | TSV | CLF | ELF | XLSX | JSON  \nUpdate requires: No interruption\n"
     },
     "IngestionWaitPolicy": {
       "description": "<p>Wait policy to use when creating/updating dataset. Default is to wait for SPICE ingestion to finish with timeout of 36 hours.</p>",
@@ -272,6 +781,16 @@
         "ValueType"
       ],
       "markdownDescription": "<p>A string parameter for a dataset.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RefreshFailureEmailAlert": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "AlertStatus": {
+          "$ref": "#/definitions/RefreshFailureAlertStatus"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "UntagColumnOperation": {
       "description": "<p>A transform operation that removes tags associated with a column.</p>",
@@ -432,33 +951,17 @@
       "type": "object",
       "properties": {
         "Columns": {
-          "minItems": 1,
+          "minItems": 0,
           "maxItems": 128,
           "description": "<p>Calculated columns to create.</p>",
           "type": "array",
           "items": {
             "$ref": "#/definitions/CalculatedColumn"
           },
-          "markdownDescription": "<p>Calculated columns to create.</p>\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+          "markdownDescription": "<p>Calculated columns to create.</p>\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         }
       },
-      "required": [
-        "Columns"
-      ],
       "markdownDescription": "<p>A transform operation that creates calculated columns. Columns created in one such\n            operation form a lexical closure.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "JoinKeyProperties": {
-      "description": "<p>Properties associated with the columns participating in a join.</p>",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "UniqueKey": {
-          "description": "<p>A value that indicates that a row in a table is uniquely identified by the columns in\n            a join key. This is used by Amazon QuickSight to optimize query performance.</p>",
-          "type": "boolean",
-          "markdownDescription": "<p>A value that indicates that a row in a table is uniquely identified by the columns in\n            a join key. This is used by Amazon QuickSight to optimize query performance.</p>\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "<p>Properties associated with the columns participating in a join.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "ResourcePermission": {
       "description": "<p>Permission for the resource.</p>",
@@ -490,47 +993,6 @@
       ],
       "markdownDescription": "<p>Permission for the resource.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "DecimalDatasetParameterDefaultValues": {
-      "description": "<p>The default values of a decimal parameter.</p>",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "StaticValues": {
-          "minItems": 0,
-          "maxItems": 32,
-          "description": "<p>A list of static default values for a given decimal parameter.</p>",
-          "type": "array",
-          "items": {
-            "default": 0,
-            "description": "<p>The default value for the decimal parameter.</p>",
-            "type": "number",
-            "markdownDescription": "<p>The default value for the decimal parameter.</p>\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
-          },
-          "markdownDescription": "<p>A list of static default values for a given decimal parameter.</p>\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "<p>The default values of a decimal parameter.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "Status": {
-      "type": "string",
-      "enum": [
-        "ENABLED",
-        "DISABLED"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption\n"
-    },
-    "PhysicalTableMap": {
-      "patternProperties": {
-        "^[0-9a-zA-Z-]*$": {
-          "$ref": "#/definitions/PhysicalTable"
-        }
-      },
-      "maxProperties": 32,
-      "additionalProperties": false,
-      "type": "object",
-      "minProperties": 0,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
     "TagColumnOperation": {
       "description": "<p>A transform operation that tags a column with additional information.</p>",
       "additionalProperties": false,
@@ -560,20 +1022,6 @@
       ],
       "markdownDescription": "<p>A transform operation that tags a column with additional information.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "RefreshConfiguration": {
-      "description": "<p>The refresh configuration of a dataset.</p>",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "IncrementalRefresh": {
-          "$ref": "#/definitions/IncrementalRefresh"
-        }
-      },
-      "required": [
-        "IncrementalRefresh"
-      ],
-      "markdownDescription": "<p>The refresh configuration of a dataset.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
     "LookbackWindow": {
       "description": "<p>The lookback window setup of an incremental refresh configuration.</p>",
       "additionalProperties": false,
@@ -602,54 +1050,6 @@
       ],
       "markdownDescription": "<p>The lookback window setup of an incremental refresh configuration.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "RelationalTable": {
-      "description": "<p>A physical table type for relational data sources.</p>",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "DataSourceArn": {
-          "description": "<p>The Amazon Resource Name (ARN) for the data source.</p>",
-          "type": "string",
-          "markdownDescription": "<p>The Amazon Resource Name (ARN) for the data source.</p>\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "InputColumns": {
-          "minItems": 1,
-          "maxItems": 2048,
-          "description": "<p>The column schema of the table.</p>",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/InputColumn"
-          },
-          "markdownDescription": "<p>The column schema of the table.</p>\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "Schema": {
-          "minLength": 0,
-          "description": "<p>The schema name. This name applies to certain relational database engines.</p>",
-          "type": "string",
-          "maxLength": 256,
-          "markdownDescription": "<p>The schema name. This name applies to certain relational database engines.</p>\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
-        },
-        "Catalog": {
-          "minLength": 0,
-          "description": "<p>The catalog associated with a table.</p>",
-          "type": "string",
-          "maxLength": 256,
-          "markdownDescription": "<p>The catalog associated with a table.</p>\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
-        },
-        "Name": {
-          "minLength": 1,
-          "description": "<p>The name of the relational table.</p>",
-          "type": "string",
-          "maxLength": 256,
-          "markdownDescription": "<p>The name of the relational table.</p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "DataSourceArn",
-        "Name"
-      ],
-      "markdownDescription": "<p>A physical table type for relational data sources.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
     "DatasetParameterValueType": {
       "type": "string",
       "enum": [
@@ -657,22 +1057,6 @@
         "SINGLE_VALUED"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MULTI_VALUED | SINGLE_VALUED  \nUpdate requires: No interruption\n"
-    },
-    "PerformanceConfiguration": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "UniqueKeys": {
-          "minItems": 1,
-          "maxItems": 1,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/UniqueKey"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "CalculatedColumn": {
       "description": "<p>A calculated column for a dataset.</p>",
@@ -715,6 +1099,9 @@
       "properties": {
         "RefreshConfiguration": {
           "$ref": "#/definitions/RefreshConfiguration"
+        },
+        "FailureConfiguration": {
+          "$ref": "#/definitions/RefreshFailureConfiguration"
         }
       },
       "markdownDescription": "<p>The refresh properties of a dataset.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
@@ -737,13 +1124,14 @@
           "items": {
             "$ref": "#/definitions/InputColumn"
           },
-          "markdownDescription": "<p>A physical table type for an S3 data source.</p>\n         <note>\n            <p>For files that aren't JSON, only <code>STRING</code> data types are supported in input columns.</p>\n         </note>\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+          "markdownDescription": "<p>A physical table type for an S3 data source.</p>\n         <note>\n            <p>For files that aren't JSON, only <code>STRING</code> data types are supported in input columns.</p>\n         </note>\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         },
-        "UploadSettings": {}
+        "UploadSettings": {
+          "$ref": "#/definitions/UploadSettings"
+        }
       },
       "required": [
-        "DataSourceArn",
-        "InputColumns"
+        "DataSourceArn"
       ],
       "markdownDescription": "<p>A physical table type for an S3 data source.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
@@ -772,43 +1160,6 @@
         }
       },
       "markdownDescription": "<p>A FieldFolder element is a folder that contains fields and nested subfolders.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "InputColumn": {
-      "description": "<p>Metadata for a column that is used as the input of a transform operation.</p>",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Type": {
-          "$ref": "#/definitions/InputColumnDataType"
-        },
-        "SubType": {
-          "$ref": "#/definitions/ColumnDataSubType"
-        },
-        "Name": {
-          "minLength": 1,
-          "description": "<p>The name of this column in the underlying data source.</p>",
-          "type": "string",
-          "maxLength": 127,
-          "markdownDescription": "<p>The name of this column in the underlying data source.</p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 127  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Name",
-        "Type"
-      ],
-      "markdownDescription": "<p>Metadata for a column that is used as the input of a transform operation.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "LogicalTableMap": {
-      "patternProperties": {
-        "^[0-9a-zA-Z-]*$": {
-          "$ref": "#/definitions/LogicalTable"
-        }
-      },
-      "maxProperties": 64,
-      "additionalProperties": false,
-      "type": "object",
-      "minProperties": 1,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "IncrementalRefresh": {
       "description": "<p>The incremental refresh configuration for a dataset.</p>",
@@ -877,49 +1228,6 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: FLOAT | FIXED  \nUpdate requires: No interruption\n"
     },
-    "DateTimeDatasetParameterDefaultValues": {
-      "description": "<p>The default values of a date time parameter.</p>",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "StaticValues": {
-          "minItems": 0,
-          "maxItems": 32,
-          "description": "<p>A list of static default values for a given date time parameter.</p>",
-          "type": "array",
-          "items": {
-            "description": "<p>The default value for the date time parameter.</p>",
-            "type": "string",
-            "markdownDescription": "<p>The default value for the date time parameter.</p>\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-          },
-          "markdownDescription": "<p>A list of static default values for a given date time parameter.</p>\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "<p>The default values of a date time parameter.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "LogicalTableSource": {
-      "description": "<p>Information about the source of a logical table. This is a variant type structure. For\n            this structure to be valid, only one of the attributes can be non-null.</p>",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "PhysicalTableId": {
-          "minLength": 1,
-          "description": "<p>Physical table ID.</p>",
-          "type": "string",
-          "maxLength": 64,
-          "markdownDescription": "<p>Physical table ID.</p>\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[0-9a-zA-Z-]*$  \nUpdate requires: No interruption\n"
-        },
-        "JoinInstruction": {
-          "$ref": "#/definitions/JoinInstruction"
-        },
-        "DataSetArn": {
-          "description": "<p>The Amazon Resource Number (ARN) of the parent dataset.</p>",
-          "type": "string",
-          "markdownDescription": "<p>The Amazon Resource Number (ARN) of the parent dataset.</p>\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "<p>Information about the source of a logical table. This is a variant type structure. For\n            this structure to be valid, only one of the attributes can be non-null.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
     "ColumnTag": {
       "description": "<p>A tag for a column in a\n            <code>\n               <a href=\"https://docs.aws.amazon.com/quicksight/latest/APIReference/API_TagColumnOperation.html\">TagColumnOperation</a>\n            </code>\n            structure. This is a\n            variant type structure. For this structure to be valid, only one of the attributes can\n            be non-null.</p>",
       "additionalProperties": false,
@@ -933,14 +1241,6 @@
         }
       },
       "markdownDescription": "<p>A tag for a column in a\n            <code>\n               <a href=\"https://docs.aws.amazon.com/quicksight/latest/APIReference/API_TagColumnOperation.html\">TagColumnOperation</a>\n            </code>\n            structure. This is a\n            variant type structure. For this structure to be valid, only one of the attributes can\n            be non-null.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "TextQualifier": {
-      "type": "string",
-      "enum": [
-        "DOUBLE_QUOTE",
-        "SINGLE_QUOTE"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DOUBLE_QUOTE | SINGLE_QUOTE  \nUpdate requires: No interruption\n"
     },
     "ColumnDescription": {
       "description": "<p>Metadata that contains a description for a column.</p>",
@@ -1016,7 +1316,7 @@
           "description": "<p>The new name for the column.</p>",
           "type": "string",
           "maxLength": 127,
-          "markdownDescription": "<p>The new name for the column.</p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 127  \nUpdate requires: No interruption\n"
+          "markdownDescription": "<p>The new name for the column.</p>\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 127  \nUpdate requires: No interruption\n"
         },
         "ColumnName": {
           "minLength": 1,
@@ -1027,8 +1327,7 @@
         }
       },
       "required": [
-        "ColumnName",
-        "NewColumnName"
+        "ColumnName"
       ],
       "markdownDescription": "<p>A transform operation that renames a column.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
@@ -1050,39 +1349,6 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: VERSION_1 | VERSION_2  \nUpdate requires: No interruption\n"
     },
-    "DecimalDatasetParameter": {
-      "description": "<p>A decimal parameter for a dataset.</p>",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "ValueType": {
-          "$ref": "#/definitions/DatasetParameterValueType"
-        },
-        "DefaultValues": {
-          "$ref": "#/definitions/DecimalDatasetParameterDefaultValues"
-        },
-        "Id": {
-          "minLength": 1,
-          "description": "<p>An identifier for the decimal parameter created in the dataset.</p>",
-          "type": "string",
-          "maxLength": 128,
-          "markdownDescription": "<p>An identifier for the decimal parameter created in the dataset.</p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9-]+$  \nUpdate requires: No interruption\n"
-        },
-        "Name": {
-          "minLength": 1,
-          "description": "<p>The name of the decimal parameter that is created in the dataset.</p>",
-          "type": "string",
-          "maxLength": 2048,
-          "markdownDescription": "<p>The name of the decimal parameter that is created in the dataset.</p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^[a-zA-Z0-9]+$  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Id",
-        "Name",
-        "ValueType"
-      ],
-      "markdownDescription": "<p>A decimal parameter for a dataset.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
     "ColumnDataType": {
       "type": "string",
       "enum": [
@@ -1092,42 +1358,6 @@
         "DATETIME"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: STRING | INTEGER | DECIMAL | DATETIME  \nUpdate requires: No interruption\n"
-    },
-    "DateTimeDatasetParameter": {
-      "description": "<p>A date time parameter for a dataset.</p>",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "ValueType": {
-          "$ref": "#/definitions/DatasetParameterValueType"
-        },
-        "TimeGranularity": {
-          "$ref": "#/definitions/TimeGranularity"
-        },
-        "DefaultValues": {
-          "$ref": "#/definitions/DateTimeDatasetParameterDefaultValues"
-        },
-        "Id": {
-          "minLength": 1,
-          "description": "<p>An identifier for the parameter that is created in the dataset.</p>",
-          "type": "string",
-          "maxLength": 128,
-          "markdownDescription": "<p>An identifier for the parameter that is created in the dataset.</p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9-]+$  \nUpdate requires: No interruption\n"
-        },
-        "Name": {
-          "minLength": 1,
-          "description": "<p>The name of the date time parameter that is created in the dataset.</p>",
-          "type": "string",
-          "maxLength": 2048,
-          "markdownDescription": "<p>The name of the date time parameter that is created in the dataset.</p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^[a-zA-Z0-9]+$  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Id",
-        "Name",
-        "ValueType"
-      ],
-      "markdownDescription": "<p>A date time parameter for a dataset.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "JoinInstruction": {
       "description": "<p>The instructions associated with a join. </p>",
@@ -1271,76 +1501,6 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: STRING | INTEGER | DECIMAL | DATETIME | BIT | BOOLEAN | JSON  \nUpdate requires: No interruption\n"
     },
-    "GeoSpatialColumnGroup": {
-      "description": "<p>Geospatial column group that denotes a hierarchy.</p>",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Columns": {
-          "minItems": 1,
-          "maxItems": 16,
-          "description": "<p>Columns in this hierarchy.</p>",
-          "type": "array",
-          "items": {
-            "minLength": 1,
-            "type": "string",
-            "maxLength": 127,
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 127  \nUpdate requires: No interruption\n"
-          },
-          "markdownDescription": "<p>Columns in this hierarchy.</p>\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "CountryCode": {
-          "$ref": "#/definitions/GeoSpatialCountryCode"
-        },
-        "Name": {
-          "minLength": 1,
-          "description": "<p>A display name for the hierarchy.</p>",
-          "type": "string",
-          "maxLength": 64,
-          "markdownDescription": "<p>A display name for the hierarchy.</p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Columns",
-        "Name"
-      ],
-      "markdownDescription": "<p>Geospatial column group that denotes a hierarchy.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "GeoSpatialCountryCode": {
-      "type": "string",
-      "enum": [
-        "US"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: US  \nUpdate requires: No interruption\n"
-    },
-    "OverrideDatasetParameterOperation": {
-      "description": "<p>A transform operation that overrides the dataset parameter values that are defined in another dataset.</p>",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "NewDefaultValues": {
-          "$ref": "#/definitions/NewDefaultValues"
-        },
-        "ParameterName": {
-          "minLength": 1,
-          "description": "<p>The name of the parameter to be overridden with different values.</p>",
-          "type": "string",
-          "maxLength": 2048,
-          "markdownDescription": "<p>The name of the parameter to be overridden with different values.</p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^[a-zA-Z0-9]+$  \nUpdate requires: No interruption\n"
-        },
-        "NewParameterName": {
-          "minLength": 1,
-          "description": "<p>The new name for the parameter.</p>",
-          "type": "string",
-          "maxLength": 2048,
-          "markdownDescription": "<p>The new name for the parameter.</p>\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^[a-zA-Z0-9]+$  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "ParameterName"
-      ],
-      "markdownDescription": "<p>A transform operation that overrides the dataset parameter values that are defined in another dataset.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
     "UniqueKey": {
       "additionalProperties": false,
       "type": "object",
@@ -1440,47 +1600,6 @@
       },
       "markdownDescription": "<p>The configuration that overrides the existing default values for a dataset parameter that is inherited from another dataset.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "DatasetParameter": {
-      "description": "<p>A dataset parameter.</p>",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "IntegerDatasetParameter": {
-          "$ref": "#/definitions/IntegerDatasetParameter"
-        },
-        "DateTimeDatasetParameter": {
-          "$ref": "#/definitions/DateTimeDatasetParameter"
-        },
-        "DecimalDatasetParameter": {
-          "$ref": "#/definitions/DecimalDatasetParameter"
-        },
-        "StringDatasetParameter": {
-          "$ref": "#/definitions/StringDatasetParameter"
-        }
-      },
-      "markdownDescription": "<p>A dataset parameter.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "IntegerDatasetParameterDefaultValues": {
-      "description": "<p>The default values of an integer parameter.</p>",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "StaticValues": {
-          "minItems": 0,
-          "maxItems": 32,
-          "description": "<p>A list of static default values for a given integer parameter.</p>",
-          "type": "array",
-          "items": {
-            "default": 0,
-            "description": "<p>The default value for the integer parameter.</p>",
-            "type": "number",
-            "markdownDescription": "<p>The default value for the integer parameter.</p>\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
-          },
-          "markdownDescription": "<p>A list of static default values for a given integer parameter.</p>\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "<p>The default values of an integer parameter.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
     "DataSetUsageConfiguration": {
       "description": "<p>The usage configuration to apply to child datasets that reference this dataset as a source.</p>",
       "additionalProperties": false,
@@ -1500,63 +1619,6 @@
         }
       },
       "markdownDescription": "<p>The usage configuration to apply to child datasets that reference this dataset as a source.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "StringDatasetParameterDefaultValues": {
-      "description": "<p>The default values of a string parameter.</p>",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "StaticValues": {
-          "minItems": 0,
-          "maxItems": 32,
-          "description": "<p>A list of static default values for a given string parameter.</p>",
-          "type": "array",
-          "items": {
-            "minLength": 0,
-            "description": "<p>The default value for the string parameter.</p>",
-            "type": "string",
-            "maxLength": 512,
-            "markdownDescription": "<p>The default value for the string parameter.</p>\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 512  \nUpdate requires: No interruption\n"
-          },
-          "markdownDescription": "<p>A list of static default values for a given string parameter.</p>\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "<p>The default values of a string parameter.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "LookbackWindowSizeUnit": {
-      "type": "string",
-      "enum": [
-        "HOUR",
-        "DAY",
-        "WEEK"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: HOUR | DAY | WEEK  \nUpdate requires: No interruption\n"
-    },
-    "Tag": {
-      "description": "<p>The key or keys of the key-value pairs for the resource tag or tags assigned to the\n            resource.</p>",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Value": {
-          "minLength": 1,
-          "description": "<p>Tag value.</p>",
-          "type": "string",
-          "maxLength": 256,
-          "markdownDescription": "<p>Tag value.</p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
-        },
-        "Key": {
-          "minLength": 1,
-          "description": "<p>Tag key.</p>",
-          "type": "string",
-          "maxLength": 128,
-          "markdownDescription": "<p>Tag key.</p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Key",
-        "Value"
-      ],
-      "markdownDescription": "<p>The key or keys of the key-value pairs for the resource tag or tags assigned to the\n            resource.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "ColumnGroup": {
       "description": "<p>Groupings of columns that work together in certain Amazon QuickSight features. This is\n            a variant type structure. For this structure to be valid, only one of the attributes can\n            be non-null.</p>",
@@ -1610,52 +1672,14 @@
         "SqlQuery"
       ],
       "markdownDescription": "<p>A physical table type built from the results of the custom SQL query.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "ProjectOperation": {
-      "description": "<p>A transform operation that projects columns. Operations that come after a projection\n            can only refer to projected columns.</p>",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "ProjectedColumns": {
-          "minItems": 1,
-          "maxItems": 2000,
-          "description": "<p>Projected columns.</p>",
-          "type": "array",
-          "items": {
-            "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-          },
-          "markdownDescription": "<p>Projected columns.</p>\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "ProjectedColumns"
-      ],
-      "markdownDescription": "<p>A transform operation that projects columns. Operations that come after a projection\n            can only refer to projected columns.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
-    "PhysicalTableMap": {
-      "$ref": "#/definitions/PhysicalTableMap"
-    },
     "CreatedTime": {
       "format": "string",
       "description": "<p>The time that this dataset was created.</p>",
       "type": "string",
       "markdownDescription": "<p>The time that this dataset was created.</p>\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "FieldFolders": {
-      "$ref": "#/definitions/FieldFolderMap"
-    },
-    "LastUpdatedTime": {
-      "format": "string",
-      "description": "<p>The last time that this dataset was updated.</p>",
-      "type": "string",
-      "markdownDescription": "<p>The last time that this dataset was updated.</p>\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "DataSetId": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
     },
     "FolderArns": {
       "minItems": 0,
@@ -1674,17 +1698,8 @@
       "type": "number",
       "markdownDescription": "<p>The amount of SPICE capacity used by this dataset. This is 0 if the dataset isn't\n            imported into SPICE.</p>\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\nRead only property: Yes"
     },
-    "PerformanceConfiguration": {
-      "$ref": "#/definitions/PerformanceConfiguration"
-    },
     "RowLevelPermissionDataSet": {
       "$ref": "#/definitions/RowLevelPermissionDataSet"
-    },
-    "DataSetRefreshProperties": {
-      "$ref": "#/definitions/DataSetRefreshProperties"
-    },
-    "RowLevelPermissionTagConfiguration": {
-      "$ref": "#/definitions/RowLevelPermissionTagConfiguration"
     },
     "IngestionWaitPolicy": {
       "$ref": "#/definitions/IngestionWaitPolicy"
@@ -1704,6 +1719,54 @@
       "type": "string",
       "maxLength": 128,
       "markdownDescription": "<p>The display name for the dataset.</p>\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+    },
+    "Permissions": {
+      "minItems": 1,
+      "maxItems": 64,
+      "description": "<p>A list of resource permissions on the dataset.</p>",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ResourcePermission"
+      },
+      "markdownDescription": "<p>A list of resource permissions on the dataset.</p>\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "UseAs": {
+      "$ref": "#/definitions/DataSetUseAs"
+    },
+    "Tags": {
+      "minItems": 1,
+      "maxItems": 200,
+      "description": "<p>Contains a map of the key-value pairs for the resource tag or tags assigned to the dataset.</p>",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "<p>Contains a map of the key-value pairs for the resource tag or tags assigned to the dataset.</p>\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "PhysicalTableMap": {
+      "$ref": "#/definitions/PhysicalTableMap"
+    },
+    "FieldFolders": {
+      "$ref": "#/definitions/FieldFolderMap"
+    },
+    "LastUpdatedTime": {
+      "format": "string",
+      "description": "<p>The last time that this dataset was updated.</p>",
+      "type": "string",
+      "markdownDescription": "<p>The last time that this dataset was updated.</p>\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "DataSetId": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "PerformanceConfiguration": {
+      "$ref": "#/definitions/PerformanceConfiguration"
+    },
+    "DataSetRefreshProperties": {
+      "$ref": "#/definitions/DataSetRefreshProperties"
+    },
+    "RowLevelPermissionTagConfiguration": {
+      "$ref": "#/definitions/RowLevelPermissionTagConfiguration"
     },
     "ColumnGroups": {
       "minItems": 1,
@@ -1740,16 +1803,6 @@
     "DataSetUsageConfiguration": {
       "$ref": "#/definitions/DataSetUsageConfiguration"
     },
-    "Permissions": {
-      "minItems": 1,
-      "maxItems": 64,
-      "description": "<p>A list of resource permissions on the dataset.</p>",
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/ResourcePermission"
-      },
-      "markdownDescription": "<p>A list of resource permissions on the dataset.</p>\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-    },
     "OutputColumns": {
       "description": "<p>The list of columns after all transforms. These columns are available in templates,\n            analyses, and dashboards.</p>",
       "type": "array",
@@ -1762,16 +1815,6 @@
       "description": "<p>The Amazon Resource Name (ARN) of the resource.</p>",
       "type": "string",
       "markdownDescription": "<p>The Amazon Resource Name (ARN) of the resource.</p>\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "Tags": {
-      "minItems": 1,
-      "maxItems": 200,
-      "description": "<p>Contains a map of the key-value pairs for the resource tag or tags assigned to the dataset.</p>",
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/Tag"
-      },
-      "markdownDescription": "<p>Contains a map of the key-value pairs for the resource tag or tags assigned to the dataset.</p>\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "attributes": {
@@ -1781,17 +1824,17 @@
       "type": "string",
       "markdownDescription": "<p>The time that this dataset was created.</p>\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
-    "LastUpdatedTime": {
-      "format": "string",
-      "description": "<p>The last time that this dataset was updated.</p>",
-      "type": "string",
-      "markdownDescription": "<p>The last time that this dataset was updated.</p>\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
     "ConsumedSpiceCapacityInBytes": {
       "default": 0,
       "description": "<p>The amount of SPICE capacity used by this dataset. This is 0 if the dataset isn't\n            imported into SPICE.</p>",
       "type": "number",
       "markdownDescription": "<p>The amount of SPICE capacity used by this dataset. This is 0 if the dataset isn't\n            imported into SPICE.</p>\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "LastUpdatedTime": {
+      "format": "string",
+      "description": "<p>The last time that this dataset was updated.</p>",
+      "type": "string",
+      "markdownDescription": "<p>The last time that this dataset was updated.</p>\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "OutputColumns": {
       "description": "<p>The list of columns after all transforms. These columns are available in templates,\n            analyses, and dashboards.</p>",

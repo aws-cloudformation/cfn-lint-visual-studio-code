@@ -1,13 +1,33 @@
 {
   "typeName": "AWS::Omics::SequenceStore",
-  "description": "Definition of AWS::Omics::SequenceStore Resource Type",
+  "description": "Resource Type definition for AWS::Omics::SequenceStore",
   "definitions": {
+    "ETagAlgorithmFamily": {
+      "type": "string",
+      "enum": [
+        "MD5up",
+        "SHA256up",
+        "SHA512up"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MD5up | SHA256up | SHA512up  \nUpdate requires: No interruption\n"
+    },
     "EncryptionType": {
       "type": "string",
       "enum": [
         "KMS"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: KMS  \nUpdate requires: No interruption\n"
+    },
+    "SequenceStoreStatus": {
+      "type": "string",
+      "enum": [
+        "CREATING",
+        "ACTIVE",
+        "UPDATING",
+        "DELETING",
+        "FAILED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | ACTIVE | UPDATING | DELETING | FAILED  \nUpdate requires: No interruption\n"
     },
     "SseConfig": {
       "type": "object",
@@ -45,6 +65,11 @@
     }
   },
   "properties": {
+    "AccessLogLocation": {
+      "type": "string",
+      "description": "Location of the access logs.",
+      "markdownDescription": "Location of the access logs.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^$|^s3://([a-z0-9][a-z0-9-.]{1,61}[a-z0-9])/?((.{1,800})/)?$  \nUpdate requires: No interruption\n"
+    },
     "Arn": {
       "type": "string",
       "maxLength": 127,
@@ -63,20 +88,53 @@
       "maxLength": 255,
       "minLength": 1,
       "description": "A description for the store.",
-      "markdownDescription": "A description for the store.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[\\p{L}||\\p{M}||\\p{Z}||\\p{S}||\\p{N}||\\p{P}]+$  \nUpdate requires: Replacement\n"
+      "markdownDescription": "A description for the store.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[\\p{L}||\\p{M}||\\p{Z}||\\p{S}||\\p{N}||\\p{P}]+$  \nUpdate requires: No interruption\n"
+    },
+    "ETagAlgorithmFamily": {
+      "$ref": "#/definitions/ETagAlgorithmFamily"
+    },
+    "FallbackLocation": {
+      "type": "string",
+      "minLength": 0,
+      "description": "An S3 location that is used to store files that have failed a direct upload.",
+      "markdownDescription": "An S3 location that is used to store files that have failed a direct upload.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^$|^s3://([a-z0-9][a-z0-9-.]{1,61}[a-z0-9])/?((.{1,1024})/)?$  \nUpdate requires: No interruption\n"
     },
     "Name": {
       "type": "string",
       "maxLength": 127,
       "minLength": 1,
       "description": "A name for the store.",
-      "markdownDescription": "A name for the store.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 127  \nPattern: ^[\\p{L}||\\p{M}||\\p{Z}||\\p{S}||\\p{N}||\\p{P}]+$  \nUpdate requires: Replacement\n"
+      "markdownDescription": "A name for the store.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 127  \nPattern: ^[\\p{L}||\\p{M}||\\p{Z}||\\p{S}||\\p{N}||\\p{P}]+$  \nUpdate requires: No interruption\n"
     },
-    "FallbackLocation": {
+    "PropagatedSetLevelTags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 128,
+        "minLength": 1,
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+      },
+      "maxItems": 50,
+      "minItems": 0,
+      "description": "The tags keys to propagate to the S3 objects associated with read sets in the sequence store.",
+      "markdownDescription": "The tags keys to propagate to the S3 objects associated with read sets in the sequence store.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "S3AccessPointArn": {
       "type": "string",
+      "maxLength": 1024,
       "minLength": 1,
-      "description": "An S3 URI representing the bucket and folder to store failed read set uploads.",
-      "markdownDescription": "An S3 URI representing the bucket and folder to store failed read set uploads.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nPattern: ^s3:\\/\\/([a-z0-9][a-z0-9-.]{1,61}[a-z0-9])\\/?((.{1,1024})\\/)?$  \nUpdate requires: Replacement\n"
+      "description": "This is ARN of the access point associated with the S3 bucket storing read sets.",
+      "markdownDescription": "This is ARN of the access point associated with the S3 bucket storing read sets.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nPattern: ^arn:[^:]*:s3:[^:]*:[^:]*:accesspoint/.*$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "S3AccessPolicy": {
+      "description": "The resource policy that controls S3 access on the store",
+      "type": "object",
+      "markdownDescription": "The resource policy that controls S3 access on the store\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "S3Uri": {
+      "type": "string",
+      "description": "The S3 URI of the sequence store.",
+      "markdownDescription": "The S3 URI of the sequence store.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^s3://([a-z0-9][a-z0-9-.]{1,61}[a-z0-9])/(.{1,1024})$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "SequenceStoreId": {
       "type": "string",
@@ -87,8 +145,24 @@
     "SseConfig": {
       "$ref": "#/definitions/SseConfig"
     },
+    "Status": {
+      "$ref": "#/definitions/SequenceStoreStatus"
+    },
+    "StatusMessage": {
+      "type": "string",
+      "maxLength": 127,
+      "minLength": 1,
+      "description": "The status message of the sequence store.",
+      "markdownDescription": "The status message of the sequence store.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 127  \nPattern: ^[\\p{L}||\\p{M}||\\p{Z}||\\p{S}||\\p{N}||\\p{P}]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
     "Tags": {
       "$ref": "#/definitions/TagMap"
+    },
+    "UpdateTime": {
+      "type": "string",
+      "description": "The last-updated time of the sequence store.",
+      "format": "date-time",
+      "markdownDescription": "The last-updated time of the sequence store.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   },
   "required": [
@@ -97,17 +171,16 @@
   "readOnlyProperties": [
     "/properties/Arn",
     "/properties/CreationTime",
-    "/properties/SequenceStoreId"
-  ],
-  "writeOnlyProperties": [
-    "/properties/Tags"
+    "/properties/S3AccessPointArn",
+    "/properties/S3Uri",
+    "/properties/SequenceStoreId",
+    "/properties/Status",
+    "/properties/StatusMessage",
+    "/properties/UpdateTime"
   ],
   "createOnlyProperties": [
-    "/properties/Description",
-    "/properties/Name",
-    "/properties/FallbackLocation",
-    "/properties/SseConfig",
-    "/properties/Tags"
+    "/properties/ETagAlgorithmFamily",
+    "/properties/SseConfig"
   ],
   "primaryIdentifier": [
     "/properties/SequenceStoreId"
@@ -115,26 +188,44 @@
   "tagging": {
     "taggable": true,
     "tagOnCreate": true,
-    "tagUpdatable": false,
+    "tagUpdatable": true,
     "cloudFormationSystemTags": true,
     "tagProperty": "/properties/Tags",
     "permissions": [
       "omics:TagResource",
-      "omics:ListTagsForResource"
+      "omics:ListTagsForResource",
+      "omics:UntagResource"
     ]
   },
   "handlers": {
     "create": {
       "permissions": [
         "omics:CreateSequenceStore",
+        "omics:GetSequenceStore",
+        "omics:GetS3AccessPolicy",
+        "omics:PutS3AccessPolicy",
+        "omics:ListTagsForResource",
         "omics:TagResource",
         "kms:DescribeKey"
       ]
     },
     "read": {
       "permissions": [
+        "omics:GetS3AccessPolicy",
         "omics:GetSequenceStore",
         "omics:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "omics:UpdateSequenceStore",
+        "omics:GetSequenceStore",
+        "omics:TagResource",
+        "omics:UntagResource",
+        "omics:ListTagsForResource",
+        "omics:GetS3AccessPolicy",
+        "omics:DeleteS3AccessPolicy",
+        "omics:PutS3AccessPolicy"
       ]
     },
     "delete": {
@@ -163,11 +254,39 @@
       "format": "date-time",
       "markdownDescription": "When the store was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
+    "S3AccessPointArn": {
+      "type": "string",
+      "maxLength": 1024,
+      "minLength": 1,
+      "description": "This is ARN of the access point associated with the S3 bucket storing read sets.",
+      "markdownDescription": "This is ARN of the access point associated with the S3 bucket storing read sets.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nPattern: ^arn:[^:]*:s3:[^:]*:[^:]*:accesspoint/.*$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "S3Uri": {
+      "type": "string",
+      "description": "The S3 URI of the sequence store.",
+      "markdownDescription": "The S3 URI of the sequence store.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^s3://([a-z0-9][a-z0-9-.]{1,61}[a-z0-9])/(.{1,1024})$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
     "SequenceStoreId": {
       "type": "string",
       "maxLength": 36,
       "minLength": 10,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 10  \nMaximum Length: 36  \nPattern: ^[0-9]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Status": {
+      "$ref": "#/definitions/SequenceStoreStatus"
+    },
+    "StatusMessage": {
+      "type": "string",
+      "maxLength": 127,
+      "minLength": 1,
+      "description": "The status message of the sequence store.",
+      "markdownDescription": "The status message of the sequence store.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 127  \nPattern: ^[\\p{L}||\\p{M}||\\p{Z}||\\p{S}||\\p{N}||\\p{P}]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "UpdateTime": {
+      "type": "string",
+      "description": "The last-updated time of the sequence store.",
+      "format": "date-time",
+      "markdownDescription": "The last-updated time of the sequence store.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

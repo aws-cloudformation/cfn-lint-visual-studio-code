@@ -45,9 +45,11 @@
         "OPENSEARCH_SERVERLESS",
         "PINECONE",
         "RDS",
-        "MONGO_DB_ATLAS"
+        "MONGO_DB_ATLAS",
+        "NEPTUNE_ANALYTICS",
+        "OPENSEARCH_MANAGED_CLUSTER"
       ],
-      "markdownDescription": "The storage type of a knowledge base.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: OPENSEARCH_SERVERLESS | PINECONE | RDS | MONGO_DB_ATLAS  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The storage type of a knowledge base.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: OPENSEARCH_SERVERLESS | PINECONE | RDS | MONGO_DB_ATLAS | NEPTUNE_ANALYTICS | OPENSEARCH_MANAGED_CLUSTER  \nUpdate requires: No interruption\n"
     },
     "KnowledgeBaseType": {
       "type": "string",
@@ -58,6 +60,73 @@
         "SQL"
       ],
       "markdownDescription": "The type of a knowledge base.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: VECTOR | KENDRA | SQL  \nUpdate requires: No interruption\n"
+    },
+    "OpenSearchManagedClusterConfiguration": {
+      "type": "object",
+      "description": "Contains the storage configuration of the knowledge base in Amazon OpenSearch Service.",
+      "properties": {
+        "DomainArn": {
+          "type": "string",
+          "maxLength": 2048,
+          "description": "The Amazon Resource Name (ARN) of the OpenSearch domain.",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the OpenSearch domain.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nPattern: ^arn:aws(|-cn|-us-gov|-iso):es:[a-z]{2}(-gov)?-[a-z]+-\\d{1}:\\d{12}:domain/[a-z][a-z0-9-]{3,28}$  \nUpdate requires: No interruption\n"
+        },
+        "DomainEndpoint": {
+          "type": "string",
+          "maxLength": 2048,
+          "description": "The endpoint URL the OpenSearch domain.",
+          "markdownDescription": "The endpoint URL the OpenSearch domain.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nPattern: ^https://.*$  \nUpdate requires: No interruption\n"
+        },
+        "VectorIndexName": {
+          "type": "string",
+          "maxLength": 2048,
+          "minLength": 1,
+          "description": "The name of the vector store.",
+          "markdownDescription": "The name of the vector store.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^(?![\\-_+.])[a-z0-9][a-z0-9\\-_\\.]*$  \nUpdate requires: No interruption\n"
+        },
+        "FieldMapping": {
+          "$ref": "#/definitions/OpenSearchManagedClusterFieldMapping"
+        }
+      },
+      "required": [
+        "DomainArn",
+        "DomainEndpoint",
+        "VectorIndexName",
+        "FieldMapping"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Contains the storage configuration of the knowledge base in Amazon OpenSearch Service.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "OpenSearchManagedClusterFieldMapping": {
+      "type": "object",
+      "description": "A mapping of Bedrock Knowledge Base fields to OpenSearch Managed Cluster field names",
+      "properties": {
+        "VectorField": {
+          "type": "string",
+          "maxLength": 2048,
+          "description": "The name of the field in which Amazon Bedrock stores the vector embeddings for your data sources.",
+          "markdownDescription": "The name of the field in which Amazon Bedrock stores the vector embeddings for your data sources.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nPattern: ^.*$  \nUpdate requires: No interruption\n"
+        },
+        "TextField": {
+          "type": "string",
+          "maxLength": 2048,
+          "description": "The name of the field in which Amazon Bedrock stores the raw text from your data. The text is split according to the chunking strategy you choose.",
+          "markdownDescription": "The name of the field in which Amazon Bedrock stores the raw text from your data. The text is split according to the chunking strategy you choose.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nPattern: ^.*$  \nUpdate requires: No interruption\n"
+        },
+        "MetadataField": {
+          "type": "string",
+          "maxLength": 2048,
+          "description": "The name of the field in which Amazon Bedrock stores metadata about the vector store.",
+          "markdownDescription": "The name of the field in which Amazon Bedrock stores metadata about the vector store.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nPattern: ^.*$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "MetadataField",
+        "TextField",
+        "VectorField"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A mapping of Bedrock Knowledge Base fields to OpenSearch Managed Cluster field names\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "OpenSearchServerlessConfiguration": {
       "type": "object",
@@ -403,6 +472,52 @@
       "additionalProperties": false,
       "markdownDescription": "Contains the storage configuration of the knowledge base in MongoDb Atlas Cloud.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "NeptuneAnalyticsFieldMapping": {
+      "type": "object",
+      "description": "A mapping of Bedrock Knowledge Base fields to Neptune Analytics fields.",
+      "properties": {
+        "TextField": {
+          "type": "string",
+          "maxLength": 2048,
+          "description": "The name of the field in which Amazon Bedrock stores the raw text from your data. The text is split according to the chunking strategy you choose.",
+          "markdownDescription": "The name of the field in which Amazon Bedrock stores the raw text from your data. The text is split according to the chunking strategy you choose.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nPattern: ^.*$  \nUpdate requires: No interruption\n"
+        },
+        "MetadataField": {
+          "type": "string",
+          "maxLength": 2048,
+          "description": "The name of the field in which Amazon Bedrock stores metadata about the vector store.",
+          "markdownDescription": "The name of the field in which Amazon Bedrock stores metadata about the vector store.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nPattern: ^.*$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "TextField",
+        "MetadataField"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A mapping of Bedrock Knowledge Base fields to Neptune Analytics fields.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "NeptuneAnalyticsConfiguration": {
+      "type": "object",
+      "description": "Contains the configurations to use Neptune Analytics as Vector Store.",
+      "properties": {
+        "GraphArn": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "description": "ARN for Neptune Analytics graph database.",
+          "markdownDescription": "ARN for Neptune Analytics graph database.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^arn:aws(|-cn|-us-gov):neptune-graph:[a-zA-Z0-9-]*:[0-9]{12}:graph\\/g-[a-zA-Z0-9]{10}$  \nUpdate requires: No interruption\n"
+        },
+        "FieldMapping": {
+          "$ref": "#/definitions/NeptuneAnalyticsFieldMapping"
+        }
+      },
+      "required": [
+        "GraphArn",
+        "FieldMapping"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Contains the configurations to use Neptune Analytics as Vector Store.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "StorageConfiguration": {
       "type": "object",
       "description": "The vector store service in which the knowledge base is stored.",
@@ -421,6 +536,12 @@
         },
         "MongoDbAtlasConfiguration": {
           "$ref": "#/definitions/MongoDbAtlasConfiguration"
+        },
+        "NeptuneAnalyticsConfiguration": {
+          "$ref": "#/definitions/NeptuneAnalyticsConfiguration"
+        },
+        "OpensearchManagedClusterConfiguration": {
+          "$ref": "#/definitions/OpenSearchManagedClusterConfiguration"
         }
       },
       "required": [
@@ -444,7 +565,17 @@
         },
         {
           "required": [
+            "NeptuneAnalyticsConfiguration"
+          ]
+        },
+        {
+          "required": [
             "MongoDbAtlasConfiguration"
+          ]
+        },
+        {
+          "required": [
+            "OpensearchManagedClusterConfiguration"
           ]
         }
       ],
@@ -1194,7 +1325,12 @@
     "tagOnCreate": true,
     "tagProperty": "/properties/Tags",
     "tagUpdatable": true,
-    "taggable": true
+    "taggable": true,
+    "permissions": [
+      "bedrock:TagResource",
+      "bedrock:UntagResource",
+      "bedrock:ListTagsForResource"
+    ]
   },
   "additionalProperties": false,
   "attributes": {

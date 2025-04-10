@@ -87,20 +87,149 @@
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "AnalysisSource": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "Text",
+          "properties": {
+            "Text": {
+              "type": "string",
+              "maxLength": 90000,
+              "minLength": 0
+            }
+          },
+          "required": [
+            "Text"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Artifacts",
+          "properties": {
+            "Artifacts": {
+              "$ref": "#/definitions/AnalysisTemplateArtifacts"
+            }
+          },
+          "required": [
+            "Artifacts"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "AnalysisTemplateArtifacts": {
       "type": "object",
-      "additionalProperties": false,
       "properties": {
-        "Text": {
+        "EntryPoint": {
+          "$ref": "#/definitions/AnalysisTemplateArtifact"
+        },
+        "AdditionalArtifacts": {
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/AnalysisTemplateArtifact"
+          },
+          "maxItems": 1,
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "RoleArn": {
           "type": "string",
-          "minLength": 0,
-          "maxLength": 15000,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 15000  \nUpdate requires: No interruption\n"
+          "maxLength": 512,
+          "minLength": 32,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 32  \nMaximum Length: 512  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "Text"
+        "EntryPoint",
+        "RoleArn"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AnalysisTemplateArtifact": {
+      "type": "object",
+      "properties": {
+        "Location": {
+          "$ref": "#/definitions/S3Location"
+        }
+      },
+      "required": [
+        "Location"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "S3Location": {
+      "type": "object",
+      "properties": {
+        "Bucket": {
+          "type": "string",
+          "maxLength": 63,
+          "minLength": 3,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 3  \nMaximum Length: 63  \nUpdate requires: No interruption\n"
+        },
+        "Key": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Bucket",
+        "Key"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AnalysisSourceMetadata": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "Artifacts",
+          "properties": {
+            "Artifacts": {
+              "$ref": "#/definitions/AnalysisTemplateArtifactMetadata"
+            }
+          },
+          "required": [
+            "Artifacts"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "AnalysisTemplateArtifactMetadata": {
+      "type": "object",
+      "properties": {
+        "EntryPointHash": {
+          "$ref": "#/definitions/Hash"
+        },
+        "AdditionalArtifactHashes": {
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/Hash"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "EntryPointHash"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Hash": {
+      "type": "object",
+      "properties": {
+        "Sha256": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Tag": {
       "type": "object",
@@ -196,12 +325,16 @@
     "Source": {
       "$ref": "#/definitions/AnalysisSource"
     },
+    "SourceMetadata": {
+      "$ref": "#/definitions/AnalysisSourceMetadata"
+    },
     "Format": {
       "type": "string",
       "enum": [
-        "SQL"
+        "SQL",
+        "PYSPARK_1_0"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: SQL  \nUpdate requires: Replacement\n"
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: SQL | PYSPARK_1_0  \nUpdate requires: Replacement\n"
     }
   },
   "required": [
@@ -214,7 +347,6 @@
     "/properties/CollaborationArn",
     "/properties/CollaborationIdentifier",
     "/properties/AnalysisTemplateIdentifier",
-    "/properties/Schema",
     "/properties/Arn",
     "/properties/MembershipArn"
   ],
@@ -222,12 +354,9 @@
     "/properties/Name",
     "/properties/MembershipIdentifier",
     "/properties/Source",
-    "/properties/Source/Text",
     "/properties/Format",
     "/properties/AnalysisParameters",
-    "/properties/AnalysisParameters/Name",
-    "/properties/AnalysisParameters/Type",
-    "/properties/AnalysisParameters/DefaultValue"
+    "/properties/Schema"
   ],
   "primaryIdentifier": [
     "/properties/AnalysisTemplateIdentifier",
@@ -254,7 +383,8 @@
         "cleanrooms:ListTagsForResource",
         "cleanrooms:TagResource",
         "cleanrooms:GetAnalysisTemplate",
-        "cleanrooms:ListAnalysisTemplates"
+        "cleanrooms:ListAnalysisTemplates",
+        "iam:PassRole"
       ]
     },
     "read": {
@@ -325,9 +455,6 @@
       "type": "string",
       "maxLength": 100,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 100  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "Schema": {
-      "$ref": "#/definitions/AnalysisSchema"
     }
   }
 }
