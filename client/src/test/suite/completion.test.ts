@@ -219,7 +219,8 @@ export async function testCompletion(
   assert.equal(
     actualCompletionList.items.length,
     expectedCompletionList.items.length,
-    "Completion List doesn't have expected size"
+    "Completion List doesn't have expected size: " +
+      JSON.stringify(actualCompletionList.items)
   );
   expectedCompletionList.items
     .sort((a, b) => (a.label > b.label ? 1 : -1))

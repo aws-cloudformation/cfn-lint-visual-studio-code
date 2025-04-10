@@ -49,8 +49,6 @@ export class SettingsState extends YamlSettingsState {
   cfnLintIgnoreRules: Array<string> = [];
   cfnLintOverrideSpecPath: string = "";
 
-  indentation: string = "     ";
-
   pendingValidationRequests: { [uri: string]: NodeJS.Timeout } = {};
   validationDelayMs = 200;
 
@@ -58,28 +56,6 @@ export class SettingsState extends YamlSettingsState {
 
   constructor() {
     super();
-    this.customTags = [
-      "!And sequence",
-      "!If sequence",
-      "!Not sequence",
-      "!Equals sequence",
-      "!Or sequence",
-      "!FindInMap sequence",
-      "!Base64 scalar",
-      "!Join sequence",
-      "!Cidr sequence",
-      "!Ref scalar",
-      "!Sub scalar",
-      "!Sub sequence",
-      "!GetAtt scalar",
-      "!GetAtt sequence",
-      "!GetAZs mapping",
-      "!GetAZs scalar",
-      "!ImportValue mapping",
-      "!ImportValue scalar",
-      "!Select sequence",
-      "!Split sequence",
-    ];
     this.schemaStoreEnabled = false;
   }
 }
