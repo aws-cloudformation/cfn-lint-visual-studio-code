@@ -161,6 +161,14 @@
       "description": "A complex type that describes how CloudFront processes requests.\n You must create at least as many cache behaviors (including the default cache behavior) as you have origins if you want CloudFront to serve objects from all of the origins. Each cache behavior specifies the one origin from which you want CloudFront to get objects. If you have two origins and only the default cache behavior, the default cache behavior will cause CloudFront to get objects from one of the origins, but the other origin is never used.\n For the current quota (formerly known as limit) on the number of cache behaviors that you can add to a distribution, see [Quotas](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html) in the *Amazon CloudFront Developer Guide*.\n If you don't want to specify any cache behaviors, include only an empty ``CacheBehaviors`` element. Don't specify an empty individual ``CacheBehavior`` element, because this is invalid. For more information, see [CacheBehaviors](https://docs.aws.amazon.com/cloudfront/latest/APIReference/API_CacheBehaviors.html). \n To delete all cache behaviors in an existing distribution, update the distribution configuration and include only an empty ``CacheBehaviors`` element.\n To add, change, or remove one or more cache behaviors, update the distribution configuration and specify all of the cache behaviors that you want to include in the updated distribution.\n For more information about cache behaviors, see [Cache Behavior Settings](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/distribution-web-values-specify.html#DownloadDistValuesCacheBehavior) in the *Amazon CloudFront Developer Guide*.",
       "markdownDescription": "A complex type that describes how CloudFront processes requests.\n You must create at least as many cache behaviors (including the default cache behavior) as you have origins if you want CloudFront to serve objects from all of the origins. Each cache behavior specifies the one origin from which you want CloudFront to get objects. If you have two origins and only the default cache behavior, the default cache behavior will cause CloudFront to get objects from one of the origins, but the other origin is never used.\n For the current quota (formerly known as limit) on the number of cache behaviors that you can add to a distribution, see [Quotas](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html) in the *Amazon CloudFront Developer Guide*.\n If you don't want to specify any cache behaviors, include only an empty ``CacheBehaviors`` element. Don't specify an empty individual ``CacheBehavior`` element, because this is invalid. For more information, see [CacheBehaviors](https://docs.aws.amazon.com/cloudfront/latest/APIReference/API_CacheBehaviors.html). \n To delete all cache behaviors in an existing distribution, update the distribution configuration and include only an empty ``CacheBehaviors`` element.\n To add, change, or remove one or more cache behaviors, update the distribution configuration and specify all of the cache behaviors that you want to include in the updated distribution.\n For more information about cache behaviors, see [Cache Behavior Settings](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/distribution-web-values-specify.html#DownloadDistValuesCacheBehavior) in the *Amazon CloudFront Developer Guide*.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "ConnectionMode": {
+      "enum": [
+        "direct",
+        "tenant-only"
+      ],
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: direct | tenant-only  \nUpdate requires: No interruption\n"
+    },
     "Cookies": {
       "additionalProperties": false,
       "properties": {
@@ -474,6 +482,11 @@
           "description": "A comment to describe the distribution. The comment cannot be longer than 128 characters.",
           "markdownDescription": "A comment to describe the distribution. The comment cannot be longer than 128 characters.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
+        "ConnectionMode": {
+          "$ref": "#/definitions/ConnectionMode",
+          "description": "",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
         "ContinuousDeploymentPolicyId": {
           "type": "string",
           "description": "The identifier of a continuous deployment policy. For more information, see ``CreateContinuousDeploymentPolicy``.",
@@ -531,11 +544,11 @@
           "markdownDescription": "A complex type that contains information about origin groups for this distribution.\n Specify a value for either the ``Origins`` or ``OriginGroups`` property.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
         },
         "Origins": {
+          "insertionOrder": false,
           "items": {
             "$ref": "#/definitions/Origin"
           },
           "type": "array",
-          "insertionOrder": false,
           "uniqueItems": false,
           "description": "A complex type that contains information about origins for this distribution.\n Specify a value for either the ``Origins`` or ``OriginGroups`` property.",
           "markdownDescription": "A complex type that contains information about origins for this distribution.\n Specify a value for either the ``Origins`` or ``OriginGroups`` property.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
@@ -565,6 +578,21 @@
           "type": "boolean",
           "description": "A Boolean that indicates whether this is a staging distribution. When this value is ``true``, this is a staging distribution. When this value is ``false``, this is not a staging distribution.",
           "markdownDescription": "A Boolean that indicates whether this is a staging distribution. When this value is ``true``, this is a staging distribution. When this value is ``false``, this is not a staging distribution.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "TenantConfig": {
+          "properties": {
+            "ParameterDefinitions": {
+              "items": {
+                "$ref": "#/definitions/ParameterDefinition"
+              },
+              "type": "array",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "description": "",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
         },
         "ViewerCertificate": {
           "$ref": "#/definitions/ViewerCertificate",
@@ -1044,6 +1072,51 @@
       "description": "CloudFront Origin Shield.\n Using Origin Shield can help reduce the load on your origin. For more information, see [Using Origin Shield](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/origin-shield.html) in the *Amazon CloudFront Developer Guide*.",
       "markdownDescription": "CloudFront Origin Shield.\n Using Origin Shield can help reduce the load on your origin. For more information, see [Using Origin Shield](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/origin-shield.html) in the *Amazon CloudFront Developer Guide*.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "ParameterDefinition": {
+      "properties": {
+        "Name": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Definition": {
+          "properties": {
+            "StringSchema": {
+              "properties": {
+                "Comment": {
+                  "type": "string",
+                  "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+                },
+                "DefaultValue": {
+                  "type": "string",
+                  "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+                },
+                "Required": {
+                  "type": "boolean",
+                  "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption\n"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "Required"
+              ],
+              "type": "object",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Name",
+        "Definition"
+      ],
+      "additionalProperties": false,
+      "type": "object",
+      "description": "",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "Restrictions": {
       "additionalProperties": false,
       "properties": {
@@ -1193,8 +1266,10 @@
   "handlers": {
     "create": {
       "permissions": [
+        "cloudfront:CreateConnectionGroup",
         "cloudfront:CreateDistribution",
         "cloudfront:CreateDistributionWithTags",
+        "cloudfront:GetConnectionGroup",
         "cloudfront:GetDistribution",
         "cloudfront:GetDistributionConfig",
         "cloudfront:TagResource"
@@ -1209,6 +1284,7 @@
     },
     "list": {
       "permissions": [
+        "cloudfront:ListTagsForResource",
         "cloudfront:ListDistributions"
       ]
     },
@@ -1220,6 +1296,8 @@
     },
     "update": {
       "permissions": [
+        "cloudfront:CreateConnectionGroup",
+        "cloudfront:GetConnectionGroup",
         "cloudfront:GetDistribution",
         "cloudfront:GetDistributionConfig",
         "cloudfront:UpdateDistribution",
@@ -1268,9 +1346,15 @@
   ],
   "tagging": {
     "cloudFormationSystemTags": false,
-    "tagOnCreate": false,
-    "tagUpdatable": false,
-    "taggable": false
+    "permissions": [
+      "cloudfront:TagResource",
+      "cloudfront:ListTagsForResource",
+      "cloudfront:UntagResource"
+    ],
+    "tagOnCreate": true,
+    "tagProperty": "/properties/Tags",
+    "tagUpdatable": true,
+    "taggable": true
   },
   "typeName": "AWS::CloudFront::Distribution",
   "attributes": {
