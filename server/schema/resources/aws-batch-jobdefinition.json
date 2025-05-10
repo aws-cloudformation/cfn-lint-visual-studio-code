@@ -1,173 +1,358 @@
 {
-  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
-  "tagging": {
-    "permissions": [
-      "Batch:TagResource",
-      "Batch:UntagResource"
-    ],
-    "taggable": true,
-    "tagOnCreate": true,
-    "tagUpdatable": true,
-    "tagProperty": "/properties/Tags",
-    "cloudFormationSystemTags": true
-  },
-  "handlers": {
-    "read": {
-      "permissions": [
-        "Batch:DescribeJobDefinitions"
-      ]
-    },
-    "create": {
-      "permissions": [
-        "Batch:RegisterJobDefinition",
-        "Batch:TagResource",
-        "Batch:DescribeJobDefinitions",
-        "Iam:PassRole"
-      ]
-    },
-    "update": {
-      "permissions": [
-        "Batch:DescribeJobDefinitions",
-        "Batch:RegisterJobDefinition",
-        "Batch:DeregisterJobDefinition",
-        "Batch:TagResource",
-        "Batch:UntagResource",
-        "Iam:PassRole"
-      ]
-    },
-    "list": {
-      "permissions": [
-        "Batch:DescribeJobDefinitions"
-      ]
-    },
-    "delete": {
-      "permissions": [
-        "Batch:DescribeJobDefinitions",
-        "Batch:DeregisterJobDefinition",
-        "Iam:PassRole"
-      ]
-    }
-  },
   "typeName": "AWS::Batch::JobDefinition",
-  "readOnlyProperties": [
-    "/properties/JobDefinitionArn"
-  ],
   "description": "Resource Type definition for AWS::Batch::JobDefinition",
-  "createOnlyProperties": [
-    "/properties/JobDefinitionName"
-  ],
-  "additionalProperties": false,
-  "primaryIdentifier": [
-    "/properties/JobDefinitionName"
-  ],
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
   "definitions": {
-    "JobTimeout": {
-      "additionalProperties": false,
+    "ContainerProperties": {
       "type": "object",
-      "properties": {
-        "AttemptDurationSeconds": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "EksContainerEnvironmentVariable": {
       "additionalProperties": false,
-      "type": "object",
       "properties": {
-        "Value": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "Name": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Name"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "NodeRangeProperty": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Container": {
-          "$ref": "#/definitions/MultiNodeContainerProperties"
-        },
-        "TargetNodes": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "EcsProperties": {
-          "$ref": "#/definitions/MultiNodeEcsProperties"
-        },
-        "InstanceTypes": {
-          "uniqueItems": false,
-          "insertionOrder": false,
+        "Command": {
           "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": true,
           "items": {
             "type": "string",
             "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
           },
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         },
-        "EksProperties": {
-          "$ref": "#/definitions/EksProperties"
+        "Environment": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": true,
+          "items": {
+            "$ref": "#/definitions/Environment"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         },
-        "ConsumableResourceProperties": {
-          "$ref": "#/definitions/ConsumableResourceProperties"
-        }
-      },
-      "required": [
-        "TargetNodes"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "EksEmptyDir": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Medium": {
+        "Image": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "JobRoleArn": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
-        "SizeLimit": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "LogConfiguration": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "SecretOptions": {
+        "Memory": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "MountPoints": {
+          "type": "array",
           "uniqueItems": false,
           "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/MountPoint"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "Privileged": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "ReadonlyRootFilesystem": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "Ulimits": {
           "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/Ulimit"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "User": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Vcpus": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Volumes": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/Volume"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "ResourceRequirements": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/ResourceRequirement"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "LinuxParameters": {
+          "$ref": "#/definitions/LinuxParameters"
+        },
+        "LogConfiguration": {
+          "$ref": "#/definitions/LogConfiguration"
+        },
+        "ExecutionRoleArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Secrets": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
           "items": {
             "$ref": "#/definitions/Secret"
           },
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         },
+        "NetworkConfiguration": {
+          "$ref": "#/definitions/NetworkConfiguration"
+        },
+        "FargatePlatformConfiguration": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "PlatformVersion": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            }
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "EphemeralStorage": {
+          "$ref": "#/definitions/EphemeralStorage"
+        },
+        "RuntimePlatform": {
+          "$ref": "#/definitions/RuntimePlatform"
+        },
+        "RepositoryCredentials": {
+          "$ref": "#/definitions/RepositoryCredentials"
+        },
+        "EnableExecuteCommand": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Image"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "MultiNodeContainerProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Command": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": true,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "Environment": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": true,
+          "items": {
+            "$ref": "#/definitions/Environment"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "Image": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "JobRoleArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Memory": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "MountPoints": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/MountPoint"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "Privileged": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "ReadonlyRootFilesystem": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "Ulimits": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/Ulimit"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "User": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Vcpus": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Volumes": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/Volume"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "InstanceType": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ResourceRequirements": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/ResourceRequirement"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "LinuxParameters": {
+          "$ref": "#/definitions/LinuxParameters"
+        },
+        "LogConfiguration": {
+          "$ref": "#/definitions/LogConfiguration"
+        },
+        "ExecutionRoleArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Secrets": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/Secret"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "EphemeralStorage": {
+          "$ref": "#/definitions/EphemeralStorage"
+        },
+        "RuntimePlatform": {
+          "$ref": "#/definitions/RuntimePlatform"
+        },
+        "RepositoryCredentials": {
+          "$ref": "#/definitions/RepositoryCredentials"
+        },
+        "EnableExecuteCommand": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Image"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EphemeralStorage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "SizeInGiB": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "SizeInGiB"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LinuxParameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Devices": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/Device"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "InitProcessEnabled": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "MaxSwap": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Swappiness": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "SharedMemorySize": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Tmpfs": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/Tmpfs"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LogConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "LogDriver": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
         "Options": {
+          "type": "object",
+          "additionalProperties": false,
           "patternProperties": {
             ".*": {
               "type": "string",
               "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
             }
           },
-          "additionalProperties": false,
-          "type": "object",
           "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
         },
-        "LogDriver": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        "SecretOptions": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/Secret"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
@@ -176,8 +361,8 @@
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "RuntimePlatform": {
-      "additionalProperties": false,
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "OperatingSystemFamily": {
           "type": "string",
@@ -190,110 +375,217 @@
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "MultiNodeEcsTaskProperties": {
-      "additionalProperties": false,
+    "NetworkConfiguration": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "ExecutionRoleArn": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "TaskRoleArn": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "IpcMode": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "Volumes": {
-          "uniqueItems": false,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Volume"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "Containers": {
-          "uniqueItems": false,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/TaskContainerProperties"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "PidMode": {
+        "AssignPublicIp": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         }
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "EksPersistentVolumeClaim": {
-      "additionalProperties": false,
+    "RepositoryCredentials": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
+        "CredentialsParameter": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "CredentialsParameter"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Name": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "MountPoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ContainerPath": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
         "ReadOnly": {
           "type": "boolean",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
         },
-        "ClaimName": {
+        "SourceVolume": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Ulimit": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "HardLimit": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Name": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "SoftLimit": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "ClaimName"
+        "HardLimit",
+        "Name",
+        "SoftLimit"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "NodeProperties": {
-      "additionalProperties": false,
+    "Volume": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "MainNode": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        "Host": {
+          "$ref": "#/definitions/Host"
         },
-        "NodeRangeProperties": {
-          "uniqueItems": false,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/NodeRangeProperty"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        "EfsVolumeConfiguration": {
+          "$ref": "#/definitions/EFSVolumeConfiguration"
         },
-        "NumNodes": {
+        "Name": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Host": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "SourcePath": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EFSVolumeConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "FileSystemId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "RootDirectory": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "TransitEncryption": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "TransitEncryptionPort": {
           "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "AuthorizationConfig": {
+          "$ref": "#/definitions/EFSAuthorizationConfig"
         }
       },
       "required": [
-        "NumNodes",
-        "MainNode",
-        "NodeRangeProperties"
+        "FileSystemId"
       ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EFSAuthorizationConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "AccessPointId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Iam": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ResourceRequirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Type": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Device": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "HostPath": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ContainerPath": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Permissions": {
+          "type": "array",
+          "insertionOrder": false,
+          "uniqueItems": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Tmpfs": {
-      "additionalProperties": false,
       "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "Size": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
-        },
         "ContainerPath": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         },
+        "Size": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
         "MountOptions": {
-          "uniqueItems": false,
-          "insertionOrder": false,
           "type": "array",
+          "insertionOrder": false,
+          "uniqueItems": false,
           "items": {
             "type": "string",
             "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
@@ -307,153 +599,156 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "TaskContainerDependency": {
-      "additionalProperties": false,
+    "Secret": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "Condition": {
+        "Name": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         },
-        "ContainerName": {
+        "ValueFrom": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "ContainerName",
-        "Condition"
+        "Name",
+        "ValueFrom"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "ContainerProperties": {
-      "additionalProperties": false,
+    "EksProperties": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "RepositoryCredentials": {
-          "$ref": "#/definitions/RepositoryCredentials"
-        },
-        "User": {
+        "PodProperties": {
+          "$ref": "#/definitions/EksPodProperties"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EksPodProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ServiceAccountName": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
-        "Secrets": {
+        "HostNetwork": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "DnsPolicy": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "InitContainers": {
+          "type": "array",
           "uniqueItems": false,
           "insertionOrder": false,
-          "type": "array",
           "items": {
-            "$ref": "#/definitions/Secret"
+            "$ref": "#/definitions/EksContainer"
           },
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         },
-        "Memory": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        "Containers": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/EksContainer"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         },
-        "Privileged": {
+        "Volumes": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/EksVolume"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "ImagePullSecrets": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/ImagePullSecret"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "Metadata": {
+          "$ref": "#/definitions/EksMetadata"
+        },
+        "ShareProcessNamespace": {
           "type": "boolean",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-        },
-        "LinuxParameters": {
-          "$ref": "#/definitions/LinuxParameters"
-        },
-        "FargatePlatformConfiguration": {
-          "additionalProperties": false,
-          "type": "object",
-          "properties": {
-            "PlatformVersion": {
-              "type": "string",
-              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-            }
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-        },
-        "JobRoleArn": {
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EksContainer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Name": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "ReadonlyRootFilesystem": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-        },
-        "Vcpus": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
         },
         "Image": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         },
-        "ResourceRequirements": {
-          "uniqueItems": false,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ResourceRequirement"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "LogConfiguration": {
-          "$ref": "#/definitions/LogConfiguration"
-        },
-        "MountPoints": {
-          "uniqueItems": false,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/MountPoint"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "ExecutionRoleArn": {
+        "ImagePullPolicy": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
-        "RuntimePlatform": {
-          "$ref": "#/definitions/RuntimePlatform"
-        },
-        "Volumes": {
-          "uniqueItems": false,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Volume"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
         "Command": {
-          "uniqueItems": false,
-          "insertionOrder": true,
           "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": false,
           "items": {
             "type": "string",
             "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
           },
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         },
-        "Environment": {
-          "uniqueItems": false,
-          "insertionOrder": true,
+        "Args": {
           "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": false,
           "items": {
-            "$ref": "#/definitions/Environment"
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
           },
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         },
-        "Ulimits": {
+        "Env": {
+          "type": "array",
           "uniqueItems": false,
           "insertionOrder": false,
-          "type": "array",
           "items": {
-            "$ref": "#/definitions/Ulimit"
+            "$ref": "#/definitions/EksContainerEnvironmentVariable"
           },
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         },
-        "NetworkConfiguration": {
-          "$ref": "#/definitions/NetworkConfiguration"
+        "Resources": {
+          "$ref": "#/definitions/EksContainerResourceRequirements"
         },
-        "EphemeralStorage": {
-          "$ref": "#/definitions/EphemeralStorage"
+        "VolumeMounts": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/EksContainerVolumeMount"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "SecurityContext": {
+          "$ref": "#/definitions/EksContainerSecurityContext"
         }
       },
       "required": [
@@ -461,136 +756,70 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "EcsProperties": {
-      "additionalProperties": false,
+    "EksContainerEnvironmentVariable": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "TaskProperties": {
-          "uniqueItems": false,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/EcsTaskProperties"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        "Name": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "TaskProperties"
+        "Name"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "EksContainerResourceRequirements": {
-      "additionalProperties": false,
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "Limits": {
+          "type": "object",
+          "additionalProperties": false,
           "patternProperties": {
             ".*": {
               "type": "string",
               "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
             }
           },
-          "additionalProperties": false,
-          "type": "object",
           "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
         },
         "Requests": {
+          "type": "object",
+          "additionalProperties": false,
           "patternProperties": {
             ".*": {
               "type": "string",
               "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
             }
           },
-          "additionalProperties": false,
-          "type": "object",
           "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "NetworkConfiguration": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "AssignPublicIp": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "EcsTaskProperties": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "PlatformVersion": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "ExecutionRoleArn": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "RuntimePlatform": {
-          "$ref": "#/definitions/RuntimePlatform"
-        },
-        "TaskRoleArn": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "IpcMode": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "Volumes": {
-          "uniqueItems": false,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Volume"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "Containers": {
-          "uniqueItems": false,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/TaskContainerProperties"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "NetworkConfiguration": {
-          "$ref": "#/definitions/NetworkConfiguration"
-        },
-        "PidMode": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "EphemeralStorage": {
-          "$ref": "#/definitions/EphemeralStorage"
         }
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "EksContainerSecurityContext": {
-      "additionalProperties": false,
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "RunAsUser": {
           "type": "integer",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
         },
-        "AllowPrivilegeEscalation": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-        },
-        "RunAsNonRoot": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        "RunAsGroup": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
         },
         "Privileged": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "AllowPrivilegeEscalation": {
           "type": "boolean",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
         },
@@ -598,147 +827,59 @@
           "type": "boolean",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
         },
-        "RunAsGroup": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        "RunAsNonRoot": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
         }
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "TaskContainerProperties": {
-      "additionalProperties": false,
+    "EksVolume": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "RepositoryCredentials": {
-          "$ref": "#/definitions/RepositoryCredentials"
-        },
-        "User": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "Secrets": {
-          "uniqueItems": false,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Secret"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "Privileged": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-        },
-        "LinuxParameters": {
-          "$ref": "#/definitions/LinuxParameters"
-        },
-        "ReadonlyRootFilesystem": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-        },
-        "Image": {
+        "Name": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         },
-        "LogConfiguration": {
-          "$ref": "#/definitions/LogConfiguration"
+        "HostPath": {
+          "$ref": "#/definitions/EksHostPath"
         },
-        "Essential": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        "EmptyDir": {
+          "$ref": "#/definitions/EksEmptyDir"
         },
-        "ResourceRequirements": {
-          "uniqueItems": false,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ResourceRequirement"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        "Secret": {
+          "$ref": "#/definitions/EksSecret"
         },
-        "Name": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "MountPoints": {
-          "uniqueItems": false,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/MountPoint"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "DependsOn": {
-          "uniqueItems": false,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/TaskContainerDependency"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "Command": {
-          "uniqueItems": false,
-          "insertionOrder": true,
-          "type": "array",
-          "items": {
-            "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "Environment": {
-          "uniqueItems": false,
-          "insertionOrder": true,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Environment"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "Ulimits": {
-          "uniqueItems": false,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Ulimit"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        "PersistentVolumeClaim": {
+          "$ref": "#/definitions/EksPersistentVolumeClaim"
         }
       },
       "required": [
-        "Image"
+        "Name"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "EksMetadata": {
-      "additionalProperties": false,
+    "EksHostPath": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "Annotations": {
-          "patternProperties": {
-            ".*": {
-              "type": "string",
-              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-            }
-          },
-          "additionalProperties": false,
-          "type": "object",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        "Path": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EksEmptyDir": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Medium": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
-        "Labels": {
-          "patternProperties": {
-            ".*": {
-              "type": "string",
-              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-            }
-          },
-          "additionalProperties": false,
-          "type": "object",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-        },
-        "Namespace": {
+        "SizeLimit": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         }
@@ -746,8 +887,8 @@
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "EksSecret": {
-      "additionalProperties": false,
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "SecretName": {
           "type": "string",
@@ -763,52 +904,83 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "RepositoryCredentials": {
-      "additionalProperties": false,
+    "EksPersistentVolumeClaim": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "CredentialsParameter": {
+        "ClaimName": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ReadOnly": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "CredentialsParameter"
+        "ClaimName"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "EFSVolumeConfiguration": {
-      "additionalProperties": false,
+    "EksContainerVolumeMount": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "TransitEncryption": {
+        "Name": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
-        "AuthorizationConfig": {
-          "$ref": "#/definitions/EFSAuthorizationConfig"
-        },
-        "FileSystemId": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "RootDirectory": {
+        "MountPath": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
-        "TransitEncryptionPort": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        "SubPath": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ReadOnly": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
         }
       },
-      "required": [
-        "FileSystemId"
-      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EksMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Labels": {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            ".*": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            }
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "Annotations": {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            ".*": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            }
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "Namespace": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "ImagePullSecret": {
-      "additionalProperties": false,
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "Name": {
           "type": "string",
@@ -817,15 +989,35 @@
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "EvaluateOnExit": {
-      "additionalProperties": false,
+    "RetryStrategy": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "Action": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        "Attempts": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
         },
+        "EvaluateOnExit": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/EvaluateOnExit"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EvaluateOnExit": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
         "OnExitCode": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "OnStatusReason": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
@@ -833,9 +1025,9 @@
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
-        "OnStatusReason": {
+        "Action": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
@@ -843,14 +1035,167 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "MultiNodeEcsProperties": {
-      "additionalProperties": false,
+    "NodeProperties": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "TaskProperties": {
+        "NumNodes": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "MainNode": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "NodeRangeProperties": {
+          "type": "array",
           "uniqueItems": false,
           "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/NodeRangeProperty"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "NumNodes",
+        "MainNode",
+        "NodeRangeProperties"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "NodeRangeProperty": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "TargetNodes": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Container": {
+          "$ref": "#/definitions/MultiNodeContainerProperties"
+        },
+        "EcsProperties": {
+          "$ref": "#/definitions/MultiNodeEcsProperties"
+        },
+        "EksProperties": {
+          "$ref": "#/definitions/EksProperties"
+        },
+        "ConsumableResourceProperties": {
+          "$ref": "#/definitions/ConsumableResourceProperties"
+        },
+        "InstanceTypes": {
           "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "TargetNodes"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "JobTimeout": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "AttemptDurationSeconds": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EcsProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "TaskProperties": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/EcsTaskProperties"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "TaskProperties"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EcsTaskProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Containers": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/TaskContainerProperties"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "EphemeralStorage": {
+          "$ref": "#/definitions/EphemeralStorage"
+        },
+        "ExecutionRoleArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "RuntimePlatform": {
+          "$ref": "#/definitions/RuntimePlatform"
+        },
+        "NetworkConfiguration": {
+          "$ref": "#/definitions/NetworkConfiguration"
+        },
+        "Volumes": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/Volume"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "PidMode": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "IpcMode": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "PlatformVersion": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "TaskRoleArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "EnableExecuteCommand": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "MultiNodeEcsProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "TaskProperties": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
           "items": {
             "$ref": "#/definitions/MultiNodeEcsTaskProperties"
           },
@@ -862,189 +1207,231 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "Device": {
-      "additionalProperties": false,
+    "MultiNodeEcsTaskProperties": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "HostPath": {
+        "Containers": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/TaskContainerProperties"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "ExecutionRoleArn": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
-        "Permissions": {
+        "Volumes": {
+          "type": "array",
           "uniqueItems": false,
           "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/Volume"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "PidMode": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "IpcMode": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "TaskRoleArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "EnableExecuteCommand": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "TaskContainerProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Command": {
           "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": true,
           "items": {
             "type": "string",
             "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
           },
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         },
-        "ContainerPath": {
+        "Environment": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": true,
+          "items": {
+            "$ref": "#/definitions/Environment"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "DependsOn": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/TaskContainerDependency"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "Name": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "LinuxParameters": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Swappiness": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
         },
-        "Tmpfs": {
+        "Image": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "LinuxParameters": {
+          "$ref": "#/definitions/LinuxParameters"
+        },
+        "LogConfiguration": {
+          "$ref": "#/definitions/LogConfiguration"
+        },
+        "MountPoints": {
+          "type": "array",
           "uniqueItems": false,
           "insertionOrder": false,
-          "type": "array",
           "items": {
-            "$ref": "#/definitions/Tmpfs"
+            "$ref": "#/definitions/MountPoint"
           },
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         },
-        "SharedMemorySize": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
-        },
-        "Devices": {
-          "uniqueItems": false,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Device"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "InitProcessEnabled": {
+        "Essential": {
           "type": "boolean",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
         },
-        "MaxSwap": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        "Privileged": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "ReadonlyRootFilesystem": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "Ulimits": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/Ulimit"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "User": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Secrets": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/Secret"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "RepositoryCredentials": {
+          "$ref": "#/definitions/RepositoryCredentials"
+        },
+        "ResourceRequirements": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/ResourceRequirement"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "FirelensConfiguration": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "Type": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+            },
+            "Options": {
+              "type": "object",
+              "additionalProperties": false,
+              "patternProperties": {
+                ".*": {
+                  "type": "string",
+                  "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+                }
+              },
+              "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+            }
+          },
+          "required": [
+            "Type"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
         }
       },
+      "required": [
+        "Image"
+      ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "Ulimit": {
-      "additionalProperties": false,
+    "TaskContainerDependency": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "SoftLimit": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        "ContainerName": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         },
-        "HardLimit": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
-        },
-        "Name": {
+        "Condition": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "HardLimit",
-        "Name",
-        "SoftLimit"
+        "ContainerName",
+        "Condition"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "Host": {
-      "additionalProperties": false,
+    "ConsumableResourceRequirement": {
       "type": "object",
-      "properties": {
-        "SourcePath": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "EFSAuthorizationConfig": {
       "additionalProperties": false,
-      "type": "object",
       "properties": {
-        "Iam": {
+        "ConsumableResource": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          "description": "The ARN of the consumable resource the job definition should consume.",
+          "markdownDescription": "The ARN of the consumable resource the job definition should consume.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: arn:[a-z0-9-\\.]{1,63}:[a-z0-9-\\.]{0,63}:[a-z0-9-\\.]{0,63}:[a-z0-9-\\.]{0,63}:[^/].{0,1023}  \nUpdate requires: No interruption\n"
         },
-        "AccessPointId": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "EksVolume": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Secret": {
-          "$ref": "#/definitions/EksSecret"
-        },
-        "EmptyDir": {
-          "$ref": "#/definitions/EksEmptyDir"
-        },
-        "HostPath": {
-          "$ref": "#/definitions/EksHostPath"
-        },
-        "PersistentVolumeClaim": {
-          "$ref": "#/definitions/EksPersistentVolumeClaim"
-        },
-        "Name": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        "Quantity": {
+          "type": "integer",
+          "format": "int64",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "Name"
+        "ConsumableResource",
+        "Quantity"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "EksContainerVolumeMount": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "MountPath": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "ReadOnly": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-        },
-        "SubPath": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "Name": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "EksProperties": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "PodProperties": {
-          "$ref": "#/definitions/EksPodProperties"
-        }
-      },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "ConsumableResourceProperties": {
-      "additionalProperties": false,
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "ConsumableResourceList": {
-          "uniqueItems": true,
-          "insertionOrder": true,
           "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": true,
           "items": {
             "$ref": "#/definitions/ConsumableResourceRequirement"
           },
@@ -1055,490 +1442,144 @@
         "ConsumableResourceList"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "MultiNodeContainerProperties": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "RepositoryCredentials": {
-          "$ref": "#/definitions/RepositoryCredentials"
-        },
-        "User": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "Secrets": {
-          "uniqueItems": false,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Secret"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "Memory": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
-        },
-        "Privileged": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-        },
-        "LinuxParameters": {
-          "$ref": "#/definitions/LinuxParameters"
-        },
-        "JobRoleArn": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "ReadonlyRootFilesystem": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-        },
-        "Vcpus": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
-        },
-        "Image": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "ResourceRequirements": {
-          "uniqueItems": false,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ResourceRequirement"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "LogConfiguration": {
-          "$ref": "#/definitions/LogConfiguration"
-        },
-        "MountPoints": {
-          "uniqueItems": false,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/MountPoint"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "ExecutionRoleArn": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "RuntimePlatform": {
-          "$ref": "#/definitions/RuntimePlatform"
-        },
-        "Volumes": {
-          "uniqueItems": false,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Volume"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "Command": {
-          "uniqueItems": false,
-          "insertionOrder": true,
-          "type": "array",
-          "items": {
-            "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "Environment": {
-          "uniqueItems": false,
-          "insertionOrder": true,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Environment"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "Ulimits": {
-          "uniqueItems": false,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Ulimit"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "InstanceType": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "EphemeralStorage": {
-          "$ref": "#/definitions/EphemeralStorage"
-        }
-      },
-      "required": [
-        "Image"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "MountPoint": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "ReadOnly": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-        },
-        "SourceVolume": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "ContainerPath": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "Secret": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "ValueFrom": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "Name": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Name",
-        "ValueFrom"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "Volume": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Host": {
-          "$ref": "#/definitions/Host"
-        },
-        "EfsVolumeConfiguration": {
-          "$ref": "#/definitions/EFSVolumeConfiguration"
-        },
-        "Name": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "EksHostPath": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Path": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "ConsumableResourceRequirement": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "ConsumableResource": {
-          "description": "The ARN of the consumable resource the job definition should consume.",
-          "type": "string",
-          "markdownDescription": "The ARN of the consumable resource the job definition should consume.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: arn:[a-z0-9-\\.]{1,63}:[a-z0-9-\\.]{0,63}:[a-z0-9-\\.]{0,63}:[a-z0-9-\\.]{0,63}:[^/].{0,1023}  \nUpdate requires: No interruption\n"
-        },
-        "Quantity": {
-          "format": "int64",
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "ConsumableResource",
-        "Quantity"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "Environment": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Value": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "Name": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "ResourceRequirement": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Type": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "Value": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "EphemeralStorage": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "SizeInGiB": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "SizeInGiB"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "EksContainer": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Args": {
-          "uniqueItems": false,
-          "insertionOrder": true,
-          "type": "array",
-          "items": {
-            "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "VolumeMounts": {
-          "uniqueItems": false,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/EksContainerVolumeMount"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "ImagePullPolicy": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "Command": {
-          "uniqueItems": false,
-          "insertionOrder": true,
-          "type": "array",
-          "items": {
-            "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "SecurityContext": {
-          "$ref": "#/definitions/EksContainerSecurityContext"
-        },
-        "Resources": {
-          "$ref": "#/definitions/EksContainerResourceRequirements"
-        },
-        "Image": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "Env": {
-          "uniqueItems": false,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/EksContainerEnvironmentVariable"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "Name": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Image"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "RetryStrategy": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "EvaluateOnExit": {
-          "uniqueItems": false,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/EvaluateOnExit"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "Attempts": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "EksPodProperties": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "InitContainers": {
-          "uniqueItems": false,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/EksContainer"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "Volumes": {
-          "uniqueItems": false,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/EksVolume"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "DnsPolicy": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "Containers": {
-          "uniqueItems": false,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/EksContainer"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "Metadata": {
-          "$ref": "#/definitions/EksMetadata"
-        },
-        "ServiceAccountName": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "ImagePullSecrets": {
-          "uniqueItems": false,
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ImagePullSecret"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "HostNetwork": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-        },
-        "ShareProcessNamespace": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
-  "required": [
-    "Type"
-  ],
   "properties": {
-    "Parameters": {
-      "patternProperties": {
-        ".*": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "JobDefinitionArn": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "Timeout": {
-      "$ref": "#/definitions/JobTimeout"
-    },
-    "JobDefinitionName": {
-      "type": "string",
-      "maxLength": 128,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 128  \nUpdate requires: Replacement\n"
-    },
-    "PropagateTags": {
-      "type": "boolean",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-    },
-    "PlatformCapabilities": {
-      "uniqueItems": false,
-      "insertionOrder": true,
-      "type": "array",
-      "items": {
-        "type": "string",
-        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-    },
-    "EksProperties": {
-      "$ref": "#/definitions/EksProperties"
-    },
-    "ConsumableResourceProperties": {
-      "$ref": "#/definitions/ConsumableResourceProperties"
-    },
-    "Type": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-    },
-    "NodeProperties": {
-      "$ref": "#/definitions/NodeProperties"
-    },
-    "SchedulingPriority": {
-      "type": "integer",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
-    },
     "ContainerProperties": {
       "$ref": "#/definitions/ContainerProperties"
     },
     "EcsProperties": {
       "$ref": "#/definitions/EcsProperties"
     },
-    "RetryStrategy": {
-      "$ref": "#/definitions/RetryStrategy"
+    "NodeProperties": {
+      "$ref": "#/definitions/NodeProperties"
     },
-    "Tags": {
+    "JobDefinitionName": {
+      "type": "string",
+      "maxLength": 128,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 128  \nUpdate requires: Replacement\n"
+    },
+    "JobDefinitionArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SchedulingPriority": {
+      "type": "integer",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    },
+    "Parameters": {
+      "type": "object",
+      "additionalProperties": false,
       "patternProperties": {
         ".*": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         }
       },
-      "description": "A key-value pair to associate with a resource.",
-      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PlatformCapabilities": {
+      "type": "array",
+      "insertionOrder": true,
+      "uniqueItems": false,
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "PropagateTags": {
+      "type": "boolean",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+    },
+    "RetryStrategy": {
+      "$ref": "#/definitions/RetryStrategy"
+    },
+    "Timeout": {
+      "$ref": "#/definitions/JobTimeout"
+    },
+    "Type": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "Tags": {
       "type": "object",
+      "additionalProperties": false,
+      "description": "A key-value pair to associate with a resource.",
+      "patternProperties": {
+        ".*": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
       "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EksProperties": {
+      "$ref": "#/definitions/EksProperties"
+    },
+    "ConsumableResourceProperties": {
+      "$ref": "#/definitions/ConsumableResourceProperties"
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "Batch:TagResource",
+      "Batch:UnTagResource"
+    ]
+  },
+  "additionalProperties": false,
+  "required": [
+    "Type"
+  ],
+  "createOnlyProperties": [
+    "/properties/JobDefinitionName"
+  ],
+  "readOnlyProperties": [
+    "/properties/JobDefinitionArn"
+  ],
+  "primaryIdentifier": [
+    "/properties/JobDefinitionName"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "Batch:RegisterJobDefinition",
+        "Batch:TagResource",
+        "Batch:DescribeJobDefinitions",
+        "Iam:PassRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "Batch:DescribeJobDefinitions"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "Batch:DescribeJobDefinitions",
+        "Batch:RegisterJobDefinition",
+        "Batch:DeregisterJobDefinition",
+        "Batch:TagResource",
+        "Batch:UntagResource",
+        "Iam:PassRole"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "Batch:DescribeJobDefinitions",
+        "Batch:DeregisterJobDefinition",
+        "Iam:PassRole"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "Batch:DescribeJobDefinitions"
+      ]
     }
   },
   "attributes": {

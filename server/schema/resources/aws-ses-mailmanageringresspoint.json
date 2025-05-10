@@ -65,6 +65,78 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: OPEN | AUTH  \nUpdate requires: No interruption\n"
     },
+    "IpType": {
+      "type": "string",
+      "enum": [
+        "IPV4",
+        "DUAL_STACK"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: IPV4 | DUAL_STACK  \nUpdate requires: No interruption\n"
+    },
+    "NetworkConfiguration": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "PublicNetworkConfiguration",
+          "properties": {
+            "PublicNetworkConfiguration": {
+              "$ref": "#/definitions/PublicNetworkConfiguration"
+            }
+          },
+          "required": [
+            "PublicNetworkConfiguration"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "PrivateNetworkConfiguration",
+          "properties": {
+            "PrivateNetworkConfiguration": {
+              "$ref": "#/definitions/PrivateNetworkConfiguration"
+            }
+          },
+          "required": [
+            "PrivateNetworkConfiguration"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "PrivateNetworkConfiguration": {
+      "type": "object",
+      "properties": {
+        "VpcEndpointId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^vpce-[a-zA-Z0-9]{17}$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "VpcEndpointId"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PublicNetworkConfiguration": {
+      "type": "object",
+      "properties": {
+        "IpType": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/IpType"
+            },
+            {
+              "default": "IPV4"
+            }
+          ]
+        }
+      },
+      "required": [
+        "IpType"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "Tag": {
       "type": "object",
       "properties": {
@@ -119,6 +191,9 @@
       "minLength": 3,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 63  \nPattern: ^[A-Za-z0-9_\\-]+$  \nUpdate requires: No interruption\n"
     },
+    "NetworkConfiguration": {
+      "$ref": "#/definitions/NetworkConfiguration"
+    },
     "RuleSetId": {
       "type": "string",
       "maxLength": 100,
@@ -167,6 +242,7 @@
     "/properties/ARecord"
   ],
   "createOnlyProperties": [
+    "/properties/NetworkConfiguration",
     "/properties/Type"
   ],
   "writeOnlyProperties": [
@@ -182,7 +258,8 @@
         "ses:ListTagsForResource",
         "ses:GetIngressPoint",
         "ses:CreateIngressPoint",
-        "iam:CreateServiceLinkedRole"
+        "iam:CreateServiceLinkedRole",
+        "ec2:DescribeVpcEndpoints"
       ]
     },
     "read": {
