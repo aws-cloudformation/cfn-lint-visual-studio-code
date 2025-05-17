@@ -18,9 +18,9 @@
       "markdownDescription": "The maximum number of records in each batch that Lambda pulls from your stream or queue and sends to your function. Lambda passes all of the records in the batch to the function in a single call, up to the payload limit for synchronous invocation (6 MB).\n  +   *Amazon Kinesis* \u2013 Default 100. Max 10,000.\n  +   *Amazon DynamoDB Streams* \u2013 Default 100. Max 10,000.\n  +   *Amazon Simple Queue Service* \u2013 Default 10. For standard queues the max is 10,000. For FIFO queues the max is 10.\n  +   *Amazon Managed Streaming for Apache Kafka* \u2013 Default 100. Max 10,000.\n  +   *Self-managed Apache Kafka* \u2013 Default 100. Max 10,000.\n  +   *Amazon MQ (ActiveMQ and RabbitMQ)* \u2013 Default 100. Max 10,000.\n  +   *DocumentDB* \u2013 Default 100. Max 10,000.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
     },
     "BisectBatchOnFunctionError": {
-      "description": "(Kinesis and DynamoDB Streams only) If the function returns an error, split the batch in two and retry. The default value is false.",
+      "description": "(Kinesis and DynamoDB Streams only) If the function returns an error, split the batch in two and retry. The default value is false.\n  When using ``BisectBatchOnFunctionError``, check the ``BatchSize`` parameter in the ``OnFailure`` destination message's metadata. The ``BatchSize`` could be greater than 1 since LAM consolidates failed messages metadata when writing to the ``OnFailure`` destination.",
       "type": "boolean",
-      "markdownDescription": "(Kinesis and DynamoDB Streams only) If the function returns an error, split the batch in two and retry. The default value is false.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+      "markdownDescription": "(Kinesis and DynamoDB Streams only) If the function returns an error, split the batch in two and retry. The default value is false.\n  When using ``BisectBatchOnFunctionError``, check the ``BatchSize`` parameter in the ``OnFailure`` destination message's metadata. The ``BatchSize`` could be greater than 1 since LAM consolidates failed messages metadata when writing to the ``OnFailure`` destination.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
     },
     "DestinationConfig": {
       "description": "(Kinesis, DynamoDB Streams, Amazon MSK, and self-managed Apache Kafka event sources only) A configuration object that specifies the destination of an event after Lambda processes it.",
@@ -551,7 +551,6 @@
       "permissions": [
         "lambda:UpdateEventSourceMapping",
         "lambda:GetEventSourceMapping",
-        "lambda:ListTags",
         "lambda:TagResource",
         "lambda:UntagResource",
         "kms:DescribeKey",
@@ -565,7 +564,12 @@
     "tagOnCreate": true,
     "tagUpdatable": true,
     "cloudFormationSystemTags": true,
-    "tagProperty": "/properties/Tags"
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "lambda:ListTags",
+      "lambda:TagResource",
+      "lambda:UntagResource"
+    ]
   },
   "attributes": {
     "Id": {
