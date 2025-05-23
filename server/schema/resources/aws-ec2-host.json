@@ -3,6 +3,34 @@
   "description": "Resource Type definition for AWS::EC2::Host",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-ec2.git",
   "additionalProperties": false,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "definitions": {
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
   "properties": {
     "HostId": {
       "description": "ID of the host created.",
@@ -48,6 +76,16 @@
       "description": "The ID of the Outpost hardware asset.",
       "type": "string",
       "markdownDescription": "The ID of the Outpost hardware asset.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "Tags": {
+      "description": "Any tags assigned to the Host.",
+      "type": "array",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "Any tags assigned to the Host.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "required": [
@@ -70,7 +108,8 @@
     "create": {
       "permissions": [
         "ec2:AllocateHosts",
-        "ec2:DescribeHosts"
+        "ec2:DescribeHosts",
+        "ec2:CreateTags"
       ]
     },
     "read": {
@@ -81,7 +120,9 @@
     "update": {
       "permissions": [
         "ec2:ModifyHosts",
-        "ec2:DescribeHosts"
+        "ec2:DescribeHosts",
+        "ec2:DeleteTags",
+        "ec2:CreateTags"
       ]
     },
     "delete": {

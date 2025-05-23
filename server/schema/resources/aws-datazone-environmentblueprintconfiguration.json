@@ -76,10 +76,52 @@
   ],
   "writeOnlyProperties": [
     "/properties/DomainIdentifier",
-    "/properties/EnvironmentBlueprintIdentifier"
+    "/properties/EnvironmentBlueprintIdentifier",
+    "/properties/EnvironmentRolePermissionBoundary",
+    "/properties/ProvisioningConfigurations"
   ],
   "additionalProperties": false,
   "definitions": {
+    "ProvisioningConfiguration": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "type": "object",
+          "title": "LakeFormationConfiguration",
+          "properties": {
+            "LakeFormationConfiguration": {
+              "$ref": "#/definitions/LakeFormationConfiguration"
+            }
+          },
+          "required": [
+            "LakeFormationConfiguration"
+          ]
+        }
+      ]
+    },
+    "LakeFormationConfiguration": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "LocationRegistrationExcludeS3Locations": {
+          "minItems": 0,
+          "maxItems": 20,
+          "type": "array",
+          "items": {
+            "minLength": 1,
+            "type": "string",
+            "maxLength": 1024,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nPattern: ^s3://.+$  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "LocationRegistrationRole": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[^:]*:iam::\\d{12}:(role|role/service-role)/[\\w+=,.@-]*$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "RegionalParameter": {
       "additionalProperties": false,
       "type": "object",
@@ -107,23 +149,6 @@
     }
   },
   "properties": {
-    "RegionalParameters": {
-      "uniqueItems": true,
-      "insertionOrder": false,
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/RegionalParameter"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-    },
-    "ProvisioningRoleArn": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[^:]*:iam::\\d{12}:(role|role/service-role)/[\\w+=,.@-]*$  \nUpdate requires: No interruption\n"
-    },
-    "DomainId": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
     "CreatedAt": {
       "format": "date-time",
       "type": "string",
@@ -154,9 +179,37 @@
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
+    "RegionalParameters": {
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/RegionalParameter"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "ProvisioningRoleArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[^:]*:iam::\\d{12}:(role|role/service-role)/[\\w+=,.@-]*$  \nUpdate requires: No interruption\n"
+    },
+    "DomainId": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ProvisioningConfigurations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ProvisioningConfiguration"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
     "DomainIdentifier": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$  \nUpdate requires: Replacement\n"
+    },
+    "EnvironmentRolePermissionBoundary": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[^:]*:iam::(aws|\\d{12}):policy/[\\w+=,.@-]*$  \nUpdate requires: No interruption\n"
     },
     "ManageAccessRoleArn": {
       "type": "string",
@@ -164,10 +217,6 @@
     }
   },
   "attributes": {
-    "DomainId": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
     "CreatedAt": {
       "format": "date-time",
       "type": "string",
@@ -181,6 +230,10 @@
       "format": "date-time",
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "DomainId": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }
