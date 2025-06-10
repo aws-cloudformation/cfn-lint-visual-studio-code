@@ -1,6 +1,19 @@
 # Change Log
 All notable changes to the "vscode-cfn-lint" extension will be documented in this file.
 
+## 0.26.6
+## What's Changed
+* Bump yaml-language-server from 1.17.0 to 1.18.0 in /server by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/466
+* Bump glob from 11.0.1 to 11.0.2 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/465
+* Bump mocha from 11.1.0 to 11.2.2 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/464
+* CloudFormation Template Schema upgrade by @github-actions in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/463
+* Bump semver from 7.7.1 to 7.7.2 in /server by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/471
+* Bump @types/vscode from 1.99.1 to 1.100.0 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/470
+* Bump @types/lodash from 4.17.16 to 4.17.17 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/469
+* Bump mocha from 11.2.2 to 11.5.0 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/468
+
+**Full Changelog**: https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/compare/v0.26.5...v0.26.6
+
 ## 0.26.5
 ## What's Changed
 * Redo the order of autcompletion by @kddejong in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/461
