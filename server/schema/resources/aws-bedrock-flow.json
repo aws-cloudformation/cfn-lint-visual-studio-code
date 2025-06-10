@@ -235,7 +235,7 @@
           "items": {
             "$ref": "#/definitions/FlowNodeInput"
           },
-          "maxItems": 5,
+          "maxItems": 20,
           "description": "List of node inputs in a flow",
           "insertionOrder": true,
           "markdownDescription": "List of node inputs in a flow\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
@@ -416,6 +416,58 @@
             "Retrieval"
           ],
           "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "InlineCode",
+          "properties": {
+            "InlineCode": {
+              "$ref": "#/definitions/InlineCodeFlowNodeConfiguration"
+            }
+          },
+          "required": [
+            "InlineCode"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Loop",
+          "properties": {
+            "Loop": {
+              "$ref": "#/definitions/LoopFlowNodeConfiguration"
+            }
+          },
+          "required": [
+            "Loop"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "LoopInput",
+          "properties": {
+            "LoopInput": {
+              "$ref": "#/definitions/LoopInputFlowNodeConfiguration"
+            }
+          },
+          "required": [
+            "LoopInput"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "LoopController",
+          "properties": {
+            "LoopController": {
+              "$ref": "#/definitions/LoopControllerFlowNodeConfiguration"
+            }
+          },
+          "required": [
+            "LoopController"
+          ],
+          "additionalProperties": false
         }
       ],
       "markdownDescription": "Node configuration in a flow\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
@@ -431,6 +483,16 @@
         "Array"
       ],
       "markdownDescription": "Type of input/output for a node in a flow\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: String | Number | Boolean | Object | Array  \nUpdate requires: No interruption\n"
+    },
+    "FlowNodeInputCategory": {
+      "type": "string",
+      "description": "Optional tag to classify input type, currently exclusive to LoopNode",
+      "enum": [
+        "LoopCondition",
+        "ReturnValueToLoopStart",
+        "ExitLoop"
+      ],
+      "markdownDescription": "Optional tag to classify input type, currently exclusive to LoopNode\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: LoopCondition | ReturnValueToLoopStart | ExitLoop  \nUpdate requires: No interruption\n"
     },
     "FlowNodeInput": {
       "type": "object",
@@ -450,6 +512,9 @@
           "minLength": 1,
           "description": "Expression for a node input in a flow",
           "markdownDescription": "Expression for a node input in a flow\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nUpdate requires: No interruption\n"
+        },
+        "Category": {
+          "$ref": "#/definitions/FlowNodeInputCategory"
         }
       },
       "required": [
@@ -495,9 +560,13 @@
         "Storage",
         "Retrieval",
         "Iterator",
-        "Collector"
+        "Collector",
+        "InlineCode",
+        "Loop",
+        "LoopInput",
+        "LoopController"
       ],
-      "markdownDescription": "Flow node types\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Input | Output | KnowledgeBase | Condition | Lex | Prompt | LambdaFunction | Agent | Storage | Retrieval | Iterator | Collector  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Flow node types\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Input | Output | KnowledgeBase | Condition | Lex | Prompt | LambdaFunction | Agent | Storage | Retrieval | Iterator | Collector | InlineCode | Loop | LoopInput | LoopController  \nUpdate requires: No interruption\n"
     },
     "FlowStatus": {
       "type": "string",
@@ -552,6 +621,25 @@
         },
         "GuardrailConfiguration": {
           "$ref": "#/definitions/GuardrailConfiguration"
+        },
+        "NumberOfResults": {
+          "type": "number",
+          "maximum": 100,
+          "minimum": 1,
+          "description": "Number Of Results to Retrieve",
+          "markdownDescription": "Number Of Results to Retrieve\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "PromptTemplate": {
+          "$ref": "#/definitions/KnowledgeBasePromptTemplate"
+        },
+        "InferenceConfiguration": {
+          "$ref": "#/definitions/PromptInferenceConfiguration"
+        },
+        "OrchestrationConfiguration": {
+          "$ref": "#/definitions/KnowledgeBaseOrchestrationConfiguration"
+        },
+        "RerankingConfiguration": {
+          "$ref": "#/definitions/VectorSearchRerankingConfiguration"
         }
       },
       "required": [
@@ -1024,6 +1112,302 @@
       },
       "additionalProperties": false,
       "markdownDescription": "Configuration for a guardrail\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LoopFlowNodeConfiguration": {
+      "type": "object",
+      "description": "Loop node config, contains loop's internal definition",
+      "properties": {
+        "Definition": {
+          "$ref": "#/definitions/FlowDefinition"
+        }
+      },
+      "required": [
+        "Definition"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Loop node config, contains loop's internal definition\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LoopInputFlowNodeConfiguration": {
+      "type": "object",
+      "description": "Configuration for the LoopInput node",
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for the LoopInput node\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LoopControllerFlowNodeConfiguration": {
+      "type": "object",
+      "description": "Configuration for the LoopController node, which manages loop execution",
+      "properties": {
+        "ContinueCondition": {
+          "$ref": "#/definitions/FlowCondition"
+        },
+        "MaxIterations": {
+          "type": "number",
+          "default": 10,
+          "maximum": 1000,
+          "minimum": 1,
+          "description": "Maximum number of iterations the loop can perform",
+          "markdownDescription": "Maximum number of iterations the loop can perform\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ContinueCondition"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for the LoopController node, which manages loop execution\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "InlineCodeFlowNodeConfiguration": {
+      "type": "object",
+      "description": "Inline code config strucuture, contains code configs",
+      "properties": {
+        "Code": {
+          "type": "string",
+          "maxLength": 5000000,
+          "description": "The inline code entered by customers. max size is 5MB.",
+          "markdownDescription": "The inline code entered by customers. max size is 5MB.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 5000000  \nUpdate requires: No interruption\n"
+        },
+        "Language": {
+          "$ref": "#/definitions/SupportedLanguages"
+        }
+      },
+      "required": [
+        "Code",
+        "Language"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Inline code config strucuture, contains code configs\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SupportedLanguages": {
+      "type": "string",
+      "description": "Enum encodes the supported language type",
+      "enum": [
+        "Python_3"
+      ],
+      "markdownDescription": "Enum encodes the supported language type\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Python_3  \nUpdate requires: No interruption\n"
+    },
+    "BedrockRerankingModelArn": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 1,
+      "description": "Arn of a Bedrock Reranking model",
+      "markdownDescription": "Arn of a Bedrock Reranking model\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^(arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}::foundation-model/(.*))?$  \nUpdate requires: No interruption\n"
+    },
+    "AdditionalModelRequestFields": {
+      "type": "object",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "VectorSearchRerankingConfigurationType": {
+      "type": "string",
+      "description": "Enum of Rerank Configuration Types",
+      "enum": [
+        "BEDROCK_RERANKING_MODEL"
+      ],
+      "markdownDescription": "Enum of Rerank Configuration Types\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: BEDROCK_RERANKING_MODEL  \nUpdate requires: No interruption\n"
+    },
+    "RerankingMetadataSelectionMode": {
+      "type": "string",
+      "description": "Reranking Metadata Selection Mode",
+      "enum": [
+        "SELECTIVE",
+        "ALL"
+      ],
+      "markdownDescription": "Reranking Metadata Selection Mode\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SELECTIVE | ALL  \nUpdate requires: No interruption\n"
+    },
+    "FieldForReranking": {
+      "type": "object",
+      "properties": {
+        "FieldName": {
+          "type": "string",
+          "maxLength": 2000,
+          "minLength": 1,
+          "description": "Field name for reranking",
+          "markdownDescription": "Field name for reranking\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2000  \nUpdate requires: No interruption\n"
+        }
+      },
+      "description": "Field name for reranking",
+      "required": [
+        "FieldName"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Field name for reranking\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "FieldsForReranking": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/FieldForReranking"
+      },
+      "maxItems": 100,
+      "minItems": 1,
+      "description": "List of Fields For Reranking",
+      "insertionOrder": true,
+      "markdownDescription": "List of Fields For Reranking\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "RerankingMetadataSelectiveModeConfiguration": {
+      "description": "Reranking Metadata Selective Mode Configuration",
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "FieldsToInclude",
+          "properties": {
+            "FieldsToInclude": {
+              "$ref": "#/definitions/FieldsForReranking"
+            }
+          },
+          "required": [
+            "FieldsToInclude"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "FieldsToExclude",
+          "properties": {
+            "FieldsToExclude": {
+              "$ref": "#/definitions/FieldsForReranking"
+            }
+          },
+          "required": [
+            "FieldsToExclude"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "Reranking Metadata Selective Mode Configuration\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "MetadataConfigurationForReranking": {
+      "type": "object",
+      "title": "MetadataConfigurationForReranking",
+      "properties": {
+        "SelectionMode": {
+          "$ref": "#/definitions/RerankingMetadataSelectionMode"
+        },
+        "SelectiveModeConfiguration": {
+          "$ref": "#/definitions/RerankingMetadataSelectiveModeConfiguration"
+        }
+      },
+      "required": [
+        "SelectionMode"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "VectorSearchBedrockRerankingModelConfiguration": {
+      "type": "object",
+      "title": "VectorSearchBedrockRerankingModelConfiguration",
+      "properties": {
+        "ModelArn": {
+          "$ref": "#/definitions/BedrockRerankingModelArn"
+        },
+        "AdditionalModelRequestFields": {
+          "$ref": "#/definitions/AdditionalModelRequestFields"
+        }
+      },
+      "required": [
+        "ModelArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "VectorSearchBedrockRerankingConfiguration": {
+      "type": "object",
+      "title": "VectorSearchBedrockRerankingConfiguration",
+      "properties": {
+        "ModelConfiguration": {
+          "$ref": "#/definitions/VectorSearchBedrockRerankingModelConfiguration"
+        },
+        "NumberOfRerankedResults": {
+          "type": "number",
+          "maximum": 100,
+          "minimum": 1,
+          "description": "Number Of Results For Reranking",
+          "markdownDescription": "Number Of Results For Reranking\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "MetadataConfiguration": {
+          "$ref": "#/definitions/MetadataConfigurationForReranking"
+        }
+      },
+      "required": [
+        "ModelConfiguration"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "VectorSearchRerankingConfiguration": {
+      "type": "object",
+      "title": "VectorSearchRerankingConfiguration",
+      "properties": {
+        "Type": {
+          "$ref": "#/definitions/VectorSearchRerankingConfigurationType"
+        },
+        "BedrockRerankingConfiguration": {
+          "$ref": "#/definitions/VectorSearchBedrockRerankingConfiguration"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PerformanceConfigurationLatency": {
+      "type": "string",
+      "description": "Performance Configuration Latency",
+      "enum": [
+        "standard",
+        "optimized"
+      ],
+      "markdownDescription": "Performance Configuration Latency\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: standard | optimized  \nUpdate requires: No interruption\n"
+    },
+    "PerformanceConfiguration": {
+      "type": "object",
+      "title": "PerformanceConfiguration",
+      "properties": {
+        "Latency": {
+          "$ref": "#/definitions/PerformanceConfigurationLatency"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "KnowledgeBasePromptTemplate": {
+      "description": "Knowledge Base Prompt template",
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "Text",
+          "properties": {
+            "TextPromptTemplate": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100000
+            }
+          },
+          "required": [
+            "TextPromptTemplate"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "Knowledge Base Prompt template\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "KnowledgeBaseOrchestrationConfiguration": {
+      "type": "object",
+      "title": "KnowledgeBaseOrchestrationConfiguration",
+      "properties": {
+        "PromptTemplate": {
+          "$ref": "#/definitions/KnowledgeBasePromptTemplate"
+        },
+        "InferenceConfig": {
+          "$ref": "#/definitions/PromptInferenceConfiguration"
+        },
+        "AdditionalModelRequestFields": {
+          "$ref": "#/definitions/AdditionalModelRequestFields"
+        },
+        "PerformanceConfig": {
+          "$ref": "#/definitions/PerformanceConfiguration"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {

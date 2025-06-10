@@ -130,6 +130,7 @@
         "ec2:ModifyInstanceAttribute",
         "ec2:ModifyInstanceCreditSpecification",
         "ec2:ModifyInstanceMaintenanceOptions",
+        "ec2:ModifyInstanceMetadataOptions",
         "ec2:ModifyInstancePlacement",
         "ec2:MonitorInstances",
         "ec2:AttachVolume",
@@ -212,6 +213,57 @@
           "description": "The ID of the launch template. You must specify the LaunchTemplateName or the LaunchTemplateId, but not both.",
           "type": "string",
           "markdownDescription": "The ID of the launch template. You must specify the LaunchTemplateName or the LaunchTemplateId, but not both.\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "MetadataOptions": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "HttpPutResponseHopLimit": {
+          "default": 1,
+          "description": "The number of network hops that the metadata token can travel. Maximum is 64.",
+          "maximum": 64,
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "The number of network hops that the metadata token can travel. Maximum is 64.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "HttpProtocolIpv6": {
+          "description": "Enables or disables the IPv6 endpoint for the instance metadata service. To use this option, the instance must be a Nitro-based instance launched in a subnet that supports IPv6.",
+          "type": "string",
+          "enum": [
+            "disabled",
+            "enabled"
+          ],
+          "markdownDescription": "Enables or disables the IPv6 endpoint for the instance metadata service. To use this option, the instance must be a Nitro-based instance launched in a subnet that supports IPv6.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: disabled | enabled  \nUpdate requires: No interruption\n"
+        },
+        "HttpTokens": {
+          "description": "Indicates whether IMDSv2 is required.",
+          "type": "string",
+          "enum": [
+            "optional",
+            "required"
+          ],
+          "markdownDescription": "Indicates whether IMDSv2 is required.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: optional | required  \nUpdate requires: No interruption\n"
+        },
+        "InstanceMetadataTags": {
+          "description": "Indicates whether tags from the instance are propagated to the EBS volumes.",
+          "type": "string",
+          "enum": [
+            "disabled",
+            "enabled"
+          ],
+          "markdownDescription": "Indicates whether tags from the instance are propagated to the EBS volumes.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: disabled | enabled  \nUpdate requires: No interruption\n"
+        },
+        "HttpEndpoint": {
+          "description": "Enables or disables the HTTP metadata endpoint on your instances. If you specify a value of disabled, you cannot access your instance metadata.",
+          "type": "string",
+          "enum": [
+            "disabled",
+            "enabled"
+          ],
+          "markdownDescription": "Enables or disables the HTTP metadata endpoint on your instances. If you specify a value of disabled, you cannot access your instance metadata.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: disabled | enabled  \nUpdate requires: No interruption\n"
         }
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
@@ -635,6 +687,177 @@
     }
   },
   "properties": {
+    "PrivateDnsName": {
+      "description": "The private DNS name of the specified instance. For example: ip-10-24-34-0.ec2.internal.",
+      "type": "string",
+      "markdownDescription": "The private DNS name of the specified instance. For example: ip-10-24-34-0.ec2.internal.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Volumes": {
+      "uniqueItems": false,
+      "description": "The volumes to attach to the instance.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Volume"
+      },
+      "markdownDescription": "The volumes to attach to the instance.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "PrivateIp": {
+      "description": "The private IP address of the specified instance. For example: 10.24.34.0.",
+      "type": "string",
+      "markdownDescription": "The private IP address of the specified instance. For example: 10.24.34.0.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "EnclaveOptions": {
+      "description": "Indicates whether the instance is enabled for AWS Nitro Enclaves.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Enabled": {
+          "description": "If this parameter is set to true, the instance is enabled for AWS Nitro Enclaves; otherwise, it is not enabled for AWS Nitro Enclaves.",
+          "type": "boolean",
+          "markdownDescription": "If this parameter is set to true, the instance is enabled for AWS Nitro Enclaves; otherwise, it is not enabled for AWS Nitro Enclaves.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Indicates whether the instance is enabled for AWS Nitro Enclaves.\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
+    },
+    "ImageId": {
+      "description": "The ID of the AMI. An AMI ID is required to launch an instance and must be specified here or in a launch template.",
+      "type": "string",
+      "markdownDescription": "The ID of the AMI. An AMI ID is required to launch an instance and must be specified here or in a launch template.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "Tags": {
+      "uniqueItems": false,
+      "description": "The tags to add to the instance.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "The tags to add to the instance.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "AdditionalInfo": {
+      "description": "This property is reserved for internal use. If you use it, the stack fails with this error: Bad property set: [Testing this property] (Service: AmazonEC2; Status Code: 400; Error Code: InvalidParameterCombination; Request ID: 0XXXXXX-49c7-4b40-8bcc-76885dcXXXXX).",
+      "type": "string",
+      "markdownDescription": "This property is reserved for internal use. If you use it, the stack fails with this error: Bad property set: [Testing this property] (Service: AmazonEC2; Status Code: 400; Error Code: InvalidParameterCombination; Request ID: 0XXXXXX-49c7-4b40-8bcc-76885dcXXXXX).\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Some interruptions\n"
+    },
+    "HibernationOptions": {
+      "description": "Indicates whether an instance is enabled for hibernation.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Configured": {
+          "default": false,
+          "description": "If you set this parameter to true, your instance is enabled for hibernation.",
+          "type": "boolean",
+          "markdownDescription": "If you set this parameter to true, your instance is enabled for hibernation.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Indicates whether an instance is enabled for hibernation.\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
+    },
+    "LicenseSpecifications": {
+      "uniqueItems": false,
+      "description": "The license configurations.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/LicenseSpecification"
+      },
+      "markdownDescription": "The license configurations.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement\n"
+    },
+    "MetadataOptions": {
+      "description": "The metadata options for the instance",
+      "type": "object",
+      "$ref": "#/definitions/MetadataOptions",
+      "markdownDescription": "The metadata options for the instance\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "InstanceId": {
+      "description": "The EC2 Instance ID.",
+      "type": "string",
+      "markdownDescription": "The EC2 Instance ID.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CpuOptions": {
+      "description": "The CPU options for the instance.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ThreadsPerCore": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "CoreCount": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "The CPU options for the instance.\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
+    },
+    "AvailabilityZone": {
+      "description": "The Availability Zone of the instance.",
+      "type": "string",
+      "markdownDescription": "The Availability Zone of the instance.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "PrivateDnsNameOptions": {
+      "description": "The options for the instance hostname.",
+      "type": "object",
+      "$ref": "#/definitions/PrivateDnsNameOptions",
+      "markdownDescription": "The options for the instance hostname.\n\n---\n\nRequired: No  \nUpdate requires: Some interruptions\n"
+    },
+    "HostId": {
+      "description": "If you specify host for the Affinity property, the ID of a dedicated host that the instance is associated with. If you don't specify an ID, Amazon EC2 launches the instance onto any available, compatible dedicated host in your account.",
+      "type": "string",
+      "markdownDescription": "If you specify host for the Affinity property, the ID of a dedicated host that the instance is associated with. If you don't specify an ID, Amazon EC2 launches the instance onto any available, compatible dedicated host in your account.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Some interruptions\n"
+    },
+    "PublicDnsName": {
+      "description": "The public DNS name of the specified instance. For example: ec2-107-20-50-45.compute-1.amazonaws.com.",
+      "type": "string",
+      "markdownDescription": "The public DNS name of the specified instance. For example: ec2-107-20-50-45.compute-1.amazonaws.com.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SecurityGroupIds": {
+      "uniqueItems": false,
+      "description": "The IDs of the security groups.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "The IDs of the security groups.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Some interruptions\n"
+    },
+    "PlacementGroupName": {
+      "description": "The name of an existing placement group that you want to launch the instance into (cluster | partition | spread).",
+      "type": "string",
+      "markdownDescription": "The name of an existing placement group that you want to launch the instance into (cluster | partition | spread).\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "SsmAssociations": {
+      "uniqueItems": false,
+      "description": "The SSM document and parameter values in AWS Systems Manager to associate with this instance.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/SsmAssociation"
+      },
+      "markdownDescription": "The SSM document and parameter values in AWS Systems Manager to associate with this instance.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "VpcId": {
+      "description": "The ID of the VPC that the instance is running in.",
+      "type": "string",
+      "markdownDescription": "The ID of the VPC that the instance is running in.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "State": {
+      "description": "The current state of the instance.",
+      "type": "object",
+      "$ref": "#/definitions/State",
+      "markdownDescription": "The current state of the instance.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Affinity": {
+      "description": "Indicates whether the instance is associated with a dedicated host. If you want the instance to always restart on the same host on which it was launched, specify host. If you want the instance to restart on any available host, but try to launch onto the last host it ran on (on a best-effort basis), specify default.",
+      "type": "string",
+      "enum": [
+        "default",
+        "host"
+      ],
+      "markdownDescription": "Indicates whether the instance is associated with a dedicated host. If you want the instance to always restart on the same host on which it was launched, specify host. If you want the instance to restart on any available host, but try to launch onto the last host it ran on (on a best-effort basis), specify default.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: default | host  \nUpdate requires: Some interruptions\n"
+    },
     "Tenancy": {
       "description": "The tenancy of the instance (if the instance is running in a VPC). An instance with a tenancy of dedicated runs on single-tenant hardware.",
       "type": "string",
@@ -650,11 +873,6 @@
         "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
       },
       "markdownDescription": "the names of the security groups. For a nondefault VPC, you must use security group IDs instead.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement\n"
-    },
-    "PrivateDnsName": {
-      "description": "The private DNS name of the specified instance. For example: ip-10-24-34-0.ec2.internal.",
-      "type": "string",
-      "markdownDescription": "The private DNS name of the specified instance. For example: ip-10-24-34-0.ec2.internal.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "PrivateIpAddress": {
       "description": "[EC2-VPC] The primary IPv4 address. You must specify a value from the IPv4 address range of the subnet.",
@@ -731,21 +949,6 @@
       },
       "markdownDescription": "An elastic inference accelerator to associate with the instance.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement\n"
     },
-    "Volumes": {
-      "uniqueItems": false,
-      "description": "The volumes to attach to the instance.",
-      "insertionOrder": false,
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/Volume"
-      },
-      "markdownDescription": "The volumes to attach to the instance.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-    },
-    "PrivateIp": {
-      "description": "The private IP address of the specified instance. For example: 10.24.34.0.",
-      "type": "string",
-      "markdownDescription": "The private IP address of the specified instance. For example: 10.24.34.0.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
     "Ipv6AddressCount": {
       "description": "[EC2-VPC] The number of IPv6 addresses to associate with the primary network interface. Amazon EC2 chooses the IPv6 addresses from the range of your subnet.",
       "type": "integer",
@@ -757,19 +960,6 @@
       "$ref": "#/definitions/LaunchTemplateSpecification",
       "markdownDescription": "The launch template to use to launch the instances.\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
     },
-    "EnclaveOptions": {
-      "description": "Indicates whether the instance is enabled for AWS Nitro Enclaves.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Enabled": {
-          "description": "If this parameter is set to true, the instance is enabled for AWS Nitro Enclaves; otherwise, it is not enabled for AWS Nitro Enclaves.",
-          "type": "boolean",
-          "markdownDescription": "If this parameter is set to true, the instance is enabled for AWS Nitro Enclaves; otherwise, it is not enabled for AWS Nitro Enclaves.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "Indicates whether the instance is enabled for AWS Nitro Enclaves.\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
-    },
     "NetworkInterfaces": {
       "uniqueItems": false,
       "description": "The network interfaces to associate with the instance.",
@@ -779,11 +969,6 @@
         "$ref": "#/definitions/NetworkInterface"
       },
       "markdownDescription": "The network interfaces to associate with the instance.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement\n"
-    },
-    "ImageId": {
-      "description": "The ID of the AMI. An AMI ID is required to launch an instance and must be specified here or in a launch template.",
-      "type": "string",
-      "markdownDescription": "The ID of the AMI. An AMI ID is required to launch an instance and must be specified here or in a launch template.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
     },
     "InstanceType": {
       "description": "The instance type.",
@@ -795,50 +980,6 @@
       "type": "boolean",
       "markdownDescription": "Specifies whether detailed monitoring is enabled for the instance.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
     },
-    "Tags": {
-      "uniqueItems": false,
-      "description": "The tags to add to the instance.",
-      "insertionOrder": false,
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/Tag"
-      },
-      "markdownDescription": "The tags to add to the instance.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-    },
-    "AdditionalInfo": {
-      "description": "This property is reserved for internal use. If you use it, the stack fails with this error: Bad property set: [Testing this property] (Service: AmazonEC2; Status Code: 400; Error Code: InvalidParameterCombination; Request ID: 0XXXXXX-49c7-4b40-8bcc-76885dcXXXXX).",
-      "type": "string",
-      "markdownDescription": "This property is reserved for internal use. If you use it, the stack fails with this error: Bad property set: [Testing this property] (Service: AmazonEC2; Status Code: 400; Error Code: InvalidParameterCombination; Request ID: 0XXXXXX-49c7-4b40-8bcc-76885dcXXXXX).\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Some interruptions\n"
-    },
-    "HibernationOptions": {
-      "description": "Indicates whether an instance is enabled for hibernation.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Configured": {
-          "default": false,
-          "description": "If you set this parameter to true, your instance is enabled for hibernation.",
-          "type": "boolean",
-          "markdownDescription": "If you set this parameter to true, your instance is enabled for hibernation.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "Indicates whether an instance is enabled for hibernation.\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
-    },
-    "LicenseSpecifications": {
-      "uniqueItems": false,
-      "description": "The license configurations.",
-      "insertionOrder": false,
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/LicenseSpecification"
-      },
-      "markdownDescription": "The license configurations.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement\n"
-    },
-    "InstanceId": {
-      "description": "The EC2 Instance ID.",
-      "type": "string",
-      "markdownDescription": "The EC2 Instance ID.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
     "PublicIp": {
       "description": "The public IP address of the specified instance. For example: 192.0.2.0.",
       "type": "string",
@@ -849,58 +990,10 @@
       "type": "string",
       "markdownDescription": "Indicates whether an instance stops or terminates when you initiate shutdown from the instance (using the operating system command for system shutdown).\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
     },
-    "CpuOptions": {
-      "description": "The CPU options for the instance.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "ThreadsPerCore": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
-        },
-        "CoreCount": {
-          "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "The CPU options for the instance.\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
-    },
-    "AvailabilityZone": {
-      "description": "The Availability Zone of the instance.",
-      "type": "string",
-      "markdownDescription": "The Availability Zone of the instance.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
-    },
-    "PrivateDnsNameOptions": {
-      "description": "The options for the instance hostname.",
-      "type": "object",
-      "$ref": "#/definitions/PrivateDnsNameOptions",
-      "markdownDescription": "The options for the instance hostname.\n\n---\n\nRequired: No  \nUpdate requires: Some interruptions\n"
-    },
-    "HostId": {
-      "description": "If you specify host for the Affinity property, the ID of a dedicated host that the instance is associated with. If you don't specify an ID, Amazon EC2 launches the instance onto any available, compatible dedicated host in your account.",
-      "type": "string",
-      "markdownDescription": "If you specify host for the Affinity property, the ID of a dedicated host that the instance is associated with. If you don't specify an ID, Amazon EC2 launches the instance onto any available, compatible dedicated host in your account.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Some interruptions\n"
-    },
     "HostResourceGroupArn": {
       "description": "The ARN of the host resource group in which to launch the instances. If you specify a host resource group ARN, omit the Tenancy parameter or set it to host.",
       "type": "string",
       "markdownDescription": "The ARN of the host resource group in which to launch the instances. If you specify a host resource group ARN, omit the Tenancy parameter or set it to host.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
-    },
-    "PublicDnsName": {
-      "description": "The public DNS name of the specified instance. For example: ec2-107-20-50-45.compute-1.amazonaws.com.",
-      "type": "string",
-      "markdownDescription": "The public DNS name of the specified instance. For example: ec2-107-20-50-45.compute-1.amazonaws.com.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "SecurityGroupIds": {
-      "uniqueItems": false,
-      "description": "The IDs of the security groups.",
-      "insertionOrder": false,
-      "type": "array",
-      "items": {
-        "type": "string",
-        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-      },
-      "markdownDescription": "The IDs of the security groups.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Some interruptions\n"
     },
     "DisableApiTermination": {
       "description": "If you set this parameter to true, you can't terminate the instance using the Amazon EC2 console, CLI, or API; otherwise, you can.",
@@ -921,41 +1014,6 @@
       "description": "Specifies whether to enable an instance launched in a VPC to perform NAT.",
       "type": "boolean",
       "markdownDescription": "Specifies whether to enable an instance launched in a VPC to perform NAT.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-    },
-    "PlacementGroupName": {
-      "description": "The name of an existing placement group that you want to launch the instance into (cluster | partition | spread).",
-      "type": "string",
-      "markdownDescription": "The name of an existing placement group that you want to launch the instance into (cluster | partition | spread).\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
-    },
-    "SsmAssociations": {
-      "uniqueItems": false,
-      "description": "The SSM document and parameter values in AWS Systems Manager to associate with this instance.",
-      "insertionOrder": false,
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/SsmAssociation"
-      },
-      "markdownDescription": "The SSM document and parameter values in AWS Systems Manager to associate with this instance.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-    },
-    "VpcId": {
-      "description": "The ID of the VPC that the instance is running in.",
-      "type": "string",
-      "markdownDescription": "The ID of the VPC that the instance is running in.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "State": {
-      "description": "The current state of the instance.",
-      "type": "object",
-      "$ref": "#/definitions/State",
-      "markdownDescription": "The current state of the instance.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "Affinity": {
-      "description": "Indicates whether the instance is associated with a dedicated host. If you want the instance to always restart on the same host on which it was launched, specify host. If you want the instance to restart on any available host, but try to launch onto the last host it ran on (on a best-effort basis), specify default.",
-      "type": "string",
-      "enum": [
-        "default",
-        "host"
-      ],
-      "markdownDescription": "Indicates whether the instance is associated with a dedicated host. If you want the instance to always restart on the same host on which it was launched, specify host. If you want the instance to restart on any available host, but try to launch onto the last host it ran on (on a best-effort basis), specify default.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: default | host  \nUpdate requires: Some interruptions\n"
     },
     "CreditSpecification": {
       "description": "The credit option for CPU usage of the burstable performance instance. Valid values are standard and unlimited.",
@@ -986,11 +1044,6 @@
       "type": "string",
       "markdownDescription": "The EC2 Instance ID.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
-    "PublicIp": {
-      "description": "The public IP address of the specified instance. For example: 192.0.2.0.",
-      "type": "string",
-      "markdownDescription": "The public IP address of the specified instance. For example: 192.0.2.0.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
     "PublicDnsName": {
       "description": "The public DNS name of the specified instance. For example: ec2-107-20-50-45.compute-1.amazonaws.com.",
       "type": "string",
@@ -1006,6 +1059,11 @@
       "type": "object",
       "$ref": "#/definitions/State",
       "markdownDescription": "The current state of the instance.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "PublicIp": {
+      "description": "The public IP address of the specified instance. For example: 192.0.2.0.",
+      "type": "string",
+      "markdownDescription": "The public IP address of the specified instance. For example: 192.0.2.0.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

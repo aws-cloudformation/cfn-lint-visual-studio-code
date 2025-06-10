@@ -4,6 +4,7 @@
   "definitions": {
     "Tag": {
       "description": "A map of key and value pairs to use to tag your cluster.",
+      "type": "object",
       "properties": {
         "Key": {
           "type": "string",
@@ -25,7 +26,7 @@
         "Value"
       ],
       "additionalProperties": false,
-      "markdownDescription": "A map of key and value pairs to use to tag your cluster.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+      "markdownDescription": "A map of key and value pairs to use to tag your cluster.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -62,6 +63,35 @@
       "description": "The status of the cluster.",
       "type": "string",
       "markdownDescription": "The status of the cluster.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "VpcEndpointServiceName": {
+      "description": "The VPC endpoint service name.",
+      "type": "string",
+      "markdownDescription": "The VPC endpoint service name.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "MultiRegionProperties": {
+      "description": "The Multi-region properties associated to this cluster.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "WitnessRegion": {
+          "description": "The witness region in a multi-region cluster.",
+          "type": "string",
+          "markdownDescription": "The witness region in a multi-region cluster.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Clusters": {
+          "type": "array",
+          "items": {
+            "description": "The cluster Amazon Resource Name (ARN) in a multi-region cluster.",
+            "type": "string",
+            "markdownDescription": "The cluster Amazon Resource Name (ARN) in a multi-region cluster.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "The Multi-region properties associated to this cluster.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "additionalProperties": false,
@@ -85,7 +115,8 @@
     "/properties/ResourceArn",
     "/properties/Identifier",
     "/properties/CreationTime",
-    "/properties/Status"
+    "/properties/Status",
+    "/properties/VpcEndpointServiceName"
   ],
   "handlers": {
     "create": {
@@ -93,13 +124,18 @@
         "dsql:CreateCluster",
         "dsql:GetCluster",
         "dsql:TagResource",
+        "dsql:GetVpcEndpointServiceName",
         "dsql:ListTagsForResource",
-        "iam:CreateServiceLinkedRole"
+        "iam:CreateServiceLinkedRole",
+        "dsql:PutMultiRegionProperties",
+        "dsql:AddPeerCluster",
+        "dsql:PutWitnessRegion"
       ]
     },
     "read": {
       "permissions": [
         "dsql:GetCluster",
+        "dsql:GetVpcEndpointServiceName",
         "dsql:ListTagsForResource",
         "tag:GetTagKeys",
         "tag:GetTagValues"
@@ -111,7 +147,12 @@
         "dsql:GetCluster",
         "dsql:UntagResource",
         "dsql:TagResource",
-        "dsql:ListTagsForResource"
+        "dsql:GetVpcEndpointServiceName",
+        "dsql:ListTagsForResource",
+        "dsql:PutMultiRegionProperties",
+        "dsql:PutWitnessRegion",
+        "dsql:AddPeerCluster",
+        "dsql:RemovePeerCluster"
       ]
     },
     "delete": {
@@ -150,6 +191,11 @@
       "description": "The status of the cluster.",
       "type": "string",
       "markdownDescription": "The status of the cluster.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "VpcEndpointServiceName": {
+      "description": "The VPC endpoint service name.",
+      "type": "string",
+      "markdownDescription": "The VPC endpoint service name.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

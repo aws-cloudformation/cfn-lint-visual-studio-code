@@ -43,6 +43,169 @@
       },
       "additionalProperties": false,
       "markdownDescription": "Logging configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Label": {
+      "description": "Series label",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "description": "Name of the label",
+          "minLength": 1,
+          "markdownDescription": "Name of the label\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nPattern: ^[a-zA-Z_][a-zA-Z0-9_]*$  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "description": "Value of the label",
+          "minLength": 1,
+          "markdownDescription": "Value of the label\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Name",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Series label\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LimitsPerLabelSetEntry": {
+      "description": "Limits that can be applied to a label set",
+      "type": "object",
+      "properties": {
+        "MaxSeries": {
+          "description": "The maximum number of active series that can be ingested for this label set",
+          "type": "integer",
+          "minimum": 0,
+          "markdownDescription": "The maximum number of active series that can be ingested for this label set\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Limits that can be applied to a label set\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LimitsPerLabelSet": {
+      "description": "Label set and its associated limits",
+      "type": "object",
+      "properties": {
+        "Limits": {
+          "$ref": "#/definitions/LimitsPerLabelSetEntry"
+        },
+        "LabelSet": {
+          "description": "An array of series labels",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/Label"
+          },
+          "minItems": 0,
+          "markdownDescription": "An array of series labels\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Limits",
+        "LabelSet"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Label set and its associated limits\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "WorkspaceConfiguration": {
+      "description": "Workspace configuration",
+      "type": "object",
+      "properties": {
+        "RetentionPeriodInDays": {
+          "description": "How many days that metrics are retained in the workspace",
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "How many days that metrics are retained in the workspace\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "LimitsPerLabelSets": {
+          "description": "An array of label set and associated limits",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/LimitsPerLabelSet"
+          },
+          "minItems": 0,
+          "markdownDescription": "An array of label set and associated limits\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Workspace configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CloudWatchLogDestination": {
+      "description": "Represents a cloudwatch logs destination for query logging",
+      "type": "object",
+      "properties": {
+        "LogGroupArn": {
+          "description": "The ARN of the CloudWatch Logs log group",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 512,
+          "markdownDescription": "The ARN of the CloudWatch Logs log group\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 512  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "LogGroupArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Represents a cloudwatch logs destination for query logging\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LoggingFilter": {
+      "description": "Filters for logging",
+      "type": "object",
+      "properties": {
+        "QspThreshold": {
+          "description": "Query logs with QSP above this limit are vended",
+          "type": "integer",
+          "minimum": 0,
+          "markdownDescription": "Query logs with QSP above this limit are vended\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "QspThreshold"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Filters for logging\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LoggingDestination": {
+      "description": "Destinations for query logging",
+      "type": "object",
+      "properties": {
+        "CloudWatchLogs": {
+          "$ref": "#/definitions/CloudWatchLogDestination"
+        },
+        "Filters": {
+          "$ref": "#/definitions/LoggingFilter"
+        }
+      },
+      "required": [
+        "CloudWatchLogs",
+        "Filters"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Destinations for query logging\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "QueryLoggingConfiguration": {
+      "description": "Query logging configuration",
+      "type": "object",
+      "properties": {
+        "Destinations": {
+          "description": "The destinations configuration for query logging",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LoggingDestination"
+          },
+          "minItems": 1,
+          "maxItems": 1,
+          "markdownDescription": "The destinations configuration for query logging\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Destinations"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Query logging configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -79,6 +242,12 @@
     },
     "LoggingConfiguration": {
       "$ref": "#/definitions/LoggingConfiguration"
+    },
+    "WorkspaceConfiguration": {
+      "$ref": "#/definitions/WorkspaceConfiguration"
+    },
+    "QueryLoggingConfiguration": {
+      "$ref": "#/definitions/QueryLoggingConfiguration"
     },
     "KmsKeyArn": {
       "description": "KMS Key ARN used to encrypt and decrypt AMP workspace data.",
@@ -131,6 +300,9 @@
         "aps:CreateAlertManagerDefinition",
         "aps:DescribeAlertManagerDefinition",
         "aps:CreateLoggingConfiguration",
+        "aps:CreateQueryLoggingConfiguration",
+        "aps:DescribeWorkspaceConfiguration",
+        "aps:UpdateWorkspaceConfiguration",
         "logs:CreateLogDelivery",
         "logs:GetLogDelivery",
         "logs:ListLogDeliveries",
@@ -145,7 +317,9 @@
         "aps:DescribeWorkspace",
         "aps:ListTagsForResource",
         "aps:DescribeAlertManagerDefinition",
-        "aps:DescribeLoggingConfiguration"
+        "aps:DescribeLoggingConfiguration",
+        "aps:DescribeQueryLoggingConfiguration",
+        "aps:DescribeWorkspaceConfiguration"
       ]
     },
     "update": {
@@ -162,6 +336,12 @@
         "aps:DescribeLoggingConfiguration",
         "aps:UpdateLoggingConfiguration",
         "aps:DeleteLoggingConfiguration",
+        "aps:DescribeWorkspaceConfiguration",
+        "aps:UpdateWorkspaceConfiguration",
+        "aps:CreateQueryLoggingConfiguration",
+        "aps:UpdateQueryLoggingConfiguration",
+        "aps:DeleteQueryLoggingConfiguration",
+        "aps:DescribeQueryLoggingConfiguration",
         "logs:CreateLogDelivery",
         "logs:GetLogDelivery",
         "logs:UpdateLogDelivery",
@@ -176,6 +356,7 @@
         "aps:DescribeWorkspace",
         "aps:DeleteAlertManagerDefinition",
         "aps:DeleteLoggingConfiguration",
+        "aps:DeleteQueryLoggingConfiguration",
         "logs:DeleteLogDelivery"
       ]
     },
