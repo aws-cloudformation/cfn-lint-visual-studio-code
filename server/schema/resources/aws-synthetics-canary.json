@@ -108,6 +108,11 @@
         "OFF"
       ],
       "markdownDescription": "Setting to control if provisioned resources created by Synthetics are deleted alongside the canary. Default is AUTOMATIC.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AUTOMATIC | OFF  \nUpdate requires: No interruption\n"
+    },
+    "DryRunAndUpdate": {
+      "description": "Setting to control if UpdateCanary will perform a DryRun and validate it is PASSING before performing the Update. Default is FALSE.",
+      "type": "boolean",
+      "markdownDescription": "Setting to control if UpdateCanary will perform a DryRun and validate it is PASSING before performing the Update. Default is FALSE.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
     }
   },
   "definitions": {
@@ -122,6 +127,11 @@
         "DurationInSeconds": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "RetryConfig": {
+          "$ref": "#/definitions/RetryConfig",
+          "description": "Provide canary auto retry configuration",
+          "markdownDescription": "Provide canary auto retry configuration\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
         }
       },
       "required": [
@@ -355,6 +365,21 @@
         "lambda-function"
       ],
       "markdownDescription": "Specifies which resources canary tags should be replicated to.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: lambda-function  \nUpdate requires: No interruption\n"
+    },
+    "RetryConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "MaxRetries": {
+          "type": "integer",
+          "description": "maximum times the canary will be retried upon the scheduled run failure",
+          "markdownDescription": "maximum times the canary will be retried upon the scheduled run failure\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "MaxRetries"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "required": [
@@ -409,8 +434,10 @@
       "permissions": [
         "synthetics:UpdateCanary",
         "synthetics:StartCanary",
+        "synthetics:StartCanaryDryRun",
         "synthetics:StopCanary",
         "synthetics:GetCanary",
+        "synthetics:GetCanaryRuns",
         "synthetics:TagResource",
         "synthetics:UntagResource",
         "s3:GetObject",
@@ -480,7 +507,8 @@
     "/properties/StartCanaryAfterCreation",
     "/properties/ResourcesToReplicateTags",
     "/properties/RunConfig/EnvironmentVariables",
-    "/properties/VisualReference"
+    "/properties/VisualReference",
+    "/properties/DryRunAndUpdate"
   ],
   "deprecatedProperties": [
     "/properties/DeleteLambdaResourcesOnCanaryDeletion"

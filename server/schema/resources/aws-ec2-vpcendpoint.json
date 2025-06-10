@@ -9,7 +9,7 @@
     "tagOnCreate": true,
     "tagUpdatable": true,
     "tagProperty": "/properties/Tags",
-    "cloudFormationSystemTags": false
+    "cloudFormationSystemTags": true
   },
   "handlers": {
     "read": {
@@ -29,7 +29,8 @@
         "vpc-lattice:CreateServiceNetworkVpcEndpointAssociation",
         "vpc-lattice:DescribeServiceNetworkVpcEndpointAssociation",
         "ec2:CreateTags",
-        "ec2:DeleteTags"
+        "ec2:DeleteTags",
+        "vpce:AllowMultiRegion"
       ],
       "timeoutInMinutes": 210
     },
@@ -42,7 +43,8 @@
         "vpc-lattice:CreateServiceNetworkVpcEndpointAssociation",
         "vpc-lattice:DescribeServiceNetworkVpcEndpointAssociation",
         "ec2:CreateTags",
-        "ec2:DeleteTags"
+        "ec2:DeleteTags",
+        "vpce:AllowMultiRegion"
       ],
       "timeoutInMinutes": 210
     },
@@ -62,7 +64,8 @@
         "ec2:DescribeSecurityGroups",
         "vpc-lattice:DescribeServiceNetworkVpcEndpointAssociation",
         "ec2:CreateTags",
-        "ec2:DeleteTags"
+        "ec2:DeleteTags",
+        "vpce:AllowMultiRegion"
       ],
       "timeoutInMinutes": 210
     }
@@ -80,7 +83,8 @@
     "/properties/VpcEndpointType",
     "/properties/VpcId",
     "/properties/ServiceNetworkArn",
-    "/properties/ResourceConfigurationArn"
+    "/properties/ResourceConfigurationArn",
+    "/properties/ServiceRegion"
   ],
   "additionalProperties": false,
   "primaryIdentifier": [
@@ -88,20 +92,22 @@
   ],
   "definitions": {
     "DnsOptionsSpecification": {
-      "description": "",
+      "description": "Describes the DNS options for an endpoint.",
       "additionalProperties": false,
       "type": "object",
       "properties": {
         "PrivateDnsOnlyForInboundResolverEndpoint": {
+          "description": "Indicates whether to enable private DNS only for inbound endpoints. This option is available only for services that support both gateway and interface endpoints. It routes traffic that originates from the VPC to the gateway endpoint and traffic that originates from on-premises to the interface endpoint.",
           "type": "string",
           "enum": [
             "OnlyInboundResolver",
             "AllResolvers",
             "NotSpecified"
           ],
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: OnlyInboundResolver | AllResolvers | NotSpecified  \nUpdate requires: No interruption\n"
+          "markdownDescription": "Indicates whether to enable private DNS only for inbound endpoints. This option is available only for services that support both gateway and interface endpoints. It routes traffic that originates from the VPC to the gateway endpoint and traffic that originates from on-premises to the interface endpoint.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: OnlyInboundResolver | AllResolvers | NotSpecified  \nUpdate requires: No interruption\n"
         },
         "DnsRecordIpType": {
+          "description": "The DNS records created for the endpoint.",
           "type": "string",
           "enum": [
             "ipv4",
@@ -110,30 +116,32 @@
             "service-defined",
             "not-specified"
           ],
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ipv4 | ipv6 | dualstack | service-defined | not-specified  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The DNS records created for the endpoint.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ipv4 | ipv6 | dualstack | service-defined | not-specified  \nUpdate requires: No interruption\n"
         }
       },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Describes the DNS options for an endpoint.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Tag": {
-      "description": "",
+      "description": "Describes a tag.",
       "additionalProperties": false,
       "type": "object",
       "properties": {
         "Value": {
+          "description": "The value of the tag.\n Constraints: Tag values are case-sensitive and accept a maximum of 256 Unicode characters.",
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The value of the tag.\n Constraints: Tag values are case-sensitive and accept a maximum of 256 Unicode characters.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         },
         "Key": {
+          "description": "The key of the tag.\n Constraints: Tag keys are case-sensitive and accept a maximum of 127 Unicode characters. May not begin with ``aws:``.",
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The key of the tag.\n Constraints: Tag keys are case-sensitive and accept a maximum of 127 Unicode characters. May not begin with ``aws:``.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
         "Value",
         "Key"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Describes a tag.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -143,7 +151,7 @@
       "markdownDescription": "Indicate whether to associate a private hosted zone with the specified VPC. The private hosted zone contains a record set for the default public DNS name for the service for the Region (for example, ``kinesis.us-east-1.amazonaws.com``), which resolves to the private IP addresses of the endpoint network interfaces in the VPC. This enables you to make requests to the default public DNS name for the service instead of the public DNS names that are automatically generated by the VPC endpoint service.\n To use a private hosted zone, you must set the following VPC attributes to ``true``: ``enableDnsHostnames`` and ``enableDnsSupport``.\n This property is supported only for interface endpoints.\n Default: ``false``\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
     },
     "IpAddressType": {
-      "description": "",
+      "description": "The supported IP address types.",
       "type": "string",
       "enum": [
         "ipv4",
@@ -151,7 +159,12 @@
         "dualstack",
         "not-specified"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ipv4 | ipv6 | dualstack | not-specified  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The supported IP address types.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ipv4 | ipv6 | dualstack | not-specified  \nUpdate requires: No interruption\n"
+    },
+    "ServiceRegion": {
+      "description": "",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
     },
     "CreationTimestamp": {
       "description": "",
@@ -159,9 +172,9 @@
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "DnsOptions": {
-      "description": "",
+      "description": "Describes the DNS options for an endpoint.",
       "$ref": "#/definitions/DnsOptionsSpecification",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+      "markdownDescription": "Describes the DNS options for an endpoint.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
     },
     "NetworkInterfaceIds": {
       "uniqueItems": false,
@@ -186,9 +199,9 @@
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "ResourceConfigurationArn": {
-      "description": "",
+      "description": "The Amazon Resource Name (ARN) of the resource configuration.",
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+      "markdownDescription": "The Amazon Resource Name (ARN) of the resource configuration.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
     },
     "SecurityGroupIds": {
       "uniqueItems": true,
@@ -237,9 +250,9 @@
       "markdownDescription": "The IDs of the subnets in which to create endpoint network interfaces. You must specify this property for an interface endpoint or a Gateway Load Balancer endpoint. You can't specify this property for a gateway endpoint. For a Gateway Load Balancer endpoint, you can specify only one subnet.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     },
     "ServiceNetworkArn": {
-      "description": "",
+      "description": "The Amazon Resource Name (ARN) of the service network.",
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+      "markdownDescription": "The Amazon Resource Name (ARN) of the service network.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
     },
     "VpcId": {
       "description": "The ID of the VPC.",
@@ -293,13 +306,13 @@
     },
     "Tags": {
       "uniqueItems": false,
-      "description": "",
+      "description": "The tags to associate with the endpoint.",
       "insertionOrder": false,
       "type": "array",
       "items": {
         "$ref": "#/definitions/Tag"
       },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The tags to associate with the endpoint.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "required": [

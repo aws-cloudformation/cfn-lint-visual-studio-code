@@ -2,7 +2,169 @@
   "typeName": "AWS::DataZone::Project",
   "description": "Amazon DataZone projects are business use case\u2013based groupings of people, assets (data), and tools used to simplify access to the AWS analytics.",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-datazone",
-  "definitions": {},
+  "definitions": {
+    "EnvironmentConfigurationUserParameter": {
+      "type": "object",
+      "properties": {
+        "EnvironmentId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9_-]{1,36}$  \nUpdate requires: No interruption\n"
+        },
+        "EnvironmentConfigurationName": {
+          "type": "string",
+          "maxLength": 64,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[\\w -]+$  \nUpdate requires: No interruption\n"
+        },
+        "EnvironmentParameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EnvironmentParameter"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EnvironmentDeploymentDetails": {
+      "type": "object",
+      "properties": {
+        "OverallDeploymentStatus": {
+          "$ref": "#/definitions/OverallDeploymentStatus"
+        },
+        "EnvironmentFailureReasons": {
+          "$ref": "#/definitions/EnvironmentFailureReasons"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EnvironmentError": {
+      "type": "object",
+      "properties": {
+        "Code": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Message": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Message"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EnvironmentFailureReasons": {
+      "type": "object",
+      "patternProperties": {
+        ".+": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EnvironmentError"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EnvironmentParameter": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EnvironmentResolvedAccount": {
+      "type": "object",
+      "properties": {
+        "AwsAccountId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^\\d{12}$  \nUpdate requires: No interruption\n"
+        },
+        "RegionName": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-z]{2}-[a-z]{4,10}-\\d$  \nUpdate requires: No interruption\n"
+        },
+        "SourceAccountPoolId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z0-9_-]{1,36}$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "AwsAccountId",
+        "RegionName",
+        "SourceAccountPoolId"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "OverallDeploymentStatus": {
+      "type": "string",
+      "enum": [
+        "PENDING_DEPLOYMENT",
+        "IN_PROGRESS",
+        "SUCCESSFUL",
+        "FAILED_VALIDATION",
+        "FAILED_DEPLOYMENT"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PENDING_DEPLOYMENT | IN_PROGRESS | SUCCESSFUL | FAILED_VALIDATION | FAILED_DEPLOYMENT  \nUpdate requires: No interruption\n"
+    },
+    "ProjectDeletionError": {
+      "type": "object",
+      "description": "Error that occurred during project deletion",
+      "properties": {
+        "Code": {
+          "type": "string",
+          "description": "Project Deletion Error Code",
+          "markdownDescription": "Project Deletion Error Code\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Message": {
+          "type": "string",
+          "description": "Project Deletion Error Message",
+          "markdownDescription": "Project Deletion Error Message\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Error that occurred during project deletion\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ProjectStatus": {
+      "type": "string",
+      "enum": [
+        "ACTIVE",
+        "MOVING",
+        "DELETING",
+        "DELETE_FAILED",
+        "UPDATING",
+        "UPDATE_FAILED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ACTIVE | MOVING | DELETING | DELETE_FAILED | UPDATING | UPDATE_FAILED  \nUpdate requires: No interruption\n"
+    },
+    "Tags": {
+      "type": "object",
+      "patternProperties": {
+        "^[\\w \\.:/=+@-]+$": {
+          "type": "string",
+          "maxLength": 256,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nPattern: ^[\\w \\.:/=+@-]*$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
   "properties": {
     "CreatedAt": {
       "description": "The timestamp of when the project was created.",
@@ -30,6 +192,11 @@
       "description": "The ID of the Amazon DataZone domain in which this project is created.",
       "type": "string",
       "markdownDescription": "The ID of the Amazon DataZone domain in which this project is created.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$  \nUpdate requires: Replacement\n"
+    },
+    "DomainUnitId": {
+      "description": "The ID of the domain unit.",
+      "type": "string",
+      "markdownDescription": "The ID of the domain unit.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-z0-9_\\-]+$  \nUpdate requires: Replacement\n"
     },
     "GlossaryTerms": {
       "description": "The glossary terms that can be used in this Amazon DataZone project.",
@@ -60,6 +227,29 @@
       "maxLength": 64,
       "minLength": 1,
       "markdownDescription": "The name of the Amazon DataZone project.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[\\w -]+$  \nUpdate requires: No interruption\n"
+    },
+    "ProjectProfileId": {
+      "description": "The project profile ID.",
+      "type": "string",
+      "markdownDescription": "The project profile ID.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9_-]{1,36}$  \nUpdate requires: Replacement\n"
+    },
+    "ProjectProfileVersion": {
+      "description": "The project profile version to which the project should be updated. You can only specify the following string for this parameter: latest.",
+      "type": "string",
+      "markdownDescription": "The project profile version to which the project should be updated. You can only specify the following string for this parameter: latest.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "ProjectStatus": {
+      "description": "The status of the project.",
+      "$ref": "#/definitions/ProjectStatus",
+      "markdownDescription": "The status of the project.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "UserParameters": {
+      "description": "The user parameters of the project.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/EnvironmentConfigurationUserParameter"
+      },
+      "markdownDescription": "The user parameters of the project.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "required": [
@@ -71,17 +261,23 @@
     "/properties/CreatedAt",
     "/properties/CreatedBy",
     "/properties/DomainId",
-    "/properties/LastUpdatedAt"
+    "/properties/LastUpdatedAt",
+    "/properties/ProjectStatus"
   ],
   "writeOnlyProperties": [
-    "/properties/DomainIdentifier"
+    "/properties/DomainIdentifier",
+    "/properties/ProjectProfileVersion",
+    "/properties/ProjectProfileId",
+    "/properties/UserParameters"
   ],
   "primaryIdentifier": [
     "/properties/DomainId",
     "/properties/Id"
   ],
   "createOnlyProperties": [
-    "/properties/DomainIdentifier"
+    "/properties/ProjectProfileId",
+    "/properties/DomainIdentifier",
+    "/properties/DomainUnitId"
   ],
   "additionalIdentifiers": [
     [
@@ -162,6 +358,11 @@
       "type": "string",
       "format": "date-time",
       "markdownDescription": "The timestamp of when the project was last updated.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ProjectStatus": {
+      "description": "The status of the project.",
+      "$ref": "#/definitions/ProjectStatus",
+      "markdownDescription": "The status of the project.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

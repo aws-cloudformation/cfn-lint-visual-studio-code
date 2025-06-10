@@ -36,6 +36,47 @@
       },
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DeletionMode": {
+      "type": "string",
+      "default": "DISABLED",
+      "enum": [
+        "ENABLED",
+        "DISABLED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption\n"
+    },
+    "DeletionProtection": {
+      "type": "object",
+      "properties": {
+        "Mode": {
+          "$ref": "#/definitions/DeletionMode"
+        }
+      },
+      "required": [
+        "Mode"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -62,6 +103,19 @@
     },
     "Schema": {
       "$ref": "#/definitions/SchemaDefinition"
+    },
+    "DeletionProtection": {
+      "$ref": "#/definitions/DeletionProtection"
+    },
+    "Tags": {
+      "description": "The tags to add to the policy store",
+      "type": "array",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "The tags to add to the policy store\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "required": [
@@ -75,10 +129,16 @@
     "/properties/PolicyStoreId"
   ],
   "tagging": {
-    "taggable": false,
-    "tagOnCreate": false,
-    "tagUpdatable": false,
-    "cloudFormationSystemTags": false
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "verifiedpermissions:TagResource",
+      "verifiedpermissions:ListTagsForResource",
+      "verifiedpermissions:UntagResource"
+    ]
   },
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-avp",
   "propertyTransform": {
@@ -88,6 +148,7 @@
     "create": {
       "permissions": [
         "verifiedpermissions:CreatePolicyStore",
+        "verifiedpermissions:TagResource",
         "verifiedpermissions:GetPolicyStore",
         "verifiedpermissions:PutSchema"
       ]
@@ -95,6 +156,7 @@
     "read": {
       "permissions": [
         "verifiedpermissions:GetPolicyStore",
+        "verifiedpermissions:ListTagsForResource",
         "verifiedpermissions:GetSchema"
       ]
     },
@@ -102,6 +164,8 @@
       "permissions": [
         "verifiedpermissions:UpdatePolicyStore",
         "verifiedpermissions:GetPolicyStore",
+        "verifiedpermissions:TagResource",
+        "verifiedpermissions:UntagResource",
         "verifiedpermissions:GetSchema",
         "verifiedpermissions:PutSchema"
       ]

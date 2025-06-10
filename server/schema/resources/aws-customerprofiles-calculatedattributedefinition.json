@@ -101,8 +101,34 @@
       "description": "The amount of time of the specified unit.",
       "type": "integer",
       "minimum": 1,
-      "maximum": 366,
+      "maximum": 2147483647,
       "markdownDescription": "The amount of time of the specified unit.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    },
+    "ValueRange": {
+      "description": "A structure specifying the endpoints of the relative time period over which data is included in the aggregation.",
+      "type": "object",
+      "properties": {
+        "Start": {
+          "description": "The starting point for this range. Positive numbers indicate how many days in the past data should be included, and negative numbers indicate how many days in the future.",
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647,
+          "markdownDescription": "The starting point for this range. Positive numbers indicate how many days in the past data should be included, and negative numbers indicate how many days in the future.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "End": {
+          "description": "The ending point for this range. Positive numbers indicate how many days in the past data should be included, and negative numbers indicate how many days in the future.",
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647,
+          "markdownDescription": "The ending point for this range. Positive numbers indicate how many days in the past data should be included, and negative numbers indicate how many days in the future.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Start",
+        "End"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A structure specifying the endpoints of the relative time period over which data is included in the aggregation.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Range": {
       "description": "The relative time period over which data is included in the aggregation.",
@@ -113,10 +139,26 @@
         },
         "Unit": {
           "$ref": "#/definitions/RangeUnit"
+        },
+        "ValueRange": {
+          "$ref": "#/definitions/ValueRange"
+        },
+        "TimestampSource": {
+          "description": "An expression specifying the field in your JSON object from which the date should be parsed. The expression should follow the structure of \\\"{ObjectTypeName.<Location of timestamp field in JSON pointer format>}\\\". E.g. if your object type is MyType and source JSON is {\"generatedAt\": {\"timestamp\": \"1737587945945\"}}, then TimestampSource should be \"{MyType.generatedAt.timestamp}\".",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "An expression specifying the field in your JSON object from which the date should be parsed. The expression should follow the structure of \\\"{ObjectTypeName.<Location of timestamp field in JSON pointer format>}\\\". E.g. if your object type is MyType and source JSON is {\"generatedAt\": {\"timestamp\": \"1737587945945\"}}, then TimestampSource should be \"{MyType.generatedAt.timestamp}\".\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+        },
+        "TimestampFormat": {
+          "description": "The format the timestamp field in your JSON object is specified. This value should be one of EPOCHMILLI or ISO_8601. E.g. if your object type is MyType and source JSON is {\"generatedAt\": {\"timestamp\": \"2001-07-04T12:08:56.235Z\"}}, then TimestampFormat should be \"ISO_8601\".",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "The format the timestamp field in your JSON object is specified. This value should be one of EPOCHMILLI or ISO_8601. E.g. if your object type is MyType and source JSON is {\"generatedAt\": {\"timestamp\": \"2001-07-04T12:08:56.235Z\"}}, then TimestampFormat should be \"ISO_8601\".\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "Value",
         "Unit"
       ],
       "additionalProperties": false,
@@ -126,7 +168,7 @@
       "description": "The number of profile objects used for the calculated attribute.",
       "type": "integer",
       "minimum": 1,
-      "maximum": 100,
+      "maximum": 300,
       "markdownDescription": "The number of profile objects used for the calculated attribute.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
     },
     "ThresholdValue": {
@@ -180,7 +222,7 @@
         }
       },
       "additionalProperties": false,
-      "markdownDescription": "The conditions including range, object count, and threshold for the calculated attribute.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The conditions including range, object count, and threshold for the calculated attribute.\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
     },
     "Statistic": {
       "description": "The aggregation operation to perform for the calculated attribute.",
@@ -196,6 +238,26 @@
         "MAX_OCCURRENCE"
       ],
       "markdownDescription": "The aggregation operation to perform for the calculated attribute.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: FIRST_OCCURRENCE | LAST_OCCURRENCE | COUNT | SUM | MINIMUM | MAXIMUM | AVERAGE | MAX_OCCURRENCE  \nUpdate requires: No interruption\n"
+    },
+    "Readiness": {
+      "description": "The readiness status of the calculated attribute.",
+      "type": "object",
+      "properties": {
+        "ProgressPercentage": {
+          "description": "The progress percentage for including historical data in your calculated attribute.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "markdownDescription": "The progress percentage for including historical data in your calculated attribute.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Message": {
+          "description": "Any information pertaining to the status of the calculated attribute if required.",
+          "type": "string",
+          "markdownDescription": "Any information pertaining to the status of the calculated attribute if required.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The readiness status of the calculated attribute.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Tag": {
       "description": "A key-value pair to associate with a resource.",
@@ -258,6 +320,11 @@
     "Statistic": {
       "$ref": "#/definitions/Statistic"
     },
+    "UseHistoricalData": {
+      "description": "Whether to use historical data for the calculated attribute.",
+      "type": "boolean",
+      "markdownDescription": "Whether to use historical data for the calculated attribute.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: Replacement\n"
+    },
     "CreatedAt": {
       "description": "The timestamp of when the calculated attribute definition was created.",
       "type": "string",
@@ -267,6 +334,20 @@
       "description": "The timestamp of when the calculated attribute definition was most recently edited.",
       "type": "string",
       "markdownDescription": "The timestamp of when the calculated attribute definition was most recently edited.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Status": {
+      "description": "The status of the calculated attribute definition.",
+      "type": "string",
+      "enum": [
+        "IN_PROGRESS",
+        "PREPARING",
+        "COMPLETED",
+        "FAILED"
+      ],
+      "markdownDescription": "The status of the calculated attribute definition.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: IN_PROGRESS | PREPARING | COMPLETED | FAILED  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Readiness": {
+      "$ref": "#/definitions/Readiness"
     },
     "Tags": {
       "$ref": "#/definitions/Tags"
@@ -293,11 +374,16 @@
   },
   "createOnlyProperties": [
     "/properties/DomainName",
-    "/properties/CalculatedAttributeName"
+    "/properties/CalculatedAttributeName",
+    "/properties/UseHistoricalData",
+    "/properties/Conditions/Range/TimestampSource",
+    "/properties/Conditions/Range/TimestampFormat"
   ],
   "readOnlyProperties": [
     "/properties/CreatedAt",
-    "/properties/LastUpdatedAt"
+    "/properties/LastUpdatedAt",
+    "/properties/Status",
+    "/properties/Readiness"
   ],
   "primaryIdentifier": [
     "/properties/DomainName",
@@ -354,6 +440,20 @@
       "description": "The timestamp of when the calculated attribute definition was most recently edited.",
       "type": "string",
       "markdownDescription": "The timestamp of when the calculated attribute definition was most recently edited.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Status": {
+      "description": "The status of the calculated attribute definition.",
+      "type": "string",
+      "enum": [
+        "IN_PROGRESS",
+        "PREPARING",
+        "COMPLETED",
+        "FAILED"
+      ],
+      "markdownDescription": "The status of the calculated attribute definition.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: IN_PROGRESS | PREPARING | COMPLETED | FAILED  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Readiness": {
+      "$ref": "#/definitions/Readiness"
     }
   }
 }
