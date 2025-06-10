@@ -1,0 +1,580 @@
+{
+  "typeName": "AWS::EVS::Environment",
+  "description": "An environment created within the EVS service",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "definitions": {
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "InitialVlanInfo": {
+      "type": "object",
+      "properties": {
+        "Cidr": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/(3[0-2]|[1-2][0-9]|[0-9])$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Cidr"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HostName": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^([a-zA-Z0-9\\-]*)$  \nUpdate requires: No interruption\n"
+    },
+    "HostInfoForCreate": {
+      "type": "object",
+      "properties": {
+        "HostName": {
+          "$ref": "#/definitions/HostName"
+        },
+        "KeyName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[a-zA-Z0-9_-]+$  \nUpdate requires: No interruption\n"
+        },
+        "InstanceType": {
+          "type": "string",
+          "enum": [
+            "i4i.metal"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: i4i.metal  \nUpdate requires: No interruption\n"
+        },
+        "PlacementGroupId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 25,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 25  \nPattern: ^pg-[a-f0-9]{8}([a-f0-9]{9})?$  \nUpdate requires: No interruption\n"
+        },
+        "DedicatedHostId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 25,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 25  \nPattern: ^h-[a-f0-9]{8}([a-f0-9]{9})?$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "HostName",
+        "KeyName",
+        "InstanceType"
+      ],
+      "dependencies": {
+        "PlacementGroupId": {
+          "oneOf": [
+            {
+              "required": [
+                "DedicatedHostId"
+              ]
+            },
+            {}
+          ]
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RouteServerPeering": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 21,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 21  \nUpdate requires: No interruption\n"
+    },
+    "EnvironmentState": {
+      "type": "string",
+      "enum": [
+        "CREATING",
+        "CREATED",
+        "DELETING",
+        "DELETED",
+        "CREATE_FAILED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | CREATED | DELETING | DELETED | CREATE_FAILED  \nUpdate requires: No interruption\n"
+    },
+    "CheckResult": {
+      "type": "string",
+      "enum": [
+        "PASSED",
+        "FAILED",
+        "UNKNOWN"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PASSED | FAILED | UNKNOWN  \nUpdate requires: No interruption\n"
+    },
+    "Check": {
+      "type": "object",
+      "properties": {
+        "Type": {
+          "type": "string",
+          "enum": [
+            "KEY_REUSE",
+            "KEY_COVERAGE",
+            "REACHABILITY",
+            "VCF_VERSION",
+            "HOST_COUNT"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: KEY_REUSE | KEY_COVERAGE | REACHABILITY | VCF_VERSION | HOST_COUNT  \nUpdate requires: No interruption\n"
+        },
+        "Result": {
+          "$ref": "#/definitions/CheckResult"
+        },
+        "ImpairedSince": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Type",
+        "Result"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Secret": {
+      "type": "object",
+      "properties": {
+        "SecretArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SecurityGroupId": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 25,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 25  \nPattern: ^sg-[0-9a-zA-Z]*$  \nUpdate requires: No interruption\n"
+    },
+    "Timestamp": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "EnvironmentName": {
+      "description": "The name of an EVS environment",
+      "type": "string",
+      "markdownDescription": "The name of an EVS environment\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9_-]{1,100}$  \nUpdate requires: Replacement\n"
+    },
+    "KmsKeyId": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "VpcId": {
+      "type": "string",
+      "minLength": 12,
+      "maxLength": 21,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 12  \nMaximum Length: 21  \nPattern: ^vpc-[a-f0-9]{8}([a-f0-9]{9})?$  \nUpdate requires: Replacement\n"
+    },
+    "ServiceAccessSubnetId": {
+      "type": "string",
+      "minLength": 15,
+      "maxLength": 24,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 15  \nMaximum Length: 24  \nPattern: ^subnet-[a-f0-9]{8}([a-f0-9]{9})?$  \nUpdate requires: Replacement\n"
+    },
+    "VcfVersion": {
+      "type": "string",
+      "enum": [
+        "VCF-5.2.1"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: VCF-5.2.1  \nUpdate requires: Replacement\n"
+    },
+    "TermsAccepted": {
+      "type": "boolean",
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: Replacement\n"
+    },
+    "LicenseInfo": {
+      "description": "The license information for an EVS environment",
+      "type": "object",
+      "properties": {
+        "SolutionKey": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z0-9]{5}-[a-zA-Z0-9]{5}-[a-zA-Z0-9]{5}-[a-zA-Z0-9]{5}-[a-zA-Z0-9]{5}$  \nUpdate requires: No interruption\n"
+        },
+        "VsanKey": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z0-9]{5}-[a-zA-Z0-9]{5}-[a-zA-Z0-9]{5}-[a-zA-Z0-9]{5}-[a-zA-Z0-9]{5}$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "SolutionKey",
+        "VsanKey"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The license information for an EVS environment\n\n---\n\nRequired: Yes  \nUpdate requires: Replacement\n"
+    },
+    "InitialVlans": {
+      "description": "The initial Vlan configuration only required upon creation. Modification after creation will have no effect",
+      "type": "object",
+      "properties": {
+        "VmkManagement": {
+          "$ref": "#/definitions/InitialVlanInfo"
+        },
+        "VmManagement": {
+          "$ref": "#/definitions/InitialVlanInfo"
+        },
+        "VMotion": {
+          "$ref": "#/definitions/InitialVlanInfo"
+        },
+        "VSan": {
+          "$ref": "#/definitions/InitialVlanInfo"
+        },
+        "VTep": {
+          "$ref": "#/definitions/InitialVlanInfo"
+        },
+        "EdgeVTep": {
+          "$ref": "#/definitions/InitialVlanInfo"
+        },
+        "NsxUpLink": {
+          "$ref": "#/definitions/InitialVlanInfo"
+        },
+        "Hcx": {
+          "$ref": "#/definitions/InitialVlanInfo"
+        },
+        "ExpansionVlan1": {
+          "$ref": "#/definitions/InitialVlanInfo"
+        },
+        "ExpansionVlan2": {
+          "$ref": "#/definitions/InitialVlanInfo"
+        }
+      },
+      "required": [
+        "VmkManagement",
+        "VmManagement",
+        "VMotion",
+        "VSan",
+        "VTep",
+        "EdgeVTep",
+        "NsxUpLink",
+        "Hcx",
+        "ExpansionVlan1",
+        "ExpansionVlan2"
+      ],
+      "markdownDescription": "The initial Vlan configuration only required upon creation. Modification after creation will have no effect\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Hosts": {
+      "description": "The initial hosts for environment only required upon creation. Modification after creation will have no effect",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/HostInfoForCreate"
+      },
+      "minItems": 4,
+      "maxItems": 4,
+      "insertionOrder": true,
+      "markdownDescription": "The initial hosts for environment only required upon creation. Modification after creation will have no effect\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "ConnectivityInfo": {
+      "type": "object",
+      "properties": {
+        "PrivateRouteServerPeerings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RouteServerPeering"
+          },
+          "minItems": 2,
+          "maxItems": 2,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "PrivateRouteServerPeerings"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nUpdate requires: Replacement\n"
+    },
+    "VcfHostnames": {
+      "type": "object",
+      "properties": {
+        "VCenter": {
+          "$ref": "#/definitions/HostName"
+        },
+        "Nsx": {
+          "$ref": "#/definitions/HostName"
+        },
+        "NsxManager1": {
+          "$ref": "#/definitions/HostName"
+        },
+        "NsxManager2": {
+          "$ref": "#/definitions/HostName"
+        },
+        "NsxManager3": {
+          "$ref": "#/definitions/HostName"
+        },
+        "NsxEdge1": {
+          "$ref": "#/definitions/HostName"
+        },
+        "NsxEdge2": {
+          "$ref": "#/definitions/HostName"
+        },
+        "SddcManager": {
+          "$ref": "#/definitions/HostName"
+        },
+        "CloudBuilder": {
+          "$ref": "#/definitions/HostName"
+        }
+      },
+      "required": [
+        "VCenter",
+        "Nsx",
+        "NsxManager1",
+        "NsxManager2",
+        "NsxManager3",
+        "NsxEdge1",
+        "NsxEdge2",
+        "SddcManager",
+        "CloudBuilder"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nUpdate requires: Replacement\n"
+    },
+    "SiteId": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "EnvironmentId": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(env-[a-zA-Z0-9]{10})$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "EnvironmentArn": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1011,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1011  \nPattern: ^arn:aws:evs:[a-z]{2}-[a-z]+-[0-9]:[0-9]{12}:environment/[a-zA-Z0-9_-]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "EnvironmentState": {
+      "$ref": "#/definitions/EnvironmentState"
+    },
+    "StateDetails": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Checks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Check"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Credentials": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Secret"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ServiceAccessSecurityGroups": {
+      "type": "object",
+      "properties": {
+        "SecurityGroups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SecurityGroupId"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
+    },
+    "Tags": {
+      "description": "An array of key-value pairs to apply to this resource.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "An array of key-value pairs to apply to this resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "CreatedAt": {
+      "$ref": "#/definitions/Timestamp"
+    },
+    "ModifiedAt": {
+      "$ref": "#/definitions/Timestamp"
+    }
+  },
+  "required": [
+    "VpcId",
+    "ServiceAccessSubnetId",
+    "VcfVersion",
+    "TermsAccepted",
+    "LicenseInfo",
+    "ConnectivityInfo",
+    "VcfHostnames",
+    "SiteId"
+  ],
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/EnvironmentId"
+  ],
+  "readOnlyProperties": [
+    "/properties/EnvironmentId",
+    "/properties/Checks",
+    "/properties/EnvironmentArn",
+    "/properties/Credentials",
+    "/properties/EnvironmentState",
+    "/properties/StateDetails",
+    "/properties/CreatedAt",
+    "/properties/ModifiedAt"
+  ],
+  "createOnlyProperties": [
+    "/properties/EnvironmentName",
+    "/properties/VpcId",
+    "/properties/ServiceAccessSubnetId",
+    "/properties/VcfVersion",
+    "/properties/TermsAccepted",
+    "/properties/LicenseInfo",
+    "/properties/ConnectivityInfo",
+    "/properties/VcfHostnames",
+    "/properties/SiteId",
+    "/properties/KmsKeyId",
+    "/properties/ServiceAccessSecurityGroups"
+  ],
+  "writeOnlyProperties": [
+    "/properties/Hosts",
+    "/properties/InitialVlans"
+  ],
+  "deprecatedProperties": [
+    "/properties/Checks/*/ImpairedSince",
+    "/properties/Checks/*/Result",
+    "/properties/Checks/*/Type",
+    "/properties/Credentials/*/SecretArn"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "evs:CreateEnvironment",
+        "evs:GetEnvironment",
+        "evs:TagResource",
+        "evs:ListTagsForResource",
+        "iam:CreateServiceLinkedRole",
+        "support:DescribeServices",
+        "support:DescribeSupportLevel",
+        "servicequotas:GetServiceQuota",
+        "servicequotas:ListServiceQuotas",
+        "ec2:CreateNetworkInterface",
+        "ec2:AllocateHosts",
+        "ec2:ModifyNetworkInterfaceAttribute",
+        "ec2:DeleteNetworkInterface",
+        "ec2:RunInstances",
+        "ec2:CreatePlacementGroup",
+        "ec2:CreateSubnet",
+        "ec2:CreateTags",
+        "secretsmanager:GetRandomPassword",
+        "secretsmanager:CreateSecret",
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:BatchGetSecretValue",
+        "secretsmanager:TagResource",
+        "kms:ListKeysForService",
+        "kms:DescribeKey",
+        "secretsmanager:UpdateSecret",
+        "ec2:DeleteVolume",
+        "ec2:DetachVolume"
+      ],
+      "timeoutInMinutes": 720
+    },
+    "read": {
+      "permissions": [
+        "evs:GetEnvironment",
+        "evs:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "evs:TagResource",
+        "evs:UntagResource",
+        "evs:ListTagsForResource",
+        "evs:GetEnvironment"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "evs:DeleteEnvironment",
+        "evs:GetEnvironment",
+        "evs:UntagResource",
+        "ec2:TerminateInstances",
+        "ec2:ReleaseHosts",
+        "ec2:DescribeHosts",
+        "ec2:DeleteSubnet",
+        "ec2:DetachNetworkInterface",
+        "ec2:DeletePlacementGroup",
+        "secretsmanager:DeleteSecret"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "evs:ListEnvironments"
+      ]
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "evs:UntagResource",
+      "evs:TagResource",
+      "evs:ListTagsForResource"
+    ]
+  },
+  "attributes": {
+    "EnvironmentId": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(env-[a-zA-Z0-9]{10})$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "EnvironmentArn": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1011,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1011  \nPattern: ^arn:aws:evs:[a-z]{2}-[a-z]+-[0-9]:[0-9]{12}:environment/[a-zA-Z0-9_-]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "EnvironmentState": {
+      "$ref": "#/definitions/EnvironmentState"
+    },
+    "StateDetails": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Checks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Check"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Credentials": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Secret"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreatedAt": {
+      "$ref": "#/definitions/Timestamp"
+    },
+    "ModifiedAt": {
+      "$ref": "#/definitions/Timestamp"
+    }
+  }
+}

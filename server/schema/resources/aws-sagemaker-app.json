@@ -58,6 +58,17 @@
       "minLength": 1,
       "maxLength": 63,
       "markdownDescription": "The user profile name.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 63  \nPattern: ^[a-zA-Z0-9](-*[a-zA-Z0-9]){0,62}  \nUpdate requires: Replacement\n"
+    },
+    "BuiltInLifecycleConfigArn": {
+      "type": "string",
+      "description": "The lifecycle configuration that runs before the default lifecycle configuration.",
+      "maxLength": 256,
+      "markdownDescription": "The lifecycle configuration that runs before the default lifecycle configuration.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nPattern: ^(arn:aws[a-z\\-]*:sagemaker:[a-z0-9\\-]*:[0-9]{12}:studio-lifecycle-config/.*|None)$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "RecoveryMode": {
+      "type": "boolean",
+      "description": "Indicates whether the application is launched in recovery mode.",
+      "markdownDescription": "Indicates whether the application is launched in recovery mode.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
     }
   },
   "definitions": {
@@ -153,7 +164,7 @@
           "type": "string",
           "description": "The Amazon Resource Name (ARN) of the Lifecycle Configuration to attach to the Resource.",
           "maxLength": 256,
-          "markdownDescription": "The Amazon Resource Name (ARN) of the Lifecycle Configuration to attach to the Resource.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nPattern: arn:aws[a-z\\-]*:sagemaker:[a-z0-9\\-]*:[0-9]{12}:studio-lifecycle-config/.*  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The Amazon Resource Name (ARN) of the Lifecycle Configuration to attach to the Resource.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nPattern: ^(arn:aws[a-z\\-]*:sagemaker:[a-z0-9\\-]*:[0-9]{12}:studio-lifecycle-config/.*|None)$  \nUpdate requires: No interruption\n"
         }
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
@@ -196,9 +207,6 @@
     "/properties/Tags",
     "/properties/ResourceSpec"
   ],
-  "writeOnlyProperties": [
-    "/properties/Tags"
-  ],
   "primaryIdentifier": [
     "/properties/AppName",
     "/properties/AppType",
@@ -206,32 +214,51 @@
     "/properties/UserProfileName"
   ],
   "readOnlyProperties": [
-    "/properties/AppArn"
+    "/properties/AppArn",
+    "/properties/BuiltInLifecycleConfigArn"
   ],
   "handlers": {
     "create": {
       "permissions": [
         "sagemaker:CreateApp",
-        "sagemaker:DescribeApp"
+        "sagemaker:DescribeApp",
+        "sagemaker:AddTags",
+        "sagemaker:ListTags"
       ]
     },
     "read": {
       "permissions": [
         "sagemaker:DescribeApp",
-        "sagemaker:DescribeApp"
+        "sagemaker:DescribeApp",
+        "sagemaker:ListTags"
       ]
     },
     "delete": {
       "permissions": [
         "sagemaker:DeleteApp",
-        "sagemaker:DescribeApp"
+        "sagemaker:DescribeApp",
+        "sagemaker:DeleteTags",
+        "sagemaker:ListTags"
       ]
     },
     "list": {
       "permissions": [
-        "sagemaker:ListApps"
+        "sagemaker:ListApps",
+        "sagemaker:ListTags"
       ]
     }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "sagemaker:AddTags",
+      "sagemaker:ListTags",
+      "sagemaker:DeleteTags"
+    ]
   },
   "attributes": {
     "AppArn": {
@@ -240,6 +267,12 @@
       "minLength": 1,
       "maxLength": 256,
       "markdownDescription": "The Amazon Resource Name (ARN) of the app.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: arn:aws[a-z\\-]*:sagemaker:[a-z0-9\\-]*:[0-9]{12}:app/.*  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "BuiltInLifecycleConfigArn": {
+      "type": "string",
+      "description": "The lifecycle configuration that runs before the default lifecycle configuration.",
+      "maxLength": 256,
+      "markdownDescription": "The lifecycle configuration that runs before the default lifecycle configuration.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nPattern: ^(arn:aws[a-z\\-]*:sagemaker:[a-z0-9\\-]*:[0-9]{12}:studio-lifecycle-config/.*|None)$  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }
