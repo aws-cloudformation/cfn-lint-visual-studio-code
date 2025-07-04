@@ -7,10 +7,32 @@
       "properties": {
         "OutboundEdi": {
           "$ref": "#/definitions/OutboundEdiOptions"
+        },
+        "InboundEdi": {
+          "$ref": "#/definitions/InboundEdiOptions"
         }
       },
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "InboundEdiOptions": {
+      "type": "object",
+      "properties": {
+        "X12": {
+          "$ref": "#/definitions/X12InboundEdiOptions"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LineTerminator": {
+      "type": "string",
+      "enum": [
+        "CRLF",
+        "LF",
+        "CR"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CRLF | LF | CR  \nUpdate requires: No interruption\n"
     },
     "OutboundEdiOptions": {
       "oneOf": [
@@ -52,6 +74,75 @@
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "WrapFormat": {
+      "type": "string",
+      "enum": [
+        "SEGMENT",
+        "ONE_LINE",
+        "LINE_LENGTH"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SEGMENT | ONE_LINE | LINE_LENGTH  \nUpdate requires: No interruption\n"
+    },
+    "WrapOptions": {
+      "type": "object",
+      "properties": {
+        "WrapBy": {
+          "$ref": "#/definitions/WrapFormat"
+        },
+        "LineTerminator": {
+          "$ref": "#/definitions/LineTerminator"
+        },
+        "LineLength": {
+          "type": "number",
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "X12AcknowledgmentOptions": {
+      "type": "object",
+      "properties": {
+        "FunctionalAcknowledgment": {
+          "$ref": "#/definitions/X12FunctionalAcknowledgment"
+        },
+        "TechnicalAcknowledgment": {
+          "$ref": "#/definitions/X12TechnicalAcknowledgment"
+        }
+      },
+      "required": [
+        "FunctionalAcknowledgment",
+        "TechnicalAcknowledgment"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "X12ControlNumbers": {
+      "type": "object",
+      "properties": {
+        "StartingInterchangeControlNumber": {
+          "type": "number",
+          "maximum": 999999999,
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "StartingFunctionalGroupControlNumber": {
+          "type": "number",
+          "maximum": 999999999,
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "StartingTransactionSetControlNumber": {
+          "type": "number",
+          "maximum": 999999999,
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "X12Delimiters": {
       "type": "object",
       "properties": {
@@ -82,10 +173,22 @@
       "properties": {
         "Common": {
           "$ref": "#/definitions/X12OutboundEdiHeaders"
+        },
+        "WrapOptions": {
+          "$ref": "#/definitions/WrapOptions"
         }
       },
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "X12FunctionalAcknowledgment": {
+      "type": "string",
+      "enum": [
+        "DO_NOT_GENERATE",
+        "GENERATE_ALL_SEGMENTS",
+        "GENERATE_WITHOUT_TRANSACTION_SET_RESPONSE_LOOP"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DO_NOT_GENERATE | GENERATE_ALL_SEGMENTS | GENERATE_WITHOUT_TRANSACTION_SET_RESPONSE_LOOP  \nUpdate requires: No interruption\n"
     },
     "X12FunctionalGroupHeaders": {
       "type": "object",
@@ -107,6 +210,25 @@
           "maxLength": 2,
           "minLength": 1,
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2  \nPattern: ^[a-zA-Z0-9]*$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "X12GS05TimeFormat": {
+      "type": "string",
+      "enum": [
+        "HHMM",
+        "HHMMSS",
+        "HHMMSSDD"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: HHMM | HHMMSS | HHMMSSDD  \nUpdate requires: No interruption\n"
+    },
+    "X12InboundEdiOptions": {
+      "type": "object",
+      "properties": {
+        "AcknowledgmentOptions": {
+          "$ref": "#/definitions/X12AcknowledgmentOptions"
         }
       },
       "additionalProperties": false,
@@ -176,10 +298,24 @@
         "ValidateEdi": {
           "type": "boolean",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "ControlNumbers": {
+          "$ref": "#/definitions/X12ControlNumbers"
+        },
+        "Gs05TimeFormat": {
+          "$ref": "#/definitions/X12GS05TimeFormat"
         }
       },
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "X12TechnicalAcknowledgment": {
+      "type": "string",
+      "enum": [
+        "DO_NOT_GENERATE",
+        "GENERATE_ALL_SEGMENTS"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DO_NOT_GENERATE | GENERATE_ALL_SEGMENTS  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
