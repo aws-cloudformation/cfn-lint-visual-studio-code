@@ -67,7 +67,7 @@
         "maxLength": 32,
         "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 32  \nPattern: [-0-9a-zA-Z]+  \nUpdate requires: No interruption\n"
       },
-      "markdownDescription": "The VPC subnets that Studio uses for communication.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The VPC subnets that Studio uses for communication.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     },
     "Tags": {
       "type": "array",
@@ -85,7 +85,7 @@
       "type": "string",
       "description": "The ID of the Amazon Virtual Private Cloud (VPC) that Studio uses for communication.",
       "maxLength": 32,
-      "markdownDescription": "The ID of the Amazon Virtual Private Cloud (VPC) that Studio uses for communication.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 32  \nPattern: [-0-9a-zA-Z]+  \nUpdate requires: Replacement\n"
+      "markdownDescription": "The ID of the Amazon Virtual Private Cloud (VPC) that Studio uses for communication.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 32  \nPattern: [-0-9a-zA-Z]+  \nUpdate requires: Replacement\n"
     },
     "DomainId": {
       "type": "string",
@@ -713,6 +713,9 @@
         },
         "FSxLustreFileSystemConfig": {
           "$ref": "#/definitions/FSxLustreFileSystemConfig"
+        },
+        "S3FileSystemConfig": {
+          "$ref": "#/definitions/S3FileSystemConfig"
         }
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
@@ -759,6 +762,25 @@
       "required": [
         "FileSystemId"
       ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "S3FileSystemConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "MountPath": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 1024,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+        },
+        "S3Uri": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 1024,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nPattern: (s3)://([^/]+)/?(.*)  \nUpdate requires: No interruption\n"
+        }
+      },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "CustomImage": {
@@ -876,6 +898,9 @@
             "DISABLED"
           ],
           "markdownDescription": "The configuration for attaching a SageMaker user profile name to the execution role as a sts:SourceIdentity key.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: USER_PROFILE_NAME | DISABLED  \nUpdate requires: No interruption\n"
+        },
+        "UnifiedStudioSettings": {
+          "$ref": "#/definitions/UnifiedStudioSettings"
         }
       },
       "markdownDescription": "A collection of Domain settings.\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
@@ -911,6 +936,61 @@
         }
       },
       "markdownDescription": "A collection of settings that are required to start docker-proxy server.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "UnifiedStudioSettings": {
+      "type": "object",
+      "description": "A collection of settings that apply to an Amazon SageMaker AI domain when you use it in Amazon SageMaker Unified Studio.",
+      "additionalProperties": false,
+      "properties": {
+        "StudioWebPortalAccess": {
+          "type": "string",
+          "description": "Sets whether you can access the domain in Amazon SageMaker Studio:\n\nENABLED\nYou can access the domain in Amazon SageMaker Studio. If you migrate the domain to Amazon SageMaker Unified Studio, you can access it in both studio interfaces.\nDISABLED\nYou can't access the domain in Amazon SageMaker Studio. If you migrate the domain to Amazon SageMaker Unified Studio, you can access it only in that studio interface.\n",
+          "enum": [
+            "ENABLED",
+            "DISABLED"
+          ],
+          "markdownDescription": "Sets whether you can access the domain in Amazon SageMaker Studio:\n\nENABLED\nYou can access the domain in Amazon SageMaker Studio. If you migrate the domain to Amazon SageMaker Unified Studio, you can access it in both studio interfaces.\nDISABLED\nYou can't access the domain in Amazon SageMaker Studio. If you migrate the domain to Amazon SageMaker Unified Studio, you can access it only in that studio interface.\n\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption\n"
+        },
+        "DomainAccountId": {
+          "type": "string",
+          "description": "The ID of the AWS account that has the Amazon SageMaker Unified Studio domain. The default value, if you don't specify an ID, is the ID of the account that has the Amazon SageMaker AI domain.",
+          "minLength": 12,
+          "maxLength": 12,
+          "markdownDescription": "The ID of the AWS account that has the Amazon SageMaker Unified Studio domain. The default value, if you don't specify an ID, is the ID of the account that has the Amazon SageMaker AI domain.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 12  \nMaximum Length: 12  \nPattern: ^\\d+$  \nUpdate requires: No interruption\n"
+        },
+        "DomainRegion": {
+          "type": "string",
+          "description": "The AWS Region where the domain is located in Amazon SageMaker Unified Studio. The default value, if you don't specify a Region, is the Region where the Amazon SageMaker AI domain is located.",
+          "markdownDescription": "The AWS Region where the domain is located in Amazon SageMaker Unified Studio. The default value, if you don't specify a Region, is the Region where the Amazon SageMaker AI domain is located.\n\n---\n\nRequired: No  \nType: String  \nPattern: [a-zA-Z]{2}-[a-zA-Z\\-]+-\\d+  \nUpdate requires: No interruption\n"
+        },
+        "DomainId": {
+          "type": "string",
+          "description": "The ID of the Amazon SageMaker Unified Studio domain associated with this domain.",
+          "minLength": 1,
+          "maxLength": 36,
+          "markdownDescription": "The ID of the Amazon SageMaker Unified Studio domain associated with this domain.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 36  \nPattern: ^dzd[-_][a-zA-Z0-9_-]{1,36}$  \nUpdate requires: No interruption\n"
+        },
+        "ProjectId": {
+          "type": "string",
+          "description": "The ID of the Amazon SageMaker Unified Studio project that corresponds to the domain.",
+          "markdownDescription": "The ID of the Amazon SageMaker Unified Studio project that corresponds to the domain.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9_-]{1,36}$  \nUpdate requires: No interruption\n"
+        },
+        "EnvironmentId": {
+          "type": "string",
+          "description": "The ID of the environment that Amazon SageMaker Unified Studio associates with the domain.",
+          "minLength": 1,
+          "maxLength": 36,
+          "markdownDescription": "The ID of the environment that Amazon SageMaker Unified Studio associates with the domain.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 36  \nPattern: ^[a-zA-Z0-9_-]{1,36}$  \nUpdate requires: No interruption\n"
+        },
+        "ProjectS3Path": {
+          "type": "string",
+          "description": "The location where Amazon S3 stores temporary execution data and other artifacts for the project that corresponds to the domain.",
+          "minLength": 1,
+          "maxLength": 100,
+          "markdownDescription": "The location where Amazon S3 stores temporary execution data and other artifacts for the project that corresponds to the domain.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: [\\w\\.-]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "A collection of settings that apply to an Amazon SageMaker AI domain when you use it in Amazon SageMaker Unified Studio.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "RStudioServerProDomainSettings": {
       "type": "object",
@@ -1284,9 +1364,7 @@
   "required": [
     "AuthMode",
     "DefaultUserSettings",
-    "DomainName",
-    "SubnetIds",
-    "VpcId"
+    "DomainName"
   ],
   "createOnlyProperties": [
     "/properties/AuthMode",

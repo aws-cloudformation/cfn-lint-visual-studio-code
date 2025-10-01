@@ -121,6 +121,13 @@
         "LogDestination": {
           "$ref": "#/definitions/LogDestination"
         },
+        "LogGroupArn": {
+          "description": "If log destination is CLOUDWATCH, logs are sent to the specified log group in Amazon CloudWatch.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "markdownDescription": "If log destination is CLOUDWATCH, logs are sent to the specified log group in Amazon CloudWatch.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: [a-zA-Z0-9:/\\-\\*]+  \nUpdate requires: No interruption\n"
+        },
         "S3BucketName": {
           "description": "The name of the S3 bucket to pull logs from if S3 is the LogDestination",
           "type": "string",
@@ -143,10 +150,10 @@
       "type": "object",
       "properties": {
         "DesiredEC2Instances": {
-          "description": "The number of EC2 instances you want to maintain in the specified fleet location. This value must fall between the minimum and maximum size limits.",
+          "description": "Defaults to MinSize if not defined. The number of EC2 instances you want to maintain in the specified fleet location. This value must fall between the minimum and maximum size limits. If any auto-scaling policy is defined for the container fleet, the desired instance will only be applied once during fleet creation and will be ignored in updates to avoid conflicts with auto-scaling. During updates with any auto-scaling policy defined, if current desired instance is lower than the new MinSize, it will be increased to the new MinSize; if current desired instance is larger than the new MaxSize, it will be decreased to the new MaxSize.",
           "type": "integer",
           "minimum": 0,
-          "markdownDescription": "The number of EC2 instances you want to maintain in the specified fleet location. This value must fall between the minimum and maximum size limits.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+          "markdownDescription": "Defaults to MinSize if not defined. The number of EC2 instances you want to maintain in the specified fleet location. This value must fall between the minimum and maximum size limits. If any auto-scaling policy is defined for the container fleet, the desired instance will only be applied once during fleet creation and will be ignored in updates to avoid conflicts with auto-scaling. During updates with any auto-scaling policy defined, if current desired instance is lower than the new MinSize, it will be increased to the new MinSize; if current desired instance is larger than the new MaxSize, it will be decreased to the new MaxSize.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
         },
         "MinSize": {
           "description": "The minimum value allowed for the fleet's instance count for a location.",
@@ -163,7 +170,6 @@
       },
       "additionalProperties": false,
       "required": [
-        "DesiredEC2Instances",
         "MinSize",
         "MaxSize"
       ],
@@ -586,7 +592,6 @@
   ],
   "writeOnlyProperties": [
     "/properties/DeploymentConfiguration",
-    "/properties/GameServerContainerGroupsPerInstance",
     "/properties/GameServerContainerGroupDefinitionName",
     "/properties/PerInstanceContainerGroupDefinitionName"
   ],

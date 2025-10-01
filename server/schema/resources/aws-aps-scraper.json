@@ -157,6 +157,100 @@
       "description": "ID of a subnet",
       "type": "string",
       "markdownDescription": "ID of a subnet\n\n---\n\nRequired: No  \nType: String  \nPattern: ^subnet-[0-9a-z]+$  \nUpdate requires: No interruption\n"
+    },
+    "CloudWatchLogDestination": {
+      "description": "Represents a cloudwatch logs destination for scraper logging",
+      "type": "object",
+      "properties": {
+        "LogGroupArn": {
+          "description": "ARN of the CloudWatch log group",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 512,
+          "markdownDescription": "ARN of the CloudWatch log group\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 512  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Represents a cloudwatch logs destination for scraper logging\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ScraperComponentType": {
+      "type": "string",
+      "enum": [
+        "SERVICE_DISCOVERY",
+        "COLLECTOR",
+        "EXPORTER"
+      ],
+      "description": "Type of scraper component",
+      "markdownDescription": "Type of scraper component\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SERVICE_DISCOVERY | COLLECTOR | EXPORTER  \nUpdate requires: No interruption\n"
+    },
+    "ComponentConfig": {
+      "type": "object",
+      "properties": {
+        "Options": {
+          "type": "object",
+          "patternProperties": {
+            "^[A-Za-z0-9]+$": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            }
+          },
+          "additionalProperties": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ScraperComponent": {
+      "type": "object",
+      "properties": {
+        "Type": {
+          "$ref": "#/definitions/ScraperComponentType"
+        },
+        "Config": {
+          "$ref": "#/definitions/ComponentConfig"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ScraperLoggingDestination": {
+      "description": "Destination for scraper logging",
+      "type": "object",
+      "properties": {
+        "CloudWatchLogs": {
+          "$ref": "#/definitions/CloudWatchLogDestination"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Destination for scraper logging\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ScraperLoggingConfiguration": {
+      "description": "Configuration for scraper logging",
+      "type": "object",
+      "properties": {
+        "ScraperComponents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ScraperComponent"
+          },
+          "minItems": 1,
+          "uniqueItems": true,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "LoggingDestination": {
+          "$ref": "#/definitions/ScraperLoggingDestination"
+        }
+      },
+      "required": [
+        "ScraperComponents",
+        "LoggingDestination"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for scraper logging\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -177,7 +271,7 @@
     "Arn": {
       "description": "Scraper ARN.",
       "type": "string",
-      "markdownDescription": "Scraper ARN.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws|aws-us-gov|aws-cn):aps:(af|ap|ca|eu|me|sa|us)-(central|north|(north(?:east|west))|south|south(?:east|west)|east|west)-[0-9]+:[0-9]+:scraper/s-[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "Scraper ARN.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws|aws-us-gov|aws-cn):aps:[a-z0-9-]+:[0-9]+:scraper/s-[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "RoleArn": {
       "description": "IAM role ARN for the scraper.",
@@ -185,6 +279,9 @@
       "minLength": 20,
       "maxLength": 2048,
       "markdownDescription": "IAM role ARN for the scraper.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:(aws|aws-us-gov|aws-cn):iam::[0-9]{12}:role/[a-zA-Z0-9-]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ScraperLoggingConfiguration": {
+      "$ref": "#/definitions/ScraperLoggingConfiguration"
     },
     "ScrapeConfiguration": {
       "$ref": "#/definitions/ScrapeConfiguration"
@@ -241,6 +338,7 @@
     "create": {
       "permissions": [
         "aps:CreateScraper",
+        "aps:UpdateScraperLoggingConfiguration",
         "aps:DescribeScraper",
         "aps:DescribeWorkspace",
         "aps:TagResource",
@@ -250,12 +348,17 @@
         "ec2:DescribeSubnets",
         "ec2:DescribeSecurityGroups",
         "iam:CreateServiceLinkedRole",
-        "iam:PassRole"
+        "iam:PassRole",
+        "logs:CreateLogDelivery",
+        "logs:GetLogDelivery",
+        "logs:ListLogDeliveries",
+        "logs:PutResourcePolicy"
       ]
     },
     "read": {
       "permissions": [
         "aps:DescribeScraper",
+        "aps:DescribeScraperLoggingConfiguration",
         "aps:ListTagsForResource"
       ]
     },
@@ -265,10 +368,17 @@
         "aps:DescribeScraper",
         "aps:UpdateScraper",
         "aps:DescribeWorkspace",
+        "aps:DescribeScraperLoggingConfiguration",
+        "aps:DeleteScraperLoggingConfiguration",
+        "aps:UpdateScraperLoggingConfiguration",
         "aps:TagResource",
         "aps:UntagResource",
         "aps:ListTagsForResource",
-        "iam:PassRole"
+        "iam:PassRole",
+        "logs:CreateLogDelivery",
+        "logs:GetLogDelivery",
+        "logs:ListLogDeliveries",
+        "logs:PutResourcePolicy"
       ]
     },
     "delete": {
@@ -276,11 +386,13 @@
         "aps:DeleteScraper",
         "aps:DescribeScraper",
         "aps:DescribeWorkspace",
+        "aps:DeleteScraperLoggingConfiguration",
         "eks:AssociateAccessPolicy",
         "eks:DescribeCluster",
         "ec2:DescribeSubnets",
         "ec2:DescribeSecurityGroups",
-        "iam:DeleteServiceLinkedRole"
+        "iam:DeleteServiceLinkedRole",
+        "logs:DeleteLogDelivery"
       ]
     },
     "list": {
@@ -301,7 +413,7 @@
     "Arn": {
       "description": "Scraper ARN.",
       "type": "string",
-      "markdownDescription": "Scraper ARN.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws|aws-us-gov|aws-cn):aps:(af|ap|ca|eu|me|sa|us)-(central|north|(north(?:east|west))|south|south(?:east|west)|east|west)-[0-9]+:[0-9]+:scraper/s-[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "Scraper ARN.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws|aws-us-gov|aws-cn):aps:[a-z0-9-]+:[0-9]+:scraper/s-[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "RoleArn": {
       "description": "IAM role ARN for the scraper.",

@@ -15,6 +15,7 @@
         "dynamodb:CreateTable",
         "dynamodb:CreateTableReplica",
         "dynamodb:Describe*",
+        "dynamodb:UpdateTable",
         "dynamodb:UpdateTimeToLive",
         "dynamodb:UpdateContributorInsights",
         "dynamodb:UpdateContinuousBackups",
@@ -30,7 +31,6 @@
         "dynamodb:EnableKinesisStreamingDestination",
         "dynamodb:DisableKinesisStreamingDestination",
         "dynamodb:UpdateTableReplicaAutoScaling",
-        "dynamodb:TagResource",
         "dynamodb:GetResourcePolicy",
         "dynamodb:PutResourcePolicy",
         "application-autoscaling:DeleteScalingPolicy",
@@ -137,12 +137,14 @@
     "/properties/Replicas/*/ReadProvisionedThroughputSettings/ReadCapacityAutoScalingSettings/SeedCapacity",
     "/properties/Replicas/*/GlobalSecondaryIndexes/*/ReadProvisionedThroughputSettings/ReadCapacityAutoScalingSettings/SeedCapacity",
     "/properties/WriteProvisionedThroughputSettings/WriteCapacityAutoScalingSettings/SeedCapacity",
-    "/properties/GlobalSecondaryIndexes/*/WriteProvisionedThroughputSettings/WriteCapacityAutoScalingSettings/SeedCapacity"
+    "/properties/GlobalSecondaryIndexes/*/WriteProvisionedThroughputSettings/WriteCapacityAutoScalingSettings/SeedCapacity",
+    "/properties/GlobalTableSourceArn"
   ],
   "createOnlyProperties": [
     "/properties/LocalSecondaryIndexes",
     "/properties/TableName",
-    "/properties/KeySchema"
+    "/properties/KeySchema",
+    "/properties/GlobalTableSourceArn"
   ],
   "additionalProperties": false,
   "primaryIdentifier": [
@@ -462,10 +464,6 @@
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MICROSECOND | MILLISECOND  \nUpdate requires: No interruption\n"
         },
         "StreamArn": {
-          "relationshipRef": {
-            "typeName": "AWS::Kinesis::Stream",
-            "propertyPath": "/properties/Arn"
-          },
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         }
@@ -493,6 +491,14 @@
       "additionalProperties": false,
       "type": "object",
       "properties": {
+        "Mode": {
+          "type": "string",
+          "enum": [
+            "ACCESSED_AND_THROTTLED_KEYS",
+            "THROTTLED_KEYS"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ACCESSED_AND_THROTTLED_KEYS | THROTTLED_KEYS  \nUpdate requires: No interruption\n"
+        },
         "Enabled": {
           "type": "boolean",
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption\n"
@@ -713,12 +719,15 @@
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
-  "required": [
-    "KeySchema",
-    "AttributeDefinitions",
-    "Replicas"
-  ],
   "properties": {
+    "MultiRegionConsistency": {
+      "type": "string",
+      "enum": [
+        "EVENTUAL",
+        "STRONG"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: EVENTUAL | STRONG  \nUpdate requires: No interruption\n"
+    },
     "TableId": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
@@ -728,6 +737,14 @@
     },
     "StreamSpecification": {
       "$ref": "#/definitions/StreamSpecification"
+    },
+    "GlobalTableSettingsReplicationMode": {
+      "type": "string",
+      "enum": [
+        "ENABLED",
+        "DISABLED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption\n"
     },
     "WarmThroughput": {
       "$ref": "#/definitions/WarmThroughput"
@@ -745,8 +762,23 @@
     "WriteProvisionedThroughputSettings": {
       "$ref": "#/definitions/WriteProvisionedThroughputSettings"
     },
+    "GlobalTableSourceArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+    },
     "WriteOnDemandThroughputSettings": {
       "$ref": "#/definitions/WriteOnDemandThroughputSettings"
+    },
+    "GlobalTableWitnesses": {
+      "minItems": 1,
+      "maxItems": 1,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/GlobalTableWitness"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     },
     "TableName": {
       "type": "string",
@@ -806,6 +838,11 @@
       "$ref": "#/definitions/TimeToLiveSpecification"
     }
   },
+  "required": [
+    "KeySchema",
+    "AttributeDefinitions",
+    "Replicas"
+  ],
   "attributes": {
     "TableId": {
       "type": "string",

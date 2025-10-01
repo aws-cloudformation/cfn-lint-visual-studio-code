@@ -41,12 +41,12 @@
     "DockerfileTemplateData": {
       "description": "Dockerfiles are text documents that are used to build Docker containers, and ensure that they contain all of the elements required by the application running inside. The template data consists of contextual variables where Image Builder places build information or scripts, based on your container image recipe.",
       "type": "string",
-      "markdownDescription": "Dockerfiles are text documents that are used to build Docker containers, and ensure that they contain all of the elements required by the application running inside. The template data consists of contextual variables where Image Builder places build information or scripts, based on your container image recipe.\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: Replacement\n"
+      "markdownDescription": "Dockerfiles are text documents that are used to build Docker containers, and ensure that they contain all of the elements required by the application running inside. The template data consists of contextual variables where Image Builder places build information or scripts, based on your container image recipe.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
     },
     "DockerfileTemplateUri": {
       "description": "The S3 URI for the Dockerfile that will be used to build your container image.",
       "type": "string",
-      "markdownDescription": "The S3 URI for the Dockerfile that will be used to build your container image.\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: Replacement\n"
+      "markdownDescription": "The S3 URI for the Dockerfile that will be used to build your container image.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
     },
     "PlatformOverride": {
       "description": "Specifies the operating system platform when you use a custom source image.",
@@ -100,7 +100,7 @@
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         }
       },
-      "markdownDescription": "Tags that are attached to the container recipe.\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
+      "markdownDescription": "Tags that are attached to the container recipe.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "definitions": {
@@ -286,18 +286,6 @@
   "oneOf": [
     {
       "required": [
-        "DockerfileTemplateData",
-        "Name",
-        "Version",
-        "Components",
-        "ParentImage",
-        "TargetRepository",
-        "ContainerType"
-      ]
-    },
-    {
-      "required": [
-        "DockerfileTemplateUri",
         "Name",
         "Version",
         "Components",
@@ -327,8 +315,7 @@
     "/properties/KmsKeyId",
     "/properties/PlatformOverride",
     "/properties/WorkingDirectory",
-    "/properties/Components",
-    "/properties/Tags"
+    "/properties/Components"
   ],
   "writeOnlyProperties": [
     "/properties/DockerfileTemplateData",
@@ -336,13 +323,10 @@
     "/properties/ImageOsVersionOverride",
     "/properties/PlatformOverride"
   ],
-  "propertyTransform": {
-    "/properties/InstanceConfiguration/BlockDeviceMappings/*/Ebs/VolumeType": "$uppercase(VolumeType)"
-  },
   "tagging": {
     "taggable": true,
     "tagOnCreate": true,
-    "tagUpdatable": false,
+    "tagUpdatable": true,
     "cloudFormationSystemTags": true,
     "tagProperty": "/properties/Tags",
     "permissions": [
@@ -378,6 +362,12 @@
       "permissions": [
         "imagebuilder:GetContainerRecipe",
         "kms:Decrypt"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "imagebuilder:TagResource",
+        "imagebuilder:UntagResource"
       ]
     },
     "delete": {

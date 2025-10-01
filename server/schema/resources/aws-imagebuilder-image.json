@@ -1,5 +1,4 @@
 {
-  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-imagebuilder",
   "tagging": {
     "permissions": [
       "imagebuilder:TagResource",
@@ -7,10 +6,32 @@
     ],
     "taggable": true,
     "tagOnCreate": true,
-    "tagUpdatable": false,
+    "tagUpdatable": true,
     "tagProperty": "/properties/Tags",
     "cloudFormationSystemTags": true
   },
+  "typeName": "AWS::ImageBuilder::Image",
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/Name",
+    "/properties/ImageId",
+    "/properties/ImageUri"
+  ],
+  "description": "Resource schema for AWS::ImageBuilder::Image",
+  "createOnlyProperties": [
+    "/properties/ImageRecipeArn",
+    "/properties/ContainerRecipeArn",
+    "/properties/InfrastructureConfigurationArn",
+    "/properties/Workflows",
+    "/properties/DistributionConfigurationArn",
+    "/properties/ImageTestsConfiguration",
+    "/properties/ImageScanningConfiguration",
+    "/properties/EnhancedImageMetadataEnabled"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-imagebuilder",
   "oneOf": [
     {
       "required": [
@@ -22,6 +43,11 @@
       "required": [
         "ImageRecipeArn",
         "InfrastructureConfigurationArn"
+      ]
+    },
+    {
+      "required": [
+        "ImagePipelineExecutionSettings"
       ]
     },
     {
@@ -53,6 +79,12 @@
       ],
       "timeoutInMinutes": 720
     },
+    "update": {
+      "permissions": [
+        "imagebuilder:TagResource",
+        "imagebuilder:UntagResource"
+      ]
+    },
     "list": {
       "permissions": [
         "imagebuilder:ListImages",
@@ -63,10 +95,7 @@
           "Arn": {
             "$ref": "resource-schema.json#/properties/Arn"
           }
-        },
-        "required": [
-          "Arn"
-        ]
+        }
       }
     },
     "delete": {
@@ -78,29 +107,7 @@
       ]
     }
   },
-  "typeName": "AWS::ImageBuilder::Image",
-  "readOnlyProperties": [
-    "/properties/Arn",
-    "/properties/Name",
-    "/properties/ImageId",
-    "/properties/ImageUri"
-  ],
-  "description": "Resource schema for AWS::ImageBuilder::Image",
-  "createOnlyProperties": [
-    "/properties/ImageRecipeArn",
-    "/properties/ContainerRecipeArn",
-    "/properties/InfrastructureConfigurationArn",
-    "/properties/Workflows",
-    "/properties/DistributionConfigurationArn",
-    "/properties/ImageTestsConfiguration",
-    "/properties/ImageScanningConfiguration",
-    "/properties/EnhancedImageMetadataEnabled",
-    "/properties/Tags"
-  ],
   "additionalProperties": false,
-  "primaryIdentifier": [
-    "/properties/Arn"
-  ],
   "definitions": {
     "ImageScanningConfiguration": {
       "description": "Contains settings for Image Builder image resource and container image scans.",
@@ -183,6 +190,24 @@
       "description": "The value associated with the workflow parameter",
       "type": "string",
       "markdownDescription": "The value associated with the workflow parameter\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "ImagePipelineExecutionSettings": {
+      "description": "The settings for starting an image pipeline execution.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "DeploymentId": {
+          "description": "The deployment ID of the pipeline, used to trigger new image pipeline executions.",
+          "type": "string",
+          "markdownDescription": "The deployment ID of the pipeline, used to trigger new image pipeline executions.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "OnUpdate": {
+          "description": "Whether to trigger the image pipeline when the pipeline is updated. False by default.",
+          "type": "boolean",
+          "markdownDescription": "Whether to trigger the image pipeline when the pipeline is updated. False by default.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "The settings for starting an image pipeline execution.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "ImageTestsConfiguration": {
       "description": "The image tests configuration used when creating this image.",
@@ -305,7 +330,7 @@
       "description": "The tags associated with the image.",
       "additionalProperties": false,
       "type": "object",
-      "markdownDescription": "The tags associated with the image.\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
+      "markdownDescription": "The tags associated with the image.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "attributes": {

@@ -1,140 +1,138 @@
 {
-  "typeName": "AWS::S3::StorageLens",
-  "description": "The AWS::S3::StorageLens resource is an Amazon S3 resource type that you can use to create Storage Lens configurations.",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-s3-storagelens",
+  "tagging": {
+    "permissions": [
+      "s3:PutStorageLensConfigurationTagging",
+      "s3:GetStorageLensConfigurationTagging",
+      "s3:DeleteStorageLensConfigurationTagging"
+    ],
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "tagProperty": "/properties/Tags",
+    "cloudFormationSystemTags": false
+  },
+  "handlers": {
+    "read": {
+      "permissions": [
+        "s3:GetStorageLensConfiguration",
+        "s3:GetStorageLensConfigurationTagging"
+      ]
+    },
+    "create": {
+      "permissions": [
+        "s3:PutStorageLensConfiguration",
+        "s3:PutStorageLensConfigurationTagging",
+        "s3:GetStorageLensConfiguration",
+        "s3:GetStorageLensConfigurationTagging",
+        "organizations:DescribeOrganization",
+        "organizations:ListAccounts",
+        "organizations:ListAWSServiceAccessForOrganization",
+        "organizations:ListDelegatedAdministrators",
+        "iam:CreateServiceLinkedRole"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "s3:PutStorageLensConfiguration",
+        "s3:PutStorageLensConfigurationTagging",
+        "s3:GetStorageLensConfiguration",
+        "s3:GetStorageLensConfigurationTagging",
+        "organizations:DescribeOrganization",
+        "organizations:ListAccounts",
+        "organizations:ListAWSServiceAccessForOrganization",
+        "organizations:ListDelegatedAdministrators",
+        "iam:CreateServiceLinkedRole"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "s3:ListStorageLensConfigurations"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "s3:DeleteStorageLensConfiguration",
+        "s3:DeleteStorageLensConfigurationTagging"
+      ]
+    }
+  },
+  "typeName": "AWS::S3::StorageLens",
+  "readOnlyProperties": [
+    "/properties/StorageLensConfiguration/StorageLensArn"
+  ],
+  "description": "The AWS::S3::StorageLens resource is an Amazon S3 resource type that you can use to create Storage Lens configurations.",
+  "createOnlyProperties": [
+    "/properties/StorageLensConfiguration/Id"
+  ],
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/StorageLensConfiguration/Id"
+  ],
   "definitions": {
-    "Id": {
-      "description": "The ID that identifies the Amazon S3 Storage Lens configuration.",
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 64,
-      "markdownDescription": "The ID that identifies the Amazon S3 Storage Lens configuration.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[a-zA-Z0-9\\-_.]+$  \nUpdate requires: No interruption\n"
-    },
-    "Arn": {
-      "description": "The Amazon Resource Name (ARN) of the specified resource.",
-      "type": "string",
-      "markdownDescription": "The Amazon Resource Name (ARN) of the specified resource.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-    },
-    "BucketsAndRegions": {
-      "description": "S3 buckets and Regions to include/exclude in the Amazon S3 Storage Lens configuration.",
-      "type": "object",
+    "PrefixLevel": {
+      "description": "Prefix-level metrics configurations.",
       "additionalProperties": false,
-      "properties": {
-        "Buckets": {
-          "type": "array",
-          "insertionOrder": false,
-          "uniqueItems": true,
-          "items": {
-            "$ref": "#/definitions/Arn"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "Regions": {
-          "type": "array",
-          "insertionOrder": false,
-          "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "description": "An AWS Region.",
-            "markdownDescription": "An AWS Region.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "S3 buckets and Regions to include/exclude in the Amazon S3 Storage Lens configuration.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "AwsOrg": {
-      "description": "The AWS Organizations ARN to use in the Amazon S3 Storage Lens configuration.",
       "type": "object",
-      "additionalProperties": false,
       "properties": {
-        "Arn": {
-          "$ref": "#/definitions/Arn"
+        "StorageMetrics": {
+          "$ref": "#/definitions/PrefixLevelStorageMetrics"
         }
       },
       "required": [
-        "Arn"
+        "StorageMetrics"
       ],
-      "markdownDescription": "The AWS Organizations ARN to use in the Amazon S3 Storage Lens configuration.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Prefix-level metrics configurations.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "ActivityMetrics": {
-      "description": "Enables activity metrics.",
-      "type": "object",
+    "StorageLensConfiguration": {
+      "description": "Specifies the details of Amazon S3 Storage Lens configuration.",
       "additionalProperties": false,
-      "properties": {
-        "IsEnabled": {
-          "description": "Specifies whether activity metrics are enabled or disabled.",
-          "type": "boolean",
-          "markdownDescription": "Specifies whether activity metrics are enabled or disabled.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "Enables activity metrics.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "AdvancedCostOptimizationMetrics": {
-      "description": "Enables advanced cost optimization metrics.",
       "type": "object",
-      "additionalProperties": false,
       "properties": {
-        "IsEnabled": {
-          "description": "Specifies whether advanced cost optimization metrics are enabled or disabled.",
-          "type": "boolean",
-          "markdownDescription": "Specifies whether advanced cost optimization metrics are enabled or disabled.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "Enables advanced cost optimization metrics.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "AdvancedDataProtectionMetrics": {
-      "description": "Enables advanced data protection metrics.",
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "IsEnabled": {
-          "description": "Specifies whether advanced data protection metrics are enabled or disabled.",
-          "type": "boolean",
-          "markdownDescription": "Specifies whether advanced data protection metrics are enabled or disabled.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "Enables advanced data protection metrics.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "DetailedStatusCodesMetrics": {
-      "description": "Enables detailed status codes metrics.",
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "IsEnabled": {
-          "description": "Specifies whether detailed status codes metrics are enabled or disabled.",
-          "type": "boolean",
-          "markdownDescription": "Specifies whether detailed status codes metrics are enabled or disabled.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "Enables detailed status codes metrics.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "SelectionCriteria": {
-      "description": "Selection criteria for prefix-level metrics.",
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "MaxDepth": {
-          "description": "Max depth of prefixes of S3 key that Amazon S3 Storage Lens will analyze.",
-          "type": "integer",
-          "markdownDescription": "Max depth of prefixes of S3 key that Amazon S3 Storage Lens will analyze.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        "AccountLevel": {
+          "$ref": "#/definitions/AccountLevel"
         },
-        "Delimiter": {
-          "description": "Delimiter to divide S3 key into hierarchy of prefixes.",
+        "Exclude": {
+          "$ref": "#/definitions/BucketsAndRegions"
+        },
+        "IsEnabled": {
+          "description": "Specifies whether the Amazon S3 Storage Lens configuration is enabled or disabled.",
+          "type": "boolean",
+          "markdownDescription": "Specifies whether the Amazon S3 Storage Lens configuration is enabled or disabled.\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "Include": {
+          "$ref": "#/definitions/BucketsAndRegions"
+        },
+        "AwsOrg": {
+          "$ref": "#/definitions/AwsOrg"
+        },
+        "Id": {
+          "$ref": "#/definitions/Id"
+        },
+        "StorageLensArn": {
+          "description": "The ARN for the Amazon S3 Storage Lens configuration.",
           "type": "string",
-          "markdownDescription": "Delimiter to divide S3 key into hierarchy of prefixes.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The ARN for the Amazon S3 Storage Lens configuration.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
-        "MinStorageBytesPercentage": {
-          "description": "The minimum storage bytes threshold for the prefixes to be included in the analysis.",
-          "type": "number",
-          "markdownDescription": "The minimum storage bytes threshold for the prefixes to be included in the analysis.\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        "DataExport": {
+          "$ref": "#/definitions/DataExport"
         }
       },
-      "markdownDescription": "Selection criteria for prefix-level metrics.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "required": [
+        "Id",
+        "AccountLevel",
+        "IsEnabled"
+      ],
+      "markdownDescription": "Specifies the details of Amazon S3 Storage Lens configuration.\n\n---\n\nRequired: No  \nUpdate requires: Replacement\nRead only property: Yes"
+    },
+    "StorageLensGroupArn": {
+      "description": "The ARN for the Amazon S3 Storage Lens Group configuration.",
+      "type": "string",
+      "markdownDescription": "The ARN for the Amazon S3 Storage Lens Group configuration.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
     },
     "PrefixLevelStorageMetrics": {
-      "type": "object",
       "additionalProperties": false,
+      "type": "object",
       "properties": {
         "IsEnabled": {
           "description": "Specifies whether prefix-level storage metrics are enabled or disabled.",
@@ -147,141 +145,29 @@
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "PrefixLevel": {
-      "description": "Prefix-level metrics configurations.",
-      "type": "object",
+    "AwsOrg": {
+      "description": "The AWS Organizations ARN to use in the Amazon S3 Storage Lens configuration.",
       "additionalProperties": false,
+      "type": "object",
       "properties": {
-        "StorageMetrics": {
-          "$ref": "#/definitions/PrefixLevelStorageMetrics"
+        "Arn": {
+          "$ref": "#/definitions/Arn"
         }
       },
       "required": [
-        "StorageMetrics"
+        "Arn"
       ],
-      "markdownDescription": "Prefix-level metrics configurations.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "BucketLevel": {
-      "description": "Bucket-level metrics configurations.",
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "ActivityMetrics": {
-          "$ref": "#/definitions/ActivityMetrics"
-        },
-        "AdvancedCostOptimizationMetrics": {
-          "$ref": "#/definitions/AdvancedCostOptimizationMetrics"
-        },
-        "AdvancedDataProtectionMetrics": {
-          "$ref": "#/definitions/AdvancedDataProtectionMetrics"
-        },
-        "DetailedStatusCodesMetrics": {
-          "$ref": "#/definitions/DetailedStatusCodesMetrics"
-        },
-        "PrefixLevel": {
-          "$ref": "#/definitions/PrefixLevel"
-        }
-      },
-      "markdownDescription": "Bucket-level metrics configurations.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "StorageLensGroupArn": {
-      "description": "The ARN for the Amazon S3 Storage Lens Group configuration.",
-      "type": "string",
-      "markdownDescription": "The ARN for the Amazon S3 Storage Lens Group configuration.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-    },
-    "StorageLensGroupSelectionCriteria": {
-      "description": "Selection criteria for Storage Lens Group level metrics",
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "Include": {
-          "type": "array",
-          "insertionOrder": false,
-          "uniqueItems": true,
-          "items": {
-            "$ref": "#/definitions/StorageLensGroupArn"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "Exclude": {
-          "type": "array",
-          "insertionOrder": false,
-          "uniqueItems": true,
-          "items": {
-            "$ref": "#/definitions/StorageLensGroupArn"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "Selection criteria for Storage Lens Group level metrics\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "StorageLensGroupLevel": {
-      "description": "Specifies the details of Amazon S3 Storage Lens Group configuration.",
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "StorageLensGroupSelectionCriteria": {
-          "$ref": "#/definitions/StorageLensGroupSelectionCriteria"
-        }
-      },
-      "markdownDescription": "Specifies the details of Amazon S3 Storage Lens Group configuration.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "AccountLevel": {
-      "description": "Account-level metrics configurations.",
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "ActivityMetrics": {
-          "$ref": "#/definitions/ActivityMetrics"
-        },
-        "AdvancedCostOptimizationMetrics": {
-          "$ref": "#/definitions/AdvancedCostOptimizationMetrics"
-        },
-        "AdvancedDataProtectionMetrics": {
-          "$ref": "#/definitions/AdvancedDataProtectionMetrics"
-        },
-        "DetailedStatusCodesMetrics": {
-          "$ref": "#/definitions/DetailedStatusCodesMetrics"
-        },
-        "BucketLevel": {
-          "$ref": "#/definitions/BucketLevel"
-        },
-        "StorageLensGroupLevel": {
-          "$ref": "#/definitions/StorageLensGroupLevel"
-        }
-      },
-      "required": [
-        "BucketLevel"
-      ],
-      "markdownDescription": "Account-level metrics configurations.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "SSEKMS": {
-      "description": "AWS KMS server-side encryption.",
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "KeyId": {
-          "description": "The ARN of the KMS key to use for encryption.",
-          "type": "string",
-          "markdownDescription": "The ARN of the KMS key to use for encryption.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "KeyId"
-      ],
-      "markdownDescription": "AWS KMS server-side encryption.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The AWS Organizations ARN to use in the Amazon S3 Storage Lens configuration.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Encryption": {
-      "description": "Configures the server-side encryption for Amazon S3 Storage Lens report files with either S3-managed keys (SSE-S3) or KMS-managed keys (SSE-KMS).",
-      "type": "object",
       "oneOf": [
         {
           "additionalProperties": false,
           "properties": {
             "SSES3": {
               "description": "S3 default server-side encryption.",
-              "type": "object",
-              "additionalProperties": false
+              "additionalProperties": false,
+              "type": "object"
             }
           },
           "required": [
@@ -300,12 +186,106 @@
           ]
         }
       ],
+      "description": "Configures the server-side encryption for Amazon S3 Storage Lens report files with either S3-managed keys (SSE-S3) or KMS-managed keys (SSE-KMS).",
+      "type": "object",
       "markdownDescription": "Configures the server-side encryption for Amazon S3 Storage Lens report files with either S3-managed keys (SSE-S3) or KMS-managed keys (SSE-KMS).\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DetailedStatusCodesMetrics": {
+      "description": "Enables detailed status codes metrics.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "IsEnabled": {
+          "description": "Specifies whether detailed status codes metrics are enabled or disabled.",
+          "type": "boolean",
+          "markdownDescription": "Specifies whether detailed status codes metrics are enabled or disabled.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Enables detailed status codes metrics.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AdvancedDataProtectionMetrics": {
+      "description": "Enables advanced data protection metrics.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "IsEnabled": {
+          "description": "Specifies whether advanced data protection metrics are enabled or disabled.",
+          "type": "boolean",
+          "markdownDescription": "Specifies whether advanced data protection metrics are enabled or disabled.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Enables advanced data protection metrics.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AccountLevel": {
+      "description": "Account-level metrics configurations.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "AdvancedDataProtectionMetrics": {
+          "$ref": "#/definitions/AdvancedDataProtectionMetrics"
+        },
+        "StorageLensGroupLevel": {
+          "$ref": "#/definitions/StorageLensGroupLevel"
+        },
+        "ActivityMetrics": {
+          "$ref": "#/definitions/ActivityMetrics"
+        },
+        "BucketLevel": {
+          "$ref": "#/definitions/BucketLevel"
+        },
+        "AdvancedCostOptimizationMetrics": {
+          "$ref": "#/definitions/AdvancedCostOptimizationMetrics"
+        },
+        "DetailedStatusCodesMetrics": {
+          "$ref": "#/definitions/DetailedStatusCodesMetrics"
+        }
+      },
+      "required": [
+        "BucketLevel"
+      ],
+      "markdownDescription": "Account-level metrics configurations.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "StorageLensGroupLevel": {
+      "description": "Specifies the details of Amazon S3 Storage Lens Group configuration.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "StorageLensGroupSelectionCriteria": {
+          "$ref": "#/definitions/StorageLensGroupSelectionCriteria"
+        }
+      },
+      "markdownDescription": "Specifies the details of Amazon S3 Storage Lens Group configuration.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "StorageLensGroupSelectionCriteria": {
+      "description": "Selection criteria for Storage Lens Group level metrics",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Exclude": {
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StorageLensGroupArn"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "Include": {
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StorageLensGroupArn"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Selection criteria for Storage Lens Group level metrics\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "S3BucketDestination": {
       "description": "S3 bucket destination settings for the Amazon S3 Storage Lens metrics export.",
-      "type": "object",
       "additionalProperties": false,
+      "type": "object",
       "properties": {
         "OutputSchemaVersion": {
           "description": "The version of the output schema to use when exporting Amazon S3 Storage Lens metrics.",
@@ -329,15 +309,6 @@
           "type": "string",
           "markdownDescription": "The AWS account ID that owns the destination S3 bucket.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         },
-        "Arn": {
-          "description": "The ARN of the bucket to which Amazon S3 Storage Lens exports will be placed.",
-          "type": "string",
-          "relationshipRef": {
-            "typeName": "AWS::S3::Bucket",
-            "propertyPath": "/properties/Arn"
-          },
-          "markdownDescription": "The ARN of the bucket to which Amazon S3 Storage Lens exports will be placed.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        },
         "Prefix": {
           "description": "The prefix to use for Amazon S3 Storage Lens export.",
           "type": "string",
@@ -345,6 +316,11 @@
         },
         "Encryption": {
           "$ref": "#/definitions/Encryption"
+        },
+        "Arn": {
+          "description": "The ARN of the bucket to which Amazon S3 Storage Lens exports will be placed.",
+          "type": "string",
+          "markdownDescription": "The ARN of the bucket to which Amazon S3 Storage Lens exports will be placed.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
@@ -355,10 +331,46 @@
       ],
       "markdownDescription": "S3 bucket destination settings for the Amazon S3 Storage Lens metrics export.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "ActivityMetrics": {
+      "description": "Enables activity metrics.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "IsEnabled": {
+          "description": "Specifies whether activity metrics are enabled or disabled.",
+          "type": "boolean",
+          "markdownDescription": "Specifies whether activity metrics are enabled or disabled.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Enables activity metrics.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SelectionCriteria": {
+      "description": "Selection criteria for prefix-level metrics.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Delimiter": {
+          "description": "Delimiter to divide S3 key into hierarchy of prefixes.",
+          "type": "string",
+          "markdownDescription": "Delimiter to divide S3 key into hierarchy of prefixes.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "MaxDepth": {
+          "description": "Max depth of prefixes of S3 key that Amazon S3 Storage Lens will analyze.",
+          "type": "integer",
+          "markdownDescription": "Max depth of prefixes of S3 key that Amazon S3 Storage Lens will analyze.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "MinStorageBytesPercentage": {
+          "description": "The minimum storage bytes threshold for the prefixes to be included in the analysis.",
+          "type": "number",
+          "markdownDescription": "The minimum storage bytes threshold for the prefixes to be included in the analysis.\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Selection criteria for prefix-level metrics.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "CloudWatchMetrics": {
       "description": "CloudWatch metrics settings for the Amazon S3 Storage Lens metrics export.",
-      "type": "object",
       "additionalProperties": false,
+      "type": "object",
       "properties": {
         "IsEnabled": {
           "description": "Specifies whether CloudWatch metrics are enabled or disabled.",
@@ -371,10 +383,112 @@
       ],
       "markdownDescription": "CloudWatch metrics settings for the Amazon S3 Storage Lens metrics export.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "SSEKMS": {
+      "description": "AWS KMS server-side encryption.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "KeyId": {
+          "description": "The ARN of the KMS key to use for encryption.",
+          "type": "string",
+          "markdownDescription": "The ARN of the KMS key to use for encryption.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "KeyId"
+      ],
+      "markdownDescription": "AWS KMS server-side encryption.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "BucketsAndRegions": {
+      "description": "S3 buckets and Regions to include/exclude in the Amazon S3 Storage Lens configuration.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Regions": {
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "description": "An AWS Region.",
+            "type": "string",
+            "markdownDescription": "An AWS Region.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "Buckets": {
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Arn"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "S3 buckets and Regions to include/exclude in the Amazon S3 Storage Lens configuration.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Id": {
+      "minLength": 1,
+      "description": "The ID that identifies the Amazon S3 Storage Lens configuration.",
+      "type": "string",
+      "maxLength": 64,
+      "markdownDescription": "The ID that identifies the Amazon S3 Storage Lens configuration.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[a-zA-Z0-9\\-_.]+$  \nUpdate requires: No interruption\n"
+    },
+    "BucketLevel": {
+      "description": "Bucket-level metrics configurations.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "AdvancedDataProtectionMetrics": {
+          "$ref": "#/definitions/AdvancedDataProtectionMetrics"
+        },
+        "PrefixLevel": {
+          "$ref": "#/definitions/PrefixLevel"
+        },
+        "ActivityMetrics": {
+          "$ref": "#/definitions/ActivityMetrics"
+        },
+        "AdvancedCostOptimizationMetrics": {
+          "$ref": "#/definitions/AdvancedCostOptimizationMetrics"
+        },
+        "DetailedStatusCodesMetrics": {
+          "$ref": "#/definitions/DetailedStatusCodesMetrics"
+        }
+      },
+      "markdownDescription": "Bucket-level metrics configurations.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "minLength": 1,
+          "type": "string",
+          "maxLength": 255,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^(?!aws:.*)[a-zA-Z0-9\\s\\_\\.\\/\\=\\+\\-\\@\\:]+$  \nUpdate requires: No interruption\n"
+        },
+        "Key": {
+          "minLength": 1,
+          "type": "string",
+          "maxLength": 127,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 127  \nPattern: ^(?!aws:.*)[a-zA-Z0-9\\s\\_\\.\\/\\=\\+\\-\\@\\:]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Arn": {
+      "description": "The Amazon Resource Name (ARN) of the specified resource.",
+      "type": "string",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the specified resource.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
     "DataExport": {
       "description": "Specifies how Amazon S3 Storage Lens metrics should be exported.",
-      "type": "object",
       "additionalProperties": false,
+      "type": "object",
       "properties": {
         "S3BucketDestination": {
           "$ref": "#/definitions/S3BucketDestination"
@@ -385,69 +499,18 @@
       },
       "markdownDescription": "Specifies how Amazon S3 Storage Lens metrics should be exported.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "Tag": {
-      "type": "object",
+    "AdvancedCostOptimizationMetrics": {
+      "description": "Enables advanced cost optimization metrics.",
       "additionalProperties": false,
-      "properties": {
-        "Key": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 127,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 127  \nPattern: ^(?!aws:.*)[a-zA-Z0-9\\s\\_\\.\\/\\=\\+\\-\\@\\:]+$  \nUpdate requires: No interruption\n"
-        },
-        "Value": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 255,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^(?!aws:.*)[a-zA-Z0-9\\s\\_\\.\\/\\=\\+\\-\\@\\:]+$  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Key",
-        "Value"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "StorageLensConfiguration": {
-      "description": "Specifies the details of Amazon S3 Storage Lens configuration.",
       "type": "object",
-      "additionalProperties": false,
       "properties": {
-        "Id": {
-          "$ref": "#/definitions/Id"
-        },
-        "Include": {
-          "$ref": "#/definitions/BucketsAndRegions"
-        },
-        "Exclude": {
-          "$ref": "#/definitions/BucketsAndRegions"
-        },
-        "AwsOrg": {
-          "$ref": "#/definitions/AwsOrg"
-        },
-        "AccountLevel": {
-          "$ref": "#/definitions/AccountLevel"
-        },
-        "DataExport": {
-          "$ref": "#/definitions/DataExport"
-        },
         "IsEnabled": {
-          "description": "Specifies whether the Amazon S3 Storage Lens configuration is enabled or disabled.",
+          "description": "Specifies whether advanced cost optimization metrics are enabled or disabled.",
           "type": "boolean",
-          "markdownDescription": "Specifies whether the Amazon S3 Storage Lens configuration is enabled or disabled.\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption\n"
-        },
-        "StorageLensArn": {
-          "description": "The ARN for the Amazon S3 Storage Lens configuration.",
-          "type": "string",
-          "markdownDescription": "The ARN for the Amazon S3 Storage Lens configuration.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          "markdownDescription": "Specifies whether advanced cost optimization metrics are enabled or disabled.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
         }
       },
-      "required": [
-        "Id",
-        "AccountLevel",
-        "IsEnabled"
-      ],
-      "markdownDescription": "Specifies the details of Amazon S3 Storage Lens configuration.\n\n---\n\nRequired: No  \nUpdate requires: Replacement\nRead only property: Yes"
+      "markdownDescription": "Enables advanced cost optimization metrics.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -455,81 +518,19 @@
       "$ref": "#/definitions/StorageLensConfiguration"
     },
     "Tags": {
-      "description": "A set of tags (key-value pairs) for this Amazon S3 Storage Lens configuration.",
-      "type": "array",
-      "insertionOrder": false,
+      "maxItems": 50,
       "uniqueItems": true,
+      "description": "A set of tags (key-value pairs) for this Amazon S3 Storage Lens configuration.",
+      "insertionOrder": false,
+      "type": "array",
       "items": {
         "$ref": "#/definitions/Tag"
       },
-      "maxItems": 50,
       "markdownDescription": "A set of tags (key-value pairs) for this Amazon S3 Storage Lens configuration.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
-  },
-  "additionalProperties": false,
-  "tagging": {
-    "taggable": true,
-    "tagOnCreate": true,
-    "tagUpdatable": true,
-    "cloudFormationSystemTags": false,
-    "tagProperty": "/properties/Tags"
   },
   "required": [
     "StorageLensConfiguration"
   ],
-  "readOnlyProperties": [
-    "/properties/StorageLensConfiguration/StorageLensArn"
-  ],
-  "createOnlyProperties": [
-    "/properties/StorageLensConfiguration/Id"
-  ],
-  "primaryIdentifier": [
-    "/properties/StorageLensConfiguration/Id"
-  ],
-  "handlers": {
-    "create": {
-      "permissions": [
-        "s3:PutStorageLensConfiguration",
-        "s3:PutStorageLensConfigurationTagging",
-        "s3:GetStorageLensConfiguration",
-        "s3:GetStorageLensConfigurationTagging",
-        "organizations:DescribeOrganization",
-        "organizations:ListAccounts",
-        "organizations:ListAWSServiceAccessForOrganization",
-        "organizations:ListDelegatedAdministrators",
-        "iam:CreateServiceLinkedRole"
-      ]
-    },
-    "read": {
-      "permissions": [
-        "s3:GetStorageLensConfiguration",
-        "s3:GetStorageLensConfigurationTagging"
-      ]
-    },
-    "update": {
-      "permissions": [
-        "s3:PutStorageLensConfiguration",
-        "s3:PutStorageLensConfigurationTagging",
-        "s3:GetStorageLensConfiguration",
-        "s3:GetStorageLensConfigurationTagging",
-        "organizations:DescribeOrganization",
-        "organizations:ListAccounts",
-        "organizations:ListAWSServiceAccessForOrganization",
-        "organizations:ListDelegatedAdministrators",
-        "iam:CreateServiceLinkedRole"
-      ]
-    },
-    "delete": {
-      "permissions": [
-        "s3:DeleteStorageLensConfiguration",
-        "s3:DeleteStorageLensConfigurationTagging"
-      ]
-    },
-    "list": {
-      "permissions": [
-        "s3:ListStorageLensConfigurations"
-      ]
-    }
-  },
   "attributes": {}
 }

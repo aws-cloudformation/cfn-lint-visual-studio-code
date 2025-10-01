@@ -2,17 +2,15 @@
   "typeName": "AWS::KinesisAnalyticsV2::Application",
   "description": "Creates an Amazon Kinesis Data Analytics application. For information about creating a Kinesis Data Analytics application, see [Creating an Application](https://docs.aws.amazon.com/kinesisanalytics/latest/java/getting-started.html).",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-kinesisanalyticsv2.git",
+  "propertyTransform": {
+    "/properties/ApplicationConfiguration/ApplicationEncryptionConfiguration/KeyId": "\"arn:aws[-a-z]*:kms:[a-z0-9-]+:[0-9]{12}:key/[a-zA-Z0-9-]+\""
+  },
   "tagging": {
     "taggable": true,
     "tagOnCreate": true,
     "tagUpdatable": true,
     "cloudFormationSystemTags": true,
-    "tagProperty": "/properties/Tags",
-    "permissions": [
-      "kinesisanalytics:TagResource",
-      "kinesisanalytics:UntagResource",
-      "kinesisanalytics:ListTagsForResource"
-    ]
+    "tagProperty": "/properties/Tags"
   },
   "properties": {
     "ApplicationConfiguration": {
@@ -94,6 +92,11 @@
           "description": "The code location and type parameters for a Flink-based Kinesis Data Analytics application.",
           "$ref": "#/definitions/ApplicationCodeConfiguration",
           "markdownDescription": "The code location and type parameters for a Flink-based Kinesis Data Analytics application.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "ApplicationEncryptionConfiguration": {
+          "description": "Describes whether customer managed key is enabled and key details for customer data encryption",
+          "$ref": "#/definitions/ApplicationEncryptionConfiguration",
+          "markdownDescription": "Describes whether customer managed key is enabled and key details for customer data encryption\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
         },
         "ApplicationSnapshotConfiguration": {
           "description": "Describes whether snapshots are enabled for a Flink-based Kinesis Data Analytics application.",
@@ -273,6 +276,33 @@
         "FileKey"
       ],
       "markdownDescription": "The location of an application or a custom artifact.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ApplicationEncryptionConfiguration": {
+      "description": "Describes whether customer managed key is enabled and key details for customer data encryption",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "KeyId": {
+          "description": "KMS KeyId. Can be either key uuid or full key arn or key alias arn or short key alias",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "markdownDescription": "KMS KeyId. Can be either key uuid or full key arn or key alias arn or short key alias\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^(?:arn:.*:kms:.*:.*:(?:key\\/.*|alias\\/.*)|alias\\/.*|(?i)[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$  \nUpdate requires: No interruption\n"
+        },
+        "KeyType": {
+          "description": "Specifies whether application data is encrypted using service key: AWS_OWNED_KEY or customer key: CUSTOMER_MANAGED_KEY",
+          "type": "string",
+          "enum": [
+            "AWS_OWNED_KEY",
+            "CUSTOMER_MANAGED_KEY"
+          ],
+          "markdownDescription": "Specifies whether application data is encrypted using service key: AWS_OWNED_KEY or customer key: CUSTOMER_MANAGED_KEY\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: AWS_OWNED_KEY | CUSTOMER_MANAGED_KEY  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "KeyType"
+      ],
+      "markdownDescription": "Describes whether customer managed key is enabled and key details for customer data encryption\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "ApplicationSnapshotConfiguration": {
       "description": "Describes whether snapshots are enabled for a Flink-based Kinesis Data Analytics application.",
@@ -1100,13 +1130,18 @@
         "kinesisanalytics:CreateApplication",
         "kinesisanalytics:DescribeApplication",
         "kinesisanalytics:ListTagsForResource",
-        "kinesisanalytics:UpdateApplicationMaintenanceConfiguration"
+        "kinesisanalytics:UpdateApplicationMaintenanceConfiguration",
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:GenerateDataKey",
+        "kms:GenerateDataKeyWithoutPlaintext"
       ]
     },
     "read": {
       "permissions": [
         "kinesisanalytics:DescribeApplication",
-        "kinesisanalytics:ListTagsForResource"
+        "kinesisanalytics:ListTagsForResource",
+        "kms:DescribeKey"
       ]
     },
     "update": {
@@ -1118,7 +1153,12 @@
         "kinesisanalytics:AddApplicationVpcConfiguration",
         "kinesisanalytics:DeleteApplicationVpcConfiguration",
         "kinesisanalytics:UpdateApplicationMaintenanceConfiguration",
-        "kinesisanalytics:ListTagsForResource"
+        "kinesisanalytics:ListTagsForResource",
+        "kms:CreateGrant",
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:GenerateDataKey",
+        "kms:GenerateDataKeyWithoutPlaintext"
       ]
     },
     "delete": {

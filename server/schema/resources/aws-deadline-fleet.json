@@ -236,9 +236,10 @@
       "type": "string",
       "enum": [
         "on-demand",
-        "spot"
+        "spot",
+        "wait-and-save"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: on-demand | spot  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: on-demand | spot | wait-and-save  \nUpdate requires: No interruption\n"
     },
     "FleetAmountCapability": {
       "type": "object",
@@ -356,9 +357,10 @@
         "CREATE_IN_PROGRESS",
         "UPDATE_IN_PROGRESS",
         "CREATE_FAILED",
-        "UPDATE_FAILED"
+        "UPDATE_FAILED",
+        "SUSPENDED"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ACTIVE | CREATE_IN_PROGRESS | UPDATE_IN_PROGRESS | CREATE_FAILED | UPDATE_FAILED  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ACTIVE | CREATE_IN_PROGRESS | UPDATE_IN_PROGRESS | CREATE_FAILED | UPDATE_FAILED | SUSPENDED  \nUpdate requires: No interruption\n"
     },
     "HostConfiguration": {
       "type": "object",
@@ -413,6 +415,9 @@
         },
         "InstanceMarketOptions": {
           "$ref": "#/definitions/ServiceManagedEc2InstanceMarketOptions"
+        },
+        "VpcConfiguration": {
+          "$ref": "#/definitions/VpcConfiguration"
         },
         "StorageProfileId": {
           "type": "string",
@@ -571,6 +576,23 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "VpcConfiguration": {
+      "type": "object",
+      "properties": {
+        "ResourceConfigurationArns": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -624,6 +646,10 @@
     "Status": {
       "$ref": "#/definitions/FleetStatus"
     },
+    "StatusMessage": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
     "WorkerCount": {
       "type": "integer",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\nRead only property: Yes"
@@ -655,6 +681,7 @@
     "/properties/Capabilities",
     "/properties/FleetId",
     "/properties/Status",
+    "/properties/StatusMessage",
     "/properties/WorkerCount",
     "/properties/Arn"
   ],
@@ -685,7 +712,13 @@
         "identitystore:ListGroupMembershipsForMember",
         "logs:CreateLogGroup",
         "deadline:TagResource",
-        "deadline:ListTagsForResource"
+        "deadline:ListTagsForResource",
+        "vpc-lattice:GetResourceGateway",
+        "vpc-lattice:GetResourceConfiguration",
+        "ec2:CreateVpcEndpoint",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeVpcs"
       ]
     },
     "read": {
@@ -703,7 +736,13 @@
         "identitystore:ListGroupMembershipsForMember",
         "deadline:TagResource",
         "deadline:UntagResource",
-        "deadline:ListTagsForResource"
+        "deadline:ListTagsForResource",
+        "vpc-lattice:GetResourceGateway",
+        "vpc-lattice:GetResourceConfiguration",
+        "ec2:CreateVpcEndpoint",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeVpcs"
       ]
     },
     "delete": {
@@ -743,6 +782,10 @@
     },
     "Status": {
       "$ref": "#/definitions/FleetStatus"
+    },
+    "StatusMessage": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "WorkerCount": {
       "type": "integer",

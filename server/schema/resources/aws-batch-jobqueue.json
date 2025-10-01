@@ -26,6 +26,25 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "ServiceEnvironmentOrder": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ServiceEnvironment": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Order": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ServiceEnvironment",
+        "Order"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "JobStateTimeLimitAction": {
       "type": "object",
       "additionalProperties": false,
@@ -33,9 +52,10 @@
         "Action": {
           "type": "string",
           "enum": [
-            "CANCEL"
+            "CANCEL",
+            "TERMINATE"
           ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: CANCEL  \nUpdate requires: No interruption\n"
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: CANCEL | TERMINATE  \nUpdate requires: No interruption\n"
         },
         "MaxTimeSeconds": {
           "type": "integer",
@@ -74,6 +94,10 @@
     "JobQueueArn": {
       "$ref": "#/definitions/ResourceArn"
     },
+    "JobQueueType": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+    },
     "ComputeEnvironmentOrder": {
       "type": "array",
       "insertionOrder": true,
@@ -81,7 +105,16 @@
       "items": {
         "$ref": "#/definitions/ComputeEnvironmentOrder"
       },
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "ServiceEnvironmentOrder": {
+      "type": "array",
+      "insertionOrder": true,
+      "uniqueItems": false,
+      "items": {
+        "$ref": "#/definitions/ServiceEnvironmentOrder"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: Array  \nUpdate requires: No interruption\n"
     },
     "JobStateTimeLimitActions": {
       "type": "array",
@@ -96,7 +129,7 @@
       "type": "integer",
       "minimum": 0,
       "maximum": 1000,
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: Integer  \nUpdate requires: No interruption\n"
     },
     "State": {
       "type": "string",
@@ -134,15 +167,27 @@
     ]
   },
   "required": [
-    "ComputeEnvironmentOrder",
     "Priority"
+  ],
+  "oneOf": [
+    {
+      "required": [
+        "ComputeEnvironmentOrder"
+      ]
+    },
+    {
+      "required": [
+        "ServiceEnvironmentOrder"
+      ]
+    }
   ],
   "primaryIdentifier": [
     "/properties/JobQueueArn"
   ],
   "createOnlyProperties": [
     "/properties/Tags",
-    "/properties/JobQueueName"
+    "/properties/JobQueueName",
+    "/properties/JobQueueType"
   ],
   "readOnlyProperties": [
     "/properties/JobQueueArn"

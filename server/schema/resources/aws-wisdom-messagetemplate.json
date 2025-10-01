@@ -693,6 +693,42 @@
       "maxLength": 2048,
       "markdownDescription": "The value that define the group of Amazon Q in Connect users.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: No interruption\n"
     },
+    "AttachmentUrl": {
+      "description": "The S3 Presigned URL for the attachment file. When generating the PreSignedUrl, please ensure that the expires-in time is set to 30 minutes. The URL can be generated through the AWS Console or through the AWS CLI (https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html). ",
+      "type": "string",
+      "minLength": 1,
+      "markdownDescription": "The S3 Presigned URL for the attachment file. When generating the PreSignedUrl, please ensure that the expires-in time is set to 30 minutes. The URL can be generated through the AWS Console or through the AWS CLI (https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html). \n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nUpdate requires: No interruption\n"
+    },
+    "AttachmentName": {
+      "description": "The name of the attachment file being uploaded. The name should include the file extension.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "markdownDescription": "The name of the attachment file being uploaded. The name should include the file extension.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+    },
+    "MessageTemplateAttachment": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "AttachmentId": {
+          "type": "string",
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nUpdate requires: No interruption\n"
+        },
+        "AttachmentName": {
+          "$ref": "#/definitions/AttachmentName"
+        },
+        "S3PresignedUrl": {
+          "$ref": "#/definitions/AttachmentUrl"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "AttachmentName",
+        "S3PresignedUrl"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "Tag": {
       "description": "A key-value pair to associate with a resource.",
       "type": "object",
@@ -776,6 +812,15 @@
       "maxLength": 64,
       "markdownDescription": "The content SHA256 of the message template.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nUpdate requires: No interruption\nRead only property: Yes"
     },
+    "MessageTemplateAttachments": {
+      "description": "List of message template attachments",
+      "type": "array",
+      "insertionOrder": true,
+      "items": {
+        "$ref": "#/definitions/MessageTemplateAttachment"
+      },
+      "markdownDescription": "List of message template attachments\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
     "Tags": {
       "description": "The tags used to organize, track, or control access for this resource. For example, { \"tags\": {\"key1\":\"value1\", \"key2\":\"value2\"} }.",
       "insertionOrder": false,
@@ -796,7 +841,11 @@
   "readOnlyProperties": [
     "/properties/MessageTemplateId",
     "/properties/MessageTemplateArn",
-    "/properties/MessageTemplateContentSha256"
+    "/properties/MessageTemplateContentSha256",
+    "/properties/MessageTemplateAttachments/*/AttachmentId"
+  ],
+  "writeOnlyProperties": [
+    "/properties/MessageTemplateAttachments/*/S3PresignedUrl"
   ],
   "createOnlyProperties": [
     "/properties/KnowledgeBaseArn",
@@ -825,7 +874,9 @@
         "wisdom:GetMessageTemplate",
         "wisdom:TagResource",
         "connect:SearchRoutingProfiles",
-        "connect:DescribeRoutingProfile"
+        "connect:DescribeRoutingProfile",
+        "wisdom:CreateMessageTemplateAttachment",
+        "wisdom:DeleteMessageTemplateAttachment"
       ]
     },
     "update": {
@@ -836,13 +887,16 @@
         "wisdom:TagResource",
         "wisdom:UntagResource",
         "connect:SearchRoutingProfiles",
-        "connect:DescribeRoutingProfile"
+        "connect:DescribeRoutingProfile",
+        "wisdom:CreateMessageTemplateAttachment",
+        "wisdom:DeleteMessageTemplateAttachment"
       ]
     },
     "delete": {
       "permissions": [
         "wisdom:DeleteMessageTemplate",
-        "wisdom:UntagResource"
+        "wisdom:UntagResource",
+        "wisdom:DeleteMessageTemplateAttachment"
       ]
     },
     "list": {
