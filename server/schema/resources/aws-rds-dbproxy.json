@@ -39,11 +39,12 @@
           "type": "string",
           "enum": [
             "MYSQL_NATIVE_PASSWORD",
+            "MYSQL_CACHING_SHA2_PASSWORD",
             "POSTGRES_SCRAM_SHA_256",
             "POSTGRES_MD5",
             "SQL_SERVER_AUTHENTICATION"
           ],
-          "markdownDescription": "The type of authentication the proxy uses for connections from clients.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MYSQL_NATIVE_PASSWORD | POSTGRES_SCRAM_SHA_256 | POSTGRES_MD5 | SQL_SERVER_AUTHENTICATION  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The type of authentication the proxy uses for connections from clients.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MYSQL_NATIVE_PASSWORD | MYSQL_CACHING_SHA2_PASSWORD | POSTGRES_SCRAM_SHA_256 | POSTGRES_MD5 | SQL_SERVER_AUTHENTICATION  \nUpdate requires: No interruption\n"
         }
       },
       "additionalProperties": false,
@@ -76,7 +77,7 @@
       "items": {
         "$ref": "#/definitions/AuthFormat"
       },
-      "markdownDescription": "The authorization mechanism that the proxy uses.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The authorization mechanism that the proxy uses.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     },
     "DBProxyArn": {
       "description": "The Amazon Resource Name (ARN) for the proxy.",
@@ -94,10 +95,29 @@
       "type": "boolean",
       "markdownDescription": "Whether the proxy includes detailed information about SQL statements in its logs.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
     },
+    "DefaultAuthScheme": {
+      "description": "The default authentication scheme that the proxy uses for client connections to the proxy and connections from the proxy to the underlying database.",
+      "type": "string",
+      "enum": [
+        "IAM_AUTH",
+        "NONE"
+      ],
+      "markdownDescription": "The default authentication scheme that the proxy uses for client connections to the proxy and connections from the proxy to the underlying database.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: IAM_AUTH | NONE  \nUpdate requires: No interruption\n"
+    },
     "Endpoint": {
       "description": "The endpoint that you can use to connect to the proxy. You include the endpoint value in the connection string for a database client application.",
       "type": "string",
       "markdownDescription": "The endpoint that you can use to connect to the proxy. You include the endpoint value in the connection string for a database client application.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "EndpointNetworkType": {
+      "description": "The network type of the DB proxy endpoint. The network type determines the IP version that the proxy endpoint supports.",
+      "type": "string",
+      "enum": [
+        "IPV4",
+        "IPV6",
+        "DUAL"
+      ],
+      "markdownDescription": "The network type of the DB proxy endpoint. The network type determines the IP version that the proxy endpoint supports.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: IPV4 | IPV6 | DUAL  \nUpdate requires: Replacement\n"
     },
     "EngineFamily": {
       "description": "The kinds of databases that the proxy can connect to.",
@@ -133,6 +153,15 @@
       },
       "markdownDescription": "An optional set of key-value pairs to associate arbitrary data of your choosing with the proxy.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     },
+    "TargetConnectionNetworkType": {
+      "description": "The network type that the proxy uses to connect to the target database. The network type determines the IP version that the proxy uses for connections to the database.",
+      "type": "string",
+      "enum": [
+        "IPV4",
+        "IPV6"
+      ],
+      "markdownDescription": "The network type that the proxy uses to connect to the target database. The network type determines the IP version that the proxy uses for connections to the database.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: IPV4 | IPV6  \nUpdate requires: Replacement\n"
+    },
     "VpcId": {
       "description": "VPC ID to associate with the new DB proxy.",
       "type": "string",
@@ -163,7 +192,6 @@
   },
   "additionalProperties": false,
   "required": [
-    "Auth",
     "DBProxyName",
     "EngineFamily",
     "RoleArn",
@@ -177,6 +205,8 @@
   "createOnlyProperties": [
     "/properties/DBProxyName",
     "/properties/EngineFamily",
+    "/properties/EndpointNetworkType",
+    "/properties/TargetConnectionNetworkType",
     "/properties/VpcSubnetIds"
   ],
   "tagging": {

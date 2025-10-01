@@ -113,6 +113,26 @@
       "description": "Setting to control if UpdateCanary will perform a DryRun and validate it is PASSING before performing the Update. Default is FALSE.",
       "type": "boolean",
       "markdownDescription": "Setting to control if UpdateCanary will perform a DryRun and validate it is PASSING before performing the Update. Default is FALSE.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+    },
+    "BrowserConfigs": {
+      "description": "List of browser configurations for the canary",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2,
+      "items": {
+        "$ref": "#/definitions/BrowserConfig"
+      },
+      "markdownDescription": "List of browser configurations for the canary\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "VisualReferences": {
+      "description": "List of visual references for the canary",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2,
+      "items": {
+        "$ref": "#/definitions/VisualReference"
+      },
+      "markdownDescription": "List of visual references for the canary\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "definitions": {
@@ -166,6 +186,15 @@
         "SourceLocationArn": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Dependencies": {
+          "type": "array",
+          "description": "List of Lambda layers to attach to the canary",
+          "maxItems": 1,
+          "items": {
+            "$ref": "#/definitions/Dependency"
+          },
+          "markdownDescription": "List of Lambda layers to attach to the canary\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
@@ -185,6 +214,31 @@
         }
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Dependency": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Type": {
+          "type": "string",
+          "enum": [
+            "LambdaLayer"
+          ],
+          "description": "Type of dependency",
+          "markdownDescription": "Type of dependency\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: LambdaLayer  \nUpdate requires: No interruption\n"
+        },
+        "Reference": {
+          "type": "string",
+          "description": "ARN of the Lambda layer",
+          "minLength": 1,
+          "maxLength": 140,
+          "markdownDescription": "ARN of the Lambda layer\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 140  \nPattern: arn:[a-zA-Z0-9-]+:lambda:[a-zA-Z0-9-]+:\\d{12}:layer:[a-zA-Z0-9-_]+:[0-9]+  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Reference"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Tag": {
       "description": "A key-value pair to associate with a resource.",
@@ -262,6 +316,11 @@
           "type": "integer",
           "markdownDescription": "Provide maximum memory available for canary in MB\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
         },
+        "EphemeralStorage": {
+          "description": "Provide ephemeralStorage available for canary in MB",
+          "type": "integer",
+          "markdownDescription": "Provide ephemeralStorage available for canary in MB\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
         "ActiveTracing": {
           "description": "Enable active tracing if set to true",
           "type": "boolean",
@@ -298,6 +357,9 @@
             "$ref": "#/definitions/BaseScreenshot"
           },
           "markdownDescription": "List of screenshots used as base reference for visual testing\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "BrowserType": {
+          "$ref": "#/definitions/BrowserType"
         }
       },
       "required": [
@@ -380,6 +442,27 @@
         "MaxRetries"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "BrowserConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "BrowserType": {
+          "$ref": "#/definitions/BrowserType"
+        }
+      },
+      "required": [
+        "BrowserType"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "BrowserType": {
+      "type": "string",
+      "enum": [
+        "CHROME",
+        "FIREFOX"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CHROME | FIREFOX  \nUpdate requires: No interruption\n"
     }
   },
   "required": [
@@ -508,10 +591,12 @@
     "/properties/ResourcesToReplicateTags",
     "/properties/RunConfig/EnvironmentVariables",
     "/properties/VisualReference",
+    "/properties/VisualReferences",
     "/properties/DryRunAndUpdate"
   ],
   "deprecatedProperties": [
-    "/properties/DeleteLambdaResourcesOnCanaryDeletion"
+    "/properties/DeleteLambdaResourcesOnCanaryDeletion",
+    "/properties/VisualReference"
   ],
   "attributes": {
     "Id": {

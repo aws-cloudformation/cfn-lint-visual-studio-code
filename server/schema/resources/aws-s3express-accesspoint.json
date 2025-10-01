@@ -84,6 +84,29 @@
         }
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^(?!aws:.*)([\\p{L}\\p{Z}\\p{N}_.:=+\\/\\-@%]*)$  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: ^([\\p{L}\\p{Z}\\p{N}_.:=+\\/\\-@%]*)$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -143,6 +166,15 @@
         "arn:aws:s3express:us-west-2:123456789012:accesspoint/my-accesspoint--usw2-az1--xa-s3"
       ],
       "markdownDescription": "The Amazon Resource Name (ARN) of the specified accesspoint.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Tags": {
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "required": [
@@ -168,14 +200,16 @@
         "s3express:PutAccessPointPolicy",
         "s3express:GetAccessPoint",
         "s3express:PutAccessPointScope",
-        "s3express:GetAccessPointScope"
+        "s3express:GetAccessPointScope",
+        "s3express:TagResource"
       ]
     },
     "read": {
       "permissions": [
         "s3express:GetAccessPoint",
         "s3express:GetAccessPointPolicy",
-        "s3express:GetAccessPointScope"
+        "s3express:GetAccessPointScope",
+        "s3express:ListTagsForResource"
       ]
     },
     "update": {
@@ -183,7 +217,13 @@
         "s3express:PutAccessPointPolicy",
         "s3express:DeleteAccessPointPolicy",
         "s3express:PutAccessPointScope",
-        "s3express:DeleteAccessPointScope"
+        "s3express:DeleteAccessPointScope",
+        "s3express:TagResource",
+        "s3express:UntagResource",
+        "s3express:GetAccessPoint",
+        "s3express:GetAccessPointPolicy",
+        "s3express:GetAccessPointScope",
+        "s3express:ListTagsForResource"
       ]
     },
     "delete": {
@@ -200,7 +240,15 @@
     }
   },
   "tagging": {
-    "taggable": false
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "s3express:TagResource",
+      "s3express:UntagResource"
+    ]
   },
   "additionalProperties": false,
   "attributes": {

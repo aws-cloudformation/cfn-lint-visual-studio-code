@@ -19,6 +19,39 @@
       ],
       "markdownDescription": "Modality for filters\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: TEXT | IMAGE  \nUpdate requires: No interruption\n"
     },
+    "AutomatedReasoningPolicyConfig": {
+      "type": "object",
+      "description": "Optional configuration for integrating Automated Reasoning policies with the guardrail.",
+      "properties": {
+        "ConfidenceThreshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "The confidence threshold for triggering guardrail actions based on Automated Reasoning policy violations.",
+          "markdownDescription": "The confidence threshold for triggering guardrail actions based on Automated Reasoning policy violations.\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "Policies": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 15,
+            "description": "The Amazon Resource Name (ARN) of the Automated Reasoning policy",
+            "markdownDescription": "The Amazon Resource Name (ARN) of the Automated Reasoning policy\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 15  \nMaximum Length: 2048  \nPattern: ^arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:automated-reasoning-policy\\/[a-z0-9]{12}(:([1-9][0-9]{0,11}))?$  \nUpdate requires: No interruption\n"
+          },
+          "uniqueItems": true,
+          "minItems": 1,
+          "maxItems": 2,
+          "description": "The list of Automated Reasoning policy ARNs to include in the guardrail configuration",
+          "markdownDescription": "The list of Automated Reasoning policy ARNs to include in the guardrail configuration\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Policies"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Optional configuration for integrating Automated Reasoning policies with the guardrail.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "ContentFilterConfig": {
       "type": "object",
       "description": "Content filter config in content policy.",
@@ -99,6 +132,20 @@
           "minItems": 1,
           "description": "List of content filter configs in content policy.",
           "markdownDescription": "List of content filter configs in content policy.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "ContentFiltersTierConfig": {
+          "type": "object",
+          "properties": {
+            "TierName": {
+              "$ref": "#/definitions/ContentFiltersTierName"
+            }
+          },
+          "required": [
+            "TierName"
+          ],
+          "additionalProperties": false,
+          "description": "Guardrail tier config for content policy",
+          "markdownDescription": "Guardrail tier config for content policy\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
@@ -182,6 +229,24 @@
         "HIGH"
       ],
       "markdownDescription": "Strength for filters\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: NONE | LOW | MEDIUM | HIGH  \nUpdate requires: No interruption\n"
+    },
+    "GuardrailCrossRegionConfig": {
+      "type": "object",
+      "description": "The system-defined guardrail profile that you\u2019re using with your guardrail",
+      "properties": {
+        "GuardrailProfileArn": {
+          "type": "string",
+          "maxLength": 2048,
+          "minLength": 15,
+          "description": "The Amazon Resource Name (ARN) of the guardrail profile",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the guardrail profile\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 15  \nMaximum Length: 2048  \nPattern: ^arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:guardrail-profile/[a-z0-9-]+[.]{1}guardrail[.]{1}v[0-9:]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "GuardrailProfileArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The system-defined guardrail profile that you\u2019re using with your guardrail\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "GuardrailStatus": {
       "type": "string",
@@ -492,6 +557,20 @@
           "minItems": 1,
           "description": "List of topic configs in topic policy.",
           "markdownDescription": "List of topic configs in topic policy.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "TopicsTierConfig": {
+          "type": "object",
+          "properties": {
+            "TierName": {
+              "$ref": "#/definitions/TopicsTierName"
+            }
+          },
+          "required": [
+            "TierName"
+          ],
+          "additionalProperties": false,
+          "description": "Guardrail tier config for topic policy",
+          "markdownDescription": "Guardrail tier config for topic policy\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
@@ -571,6 +650,24 @@
       },
       "additionalProperties": false,
       "markdownDescription": "Word policy config for a guardrail.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ContentFiltersTierName": {
+      "type": "string",
+      "description": "Tier name for tier configuration in content filters policy",
+      "enum": [
+        "CLASSIC",
+        "STANDARD"
+      ],
+      "markdownDescription": "Tier name for tier configuration in content filters policy\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CLASSIC | STANDARD  \nUpdate requires: No interruption\n"
+    },
+    "TopicsTierName": {
+      "type": "string",
+      "description": "Tier name for tier configuration in topic policy",
+      "enum": [
+        "CLASSIC",
+        "STANDARD"
+      ],
+      "markdownDescription": "Tier name for tier configuration in topic policy\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CLASSIC | STANDARD  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -588,6 +685,9 @@
       "description": "Messaging for when violations are detected in text",
       "markdownDescription": "Messaging for when violations are detected in text\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 500  \nUpdate requires: No interruption\n"
     },
+    "AutomatedReasoningPolicyConfig": {
+      "$ref": "#/definitions/AutomatedReasoningPolicyConfig"
+    },
     "ContentPolicyConfig": {
       "$ref": "#/definitions/ContentPolicyConfig"
     },
@@ -599,6 +699,9 @@
       "description": "Time Stamp",
       "format": "date-time",
       "markdownDescription": "Time Stamp\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CrossRegionConfig": {
+      "$ref": "#/definitions/GuardrailCrossRegionConfig"
     },
     "Description": {
       "type": "string",

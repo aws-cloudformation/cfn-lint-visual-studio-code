@@ -68,9 +68,9 @@
       "markdownDescription": "An array of case fields\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     },
     "UserArn": {
-      "description": "The Amazon Resource Name (ARN) of the user.",
+      "description": "The Amazon Resource Name (ARN) of the user or a dynamic recipient string starting with '$.'.",
       "type": "string",
-      "markdownDescription": "The Amazon Resource Name (ARN) of the user.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^$|arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:instance/[-a-zA-Z0-9]*/agent/[-a-zA-Z0-9]*$  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The Amazon Resource Name (ARN) of the user or a dynamic recipient string starting with '$.'.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^$|arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:instance/[-a-zA-Z0-9]*/agent/[-a-zA-Z0-9]*$|^\\$\\..+$  \nUpdate requires: No interruption\n"
     },
     "NotificationRecipientType": {
       "description": "The type of notification recipient.",
@@ -122,8 +122,8 @@
             "DATE",
             "EMAIL"
           ],
-          "description": "The type of the reference. ``DATE`` must be of type Epoch timestamp. \n  *Allowed values*: ``URL`` | ``ATTACHMENT`` | ``NUMBER`` | ``STRING`` | ``DATE`` | ``EMAIL``",
-          "markdownDescription": "The type of the reference. ``DATE`` must be of type Epoch timestamp. \n  *Allowed values*: ``URL`` | ``ATTACHMENT`` | ``NUMBER`` | ``STRING`` | ``DATE`` | ``EMAIL``\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: URL | ATTACHMENT | NUMBER | STRING | DATE | EMAIL  \nUpdate requires: No interruption\n"
+          "description": "The type of the reference. ``DATE`` must be of type Epoch timestamp. \n *Allowed values*: ``URL`` | ``ATTACHMENT`` | ``NUMBER`` | ``STRING`` | ``DATE`` | ``EMAIL``",
+          "markdownDescription": "The type of the reference. ``DATE`` must be of type Epoch timestamp. \n *Allowed values*: ``URL`` | ``ATTACHMENT`` | ``NUMBER`` | ``STRING`` | ``DATE`` | ``EMAIL``\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: URL | ATTACHMENT | NUMBER | STRING | DATE | EMAIL  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
@@ -216,12 +216,12 @@
       "type": "object",
       "properties": {
         "DeliveryMethod": {
-          "description": "Notification delivery method.\n  *Allowed value*: ``EMAIL``",
+          "description": "Notification delivery method.\n *Allowed value*: ``EMAIL``",
           "type": "string",
           "enum": [
             "EMAIL"
           ],
-          "markdownDescription": "Notification delivery method.\n  *Allowed value*: ``EMAIL``\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: EMAIL  \nUpdate requires: No interruption\n"
+          "markdownDescription": "Notification delivery method.\n *Allowed value*: ``EMAIL``\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: EMAIL  \nUpdate requires: No interruption\n"
         },
         "Subject": {
           "description": "The subject of the email if the delivery method is ``EMAIL``. Supports variable injection. For more information, see [JSONPath reference](https://docs.aws.amazon.com/connect/latest/adminguide/contact-lens-variable-injection.html) in the *Administrators Guide*.",
@@ -238,12 +238,12 @@
           "markdownDescription": "Notification content. Supports variable injection. For more information, see [JSONPath reference](https://docs.aws.amazon.com/connect/latest/adminguide/contact-lens-variable-injection.html) in the *Administrators Guide*.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
         },
         "ContentType": {
-          "description": "Content type format.\n  *Allowed value*: ``PLAIN_TEXT``",
+          "description": "Content type format.\n *Allowed value*: ``PLAIN_TEXT``",
           "type": "string",
           "enum": [
             "PLAIN_TEXT"
           ],
-          "markdownDescription": "Content type format.\n  *Allowed value*: ``PLAIN_TEXT``\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: PLAIN_TEXT  \nUpdate requires: No interruption\n"
+          "markdownDescription": "Content type format.\n *Allowed value*: ``PLAIN_TEXT``\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: PLAIN_TEXT  \nUpdate requires: No interruption\n"
         },
         "Recipient": {
           "$ref": "#/definitions/NotificationRecipientType",
@@ -541,13 +541,13 @@
       "markdownDescription": "A list of actions to be run when the rule is triggered.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
     },
     "PublishStatus": {
-      "description": "The publish status of the rule.\n  *Allowed values*: ``DRAFT`` | ``PUBLISHED``",
+      "description": "The publish status of the rule.\n *Allowed values*: ``DRAFT`` | ``PUBLISHED``",
       "type": "string",
       "enum": [
         "DRAFT",
         "PUBLISHED"
       ],
-      "markdownDescription": "The publish status of the rule.\n  *Allowed values*: ``DRAFT`` | ``PUBLISHED``\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: DRAFT | PUBLISHED  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The publish status of the rule.\n *Allowed values*: ``DRAFT`` | ``PUBLISHED``\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: DRAFT | PUBLISHED  \nUpdate requires: No interruption\n"
     },
     "Tags": {
       "description": "The tags used to organize, track, or control access for this resource. For example, { \"tags\": {\"key1\":\"value1\", \"key2\":\"value2\"} }.",
@@ -574,7 +574,11 @@
     "tagOnCreate": false,
     "tagUpdatable": true,
     "cloudFormationSystemTags": true,
-    "tagProperty": "/properties/Tags"
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "connect:TagResource",
+      "connect:UntagResource"
+    ]
   },
   "handlers": {
     "create": {

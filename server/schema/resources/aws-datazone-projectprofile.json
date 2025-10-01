@@ -1,95 +1,122 @@
 {
-  "tagging": {
-    "taggable": false,
-    "tagOnCreate": false,
-    "tagUpdatable": false,
-    "cloudFormationSystemTags": false
-  },
-  "handlers": {
-    "read": {
-      "permissions": [
-        "datazone:GetProjectProfile"
-      ]
-    },
-    "create": {
-      "permissions": [
-        "datazone:CreateProjectProfile",
-        "datazone:GetProjectProfile"
-      ]
-    },
-    "update": {
-      "permissions": [
-        "datazone:UpdateProjectProfile",
-        "datazone:GetProjectProfile"
-      ]
-    },
-    "list": {
-      "permissions": [
-        "datazone:ListProjectProfiles"
-      ]
-    },
-    "delete": {
-      "permissions": [
-        "datazone:DeleteProjectProfile",
-        "datazone:GetProjectProfile"
-      ]
-    }
-  },
   "typeName": "AWS::DataZone::ProjectProfile",
-  "readOnlyProperties": [
-    "/properties/CreatedAt",
-    "/properties/CreatedBy",
-    "/properties/DomainId",
-    "/properties/DomainUnitId",
-    "/properties/Id",
-    "/properties/Identifier",
-    "/properties/LastUpdatedAt"
-  ],
   "description": "Definition of AWS::DataZone::ProjectProfile Resource Type",
-  "writeOnlyProperties": [
-    "/properties/DomainUnitIdentifier"
-  ],
-  "createOnlyProperties": [
-    "/properties/DomainIdentifier"
-  ],
-  "additionalProperties": false,
-  "primaryIdentifier": [
-    "/properties/DomainIdentifier",
-    "/properties/Identifier"
-  ],
   "definitions": {
-    "ProjectScope": {
-      "additionalProperties": false,
+    "AwsAccount": {
       "type": "object",
       "properties": {
-        "Policy": {
+        "AwsAccountId": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "Name": {
-          "minLength": 1,
-          "type": "string",
-          "maxLength": 64,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[\\w -]+$  \nUpdate requires: No interruption\n"
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^\\d{12}$  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "Name"
+        "AwsAccountId"
       ],
+      "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "Status": {
+    "DeploymentMode": {
       "type": "string",
       "enum": [
-        "ENABLED",
-        "DISABLED"
+        "ON_CREATE",
+        "ON_DEMAND"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ON_CREATE | ON_DEMAND  \nUpdate requires: No interruption\n"
     },
-    "EnvironmentConfigurationParametersDetails": {
-      "additionalProperties": false,
+    "DesignationConfiguration": {
       "type": "object",
       "properties": {
+        "DesignationId": {
+          "type": "string",
+          "maxLength": 36,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 36  \nPattern: ^[a-zA-Z0-9_-]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "DesignationId"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EnvironmentConfiguration": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "maxLength": 64,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[\\w -]+$  \nUpdate requires: No interruption\n"
+        },
+        "Id": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9_-]{1,36}$  \nUpdate requires: No interruption\n"
+        },
+        "EnvironmentBlueprintId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z0-9_-]{1,36}$  \nUpdate requires: No interruption\n"
+        },
+        "Description": {
+          "type": "string",
+          "maxLength": 2048,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nUpdate requires: No interruption\n"
+        },
+        "DeploymentMode": {
+          "$ref": "#/definitions/DeploymentMode"
+        },
+        "ConfigurationParameters": {
+          "$ref": "#/definitions/EnvironmentConfigurationParametersDetails"
+        },
+        "AwsAccount": {
+          "$ref": "#/definitions/AwsAccount"
+        },
+        "AwsRegion": {
+          "$ref": "#/definitions/Region"
+        },
+        "DeploymentOrder": {
+          "type": "number",
+          "maximum": 16,
+          "minimum": 0,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "AwsRegion",
+        "EnvironmentBlueprintId",
+        "Name"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EnvironmentConfigurationParameter": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z_][a-zA-Z0-9_]*$  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "IsEditable": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EnvironmentConfigurationParametersDetails": {
+      "type": "object",
+      "properties": {
+        "SsmPath": {
+          "type": "string",
+          "maxLength": 2048,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: No interruption\n"
+        },
         "ParameterOverrides": {
           "type": "array",
           "items": {
@@ -103,151 +130,61 @@
             "$ref": "#/definitions/EnvironmentConfigurationParameter"
           },
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "SsmPath": {
-          "minLength": 1,
-          "type": "string",
-          "maxLength": 2048,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: No interruption\n"
         }
       },
+      "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "EnvironmentConfiguration": {
-      "additionalProperties": false,
+    "ProjectScope": {
       "type": "object",
       "properties": {
-        "Description": {
-          "type": "string",
-          "maxLength": 2048,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nUpdate requires: No interruption\n"
-        },
-        "AwsRegion": {
-          "$ref": "#/definitions/Region"
-        },
-        "AwsAccount": {
-          "$ref": "#/definitions/AwsAccount"
-        },
-        "DeploymentMode": {
-          "$ref": "#/definitions/DeploymentMode"
-        },
-        "Id": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9_-]{1,36}$  \nUpdate requires: No interruption\n"
-        },
-        "EnvironmentBlueprintId": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z0-9_-]{1,36}$  \nUpdate requires: No interruption\n"
-        },
-        "ConfigurationParameters": {
-          "$ref": "#/definitions/EnvironmentConfigurationParametersDetails"
-        },
-        "DeploymentOrder": {
-          "maximum": 16,
-          "type": "number",
-          "minimum": 0,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
-        },
         "Name": {
-          "minLength": 1,
           "type": "string",
           "maxLength": 64,
+          "minLength": 1,
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[\\w -]+$  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "AwsRegion",
-        "EnvironmentBlueprintId",
-        "Name"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "EnvironmentConfigurationParameter": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "IsEditable": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
         },
-        "Value": {
+        "Policy": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "Name": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z_][a-zA-Z0-9_]*$  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "AwsAccount": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "AwsAccountId": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^\\d{12}$  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "AwsAccountId"
+        "Name"
       ],
+      "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "DeploymentMode": {
-      "type": "string",
-      "enum": [
-        "ON_CREATE",
-        "ON_DEMAND"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ON_CREATE | ON_DEMAND  \nUpdate requires: No interruption\n"
-    },
     "Region": {
-      "additionalProperties": false,
       "type": "object",
       "properties": {
         "RegionName": {
-          "minLength": 4,
           "type": "string",
           "maxLength": 16,
+          "minLength": 4,
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 4  \nMaximum Length: 16  \nPattern: ^[a-z]{2}-?(iso|gov)?-{1}[a-z]*-{1}[0-9]$  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
         "RegionName"
       ],
+      "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "DesignationConfiguration": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "DesignationId": {
-          "minLength": 1,
-          "type": "string",
-          "maxLength": 36,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 36  \nPattern: ^[a-zA-Z0-9_-]+$  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "DesignationId"
+    "Status": {
+      "type": "string",
+      "enum": [
+        "ENABLED",
+        "DISABLED"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption\n"
     }
   },
-  "required": [
-    "Name"
-  ],
   "properties": {
-    "Status": {
-      "$ref": "#/definitions/Status"
-    },
-    "DomainUnitId": {
-      "minLength": 1,
+    "CreatedAt": {
       "type": "string",
-      "maxLength": 256,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^[a-z0-9_\\-]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+      "format": "date-time",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "CreatedBy": {
       "type": "string",
@@ -258,77 +195,152 @@
       "maxLength": 2048,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nUpdate requires: No interruption\n"
     },
-    "LastUpdatedAt": {
-      "format": "date-time",
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "CreatedAt": {
-      "format": "date-time",
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "DomainUnitIdentifier": {
-      "minLength": 1,
-      "type": "string",
-      "maxLength": 256,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^[a-z0-9_\\-]+$  \nUpdate requires: No interruption\n"
-    },
-    "Name": {
-      "minLength": 1,
-      "type": "string",
-      "maxLength": 64,
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[\\w -]+$  \nUpdate requires: No interruption\n"
-    },
     "DomainId": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^dzd[_][a-zA-Z0-9_-]{1,36}$  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^dzd[_-][a-zA-Z0-9_-]{1,36}$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
-    "Identifier": {
+    "DomainIdentifier": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9_-]{1,36}$  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^dzd[_-][a-zA-Z0-9_-]{1,36}$  \nUpdate requires: Replacement\n"
+    },
+    "DomainUnitId": {
+      "type": "string",
+      "maxLength": 256,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^[a-z0-9_\\-]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "DomainUnitIdentifier": {
+      "type": "string",
+      "maxLength": 256,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^[a-z0-9_\\-]+$  \nUpdate requires: No interruption\n"
+    },
+    "EnvironmentConfigurations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/EnvironmentConfiguration"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     },
     "Id": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9_-]{1,36}$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
-    "DomainIdentifier": {
+    "Identifier": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^dzd[_][a-zA-Z0-9_-]{1,36}$  \nUpdate requires: Replacement\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9_-]{1,36}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "LastUpdatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Name": {
+      "type": "string",
+      "maxLength": 64,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[\\w -]+$  \nUpdate requires: No interruption\n"
+    },
+    "Status": {
+      "$ref": "#/definitions/Status"
     }
   },
+  "required": [
+    "Name"
+  ],
+  "readOnlyProperties": [
+    "/properties/CreatedAt",
+    "/properties/CreatedBy",
+    "/properties/DomainId",
+    "/properties/DomainUnitId",
+    "/properties/Id",
+    "/properties/Identifier",
+    "/properties/LastUpdatedAt",
+    "/properties/EnvironmentConfigurations/*/Id",
+    "/properties/EnvironmentConfigurations/*/ConfigurationParameters/ResolvedParameters"
+  ],
+  "writeOnlyProperties": [
+    "/properties/DomainUnitIdentifier"
+  ],
+  "createOnlyProperties": [
+    "/properties/DomainIdentifier"
+  ],
+  "primaryIdentifier": [
+    "/properties/DomainIdentifier",
+    "/properties/Identifier"
+  ],
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "datazone:CreateProjectProfile",
+        "datazone:GetProjectProfile",
+        "ssm:GetParameter"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "datazone:GetProjectProfile",
+        "ssm:GetParameter"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "datazone:UpdateProjectProfile",
+        "datazone:GetProjectProfile",
+        "ssm:GetParameter"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "datazone:DeleteProjectProfile",
+        "datazone:GetProjectProfile"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "datazone:ListProjectProfiles"
+      ]
+    }
+  },
+  "additionalProperties": false,
   "attributes": {
-    "DomainUnitId": {
-      "minLength": 1,
+    "CreatedAt": {
       "type": "string",
-      "maxLength": 256,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^[a-z0-9_\\-]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+      "format": "date-time",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "CreatedBy": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
-    "LastUpdatedAt": {
-      "format": "date-time",
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "CreatedAt": {
-      "format": "date-time",
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
     "DomainId": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^dzd[_][a-zA-Z0-9_-]{1,36}$  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^dzd[_-][a-zA-Z0-9_-]{1,36}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "DomainUnitId": {
+      "type": "string",
+      "maxLength": 256,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^[a-z0-9_\\-]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Id": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9_-]{1,36}$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Identifier": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9_-]{1,36}$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
-    "Id": {
+    "LastUpdatedAt": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9_-]{1,36}$  \nUpdate requires: No interruption\nRead only property: Yes"
+      "format": "date-time",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

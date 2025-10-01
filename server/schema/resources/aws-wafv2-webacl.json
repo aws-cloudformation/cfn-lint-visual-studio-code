@@ -1,94 +1,232 @@
 {
-  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-wafv2.git",
-  "tagging": {
-    "permissions": [
-      "wafv2:TagResource",
-      "wafv2:UntagResource",
-      "wafv2:ListTagsForResource"
-    ],
-    "tagOnCreate": true,
-    "taggable": true,
-    "tagUpdatable": true,
-    "tagProperty": "/properties/Tags",
-    "cloudFormationSystemTags": true
-  },
-  "handlers": {
-    "read": {
-      "permissions": [
-        "wafv2:GetWebACL",
-        "wafv2:ListTagsForResource"
-      ]
-    },
-    "create": {
-      "permissions": [
-        "wafv2:CreateWebACL",
-        "wafv2:GetWebACL",
-        "wafv2:ListTagsForResource",
-        "wafv2:TagResource",
-        "wafv2:UntagResource"
-      ]
-    },
-    "update": {
-      "permissions": [
-        "wafv2:UpdateWebACL",
-        "wafv2:GetWebACL",
-        "wafv2:ListTagsForResource",
-        "wafv2:TagResource",
-        "wafv2:UntagResource"
-      ]
-    },
-    "list": {
-      "permissions": [
-        "wafv2:listWebACLs"
-      ],
-      "handlerSchema": {
-        "properties": {
-          "Scope": {
-            "$ref": "resource-schema.json#/properties/Scope"
-          }
-        },
-        "required": [
-          "Scope"
-        ]
-      }
-    },
-    "delete": {
-      "permissions": [
-        "wafv2:DeleteWebACL",
-        "wafv2:GetWebACL"
-      ]
-    }
-  },
   "typeName": "AWS::WAFv2::WebACL",
-  "readOnlyProperties": [
-    "/properties/Arn",
-    "/properties/Capacity",
-    "/properties/Id",
-    "/properties/LabelNamespace"
-  ],
   "description": "Contains the Rules that identify the requests that you want to allow, block, or count. In a WebACL, you also specify a default action (ALLOW or BLOCK), and the action for each Rule that you add to a WebACL, for example, block requests from specified IP addresses or block requests from specified referrers. You also associate the WebACL with a CloudFront distribution to identify the requests that you want AWS WAF to filter. If you add more than one Rule to a WebACL, a request needs to match only one of the specifications to be allowed, blocked, or counted.",
-  "createOnlyProperties": [
-    "/properties/Name",
-    "/properties/Scope"
-  ],
-  "additionalProperties": false,
-  "primaryIdentifier": [
-    "/properties/Name",
-    "/properties/Id",
-    "/properties/Scope"
-  ],
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-wafv2.git",
   "definitions": {
-    "CustomHTTPHeaderName": {
-      "minLength": 1,
-      "description": "HTTP header name.",
-      "type": "string",
-      "maxLength": 64,
-      "markdownDescription": "HTTP header name.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nUpdate requires: No interruption\n"
+    "AndStatement": {
+      "type": "object",
+      "properties": {
+        "Statements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Statement"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Statements"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "SearchString": {
-      "description": "String that is searched to find a match.",
+    "Body": {
+      "description": "The body of a web request. This immediately follows the request headers.",
+      "type": "object",
+      "properties": {
+        "OversizeHandling": {
+          "$ref": "#/definitions/OversizeHandling"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The body of a web request. This immediately follows the request headers.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ByteMatchStatement": {
+      "description": "Byte Match statement.",
+      "type": "object",
+      "properties": {
+        "SearchString": {
+          "$ref": "#/definitions/SearchString"
+        },
+        "SearchStringBase64": {
+          "$ref": "#/definitions/SearchStringBase64"
+        },
+        "FieldToMatch": {
+          "$ref": "#/definitions/FieldToMatch"
+        },
+        "TextTransformations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TextTransformation"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "PositionalConstraint": {
+          "$ref": "#/definitions/PositionalConstraint"
+        }
+      },
+      "required": [
+        "FieldToMatch",
+        "PositionalConstraint",
+        "TextTransformations"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Byte Match statement.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DefaultAction": {
+      "description": "Default Action WebACL will take against ingress traffic when there is no matching Rule.",
+      "type": "object",
+      "properties": {
+        "Allow": {
+          "$ref": "#/definitions/AllowAction"
+        },
+        "Block": {
+          "$ref": "#/definitions/BlockAction"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Default Action WebACL will take against ingress traffic when there is no matching Rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EntityDescription": {
+      "description": "Description of the entity.",
       "type": "string",
-      "markdownDescription": "String that is searched to find a match.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Description of the entity.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9=:#@/\\-,.][a-zA-Z0-9+=:#@/\\-,.\\s]+[a-zA-Z0-9+=:#@/\\-,.]{1,256}$  \nUpdate requires: No interruption\n"
+    },
+    "EntityName": {
+      "description": "Name of the WebACL.",
+      "type": "string",
+      "markdownDescription": "Name of the WebACL.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[0-9A-Za-z_-]{1,128}$  \nUpdate requires: No interruption\n"
+    },
+    "ExcludedRule": {
+      "description": "Excluded Rule in the RuleGroup or ManagedRuleGroup will not be evaluated.",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "$ref": "#/definitions/EntityName"
+        }
+      },
+      "required": [
+        "Name"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Excluded Rule in the RuleGroup or ManagedRuleGroup will not be evaluated.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RuleActionOverride": {
+      "description": "Action override for rules in the rule group.",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "$ref": "#/definitions/EntityName"
+        },
+        "ActionToUse": {
+          "$ref": "#/definitions/RuleAction"
+        }
+      },
+      "required": [
+        "Name",
+        "ActionToUse"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Action override for rules in the rule group.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ExcludedRules": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ExcludedRule"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "FieldToMatch": {
+      "description": "Field of the request to match.",
+      "type": "object",
+      "properties": {
+        "SingleHeader": {
+          "type": "object",
+          "properties": {
+            "Name": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+            }
+          },
+          "required": [
+            "Name"
+          ],
+          "additionalProperties": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "SingleQueryArgument": {
+          "description": "One query argument in a web request, identified by name, for example UserName or SalesRegion. The name can be up to 30 characters long and isn't case sensitive.",
+          "type": "object",
+          "properties": {
+            "Name": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+            }
+          },
+          "required": [
+            "Name"
+          ],
+          "additionalProperties": false,
+          "markdownDescription": "One query argument in a web request, identified by name, for example UserName or SalesRegion. The name can be up to 30 characters long and isn't case sensitive.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "AllQueryArguments": {
+          "description": "All query arguments of a web request.",
+          "type": "object",
+          "markdownDescription": "All query arguments of a web request.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "UriPath": {
+          "description": "The path component of the URI of a web request. This is the part of a web request that identifies a resource, for example, /images/daily-ad.jpg.",
+          "type": "object",
+          "markdownDescription": "The path component of the URI of a web request. This is the part of a web request that identifies a resource, for example, /images/daily-ad.jpg.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "QueryString": {
+          "description": "The query string of a web request. This is the part of a URL that appears after a ? character, if any.",
+          "type": "object",
+          "markdownDescription": "The query string of a web request. This is the part of a URL that appears after a ? character, if any.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "Body": {
+          "$ref": "#/definitions/Body"
+        },
+        "Method": {
+          "description": "The HTTP method of a web request. The method indicates the type of operation that the request is asking the origin to perform.",
+          "type": "object",
+          "markdownDescription": "The HTTP method of a web request. The method indicates the type of operation that the request is asking the origin to perform.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "JsonBody": {
+          "$ref": "#/definitions/JsonBody"
+        },
+        "Headers": {
+          "$ref": "#/definitions/Headers"
+        },
+        "Cookies": {
+          "$ref": "#/definitions/Cookies"
+        },
+        "JA3Fingerprint": {
+          "$ref": "#/definitions/JA3Fingerprint"
+        },
+        "JA4Fingerprint": {
+          "$ref": "#/definitions/JA4Fingerprint"
+        },
+        "UriFragment": {
+          "$ref": "#/definitions/UriFragment"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Field of the request to match.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "JsonBody": {
+      "description": "Inspect the request body as JSON. The request body immediately follows the request headers.",
+      "type": "object",
+      "properties": {
+        "MatchPattern": {
+          "$ref": "#/definitions/JsonMatchPattern"
+        },
+        "MatchScope": {
+          "$ref": "#/definitions/JsonMatchScope"
+        },
+        "InvalidFallbackBehavior": {
+          "$ref": "#/definitions/BodyParsingFallbackBehavior"
+        },
+        "OversizeHandling": {
+          "$ref": "#/definitions/OversizeHandling"
+        }
+      },
+      "required": [
+        "MatchPattern",
+        "MatchScope"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Inspect the request body as JSON. The request body immediately follows the request headers.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "BodyParsingFallbackBehavior": {
       "description": "The inspection behavior to fall back to if the JSON in the request body is invalid.",
@@ -100,235 +238,6 @@
       ],
       "markdownDescription": "The inspection behavior to fall back to if the JSON in the request body is invalid.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MATCH | NO_MATCH | EVALUATE_AS_STRING  \nUpdate requires: No interruption\n"
     },
-    "DataProtect": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Field": {
-          "$ref": "#/definitions/FieldToProtect"
-        },
-        "Action": {
-          "$ref": "#/definitions/DataProtectionAction"
-        },
-        "ExcludeRateBasedDetails": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-        },
-        "ExcludeRuleMatchDetails": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Field",
-        "Action"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "ResponseStatusCode": {
-      "description": "Custom response code.",
-      "maximum": 599,
-      "type": "integer",
-      "minimum": 200,
-      "markdownDescription": "Custom response code.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
-    },
-    "HeaderMatchPattern": {
-      "description": "The pattern to look for in the request headers.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "All": {
-          "description": "Inspect all parts of the web request headers.",
-          "type": "object",
-          "markdownDescription": "Inspect all parts of the web request headers.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-        },
-        "IncludedHeaders": {
-          "minItems": 1,
-          "maxItems": 199,
-          "type": "array",
-          "items": {
-            "minLength": 1,
-            "type": "string",
-            "maxLength": 64,
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "ExcludedHeaders": {
-          "minItems": 1,
-          "maxItems": 199,
-          "type": "array",
-          "items": {
-            "minLength": 1,
-            "type": "string",
-            "maxLength": 64,
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "The pattern to look for in the request headers.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "CustomResponse": {
-      "description": "Custom response.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "ResponseCode": {
-          "$ref": "#/definitions/ResponseStatusCode"
-        },
-        "CustomResponseBodyKey": {
-          "description": "Custom response body key.",
-          "type": "string",
-          "markdownDescription": "Custom response body key.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[\\w\\-]+$  \nUpdate requires: No interruption\n"
-        },
-        "ResponseHeaders": {
-          "minItems": 1,
-          "description": "Collection of HTTP headers.",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/CustomHTTPHeader"
-          },
-          "markdownDescription": "Collection of HTTP headers.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "ResponseCode"
-      ],
-      "markdownDescription": "Custom response.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "JA4Fingerprint": {
-      "description": "Includes the JA4 fingerprint of a web request.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "FallbackBehavior": {
-          "type": "string",
-          "enum": [
-            "MATCH",
-            "NO_MATCH"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: MATCH | NO_MATCH  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "FallbackBehavior"
-      ],
-      "markdownDescription": "Includes the JA4 fingerprint of a web request.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "RegexMatchStatement": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "TextTransformations": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/TextTransformation"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "RegexString": {
-          "minLength": 1,
-          "type": "string",
-          "maxLength": 512,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nUpdate requires: No interruption\n"
-        },
-        "FieldToMatch": {
-          "$ref": "#/definitions/FieldToMatch"
-        }
-      },
-      "required": [
-        "RegexString",
-        "FieldToMatch",
-        "TextTransformations"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "RegexPatternSetReferenceStatement": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "TextTransformations": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/TextTransformation"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "Arn": {
-          "$ref": "#/definitions/ResourceArn"
-        },
-        "FieldToMatch": {
-          "$ref": "#/definitions/FieldToMatch"
-        }
-      },
-      "required": [
-        "Arn",
-        "FieldToMatch",
-        "TextTransformations"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "IPSetReferenceStatement": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "IPSetForwardedIPConfig": {
-          "$ref": "#/definitions/IPSetForwardedIPConfiguration"
-        },
-        "Arn": {
-          "$ref": "#/definitions/ResourceArn"
-        }
-      },
-      "required": [
-        "Arn"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "RequestBodyAssociatedResourceTypeConfig": {
-      "description": "Configures the inspection size in the request body.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "DefaultSizeInspectionLimit": {
-          "$ref": "#/definitions/SizeInspectionLimit"
-        }
-      },
-      "required": [
-        "DefaultSizeInspectionLimit"
-      ],
-      "markdownDescription": "Configures the inspection size in the request body.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "RateLimitJA3Fingerprint": {
-      "description": "Specifies the request's JA3 fingerprint as an aggregate key for a rate-based rule.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "FallbackBehavior": {
-          "type": "string",
-          "enum": [
-            "MATCH",
-            "NO_MATCH"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: MATCH | NO_MATCH  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "FallbackBehavior"
-      ],
-      "markdownDescription": "Specifies the request's JA3 fingerprint as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "AssociationConfig": {
-      "description": "AssociationConfig for body inspection",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "RequestBody": {
-          "$ref": "#/definitions/RequestBody"
-        }
-      },
-      "markdownDescription": "AssociationConfig for body inspection\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
     "JsonMatchScope": {
       "description": "The parts of the JSON to match against using the MatchPattern.",
       "type": "string",
@@ -339,52 +248,384 @@
       ],
       "markdownDescription": "The parts of the JSON to match against using the MatchPattern.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ALL | KEY | VALUE  \nUpdate requires: No interruption\n"
     },
-    "RulePriority": {
-      "description": "Priority of the Rule, Rules get evaluated from lower to higher priority.",
-      "type": "integer",
-      "minimum": 0,
-      "markdownDescription": "Priority of the Rule, Rules get evaluated from lower to higher priority.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
-    },
-    "RuleActionOverride": {
-      "description": "Action override for rules in the rule group.",
-      "additionalProperties": false,
+    "JsonMatchPattern": {
+      "description": "The pattern to look for in the JSON body.",
       "type": "object",
       "properties": {
-        "ActionToUse": {
-          "$ref": "#/definitions/RuleAction"
+        "All": {
+          "description": "Inspect all parts of the web request's JSON body.",
+          "type": "object",
+          "markdownDescription": "Inspect all parts of the web request's JSON body.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
         },
+        "IncludedPaths": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/JsonPointerPath"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The pattern to look for in the JSON body.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "JsonPointerPath": {
+      "description": "JSON pointer path in the web request's JSON body",
+      "type": "string",
+      "markdownDescription": "JSON pointer path in the web request's JSON body\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[\\/]+([^~]*(~[01])*)*{1,512}$  \nUpdate requires: No interruption\n"
+    },
+    "GeoMatchStatement": {
+      "type": "object",
+      "properties": {
+        "CountryCodes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "ForwardedIPConfig": {
+          "$ref": "#/definitions/ForwardedIPConfiguration"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EntityId": {
+      "description": "Id of the WebACL",
+      "type": "string",
+      "markdownDescription": "Id of the WebACL\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$  \nUpdate requires: No interruption\n"
+    },
+    "IPSetReferenceStatement": {
+      "type": "object",
+      "properties": {
+        "Arn": {
+          "$ref": "#/definitions/ResourceArn"
+        },
+        "IPSetForwardedIPConfig": {
+          "$ref": "#/definitions/IPSetForwardedIPConfiguration"
+        }
+      },
+      "required": [
+        "Arn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ManagedRuleGroupStatement": {
+      "type": "object",
+      "properties": {
         "Name": {
           "$ref": "#/definitions/EntityName"
+        },
+        "VendorName": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[\\w#:\\.\\-/]+$  \nUpdate requires: No interruption\n"
+        },
+        "ExcludedRules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ExcludedRule"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "ScopeDownStatement": {
+          "$ref": "#/definitions/Statement"
+        },
+        "ManagedRuleGroupConfigs": {
+          "description": "Collection of ManagedRuleGroupConfig.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ManagedRuleGroupConfig"
+          },
+          "markdownDescription": "Collection of ManagedRuleGroupConfig.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "RuleActionOverrides": {
+          "description": "Action overrides for rules in the rule group.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RuleActionOverride"
+          },
+          "maxItems": 100,
+          "markdownDescription": "Action overrides for rules in the rule group.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "VendorName",
+        "Name"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "NotStatement": {
+      "type": "object",
+      "properties": {
+        "Statement": {
+          "$ref": "#/definitions/Statement"
+        }
+      },
+      "required": [
+        "Statement"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "OrStatement": {
+      "type": "object",
+      "properties": {
+        "Statements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Statement"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Statements"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "OverrideAction": {
+      "description": "Override a RuleGroup or ManagedRuleGroup behavior. This can only be applied to Rule that has RuleGroupReferenceStatement or ManagedRuleGroupReferenceStatement.",
+      "type": "object",
+      "properties": {
+        "Count": {
+          "description": "Count traffic towards application.",
+          "type": "object",
+          "markdownDescription": "Count traffic towards application.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "None": {
+          "description": "Keep the RuleGroup or ManagedRuleGroup behavior as is.",
+          "type": "object",
+          "markdownDescription": "Keep the RuleGroup or ManagedRuleGroup behavior as is.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Override a RuleGroup or ManagedRuleGroup behavior. This can only be applied to Rule that has RuleGroupReferenceStatement or ManagedRuleGroupReferenceStatement.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PositionalConstraint": {
+      "description": "Position of the evaluation in the FieldToMatch of request.",
+      "type": "string",
+      "enum": [
+        "EXACTLY",
+        "STARTS_WITH",
+        "ENDS_WITH",
+        "CONTAINS",
+        "CONTAINS_WORD"
+      ],
+      "markdownDescription": "Position of the evaluation in the FieldToMatch of request.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: EXACTLY | STARTS_WITH | ENDS_WITH | CONTAINS | CONTAINS_WORD  \nUpdate requires: No interruption\n"
+    },
+    "QueryString": {
+      "type": "object",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RateBasedStatement": {
+      "type": "object",
+      "properties": {
+        "Limit": {
+          "$ref": "#/definitions/RateLimit"
+        },
+        "EvaluationWindowSec": {
+          "$ref": "#/definitions/EvaluationWindowSec"
+        },
+        "AggregateKeyType": {
+          "type": "string",
+          "enum": [
+            "CONSTANT",
+            "IP",
+            "FORWARDED_IP",
+            "CUSTOM_KEYS"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: CONSTANT | IP | FORWARDED_IP | CUSTOM_KEYS  \nUpdate requires: No interruption\n"
+        },
+        "CustomKeys": {
+          "description": "Specifies the aggregate keys to use in a rate-base rule.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RateBasedStatementCustomKey"
+          },
+          "maxItems": 5,
+          "markdownDescription": "Specifies the aggregate keys to use in a rate-base rule.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "ScopeDownStatement": {
+          "$ref": "#/definitions/Statement"
+        },
+        "ForwardedIPConfig": {
+          "$ref": "#/definitions/ForwardedIPConfiguration"
+        }
+      },
+      "required": [
+        "Limit",
+        "AggregateKeyType"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RateBasedStatementCustomKey": {
+      "description": "Specifies a single custom aggregate key for a rate-base rule.",
+      "type": "object",
+      "properties": {
+        "Cookie": {
+          "$ref": "#/definitions/RateLimitCookie"
+        },
+        "ForwardedIP": {
+          "$ref": "#/definitions/RateLimitForwardedIP"
+        },
+        "Header": {
+          "$ref": "#/definitions/RateLimitHeader"
+        },
+        "HTTPMethod": {
+          "$ref": "#/definitions/RateLimitHTTPMethod"
+        },
+        "IP": {
+          "$ref": "#/definitions/RateLimitIP"
+        },
+        "LabelNamespace": {
+          "$ref": "#/definitions/RateLimitLabelNamespace"
+        },
+        "QueryArgument": {
+          "$ref": "#/definitions/RateLimitQueryArgument"
+        },
+        "QueryString": {
+          "$ref": "#/definitions/RateLimitQueryString"
+        },
+        "UriPath": {
+          "$ref": "#/definitions/RateLimitUriPath"
+        },
+        "JA3Fingerprint": {
+          "$ref": "#/definitions/RateLimitJA3Fingerprint"
+        },
+        "JA4Fingerprint": {
+          "$ref": "#/definitions/RateLimitJA4Fingerprint"
+        },
+        "ASN": {
+          "$ref": "#/definitions/RateLimitAsn"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Specifies a single custom aggregate key for a rate-base rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RateLimitCookie": {
+      "description": "Specifies a cookie as an aggregate key for a rate-based rule.",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "The name of the cookie to use.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "markdownDescription": "The name of the cookie to use.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
+        },
+        "TextTransformations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TextTransformation"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
         "Name",
-        "ActionToUse"
+        "TextTransformations"
       ],
-      "markdownDescription": "Action override for rules in the rule group.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "ExcludedRule": {
-      "description": "Excluded Rule in the RuleGroup or ManagedRuleGroup will not be evaluated.",
       "additionalProperties": false,
+      "markdownDescription": "Specifies a cookie as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RateLimitForwardedIP": {
+      "description": "Specifies the first IP address in an HTTP header as an aggregate key for a rate-based rule.",
+      "type": "object",
+      "markdownDescription": "Specifies the first IP address in an HTTP header as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RateLimitHeader": {
+      "description": "Specifies a header as an aggregate key for a rate-based rule.",
       "type": "object",
       "properties": {
         "Name": {
-          "$ref": "#/definitions/EntityName"
+          "description": "The name of the header to use.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "markdownDescription": "The name of the header to use.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
+        },
+        "TextTransformations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TextTransformation"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "Name"
+        "Name",
+        "TextTransformations"
       ],
-      "markdownDescription": "Excluded Rule in the RuleGroup or ManagedRuleGroup will not be evaluated.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "additionalProperties": false,
+      "markdownDescription": "Specifies a header as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "EntityDescription": {
-      "description": "Description of the entity.",
-      "type": "string",
-      "markdownDescription": "Description of the entity.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9=:#@/\\-,.][a-zA-Z0-9+=:#@/\\-,.\\s]+[a-zA-Z0-9+=:#@/\\-,.]{1,256}$  \nUpdate requires: No interruption\n"
+    "RateLimitHTTPMethod": {
+      "description": "Specifies the request's HTTP method as an aggregate key for a rate-based rule.",
+      "type": "object",
+      "markdownDescription": "Specifies the request's HTTP method as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RateLimitIP": {
+      "description": "Specifies the IP address in the web request as an aggregate key for a rate-based rule.",
+      "type": "object",
+      "markdownDescription": "Specifies the IP address in the web request as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RateLimitLabelNamespace": {
+      "description": "Specifies a label namespace to use as an aggregate key for a rate-based rule.",
+      "type": "object",
+      "properties": {
+        "Namespace": {
+          "description": "The namespace to use for aggregation.",
+          "type": "string",
+          "markdownDescription": "The namespace to use for aggregation.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[0-9A-Za-z_:-]{1,1024}$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Namespace"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Specifies a label namespace to use as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "RateLimitQueryArgument": {
       "description": "Specifies a query argument in the request as an aggregate key for a rate-based rule.",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "The name of the query argument to use.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "markdownDescription": "The name of the query argument to use.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
+        },
+        "TextTransformations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TextTransformation"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Name",
+        "TextTransformations"
+      ],
       "additionalProperties": false,
+      "markdownDescription": "Specifies a query argument in the request as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RateLimitQueryString": {
+      "description": "Specifies the request's query string as an aggregate key for a rate-based rule.",
       "type": "object",
       "properties": {
         "TextTransformations": {
@@ -393,28 +634,185 @@
             "$ref": "#/definitions/TextTransformation"
           },
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "Name": {
-          "minLength": 1,
-          "description": "The name of the query argument to use.",
-          "type": "string",
-          "maxLength": 64,
-          "markdownDescription": "The name of the query argument to use.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "Name",
         "TextTransformations"
       ],
-      "markdownDescription": "Specifies a query argument in the request as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "additionalProperties": false,
+      "markdownDescription": "Specifies the request's query string as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RateLimitUriPath": {
+      "description": "Specifies the request's URI Path as an aggregate key for a rate-based rule.",
+      "type": "object",
+      "properties": {
+        "TextTransformations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TextTransformation"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "TextTransformations"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Specifies the request's URI Path as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RateLimitJA3Fingerprint": {
+      "description": "Specifies the request's JA3 fingerprint as an aggregate key for a rate-based rule.",
+      "type": "object",
+      "properties": {
+        "FallbackBehavior": {
+          "type": "string",
+          "enum": [
+            "MATCH",
+            "NO_MATCH"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: MATCH | NO_MATCH  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "FallbackBehavior"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Specifies the request's JA3 fingerprint as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RateLimitJA4Fingerprint": {
+      "description": "Specifies the request's JA4 fingerprint as an aggregate key for a rate-based rule.",
+      "type": "object",
+      "properties": {
+        "FallbackBehavior": {
+          "type": "string",
+          "enum": [
+            "MATCH",
+            "NO_MATCH"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: MATCH | NO_MATCH  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "FallbackBehavior"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Specifies the request's JA4 fingerprint as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RateLimitAsn": {
+      "description": "Specifies the request's ASN as an aggregate key for a rate-based rule.",
+      "type": "object",
+      "markdownDescription": "Specifies the request's ASN as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RateLimit": {
+      "type": "integer",
+      "minimum": 10,
+      "maximum": 2000000000,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    },
+    "EvaluationWindowSec": {
+      "type": "integer",
+      "enum": [
+        60,
+        120,
+        300,
+        600
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nAllowed Values: 60 | 120 | 300 | 600  \nUpdate requires: No interruption\n"
+    },
+    "RegexPatternSetReferenceStatement": {
+      "type": "object",
+      "properties": {
+        "Arn": {
+          "$ref": "#/definitions/ResourceArn"
+        },
+        "FieldToMatch": {
+          "$ref": "#/definitions/FieldToMatch"
+        },
+        "TextTransformations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TextTransformation"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Arn",
+        "FieldToMatch",
+        "TextTransformations"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ResourceArn": {
+      "description": "ARN of the WAF entity.",
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 2048,
+      "markdownDescription": "ARN of the WAF entity.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nUpdate requires: No interruption\n"
+    },
+    "ForwardedIPConfiguration": {
+      "type": "object",
+      "properties": {
+        "HeaderName": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z0-9-]+{1,255}$  \nUpdate requires: No interruption\n"
+        },
+        "FallbackBehavior": {
+          "type": "string",
+          "enum": [
+            "MATCH",
+            "NO_MATCH"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: MATCH | NO_MATCH  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "HeaderName",
+        "FallbackBehavior"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "IPSetForwardedIPConfiguration": {
+      "type": "object",
+      "properties": {
+        "HeaderName": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z0-9-]+{1,255}$  \nUpdate requires: No interruption\n"
+        },
+        "FallbackBehavior": {
+          "type": "string",
+          "enum": [
+            "MATCH",
+            "NO_MATCH"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: MATCH | NO_MATCH  \nUpdate requires: No interruption\n"
+        },
+        "Position": {
+          "type": "string",
+          "enum": [
+            "FIRST",
+            "LAST",
+            "ANY"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: FIRST | LAST | ANY  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "HeaderName",
+        "FallbackBehavior",
+        "Position"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Rule": {
       "description": "Rule of WebACL that contains condition and action.",
-      "additionalProperties": false,
       "type": "object",
       "properties": {
-        "Action": {
-          "$ref": "#/definitions/RuleAction"
+        "Name": {
+          "$ref": "#/definitions/EntityName"
         },
         "Priority": {
           "$ref": "#/definitions/RulePriority"
@@ -422,8 +820,8 @@
         "Statement": {
           "$ref": "#/definitions/Statement"
         },
-        "ChallengeConfig": {
-          "$ref": "#/definitions/ChallengeConfig"
+        "Action": {
+          "$ref": "#/definitions/RuleAction"
         },
         "OverrideAction": {
           "$ref": "#/definitions/OverrideAction"
@@ -442,8 +840,8 @@
         "CaptchaConfig": {
           "$ref": "#/definitions/CaptchaConfig"
         },
-        "Name": {
-          "$ref": "#/definitions/EntityName"
+        "ChallengeConfig": {
+          "$ref": "#/definitions/ChallengeConfig"
         }
       },
       "required": [
@@ -452,78 +850,312 @@
         "Statement",
         "VisibilityConfig"
       ],
+      "additionalProperties": false,
       "markdownDescription": "Rule of WebACL that contains condition and action.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "TextTransformationPriority": {
-      "description": "Priority of Rule being evaluated.",
-      "type": "integer",
-      "minimum": 0,
-      "markdownDescription": "Priority of Rule being evaluated.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    "Rules": {
+      "description": "Collection of Rules.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Rule"
+      },
+      "markdownDescription": "Collection of Rules.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     },
-    "RateLimitHeader": {
-      "description": "Specifies a header as an aggregate key for a rate-based rule.",
-      "additionalProperties": false,
+    "RuleAction": {
+      "description": "Action taken when Rule matches its condition.",
       "type": "object",
       "properties": {
-        "TextTransformations": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/TextTransformation"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        "Allow": {
+          "$ref": "#/definitions/AllowAction"
         },
+        "Block": {
+          "$ref": "#/definitions/BlockAction"
+        },
+        "Count": {
+          "$ref": "#/definitions/CountAction"
+        },
+        "Captcha": {
+          "$ref": "#/definitions/CaptchaAction"
+        },
+        "Challenge": {
+          "$ref": "#/definitions/ChallengeAction"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Action taken when Rule matches its condition.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AllowAction": {
+      "description": "Allow traffic towards application.",
+      "type": "object",
+      "properties": {
+        "CustomRequestHandling": {
+          "$ref": "#/definitions/CustomRequestHandling"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Allow traffic towards application.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CountAction": {
+      "description": "Allow traffic towards application.",
+      "type": "object",
+      "properties": {
+        "CustomRequestHandling": {
+          "$ref": "#/definitions/CustomRequestHandling"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Allow traffic towards application.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CaptchaAction": {
+      "description": "Checks valid token exists with request.",
+      "type": "object",
+      "properties": {
+        "CustomRequestHandling": {
+          "$ref": "#/definitions/CustomRequestHandling"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Checks valid token exists with request.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ChallengeAction": {
+      "description": "Checks that the request has a valid token with an unexpired challenge timestamp and, if not, returns a browser challenge to the client.",
+      "type": "object",
+      "properties": {
+        "CustomRequestHandling": {
+          "$ref": "#/definitions/CustomRequestHandling"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Checks that the request has a valid token with an unexpired challenge timestamp and, if not, returns a browser challenge to the client.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "BlockAction": {
+      "description": "Block traffic towards application.",
+      "type": "object",
+      "properties": {
+        "CustomResponse": {
+          "$ref": "#/definitions/CustomResponse"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Block traffic towards application.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CustomHTTPHeaderName": {
+      "description": "HTTP header name.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "markdownDescription": "HTTP header name.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nUpdate requires: No interruption\n"
+    },
+    "CustomHTTPHeaderValue": {
+      "description": "HTTP header value.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "markdownDescription": "HTTP header value.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+    },
+    "CustomHTTPHeader": {
+      "description": "HTTP header.",
+      "type": "object",
+      "properties": {
         "Name": {
-          "minLength": 1,
-          "description": "The name of the header to use.",
-          "type": "string",
-          "maxLength": 64,
-          "markdownDescription": "The name of the header to use.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
+          "$ref": "#/definitions/CustomHTTPHeaderName"
+        },
+        "Value": {
+          "$ref": "#/definitions/CustomHTTPHeaderValue"
         }
       },
       "required": [
         "Name",
-        "TextTransformations"
+        "Value"
       ],
-      "markdownDescription": "Specifies a header as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "IPSetForwardedIPConfiguration": {
       "additionalProperties": false,
+      "markdownDescription": "HTTP header.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CustomRequestHandling": {
+      "description": "Custom request handling.",
       "type": "object",
       "properties": {
-        "FallbackBehavior": {
-          "type": "string",
-          "enum": [
-            "MATCH",
-            "NO_MATCH"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: MATCH | NO_MATCH  \nUpdate requires: No interruption\n"
-        },
-        "HeaderName": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z0-9-]+{1,255}$  \nUpdate requires: No interruption\n"
-        },
-        "Position": {
-          "type": "string",
-          "enum": [
-            "FIRST",
-            "LAST",
-            "ANY"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: FIRST | LAST | ANY  \nUpdate requires: No interruption\n"
+        "InsertHeaders": {
+          "description": "Collection of HTTP headers.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CustomHTTPHeader"
+          },
+          "minItems": 1,
+          "markdownDescription": "Collection of HTTP headers.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "HeaderName",
-        "FallbackBehavior",
-        "Position"
+        "InsertHeaders"
       ],
+      "additionalProperties": false,
+      "markdownDescription": "Custom request handling.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ResponseStatusCode": {
+      "description": "Custom response code.",
+      "type": "integer",
+      "minimum": 200,
+      "maximum": 599,
+      "markdownDescription": "Custom response code.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    },
+    "ResponseContentType": {
+      "description": "Valid values are TEXT_PLAIN, TEXT_HTML, and APPLICATION_JSON.",
+      "type": "string",
+      "enum": [
+        "TEXT_PLAIN",
+        "TEXT_HTML",
+        "APPLICATION_JSON"
+      ],
+      "markdownDescription": "Valid values are TEXT_PLAIN, TEXT_HTML, and APPLICATION_JSON.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: TEXT_PLAIN | TEXT_HTML | APPLICATION_JSON  \nUpdate requires: No interruption\n"
+    },
+    "ResponseContent": {
+      "description": "Response content.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 10240,
+      "markdownDescription": "Response content.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 10240  \nUpdate requires: No interruption\n"
+    },
+    "CustomResponseBody": {
+      "description": "Custom response body.",
+      "type": "object",
+      "properties": {
+        "ContentType": {
+          "$ref": "#/definitions/ResponseContentType"
+        },
+        "Content": {
+          "$ref": "#/definitions/ResponseContent"
+        }
+      },
+      "required": [
+        "ContentType",
+        "Content"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Custom response body.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CustomResponse": {
+      "description": "Custom response.",
+      "type": "object",
+      "properties": {
+        "ResponseCode": {
+          "$ref": "#/definitions/ResponseStatusCode"
+        },
+        "CustomResponseBodyKey": {
+          "description": "Custom response body key.",
+          "type": "string",
+          "markdownDescription": "Custom response body key.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[\\w\\-]+$  \nUpdate requires: No interruption\n"
+        },
+        "ResponseHeaders": {
+          "description": "Collection of HTTP headers.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CustomHTTPHeader"
+          },
+          "minItems": 1,
+          "markdownDescription": "Collection of HTTP headers.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ResponseCode"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Custom response.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CustomResponseBodies": {
+      "description": "Custom response key and body map.",
+      "type": "object",
+      "patternProperties": {
+        "^[\\w\\-]+$": {
+          "$ref": "#/definitions/CustomResponseBody"
+        }
+      },
+      "minProperties": 1,
+      "additionalProperties": false,
+      "markdownDescription": "Custom response key and body map.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RuleGroupReferenceStatement": {
+      "type": "object",
+      "properties": {
+        "Arn": {
+          "$ref": "#/definitions/ResourceArn"
+        },
+        "ExcludedRules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ExcludedRule"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "RuleActionOverrides": {
+          "description": "Action overrides for rules in the rule group.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RuleActionOverride"
+          },
+          "maxItems": 100,
+          "markdownDescription": "Action overrides for rules in the rule group.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Arn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RulePriority": {
+      "description": "Priority of the Rule, Rules get evaluated from lower to higher priority.",
+      "type": "integer",
+      "minimum": 0,
+      "markdownDescription": "Priority of the Rule, Rules get evaluated from lower to higher priority.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    },
+    "Scope": {
+      "description": "Use CLOUDFRONT for CloudFront WebACL, use REGIONAL for Application Load Balancer and API Gateway.",
+      "type": "string",
+      "enum": [
+        "CLOUDFRONT",
+        "REGIONAL"
+      ],
+      "markdownDescription": "Use CLOUDFRONT for CloudFront WebACL, use REGIONAL for Application Load Balancer and API Gateway.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CLOUDFRONT | REGIONAL  \nUpdate requires: No interruption\n"
+    },
+    "SearchString": {
+      "description": "String that is searched to find a match.",
+      "type": "string",
+      "markdownDescription": "String that is searched to find a match.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "SearchStringBase64": {
+      "description": "Base64 encoded string that is searched to find a match.",
+      "type": "string",
+      "markdownDescription": "Base64 encoded string that is searched to find a match.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "SingleHeader": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SingleQueryArgument": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "SizeConstraintStatement": {
       "description": "Size Constraint statement.",
-      "additionalProperties": false,
       "type": "object",
       "properties": {
+        "FieldToMatch": {
+          "$ref": "#/definitions/FieldToMatch"
+        },
         "ComparisonOperator": {
           "type": "string",
           "enum": [
@@ -536,21 +1168,18 @@
           ],
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: EQ | NE | LE | LT | GE | GT  \nUpdate requires: No interruption\n"
         },
+        "Size": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 21474836480,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption\n"
+        },
         "TextTransformations": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/TextTransformation"
           },
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "Size": {
-          "maximum": 21474836480,
-          "type": "number",
-          "minimum": 0,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption\n"
-        },
-        "FieldToMatch": {
-          "$ref": "#/definitions/FieldToMatch"
         }
       },
       "required": [
@@ -559,148 +1188,132 @@
         "Size",
         "TextTransformations"
       ],
+      "additionalProperties": false,
       "markdownDescription": "Size Constraint statement.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "AndStatement": {
-      "additionalProperties": false,
+    "SqliMatchStatement": {
+      "description": "Sqli Match Statement.",
       "type": "object",
       "properties": {
-        "Statements": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Statement"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Statements"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "ResponseContent": {
-      "minLength": 1,
-      "description": "Response content.",
-      "type": "string",
-      "maxLength": 10240,
-      "markdownDescription": "Response content.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 10240  \nUpdate requires: No interruption\n"
-    },
-    "JA3Fingerprint": {
-      "description": "Includes the JA3 fingerprint of a web request.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "FallbackBehavior": {
-          "type": "string",
-          "enum": [
-            "MATCH",
-            "NO_MATCH"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: MATCH | NO_MATCH  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "FallbackBehavior"
-      ],
-      "markdownDescription": "Includes the JA3 fingerprint of a web request.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "EntityName": {
-      "description": "Name of the WebACL.",
-      "type": "string",
-      "markdownDescription": "Name of the WebACL.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[0-9A-Za-z_-]{1,128}$  \nUpdate requires: No interruption\n"
-    },
-    "NotStatement": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Statement": {
-          "$ref": "#/definitions/Statement"
-        }
-      },
-      "required": [
-        "Statement"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "ResponseInspectionStatusCode": {
-      "description": "Response status codes that indicate success or failure of a login request",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "SuccessCodes": {
-          "minItems": 1,
-          "maxItems": 10,
-          "type": "array",
-          "items": {
-            "minLength": 0,
-            "type": "integer",
-            "maxLength": 999,
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nMaximum Length: 999  \nUpdate requires: No interruption\n"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        "FieldToMatch": {
+          "$ref": "#/definitions/FieldToMatch"
         },
-        "FailureCodes": {
-          "minItems": 1,
-          "maxItems": 10,
-          "type": "array",
-          "items": {
-            "minLength": 0,
-            "type": "integer",
-            "maxLength": 999,
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nMaximum Length: 999  \nUpdate requires: No interruption\n"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "SuccessCodes",
-        "FailureCodes"
-      ],
-      "markdownDescription": "Response status codes that indicate success or failure of a login request\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "PhoneNumberField": {
-      "$ref": "#/definitions/FieldIdentifier"
-    },
-    "RuleAction": {
-      "description": "Action taken when Rule matches its condition.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Captcha": {
-          "$ref": "#/definitions/CaptchaAction"
-        },
-        "Block": {
-          "$ref": "#/definitions/BlockAction"
-        },
-        "Count": {
-          "$ref": "#/definitions/CountAction"
-        },
-        "Allow": {
-          "$ref": "#/definitions/AllowAction"
-        },
-        "Challenge": {
-          "$ref": "#/definitions/ChallengeAction"
-        }
-      },
-      "markdownDescription": "Action taken when Rule matches its condition.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "RateLimitUriPath": {
-      "description": "Specifies the request's URI Path as an aggregate key for a rate-based rule.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
         "TextTransformations": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/TextTransformation"
           },
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "SensitivityLevel": {
+          "$ref": "#/definitions/SensitivityLevel"
         }
       },
       "required": [
+        "FieldToMatch",
         "TextTransformations"
       ],
-      "markdownDescription": "Specifies the request's URI Path as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "additionalProperties": false,
+      "markdownDescription": "Sqli Match Statement.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Statement": {
+      "description": "First level statement that contains conditions, such as ByteMatch, SizeConstraint, etc",
+      "type": "object",
+      "properties": {
+        "ByteMatchStatement": {
+          "$ref": "#/definitions/ByteMatchStatement"
+        },
+        "SqliMatchStatement": {
+          "$ref": "#/definitions/SqliMatchStatement"
+        },
+        "XssMatchStatement": {
+          "$ref": "#/definitions/XssMatchStatement"
+        },
+        "SizeConstraintStatement": {
+          "$ref": "#/definitions/SizeConstraintStatement"
+        },
+        "GeoMatchStatement": {
+          "$ref": "#/definitions/GeoMatchStatement"
+        },
+        "RuleGroupReferenceStatement": {
+          "$ref": "#/definitions/RuleGroupReferenceStatement"
+        },
+        "IPSetReferenceStatement": {
+          "$ref": "#/definitions/IPSetReferenceStatement"
+        },
+        "RegexPatternSetReferenceStatement": {
+          "$ref": "#/definitions/RegexPatternSetReferenceStatement"
+        },
+        "ManagedRuleGroupStatement": {
+          "$ref": "#/definitions/ManagedRuleGroupStatement"
+        },
+        "RateBasedStatement": {
+          "$ref": "#/definitions/RateBasedStatement"
+        },
+        "AndStatement": {
+          "$ref": "#/definitions/AndStatement"
+        },
+        "OrStatement": {
+          "$ref": "#/definitions/OrStatement"
+        },
+        "NotStatement": {
+          "$ref": "#/definitions/NotStatement"
+        },
+        "LabelMatchStatement": {
+          "$ref": "#/definitions/LabelMatchStatement"
+        },
+        "RegexMatchStatement": {
+          "$ref": "#/definitions/RegexMatchStatement"
+        },
+        "AsnMatchStatement": {
+          "$ref": "#/definitions/AsnMatchStatement"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "First level statement that contains conditions, such as ByteMatch, SizeConstraint, etc\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "TextTransformation": {
+      "description": "Text Transformation on the Search String before match.",
+      "type": "object",
+      "properties": {
+        "Priority": {
+          "$ref": "#/definitions/TextTransformationPriority"
+        },
+        "Type": {
+          "$ref": "#/definitions/TextTransformationType"
+        }
+      },
+      "required": [
+        "Priority",
+        "Type"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Text Transformation on the Search String before match.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "TextTransformationPriority": {
+      "description": "Priority of Rule being evaluated.",
+      "type": "integer",
+      "minimum": 0,
+      "markdownDescription": "Priority of Rule being evaluated.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
     },
     "TextTransformationType": {
       "description": "Type of text transformation.",
@@ -730,32 +1343,182 @@
       ],
       "markdownDescription": "Type of text transformation.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: NONE | COMPRESS_WHITE_SPACE | HTML_ENTITY_DECODE | LOWERCASE | CMD_LINE | URL_DECODE | BASE64_DECODE | HEX_DECODE | MD5 | REPLACE_COMMENTS | ESCAPE_SEQ_DECODE | SQL_HEX_DECODE | CSS_DECODE | JS_DECODE | NORMALIZE_PATH | NORMALIZE_PATH_WIN | REMOVE_NULLS | REPLACE_NULLS | BASE64_DECODE_EXT | URL_DECODE_UNI | UTF8_TO_UNICODE  \nUpdate requires: No interruption\n"
     },
+    "UriPath": {
+      "type": "object",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "VisibilityConfig": {
+      "description": "Visibility Metric of the WebACL.",
+      "type": "object",
+      "properties": {
+        "SampledRequestsEnabled": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "CloudWatchMetricsEnabled": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "MetricName": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "SampledRequestsEnabled",
+        "CloudWatchMetricsEnabled",
+        "MetricName"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Visibility Metric of the WebACL.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DataProtectionConfig": {
+      "type": "object",
+      "properties": {
+        "DataProtections": {
+          "$ref": "#/definitions/DataProtections"
+        }
+      },
+      "required": [
+        "DataProtections"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DataProtections": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/DataProtect"
+      },
+      "minItems": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "DataProtect": {
+      "type": "object",
+      "properties": {
+        "Field": {
+          "$ref": "#/definitions/FieldToProtect"
+        },
+        "Action": {
+          "$ref": "#/definitions/DataProtectionAction"
+        },
+        "ExcludeRuleMatchDetails": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "ExcludeRateBasedDetails": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Field",
+        "Action"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DataProtectionAction": {
+      "type": "string",
+      "enum": [
+        "SUBSTITUTION",
+        "HASH"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SUBSTITUTION | HASH  \nUpdate requires: No interruption\n"
+    },
+    "FieldToProtect": {
+      "description": "Field in log to protect.",
+      "type": "object",
+      "properties": {
+        "FieldType": {
+          "description": "Field type to protect",
+          "type": "string",
+          "enum": [
+            "SINGLE_HEADER",
+            "SINGLE_COOKIE",
+            "SINGLE_QUERY_ARGUMENT",
+            "QUERY_STRING",
+            "BODY"
+          ],
+          "markdownDescription": "Field type to protect\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: SINGLE_HEADER | SINGLE_COOKIE | SINGLE_QUERY_ARGUMENT | QUERY_STRING | BODY  \nUpdate requires: No interruption\n"
+        },
+        "FieldKeys": {
+          "description": "List of field keys to protect",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FieldToProtectKeyName"
+          },
+          "markdownDescription": "List of field keys to protect\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "FieldType"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Field in log to protect.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "FieldToProtectKeyName": {
+      "description": "Key of the field to protect.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "markdownDescription": "Key of the field to protect.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nUpdate requires: No interruption\n"
+    },
+    "XssMatchStatement": {
+      "description": "Xss Match Statement.",
+      "type": "object",
+      "properties": {
+        "FieldToMatch": {
+          "$ref": "#/definitions/FieldToMatch"
+        },
+        "TextTransformations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TextTransformation"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "FieldToMatch",
+        "TextTransformations"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Xss Match Statement.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "LabelName": {
       "description": "Name of the Label.",
       "type": "string",
       "markdownDescription": "Name of the Label.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[0-9A-Za-z_:-]{1,1024}$  \nUpdate requires: No interruption\n"
     },
-    "PositionalConstraint": {
-      "description": "Position of the evaluation in the FieldToMatch of request.",
+    "Label": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "$ref": "#/definitions/LabelName"
+        }
+      },
+      "required": [
+        "Name"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LabelMatchKey": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[0-9A-Za-z_:-]{1,1024}$  \nUpdate requires: No interruption\n"
+    },
+    "LabelMatchScope": {
       "type": "string",
       "enum": [
-        "EXACTLY",
-        "STARTS_WITH",
-        "ENDS_WITH",
-        "CONTAINS",
-        "CONTAINS_WORD"
+        "LABEL",
+        "NAMESPACE"
       ],
-      "markdownDescription": "Position of the evaluation in the FieldToMatch of request.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: EXACTLY | STARTS_WITH | ENDS_WITH | CONTAINS | CONTAINS_WORD  \nUpdate requires: No interruption\n"
-    },
-    "CustomHTTPHeaderValue": {
-      "minLength": 1,
-      "description": "HTTP header value.",
-      "type": "string",
-      "maxLength": 255,
-      "markdownDescription": "HTTP header value.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: LABEL | NAMESPACE  \nUpdate requires: No interruption\n"
     },
     "LabelMatchStatement": {
-      "additionalProperties": false,
       "type": "object",
       "properties": {
         "Scope": {
@@ -769,574 +1532,102 @@
         "Scope",
         "Key"
       ],
+      "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "ResponseInspectionBodyContains": {
-      "description": "Response body contents that indicate success or failure of a login request",
-      "additionalProperties": false,
+    "RegexMatchStatement": {
       "type": "object",
       "properties": {
-        "SuccessStrings": {
-          "minItems": 1,
-          "maxItems": 5,
-          "type": "array",
-          "items": {
-            "minLength": 1,
-            "type": "string",
-            "maxLength": 100,
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        "RegexString": {
+          "type": "string",
+          "maxLength": 512,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nUpdate requires: No interruption\n"
         },
-        "FailureStrings": {
-          "minItems": 1,
-          "maxItems": 5,
+        "FieldToMatch": {
+          "$ref": "#/definitions/FieldToMatch"
+        },
+        "TextTransformations": {
           "type": "array",
           "items": {
-            "minLength": 1,
-            "type": "string",
-            "maxLength": 100,
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
+            "$ref": "#/definitions/TextTransformation"
           },
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "SuccessStrings",
-        "FailureStrings"
+        "RegexString",
+        "FieldToMatch",
+        "TextTransformations"
       ],
-      "markdownDescription": "Response body contents that indicate success or failure of a login request\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "ExcludedRules": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/ExcludedRule"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-    },
-    "FieldToMatch": {
-      "description": "Field of the request to match.",
       "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AsnMatchStatement": {
       "type": "object",
       "properties": {
-        "AllQueryArguments": {
-          "description": "All query arguments of a web request.",
-          "type": "object",
-          "markdownDescription": "All query arguments of a web request.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-        },
-        "JA3Fingerprint": {
-          "$ref": "#/definitions/JA3Fingerprint"
-        },
-        "SingleQueryArgument": {
-          "description": "One query argument in a web request, identified by name, for example UserName or SalesRegion. The name can be up to 30 characters long and isn't case sensitive.",
-          "additionalProperties": false,
-          "type": "object",
-          "properties": {
-            "Name": {
-              "type": "string",
-              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-            }
+        "AsnList": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
           },
-          "required": [
-            "Name"
-          ],
-          "markdownDescription": "One query argument in a web request, identified by name, for example UserName or SalesRegion. The name can be up to 30 characters long and isn't case sensitive.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         },
-        "QueryString": {
-          "description": "The query string of a web request. This is the part of a URL that appears after a ? character, if any.",
-          "type": "object",
-          "markdownDescription": "The query string of a web request. This is the part of a URL that appears after a ? character, if any.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-        },
-        "Headers": {
-          "$ref": "#/definitions/Headers"
-        },
-        "Method": {
-          "description": "The HTTP method of a web request. The method indicates the type of operation that the request is asking the origin to perform.",
-          "type": "object",
-          "markdownDescription": "The HTTP method of a web request. The method indicates the type of operation that the request is asking the origin to perform.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-        },
-        "UriFragment": {
-          "$ref": "#/definitions/UriFragment"
-        },
-        "JsonBody": {
-          "$ref": "#/definitions/JsonBody"
-        },
-        "UriPath": {
-          "description": "The path component of the URI of a web request. This is the part of a web request that identifies a resource, for example, /images/daily-ad.jpg.",
-          "type": "object",
-          "markdownDescription": "The path component of the URI of a web request. This is the part of a web request that identifies a resource, for example, /images/daily-ad.jpg.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-        },
-        "Cookies": {
-          "$ref": "#/definitions/Cookies"
-        },
-        "JA4Fingerprint": {
-          "$ref": "#/definitions/JA4Fingerprint"
-        },
-        "Body": {
-          "$ref": "#/definitions/Body"
-        },
-        "SingleHeader": {
-          "additionalProperties": false,
-          "type": "object",
-          "properties": {
-            "Name": {
-              "type": "string",
-              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-            }
-          },
-          "required": [
-            "Name"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        "ForwardedIPConfig": {
+          "$ref": "#/definitions/ForwardedIPConfiguration"
         }
       },
-      "markdownDescription": "Field of the request to match.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "RequestBody": {
-      "patternProperties": {
-        "^(CLOUDFRONT|API_GATEWAY|COGNITO_USER_POOL|APP_RUNNER_SERVICE|VERIFIED_ACCESS_INSTANCE)$": {
-          "$ref": "#/definitions/RequestBodyAssociatedResourceTypeConfig"
-        }
-      },
-      "description": "Map of AssociatedResourceType and RequestBodyAssociatedResourceTypeConfig",
       "additionalProperties": false,
-      "type": "object",
-      "markdownDescription": "Map of AssociatedResourceType and RequestBodyAssociatedResourceTypeConfig\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "Statement": {
-      "description": "First level statement that contains conditions, such as ByteMatch, SizeConstraint, etc",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "SizeConstraintStatement": {
-          "$ref": "#/definitions/SizeConstraintStatement"
-        },
-        "AndStatement": {
-          "$ref": "#/definitions/AndStatement"
-        },
-        "XssMatchStatement": {
-          "$ref": "#/definitions/XssMatchStatement"
-        },
-        "NotStatement": {
-          "$ref": "#/definitions/NotStatement"
-        },
-        "ByteMatchStatement": {
-          "$ref": "#/definitions/ByteMatchStatement"
-        },
-        "RateBasedStatement": {
-          "$ref": "#/definitions/RateBasedStatement"
-        },
-        "GeoMatchStatement": {
-          "$ref": "#/definitions/GeoMatchStatement"
-        },
-        "RuleGroupReferenceStatement": {
-          "$ref": "#/definitions/RuleGroupReferenceStatement"
-        },
-        "LabelMatchStatement": {
-          "$ref": "#/definitions/LabelMatchStatement"
-        },
-        "RegexMatchStatement": {
-          "$ref": "#/definitions/RegexMatchStatement"
-        },
-        "SqliMatchStatement": {
-          "$ref": "#/definitions/SqliMatchStatement"
-        },
-        "RegexPatternSetReferenceStatement": {
-          "$ref": "#/definitions/RegexPatternSetReferenceStatement"
-        },
-        "OrStatement": {
-          "$ref": "#/definitions/OrStatement"
-        },
-        "ManagedRuleGroupStatement": {
-          "$ref": "#/definitions/ManagedRuleGroupStatement"
-        },
-        "IPSetReferenceStatement": {
-          "$ref": "#/definitions/IPSetReferenceStatement"
-        }
-      },
-      "markdownDescription": "First level statement that contains conditions, such as ByteMatch, SizeConstraint, etc\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "ChallengeConfig": {
-      "additionalProperties": false,
+    "CaptchaConfig": {
       "type": "object",
       "properties": {
         "ImmunityTimeProperty": {
           "$ref": "#/definitions/ImmunityTimeProperty"
         }
       },
+      "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "RateBasedStatement": {
-      "additionalProperties": false,
+    "ChallengeConfig": {
       "type": "object",
       "properties": {
-        "AggregateKeyType": {
-          "type": "string",
-          "enum": [
-            "CONSTANT",
-            "IP",
-            "FORWARDED_IP",
-            "CUSTOM_KEYS"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: CONSTANT | IP | FORWARDED_IP | CUSTOM_KEYS  \nUpdate requires: No interruption\n"
-        },
-        "CustomKeys": {
-          "maxItems": 5,
-          "description": "Specifies the aggregate keys to use in a rate-base rule.",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/RateBasedStatementCustomKey"
-          },
-          "markdownDescription": "Specifies the aggregate keys to use in a rate-base rule.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "ForwardedIPConfig": {
-          "$ref": "#/definitions/ForwardedIPConfiguration"
-        },
-        "Limit": {
-          "$ref": "#/definitions/RateLimit"
-        },
-        "EvaluationWindowSec": {
-          "$ref": "#/definitions/EvaluationWindowSec"
-        },
-        "ScopeDownStatement": {
-          "$ref": "#/definitions/Statement"
+        "ImmunityTimeProperty": {
+          "$ref": "#/definitions/ImmunityTimeProperty"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ImmunityTimeProperty": {
+      "type": "object",
+      "properties": {
+        "ImmunityTime": {
+          "type": "integer",
+          "minimum": 60,
+          "maximum": 259200,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "Limit",
-        "AggregateKeyType"
+        "ImmunityTime"
       ],
+      "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "LabelMatchKey": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[0-9A-Za-z_:-]{1,1024}$  \nUpdate requires: No interruption\n"
-    },
-    "FieldIdentifier": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Identifier": {
-          "minLength": 1,
-          "type": "string",
-          "maxLength": 512,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Identifier"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "Rules": {
-      "description": "Collection of Rules.",
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/Rule"
-      },
-      "markdownDescription": "Collection of Rules.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-    },
-    "OversizeHandling": {
-      "description": "Handling of requests containing oversize fields",
-      "type": "string",
-      "enum": [
-        "CONTINUE",
-        "MATCH",
-        "NO_MATCH"
-      ],
-      "markdownDescription": "Handling of requests containing oversize fields\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CONTINUE | MATCH | NO_MATCH  \nUpdate requires: No interruption\n"
-    },
-    "SearchStringBase64": {
-      "description": "Base64 encoded string that is searched to find a match.",
-      "type": "string",
-      "markdownDescription": "Base64 encoded string that is searched to find a match.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-    },
-    "UriPath": {
-      "type": "object",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "CustomResponseBodies": {
-      "patternProperties": {
-        "^[\\w\\-]+$": {
-          "$ref": "#/definitions/CustomResponseBody"
-        }
-      },
-      "description": "Custom response key and body map.",
-      "additionalProperties": false,
-      "type": "object",
-      "minProperties": 1,
-      "markdownDescription": "Custom response key and body map.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "Tag": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Value": {
-          "minLength": 0,
-          "type": "string",
-          "maxLength": 256,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
-        },
-        "Key": {
-          "minLength": 1,
-          "type": "string",
-          "maxLength": 128,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "CookieMatchPattern": {
-      "description": "The pattern to look for in the request cookies.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "All": {
-          "description": "Inspect all parts of the web request cookies.",
-          "type": "object",
-          "markdownDescription": "Inspect all parts of the web request cookies.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-        },
-        "IncludedCookies": {
-          "minItems": 1,
-          "maxItems": 199,
-          "type": "array",
-          "items": {
-            "minLength": 1,
-            "type": "string",
-            "maxLength": 60,
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 60  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "ExcludedCookies": {
-          "minItems": 1,
-          "maxItems": 199,
-          "type": "array",
-          "items": {
-            "minLength": 1,
-            "type": "string",
-            "maxLength": 60,
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 60  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "The pattern to look for in the request cookies.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "ResponseInspectionHeader": {
-      "description": "Response headers that indicate success or failure of a login request",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "SuccessValues": {
-          "minItems": 1,
-          "maxItems": 3,
-          "type": "array",
-          "items": {
-            "minLength": 1,
-            "type": "string",
-            "maxLength": 100,
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "FailureValues": {
-          "minItems": 1,
-          "maxItems": 3,
-          "type": "array",
-          "items": {
-            "minLength": 1,
-            "type": "string",
-            "maxLength": 100,
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "Name": {
-          "minLength": 1,
-          "type": "string",
-          "maxLength": 200,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 200  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Name",
-        "SuccessValues",
-        "FailureValues"
-      ],
-      "markdownDescription": "Response headers that indicate success or failure of a login request\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "CaptchaAction": {
-      "description": "Checks valid token exists with request.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "CustomRequestHandling": {
-          "$ref": "#/definitions/CustomRequestHandling"
-        }
-      },
-      "markdownDescription": "Checks valid token exists with request.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "BlockAction": {
-      "description": "Block traffic towards application.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "CustomResponse": {
-          "$ref": "#/definitions/CustomResponse"
-        }
-      },
-      "markdownDescription": "Block traffic towards application.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "DataProtectionAction": {
-      "type": "string",
-      "enum": [
-        "SUBSTITUTION",
-        "HASH"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SUBSTITUTION | HASH  \nUpdate requires: No interruption\n"
-    },
-    "Label": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Name": {
-          "$ref": "#/definitions/LabelName"
-        }
-      },
-      "required": [
-        "Name"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "DataProtectionConfig": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "DataProtections": {
-          "$ref": "#/definitions/DataProtections"
-        }
-      },
-      "required": [
-        "DataProtections"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "UriFragment": {
-      "description": "The path component of the URI Fragment. This is the part of a web request that identifies a fragment uri, for example, /abcd#introduction",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "FallbackBehavior": {
-          "type": "string",
-          "enum": [
-            "MATCH",
-            "NO_MATCH"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MATCH | NO_MATCH  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "The path component of the URI Fragment. This is the part of a web request that identifies a fragment uri, for example, /abcd#introduction\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "ResponseInspectionJson": {
-      "description": "Response JSON that indicate success or failure of a login request",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Identifier": {
-          "minLength": 1,
-          "type": "string",
-          "maxLength": 512,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
-        },
-        "SuccessValues": {
-          "minItems": 1,
-          "maxItems": 5,
-          "type": "array",
-          "items": {
-            "minLength": 1,
-            "type": "string",
-            "maxLength": 100,
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "FailureValues": {
-          "minItems": 1,
-          "maxItems": 5,
-          "type": "array",
-          "items": {
-            "minLength": 1,
-            "type": "string",
-            "maxLength": 100,
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Identifier",
-        "SuccessValues",
-        "FailureValues"
-      ],
-      "markdownDescription": "Response JSON that indicate success or failure of a login request\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "FieldToProtect": {
-      "description": "Field in log to protect.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "FieldKeys": {
-          "description": "List of field keys to protect",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/FieldToProtectKeyName"
-          },
-          "markdownDescription": "List of field keys to protect\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "FieldType": {
-          "description": "Field type to protect",
-          "type": "string",
-          "enum": [
-            "SINGLE_HEADER",
-            "SINGLE_COOKIE",
-            "SINGLE_QUERY_ARGUMENT",
-            "QUERY_STRING",
-            "BODY"
-          ],
-          "markdownDescription": "Field type to protect\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: SINGLE_HEADER | SINGLE_COOKIE | SINGLE_QUERY_ARGUMENT | QUERY_STRING | BODY  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "FieldType"
-      ],
-      "markdownDescription": "Field in log to protect.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "ManagedRuleGroupConfig": {
       "description": "ManagedRuleGroupConfig.",
-      "additionalProperties": false,
       "type": "object",
       "properties": {
-        "UsernameField": {
-          "$ref": "#/definitions/FieldIdentifier"
-        },
         "LoginPath": {
-          "minLength": 1,
           "type": "string",
+          "minLength": 1,
           "maxLength": 256,
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
-        },
-        "AWSManagedRulesATPRuleSet": {
-          "$ref": "#/definitions/AWSManagedRulesATPRuleSet"
-        },
-        "AWSManagedRulesBotControlRuleSet": {
-          "$ref": "#/definitions/AWSManagedRulesBotControlRuleSet"
-        },
-        "PasswordField": {
-          "$ref": "#/definitions/FieldIdentifier"
-        },
-        "AWSManagedRulesACFPRuleSet": {
-          "$ref": "#/definitions/AWSManagedRulesACFPRuleSet"
         },
         "PayloadType": {
           "type": "string",
@@ -1345,46 +1636,31 @@
             "FORM_ENCODED"
           ],
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: JSON | FORM_ENCODED  \nUpdate requires: No interruption\n"
+        },
+        "UsernameField": {
+          "$ref": "#/definitions/FieldIdentifier"
+        },
+        "PasswordField": {
+          "$ref": "#/definitions/FieldIdentifier"
+        },
+        "AWSManagedRulesBotControlRuleSet": {
+          "$ref": "#/definitions/AWSManagedRulesBotControlRuleSet"
+        },
+        "AWSManagedRulesATPRuleSet": {
+          "$ref": "#/definitions/AWSManagedRulesATPRuleSet"
+        },
+        "AWSManagedRulesACFPRuleSet": {
+          "$ref": "#/definitions/AWSManagedRulesACFPRuleSet"
+        },
+        "AWSManagedRulesAntiDDoSRuleSet": {
+          "$ref": "#/definitions/AWSManagedRulesAntiDDoSRuleSet"
         }
       },
+      "additionalProperties": false,
       "markdownDescription": "ManagedRuleGroupConfig.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "Cookies": {
-      "description": "Includes cookies of a web request.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "MatchScope": {
-          "$ref": "#/definitions/MapMatchScope"
-        },
-        "MatchPattern": {
-          "$ref": "#/definitions/CookieMatchPattern"
-        },
-        "OversizeHandling": {
-          "$ref": "#/definitions/OversizeHandling"
-        }
-      },
-      "required": [
-        "MatchPattern",
-        "MatchScope",
-        "OversizeHandling"
-      ],
-      "markdownDescription": "Includes cookies of a web request.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "AllowAction": {
-      "description": "Allow traffic towards application.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "CustomRequestHandling": {
-          "$ref": "#/definitions/CustomRequestHandling"
-        }
-      },
-      "markdownDescription": "Allow traffic towards application.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "AWSManagedRulesBotControlRuleSet": {
       "description": "Configures how to use the Bot Control managed rule group in the web ACL",
-      "additionalProperties": false,
       "type": "object",
       "properties": {
         "InspectionLevel": {
@@ -1403,208 +1679,449 @@
       "required": [
         "InspectionLevel"
       ],
+      "additionalProperties": false,
       "markdownDescription": "Configures how to use the Bot Control managed rule group in the web ACL\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "SqliMatchStatement": {
-      "description": "Sqli Match Statement.",
-      "additionalProperties": false,
+    "AWSManagedRulesATPRuleSet": {
+      "description": "Configures how to use the Account Takeover Prevention managed rule group in the web ACL",
       "type": "object",
       "properties": {
-        "SensitivityLevel": {
-          "$ref": "#/definitions/SensitivityLevel"
-        },
-        "TextTransformations": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/TextTransformation"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "FieldToMatch": {
-          "$ref": "#/definitions/FieldToMatch"
-        }
-      },
-      "required": [
-        "FieldToMatch",
-        "TextTransformations"
-      ],
-      "markdownDescription": "Sqli Match Statement.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "ManagedRuleGroupStatement": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "VendorName": {
+        "LoginPath": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         },
-        "Version": {
-          "minLength": 1,
-          "type": "string",
-          "maxLength": 64,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[\\w#:\\.\\-/]+$  \nUpdate requires: No interruption\n"
+        "EnableRegexInPath": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
         },
-        "RuleActionOverrides": {
-          "maxItems": 100,
-          "description": "Action overrides for rules in the rule group.",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/RuleActionOverride"
-          },
-          "markdownDescription": "Action overrides for rules in the rule group.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        "RequestInspection": {
+          "$ref": "#/definitions/RequestInspection"
         },
-        "ManagedRuleGroupConfigs": {
-          "description": "Collection of ManagedRuleGroupConfig.",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ManagedRuleGroupConfig"
-          },
-          "markdownDescription": "Collection of ManagedRuleGroupConfig.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "ExcludedRules": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ExcludedRule"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "Name": {
-          "$ref": "#/definitions/EntityName"
-        },
-        "ScopeDownStatement": {
-          "$ref": "#/definitions/Statement"
+        "ResponseInspection": {
+          "$ref": "#/definitions/ResponseInspection"
         }
       },
       "required": [
-        "VendorName",
-        "Name"
+        "LoginPath"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "EvaluationWindowSec": {
-      "type": "integer",
-      "enum": [
-        60,
-        120,
-        300,
-        600
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nAllowed Values: 60 | 120 | 300 | 600  \nUpdate requires: No interruption\n"
-    },
-    "RateLimitCookie": {
-      "description": "Specifies a cookie as an aggregate key for a rate-based rule.",
       "additionalProperties": false,
+      "markdownDescription": "Configures how to use the Account Takeover Prevention managed rule group in the web ACL\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AWSManagedRulesACFPRuleSet": {
+      "description": "Configures how to use the Account creation fraud prevention managed rule group in the web ACL",
       "type": "object",
       "properties": {
-        "TextTransformations": {
+        "CreationPath": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "RegistrationPagePath": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "RequestInspection": {
+          "$ref": "#/definitions/RequestInspectionACFP"
+        },
+        "ResponseInspection": {
+          "$ref": "#/definitions/ResponseInspection"
+        },
+        "EnableRegexInPath": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "CreationPath",
+        "RegistrationPagePath",
+        "RequestInspection"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configures how to use the Account creation fraud prevention managed rule group in the web ACL\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AWSManagedRulesAntiDDoSRuleSet": {
+      "description": "Configures how to use the AntiDDOS AWS managed rule group in the web ACL",
+      "type": "object",
+      "properties": {
+        "ClientSideActionConfig": {
+          "$ref": "#/definitions/ClientSideActionConfig"
+        },
+        "SensitivityToBlock": {
+          "$ref": "#/definitions/SensitivityToAct"
+        }
+      },
+      "required": [
+        "ClientSideActionConfig"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configures how to use the AntiDDOS AWS managed rule group in the web ACL\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ClientSideActionConfig": {
+      "description": "Client side action config for AntiDDOS AMR.",
+      "type": "object",
+      "properties": {
+        "Challenge": {
+          "$ref": "#/definitions/ClientSideAction"
+        }
+      },
+      "required": [
+        "Challenge"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Client side action config for AntiDDOS AMR.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ClientSideAction": {
+      "description": "Client side action config for AntiDDOS AMR.",
+      "type": "object",
+      "properties": {
+        "UsageOfAction": {
+          "$ref": "#/definitions/UsageOfAction"
+        },
+        "Sensitivity": {
+          "$ref": "#/definitions/SensitivityToAct"
+        },
+        "ExemptUriRegularExpressions": {
+          "$ref": "#/definitions/RegularExpressionList"
+        }
+      },
+      "required": [
+        "UsageOfAction"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Client side action config for AntiDDOS AMR.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "UsageOfAction": {
+      "type": "string",
+      "enum": [
+        "ENABLED",
+        "DISABLED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption\n"
+    },
+    "SensitivityToAct": {
+      "type": "string",
+      "enum": [
+        "LOW",
+        "MEDIUM",
+        "HIGH"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: LOW | MEDIUM | HIGH  \nUpdate requires: No interruption\n"
+    },
+    "RegularExpressionList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Regex"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "Regex": {
+      "description": "Regex",
+      "type": "object",
+      "properties": {
+        "RegexString": {
+          "$ref": "#/definitions/RegexPatternString"
+        }
+      },
+      "markdownDescription": "Regex\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RegexPatternString": {
+      "type": "string",
+      "maxLength": 512,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nUpdate requires: No interruption\n"
+    },
+    "RequestInspection": {
+      "description": "Configures the inspection of login requests",
+      "type": "object",
+      "properties": {
+        "PayloadType": {
+          "type": "string",
+          "enum": [
+            "JSON",
+            "FORM_ENCODED"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: JSON | FORM_ENCODED  \nUpdate requires: No interruption\n"
+        },
+        "UsernameField": {
+          "$ref": "#/definitions/FieldIdentifier"
+        },
+        "PasswordField": {
+          "$ref": "#/definitions/FieldIdentifier"
+        }
+      },
+      "required": [
+        "PayloadType",
+        "UsernameField",
+        "PasswordField"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configures the inspection of login requests\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RequestInspectionACFP": {
+      "description": "Configures the inspection of sign-up requests",
+      "type": "object",
+      "properties": {
+        "PayloadType": {
+          "type": "string",
+          "enum": [
+            "JSON",
+            "FORM_ENCODED"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: JSON | FORM_ENCODED  \nUpdate requires: No interruption\n"
+        },
+        "UsernameField": {
+          "$ref": "#/definitions/FieldIdentifier"
+        },
+        "PasswordField": {
+          "$ref": "#/definitions/FieldIdentifier"
+        },
+        "EmailField": {
+          "$ref": "#/definitions/FieldIdentifier"
+        },
+        "PhoneNumberFields": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/TextTransformation"
+            "$ref": "#/definitions/PhoneNumberField"
           },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "AddressFields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AddressField"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "PayloadType"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configures the inspection of sign-up requests\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ResponseInspection": {
+      "description": "Configures the inspection of login responses",
+      "type": "object",
+      "properties": {
+        "StatusCode": {
+          "$ref": "#/definitions/ResponseInspectionStatusCode"
+        },
+        "Header": {
+          "$ref": "#/definitions/ResponseInspectionHeader"
+        },
+        "BodyContains": {
+          "$ref": "#/definitions/ResponseInspectionBodyContains"
+        },
+        "Json": {
+          "$ref": "#/definitions/ResponseInspectionJson"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Configures the inspection of login responses\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ResponseInspectionStatusCode": {
+      "description": "Response status codes that indicate success or failure of a login request",
+      "type": "object",
+      "properties": {
+        "SuccessCodes": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minLength": 0,
+            "maxLength": 999,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nMaximum Length: 999  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 1,
+          "maxItems": 10,
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
         },
+        "FailureCodes": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minLength": 0,
+            "maxLength": 999,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nMaximum Length: 999  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 1,
+          "maxItems": 10,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "SuccessCodes",
+        "FailureCodes"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Response status codes that indicate success or failure of a login request\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ResponseInspectionHeader": {
+      "description": "Response headers that indicate success or failure of a login request",
+      "type": "object",
+      "properties": {
         "Name": {
-          "minLength": 1,
-          "description": "The name of the cookie to use.",
           "type": "string",
-          "maxLength": 64,
-          "markdownDescription": "The name of the cookie to use.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
+          "minLength": 1,
+          "maxLength": 200,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 200  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
+        },
+        "SuccessValues": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 1,
+          "maxItems": 3,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "FailureValues": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 1,
+          "maxItems": 3,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
         "Name",
-        "TextTransformations"
+        "SuccessValues",
+        "FailureValues"
       ],
-      "markdownDescription": "Specifies a cookie as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "AddressField": {
-      "$ref": "#/definitions/FieldIdentifier"
-    },
-    "JsonMatchPattern": {
-      "description": "The pattern to look for in the JSON body.",
       "additionalProperties": false,
+      "markdownDescription": "Response headers that indicate success or failure of a login request\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ResponseInspectionBodyContains": {
+      "description": "Response body contents that indicate success or failure of a login request",
       "type": "object",
       "properties": {
-        "All": {
-          "description": "Inspect all parts of the web request's JSON body.",
-          "type": "object",
-          "markdownDescription": "Inspect all parts of the web request's JSON body.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-        },
-        "IncludedPaths": {
+        "SuccessStrings": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/JsonPointerPath"
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
           },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "The pattern to look for in the JSON body.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "RateLimitIP": {
-      "description": "Specifies the IP address in the web request as an aggregate key for a rate-based rule.",
-      "type": "object",
-      "markdownDescription": "Specifies the IP address in the web request as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "ChallengeAction": {
-      "description": "Checks that the request has a valid token with an unexpired challenge timestamp and, if not, returns a browser challenge to the client.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "CustomRequestHandling": {
-          "$ref": "#/definitions/CustomRequestHandling"
-        }
-      },
-      "markdownDescription": "Checks that the request has a valid token with an unexpired challenge timestamp and, if not, returns a browser challenge to the client.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "FieldToProtectKeyName": {
-      "minLength": 1,
-      "description": "Key of the field to protect.",
-      "type": "string",
-      "maxLength": 64,
-      "markdownDescription": "Key of the field to protect.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nUpdate requires: No interruption\n"
-    },
-    "CountAction": {
-      "description": "Allow traffic towards application.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "CustomRequestHandling": {
-          "$ref": "#/definitions/CustomRequestHandling"
-        }
-      },
-      "markdownDescription": "Allow traffic towards application.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "ByteMatchStatement": {
-      "description": "Byte Match statement.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "SearchStringBase64": {
-          "$ref": "#/definitions/SearchStringBase64"
-        },
-        "TextTransformations": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/TextTransformation"
-          },
+          "minItems": 1,
+          "maxItems": 5,
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
         },
-        "PositionalConstraint": {
-          "$ref": "#/definitions/PositionalConstraint"
-        },
-        "SearchString": {
-          "$ref": "#/definitions/SearchString"
-        },
-        "FieldToMatch": {
-          "$ref": "#/definitions/FieldToMatch"
+        "FailureStrings": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 1,
+          "maxItems": 5,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "FieldToMatch",
-        "PositionalConstraint",
-        "TextTransformations"
+        "SuccessStrings",
+        "FailureStrings"
       ],
-      "markdownDescription": "Byte Match statement.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "additionalProperties": false,
+      "markdownDescription": "Response body contents that indicate success or failure of a login request\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ResponseInspectionJson": {
+      "description": "Response JSON that indicate success or failure of a login request",
+      "type": "object",
+      "properties": {
+        "Identifier": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
+        },
+        "SuccessValues": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 1,
+          "maxItems": 5,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "FailureValues": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 1,
+          "maxItems": 5,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Identifier",
+        "SuccessValues",
+        "FailureValues"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Response JSON that indicate success or failure of a login request\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "TokenDomains": {
+      "description": "List of domains to accept in web request tokens, in addition to the domain of the protected resource.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 253,
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 253  \nPattern: ^[\\w\\.\\-/]+$  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "List of domains to accept in web request tokens, in addition to the domain of the protected resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "AssociationConfig": {
+      "description": "AssociationConfig for body inspection",
+      "type": "object",
+      "properties": {
+        "RequestBody": {
+          "$ref": "#/definitions/RequestBody"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "AssociationConfig for body inspection\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RequestBody": {
+      "type": "object",
+      "description": "Map of AssociatedResourceType and RequestBodyAssociatedResourceTypeConfig",
+      "patternProperties": {
+        "^(CLOUDFRONT|API_GATEWAY|COGNITO_USER_POOL|APP_RUNNER_SERVICE|VERIFIED_ACCESS_INSTANCE)$": {
+          "$ref": "#/definitions/RequestBodyAssociatedResourceTypeConfig"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Map of AssociatedResourceType and RequestBodyAssociatedResourceTypeConfig\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RequestBodyAssociatedResourceTypeConfig": {
+      "description": "Configures the inspection size in the request body.",
+      "type": "object",
+      "properties": {
+        "DefaultSizeInspectionLimit": {
+          "$ref": "#/definitions/SizeInspectionLimit"
+        }
+      },
+      "required": [
+        "DefaultSizeInspectionLimit"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configures the inspection size in the request body.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "SizeInspectionLimit": {
       "type": "string",
@@ -1616,406 +2133,37 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: KB_16 | KB_32 | KB_48 | KB_64  \nUpdate requires: No interruption\n"
     },
-    "CustomRequestHandling": {
-      "description": "Custom request handling.",
-      "additionalProperties": false,
+    "PhoneNumberField": {
+      "$ref": "#/definitions/FieldIdentifier"
+    },
+    "AddressField": {
+      "$ref": "#/definitions/FieldIdentifier"
+    },
+    "FieldIdentifier": {
       "type": "object",
       "properties": {
-        "InsertHeaders": {
-          "minItems": 1,
-          "description": "Collection of HTTP headers.",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/CustomHTTPHeader"
-          },
-          "markdownDescription": "Collection of HTTP headers.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "InsertHeaders"
-      ],
-      "markdownDescription": "Custom request handling.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "DataProtections": {
-      "minItems": 1,
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/DataProtect"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-    },
-    "OverrideAction": {
-      "description": "Override a RuleGroup or ManagedRuleGroup behavior. This can only be applied to Rule that has RuleGroupReferenceStatement or ManagedRuleGroupReferenceStatement.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Count": {
-          "description": "Count traffic towards application.",
-          "type": "object",
-          "markdownDescription": "Count traffic towards application.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-        },
-        "None": {
-          "description": "Keep the RuleGroup or ManagedRuleGroup behavior as is.",
-          "type": "object",
-          "markdownDescription": "Keep the RuleGroup or ManagedRuleGroup behavior as is.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "Override a RuleGroup or ManagedRuleGroup behavior. This can only be applied to Rule that has RuleGroupReferenceStatement or ManagedRuleGroupReferenceStatement.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "GeoMatchStatement": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "ForwardedIPConfig": {
-          "$ref": "#/definitions/ForwardedIPConfiguration"
-        },
-        "CountryCodes": {
-          "type": "array",
-          "items": {
-            "minLength": 1,
-            "type": "string",
-            "maxLength": 2,
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2  \nUpdate requires: No interruption\n"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "VisibilityConfig": {
-      "description": "Visibility Metric of the WebACL.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "MetricName": {
+        "Identifier": {
+          "type": "string",
           "minLength": 1,
-          "type": "string",
-          "maxLength": 128,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
-        },
-        "SampledRequestsEnabled": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption\n"
-        },
-        "CloudWatchMetricsEnabled": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption\n"
+          "maxLength": 512,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "SampledRequestsEnabled",
-        "CloudWatchMetricsEnabled",
-        "MetricName"
+        "Identifier"
       ],
-      "markdownDescription": "Visibility Metric of the WebACL.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "AWSManagedRulesACFPRuleSet": {
-      "description": "Configures how to use the Account creation fraud prevention managed rule group in the web ACL",
       "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "RegistrationPagePath": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "ResponseInspection": {
-          "$ref": "#/definitions/ResponseInspection"
-        },
-        "CreationPath": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "EnableRegexInPath": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-        },
-        "RequestInspection": {
-          "$ref": "#/definitions/RequestInspectionACFP"
-        }
-      },
-      "required": [
-        "CreationPath",
-        "RegistrationPagePath",
-        "RequestInspection"
-      ],
-      "markdownDescription": "Configures how to use the Account creation fraud prevention managed rule group in the web ACL\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "RuleGroupReferenceStatement": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "RuleActionOverrides": {
-          "maxItems": 100,
-          "description": "Action overrides for rules in the rule group.",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/RuleActionOverride"
-          },
-          "markdownDescription": "Action overrides for rules in the rule group.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "Arn": {
-          "$ref": "#/definitions/ResourceArn"
-        },
-        "ExcludedRules": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ExcludedRule"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Arn"
-      ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "TokenDomains": {
-      "description": "List of domains to accept in web request tokens, in addition to the domain of the protected resource.",
-      "type": "array",
-      "items": {
-        "minLength": 1,
-        "type": "string",
-        "maxLength": 253,
-        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 253  \nPattern: ^[\\w\\.\\-/]+$  \nUpdate requires: No interruption\n"
-      },
-      "markdownDescription": "List of domains to accept in web request tokens, in addition to the domain of the protected resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-    },
-    "RateLimitJA4Fingerprint": {
-      "description": "Specifies the request's JA4 fingerprint as an aggregate key for a rate-based rule.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "FallbackBehavior": {
-          "type": "string",
-          "enum": [
-            "MATCH",
-            "NO_MATCH"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: MATCH | NO_MATCH  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "FallbackBehavior"
-      ],
-      "markdownDescription": "Specifies the request's JA4 fingerprint as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "ResourceArn": {
-      "minLength": 20,
-      "description": "ARN of the WAF entity.",
-      "type": "string",
-      "maxLength": 2048,
-      "markdownDescription": "ARN of the WAF entity.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nUpdate requires: No interruption\n"
-    },
-    "DefaultAction": {
-      "description": "Default Action WebACL will take against ingress traffic when there is no matching Rule.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Block": {
-          "$ref": "#/definitions/BlockAction"
-        },
-        "Allow": {
-          "$ref": "#/definitions/AllowAction"
-        }
-      },
-      "markdownDescription": "Default Action WebACL will take against ingress traffic when there is no matching Rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "JsonPointerPath": {
-      "description": "JSON pointer path in the web request's JSON body",
-      "type": "string",
-      "markdownDescription": "JSON pointer path in the web request's JSON body\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[\\/]+([^~]*(~[01])*)*{1,512}$  \nUpdate requires: No interruption\n"
-    },
-    "RateBasedStatementCustomKey": {
-      "description": "Specifies a single custom aggregate key for a rate-base rule.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Cookie": {
-          "$ref": "#/definitions/RateLimitCookie"
-        },
-        "ForwardedIP": {
-          "$ref": "#/definitions/RateLimitForwardedIP"
-        },
-        "QueryArgument": {
-          "$ref": "#/definitions/RateLimitQueryArgument"
-        },
-        "JA3Fingerprint": {
-          "$ref": "#/definitions/RateLimitJA3Fingerprint"
-        },
-        "Header": {
-          "$ref": "#/definitions/RateLimitHeader"
-        },
-        "HTTPMethod": {
-          "$ref": "#/definitions/RateLimitHTTPMethod"
-        },
-        "QueryString": {
-          "$ref": "#/definitions/RateLimitQueryString"
-        },
-        "UriPath": {
-          "$ref": "#/definitions/RateLimitUriPath"
-        },
-        "IP": {
-          "$ref": "#/definitions/RateLimitIP"
-        },
-        "JA4Fingerprint": {
-          "$ref": "#/definitions/RateLimitJA4Fingerprint"
-        },
-        "LabelNamespace": {
-          "$ref": "#/definitions/RateLimitLabelNamespace"
-        }
-      },
-      "markdownDescription": "Specifies a single custom aggregate key for a rate-base rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "ResponseInspection": {
-      "description": "Configures the inspection of login responses",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Header": {
-          "$ref": "#/definitions/ResponseInspectionHeader"
-        },
-        "BodyContains": {
-          "$ref": "#/definitions/ResponseInspectionBodyContains"
-        },
-        "Json": {
-          "$ref": "#/definitions/ResponseInspectionJson"
-        },
-        "StatusCode": {
-          "$ref": "#/definitions/ResponseInspectionStatusCode"
-        }
-      },
-      "markdownDescription": "Configures the inspection of login responses\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "LabelMatchScope": {
-      "type": "string",
-      "enum": [
-        "LABEL",
-        "NAMESPACE"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: LABEL | NAMESPACE  \nUpdate requires: No interruption\n"
-    },
-    "RateLimitHTTPMethod": {
-      "description": "Specifies the request's HTTP method as an aggregate key for a rate-based rule.",
-      "type": "object",
-      "markdownDescription": "Specifies the request's HTTP method as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "RequestInspectionACFP": {
-      "description": "Configures the inspection of sign-up requests",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "UsernameField": {
-          "$ref": "#/definitions/FieldIdentifier"
-        },
-        "EmailField": {
-          "$ref": "#/definitions/FieldIdentifier"
-        },
-        "PasswordField": {
-          "$ref": "#/definitions/FieldIdentifier"
-        },
-        "AddressFields": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/AddressField"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "PayloadType": {
-          "type": "string",
-          "enum": [
-            "JSON",
-            "FORM_ENCODED"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: JSON | FORM_ENCODED  \nUpdate requires: No interruption\n"
-        },
-        "PhoneNumberFields": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/PhoneNumberField"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "PayloadType"
-      ],
-      "markdownDescription": "Configures the inspection of sign-up requests\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "ImmunityTimeProperty": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "ImmunityTime": {
-          "maximum": 259200,
-          "type": "integer",
-          "minimum": 60,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "ImmunityTime"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "RateLimitLabelNamespace": {
-      "description": "Specifies a label namespace to use as an aggregate key for a rate-based rule.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Namespace": {
-          "description": "The namespace to use for aggregation.",
-          "type": "string",
-          "markdownDescription": "The namespace to use for aggregation.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[0-9A-Za-z_:-]{1,1024}$  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Namespace"
-      ],
-      "markdownDescription": "Specifies a label namespace to use as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "SingleQueryArgument": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Name": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "XssMatchStatement": {
-      "description": "Xss Match Statement.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "TextTransformations": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/TextTransformation"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "FieldToMatch": {
-          "$ref": "#/definitions/FieldToMatch"
-        }
-      },
-      "required": [
-        "FieldToMatch",
-        "TextTransformations"
-      ],
-      "markdownDescription": "Xss Match Statement.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Headers": {
       "description": "Includes headers of a web request.",
-      "additionalProperties": false,
       "type": "object",
       "properties": {
-        "MatchScope": {
-          "$ref": "#/definitions/MapMatchScope"
-        },
         "MatchPattern": {
           "$ref": "#/definitions/HeaderMatchPattern"
+        },
+        "MatchScope": {
+          "$ref": "#/definitions/MapMatchScope"
         },
         "OversizeHandling": {
           "$ref": "#/definitions/OversizeHandling"
@@ -2026,78 +2174,18 @@
         "MatchScope",
         "OversizeHandling"
       ],
+      "additionalProperties": false,
       "markdownDescription": "Includes headers of a web request.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "RateLimitForwardedIP": {
-      "description": "Specifies the first IP address in an HTTP header as an aggregate key for a rate-based rule.",
-      "type": "object",
-      "markdownDescription": "Specifies the first IP address in an HTTP header as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "AWSManagedRulesATPRuleSet": {
-      "description": "Configures how to use the Account Takeover Prevention managed rule group in the web ACL",
-      "additionalProperties": false,
+    "Cookies": {
+      "description": "Includes cookies of a web request.",
       "type": "object",
       "properties": {
-        "ResponseInspection": {
-          "$ref": "#/definitions/ResponseInspection"
-        },
-        "EnableRegexInPath": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-        },
-        "LoginPath": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "RequestInspection": {
-          "$ref": "#/definitions/RequestInspection"
-        }
-      },
-      "required": [
-        "LoginPath"
-      ],
-      "markdownDescription": "Configures how to use the Account Takeover Prevention managed rule group in the web ACL\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "RequestInspection": {
-      "description": "Configures the inspection of login requests",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "UsernameField": {
-          "$ref": "#/definitions/FieldIdentifier"
-        },
-        "PasswordField": {
-          "$ref": "#/definitions/FieldIdentifier"
-        },
-        "PayloadType": {
-          "type": "string",
-          "enum": [
-            "JSON",
-            "FORM_ENCODED"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: JSON | FORM_ENCODED  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "PayloadType",
-        "UsernameField",
-        "PasswordField"
-      ],
-      "markdownDescription": "Configures the inspection of login requests\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "JsonBody": {
-      "description": "Inspect the request body as JSON. The request body immediately follows the request headers.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "MatchScope": {
-          "$ref": "#/definitions/JsonMatchScope"
-        },
         "MatchPattern": {
-          "$ref": "#/definitions/JsonMatchPattern"
+          "$ref": "#/definitions/CookieMatchPattern"
         },
-        "InvalidFallbackBehavior": {
-          "$ref": "#/definitions/BodyParsingFallbackBehavior"
+        "MatchScope": {
+          "$ref": "#/definitions/MapMatchScope"
         },
         "OversizeHandling": {
           "$ref": "#/definitions/OversizeHandling"
@@ -2105,196 +2193,85 @@
       },
       "required": [
         "MatchPattern",
-        "MatchScope"
+        "MatchScope",
+        "OversizeHandling"
       ],
-      "markdownDescription": "Inspect the request body as JSON. The request body immediately follows the request headers.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "RateLimit": {
-      "maximum": 2000000000,
-      "type": "integer",
-      "minimum": 10,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
-    },
-    "OrStatement": {
       "additionalProperties": false,
+      "markdownDescription": "Includes cookies of a web request.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HeaderMatchPattern": {
+      "description": "The pattern to look for in the request headers.",
       "type": "object",
       "properties": {
-        "Statements": {
+        "All": {
+          "description": "Inspect all parts of the web request headers.",
+          "type": "object",
+          "markdownDescription": "Inspect all parts of the web request headers.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "IncludedHeaders": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Statement"
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
           },
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Statements"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "Body": {
-      "description": "The body of a web request. This immediately follows the request headers.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "OversizeHandling": {
-          "$ref": "#/definitions/OversizeHandling"
-        }
-      },
-      "markdownDescription": "The body of a web request. This immediately follows the request headers.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "CustomHTTPHeader": {
-      "description": "HTTP header.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Value": {
-          "$ref": "#/definitions/CustomHTTPHeaderValue"
+          "minItems": 1,
+          "maxItems": 199,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         },
-        "Name": {
-          "$ref": "#/definitions/CustomHTTPHeaderName"
-        }
-      },
-      "required": [
-        "Name",
-        "Value"
-      ],
-      "markdownDescription": "HTTP header.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "RateLimitQueryString": {
-      "description": "Specifies the request's query string as an aggregate key for a rate-based rule.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "TextTransformations": {
+        "ExcludedHeaders": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/TextTransformation"
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
           },
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+          "minItems": 1,
+          "maxItems": 199,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         }
       },
-      "required": [
-        "TextTransformations"
-      ],
-      "markdownDescription": "Specifies the request's query string as an aggregate key for a rate-based rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "QueryString": {
-      "type": "object",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "ResponseContentType": {
-      "description": "Valid values are TEXT_PLAIN, TEXT_HTML, and APPLICATION_JSON.",
-      "type": "string",
-      "enum": [
-        "TEXT_PLAIN",
-        "TEXT_HTML",
-        "APPLICATION_JSON"
-      ],
-      "markdownDescription": "Valid values are TEXT_PLAIN, TEXT_HTML, and APPLICATION_JSON.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: TEXT_PLAIN | TEXT_HTML | APPLICATION_JSON  \nUpdate requires: No interruption\n"
-    },
-    "TextTransformation": {
-      "description": "Text Transformation on the Search String before match.",
       "additionalProperties": false,
+      "markdownDescription": "The pattern to look for in the request headers.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CookieMatchPattern": {
+      "description": "The pattern to look for in the request cookies.",
       "type": "object",
       "properties": {
-        "Type": {
-          "$ref": "#/definitions/TextTransformationType"
+        "All": {
+          "description": "Inspect all parts of the web request cookies.",
+          "type": "object",
+          "markdownDescription": "Inspect all parts of the web request cookies.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
         },
-        "Priority": {
-          "$ref": "#/definitions/TextTransformationPriority"
-        }
-      },
-      "required": [
-        "Priority",
-        "Type"
-      ],
-      "markdownDescription": "Text Transformation on the Search String before match.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "EntityId": {
-      "description": "Id of the WebACL",
-      "type": "string",
-      "markdownDescription": "Id of the WebACL\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$  \nUpdate requires: No interruption\n"
-    },
-    "SensitivityLevel": {
-      "description": "Sensitivity Level current only used for sqli match statements.",
-      "type": "string",
-      "enum": [
-        "LOW",
-        "HIGH"
-      ],
-      "markdownDescription": "Sensitivity Level current only used for sqli match statements.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: LOW | HIGH  \nUpdate requires: No interruption\n"
-    },
-    "Scope": {
-      "description": "Use CLOUDFRONT for CloudFront WebACL, use REGIONAL for Application Load Balancer and API Gateway.",
-      "type": "string",
-      "enum": [
-        "CLOUDFRONT",
-        "REGIONAL"
-      ],
-      "markdownDescription": "Use CLOUDFRONT for CloudFront WebACL, use REGIONAL for Application Load Balancer and API Gateway.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CLOUDFRONT | REGIONAL  \nUpdate requires: No interruption\n"
-    },
-    "CustomResponseBody": {
-      "description": "Custom response body.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "ContentType": {
-          "$ref": "#/definitions/ResponseContentType"
+        "IncludedCookies": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 60  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 1,
+          "maxItems": 199,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         },
-        "Content": {
-          "$ref": "#/definitions/ResponseContent"
+        "ExcludedCookies": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 60  \nPattern: .*\\S.*  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 1,
+          "maxItems": 199,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         }
       },
-      "required": [
-        "ContentType",
-        "Content"
-      ],
-      "markdownDescription": "Custom response body.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "ForwardedIPConfiguration": {
       "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "FallbackBehavior": {
-          "type": "string",
-          "enum": [
-            "MATCH",
-            "NO_MATCH"
-          ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: MATCH | NO_MATCH  \nUpdate requires: No interruption\n"
-        },
-        "HeaderName": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z0-9-]+{1,255}$  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "HeaderName",
-        "FallbackBehavior"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "CaptchaConfig": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "ImmunityTimeProperty": {
-          "$ref": "#/definitions/ImmunityTimeProperty"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "SingleHeader": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Name": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The pattern to look for in the request cookies.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "MapMatchScope": {
       "description": "The parts of the request to match against using the MatchPattern.",
@@ -2305,29 +2282,124 @@
         "VALUE"
       ],
       "markdownDescription": "The parts of the request to match against using the MatchPattern.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ALL | KEY | VALUE  \nUpdate requires: No interruption\n"
+    },
+    "OversizeHandling": {
+      "description": "Handling of requests containing oversize fields",
+      "type": "string",
+      "enum": [
+        "CONTINUE",
+        "MATCH",
+        "NO_MATCH"
+      ],
+      "markdownDescription": "Handling of requests containing oversize fields\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CONTINUE | MATCH | NO_MATCH  \nUpdate requires: No interruption\n"
+    },
+    "SensitivityLevel": {
+      "description": "Sensitivity Level current only used for sqli match statements.",
+      "type": "string",
+      "enum": [
+        "LOW",
+        "HIGH"
+      ],
+      "markdownDescription": "Sensitivity Level current only used for sqli match statements.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: LOW | HIGH  \nUpdate requires: No interruption\n"
+    },
+    "JA3Fingerprint": {
+      "description": "Includes the JA3 fingerprint of a web request.",
+      "type": "object",
+      "properties": {
+        "FallbackBehavior": {
+          "type": "string",
+          "enum": [
+            "MATCH",
+            "NO_MATCH"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: MATCH | NO_MATCH  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "FallbackBehavior"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Includes the JA3 fingerprint of a web request.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "JA4Fingerprint": {
+      "description": "Includes the JA4 fingerprint of a web request.",
+      "type": "object",
+      "properties": {
+        "FallbackBehavior": {
+          "type": "string",
+          "enum": [
+            "MATCH",
+            "NO_MATCH"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: MATCH | NO_MATCH  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "FallbackBehavior"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Includes the JA4 fingerprint of a web request.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "UriFragment": {
+      "description": "The path component of the URI Fragment. This is the part of a web request that identifies a fragment uri, for example, /abcd#introduction",
+      "type": "object",
+      "properties": {
+        "FallbackBehavior": {
+          "type": "string",
+          "enum": [
+            "MATCH",
+            "NO_MATCH"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MATCH | NO_MATCH  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The path component of the URI Fragment. This is the part of a web request that identifies a fragment uri, for example, /abcd#introduction\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "OnSourceDDoSProtectionConfig": {
+      "description": "Configures the options for on-source DDoS protection provided by supported resource type.",
+      "type": "object",
+      "properties": {
+        "ALBLowReputationMode": {
+          "type": "string",
+          "enum": [
+            "ACTIVE_UNDER_DDOS",
+            "ALWAYS_ON"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: ACTIVE_UNDER_DDOS | ALWAYS_ON  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ALBLowReputationMode"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configures the options for on-source DDoS protection provided by supported resource type.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
-  "required": [
-    "DefaultAction",
-    "Scope",
-    "VisibilityConfig"
-  ],
   "properties": {
+    "Arn": {
+      "$ref": "#/definitions/ResourceArn"
+    },
+    "Capacity": {
+      "type": "integer",
+      "minimum": 0,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "DefaultAction": {
+      "$ref": "#/definitions/DefaultAction"
+    },
     "Description": {
       "$ref": "#/definitions/EntityDescription"
     },
-    "AssociationConfig": {
-      "$ref": "#/definitions/AssociationConfig"
+    "Name": {
+      "$ref": "#/definitions/EntityName"
     },
-    "ChallengeConfig": {
-      "$ref": "#/definitions/ChallengeConfig"
+    "Id": {
+      "$ref": "#/definitions/EntityId"
     },
-    "DataProtectionConfig": {
-      "description": "Collection of dataProtects.",
-      "$ref": "#/definitions/DataProtectionConfig",
-      "markdownDescription": "Collection of dataProtects.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    "Scope": {
+      "$ref": "#/definitions/Scope"
     },
-    "OnSourceDDoSProtectionConfig": {},
     "Rules": {
       "description": "Collection of Rules.",
       "type": "array",
@@ -2339,50 +2411,124 @@
     "VisibilityConfig": {
       "$ref": "#/definitions/VisibilityConfig"
     },
-    "LabelNamespace": {
-      "$ref": "#/definitions/LabelName"
-    },
-    "Name": {
-      "$ref": "#/definitions/EntityName"
-    },
-    "TokenDomains": {
-      "$ref": "#/definitions/TokenDomains"
-    },
-    "DefaultAction": {
-      "$ref": "#/definitions/DefaultAction"
-    },
-    "Scope": {
-      "$ref": "#/definitions/Scope"
-    },
-    "Capacity": {
-      "type": "integer",
-      "minimum": 0,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "CustomResponseBodies": {
-      "$ref": "#/definitions/CustomResponseBodies"
-    },
-    "Id": {
-      "$ref": "#/definitions/EntityId"
-    },
-    "Arn": {
-      "$ref": "#/definitions/ResourceArn"
-    },
-    "CaptchaConfig": {
-      "$ref": "#/definitions/CaptchaConfig"
+    "DataProtectionConfig": {
+      "description": "Collection of dataProtects.",
+      "$ref": "#/definitions/DataProtectionConfig",
+      "markdownDescription": "Collection of dataProtects.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
     },
     "Tags": {
-      "minItems": 1,
       "type": "array",
       "items": {
         "$ref": "#/definitions/Tag"
       },
+      "minItems": 1,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "LabelNamespace": {
+      "$ref": "#/definitions/LabelName"
+    },
+    "CustomResponseBodies": {
+      "$ref": "#/definitions/CustomResponseBodies"
+    },
+    "CaptchaConfig": {
+      "$ref": "#/definitions/CaptchaConfig"
+    },
+    "ChallengeConfig": {
+      "$ref": "#/definitions/ChallengeConfig"
+    },
+    "TokenDomains": {
+      "$ref": "#/definitions/TokenDomains"
+    },
+    "AssociationConfig": {
+      "$ref": "#/definitions/AssociationConfig"
+    },
+    "OnSourceDDoSProtectionConfig": {
+      "$ref": "#/definitions/OnSourceDDoSProtectionConfig"
+    }
+  },
+  "required": [
+    "DefaultAction",
+    "Scope",
+    "VisibilityConfig"
+  ],
+  "primaryIdentifier": [
+    "/properties/Name",
+    "/properties/Id",
+    "/properties/Scope"
+  ],
+  "createOnlyProperties": [
+    "/properties/Name",
+    "/properties/Scope"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/Capacity",
+    "/properties/Id",
+    "/properties/LabelNamespace"
+  ],
+  "additionalProperties": false,
+  "tagging": {
+    "cloudFormationSystemTags": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "taggable": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "wafv2:TagResource",
+      "wafv2:UntagResource",
+      "wafv2:ListTagsForResource"
+    ]
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "wafv2:CreateWebACL",
+        "wafv2:GetWebACL",
+        "wafv2:ListTagsForResource",
+        "wafv2:TagResource",
+        "wafv2:UntagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "wafv2:DeleteWebACL",
+        "wafv2:GetWebACL"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "wafv2:GetWebACL",
+        "wafv2:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "wafv2:UpdateWebACL",
+        "wafv2:GetWebACL",
+        "wafv2:ListTagsForResource",
+        "wafv2:TagResource",
+        "wafv2:UntagResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "wafv2:listWebACLs"
+      ],
+      "handlerSchema": {
+        "properties": {
+          "Scope": {
+            "$ref": "resource-schema.json#/properties/Scope"
+          }
+        },
+        "required": [
+          "Scope"
+        ]
+      }
     }
   },
   "attributes": {
-    "LabelNamespace": {
-      "$ref": "#/definitions/LabelName"
+    "Arn": {
+      "$ref": "#/definitions/ResourceArn"
     },
     "Capacity": {
       "type": "integer",
@@ -2392,8 +2538,8 @@
     "Id": {
       "$ref": "#/definitions/EntityId"
     },
-    "Arn": {
-      "$ref": "#/definitions/ResourceArn"
+    "LabelNamespace": {
+      "$ref": "#/definitions/LabelName"
     }
   }
 }

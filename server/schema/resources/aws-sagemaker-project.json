@@ -100,6 +100,94 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "Information about a parameter used to provision a product.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "TemplateProviderDetail": {
+      "description": "Details about the template provider for the SageMaker project.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "CfnTemplateProviderDetail": {
+          "$ref": "#/definitions/CfnTemplateProviderDetail"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "CfnTemplateProviderDetail"
+          ]
+        }
+      ],
+      "markdownDescription": "Details about the template provider for the SageMaker project.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CfnTemplateProviderDetail": {
+      "description": "CloudFormation template provider details for a SageMaker project.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Parameters": {
+          "$ref": "#/definitions/CfnStackParameters"
+        },
+        "RoleARN": {
+          "type": "string",
+          "description": "The Amazon Resource Name (ARN) of the IAM role used by the template provider.",
+          "minLength": 20,
+          "maxLength": 2048,
+          "markdownDescription": "The Amazon Resource Name (ARN) of the IAM role used by the template provider.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: arn:aws[a-z\\-]*:iam::\\d{12}:role/?[a-zA-Z_0-9+=,.@\\-_/]+  \nUpdate requires: No interruption\n"
+        },
+        "TemplateName": {
+          "type": "string",
+          "description": "The name of the template used for the project.",
+          "minLength": 1,
+          "maxLength": 32,
+          "markdownDescription": "The name of the template used for the project.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 32  \nPattern: (?=.{1,32}$)[a-zA-Z0-9](-*[a-zA-Z0-9])*  \nUpdate requires: No interruption\n"
+        },
+        "TemplateURL": {
+          "type": "string",
+          "description": "The URL of the CloudFormation template.",
+          "minLength": 1,
+          "maxLength": 1024,
+          "markdownDescription": "The URL of the CloudFormation template.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nPattern: (?=.{1,1024}$)(https)://([^/]+)/(.+)  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "TemplateName",
+        "TemplateURL"
+      ],
+      "markdownDescription": "CloudFormation template provider details for a SageMaker project.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CfnStackParameters": {
+      "type": "array",
+      "description": "A list of parameters used in the CloudFormation template.",
+      "minItems": 0,
+      "maxItems": 180,
+      "items": {
+        "$ref": "#/definitions/CfnStackParameter"
+      },
+      "markdownDescription": "A list of parameters used in the CloudFormation template.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "CfnStackParameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key of the parameter.",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "The key of the parameter.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value of the parameter.",
+          "maxLength": 4096,
+          "markdownDescription": "The value of the parameter.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 4096  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -155,7 +243,7 @@
         "ProductId"
       ],
       "additionalProperties": false,
-      "markdownDescription": "Input ServiceCatalog Provisioning Details\n\n---\n\nRequired: Yes  \nUpdate requires: Replacement\n"
+      "markdownDescription": "Input ServiceCatalog Provisioning Details\n\n---\n\nRequired: Conditional  \nUpdate requires: Replacement\n"
     },
     "ServiceCatalogProvisionedProductDetails": {
       "description": "Provisioned ServiceCatalog  Details",
@@ -170,6 +258,17 @@
       },
       "additionalProperties": false,
       "markdownDescription": "Provisioned ServiceCatalog  Details\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "TemplateProviderDetails": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "description": "An array of template providers associated with the project.",
+      "items": {
+        "$ref": "#/definitions/TemplateProviderDetail"
+      },
+      "insertionOrder": true,
+      "markdownDescription": "An array of template providers associated with the project.\n\n---\n\nRequired: Conditional  \nType: Array  \nUpdate requires: Replacement\n"
     },
     "ProjectStatus": {
       "description": "The status of a project.",
@@ -188,8 +287,19 @@
   },
   "additionalProperties": false,
   "required": [
-    "ProjectName",
-    "ServiceCatalogProvisioningDetails"
+    "ProjectName"
+  ],
+  "oneOf": [
+    {
+      "required": [
+        "ServiceCatalogProvisioningDetails"
+      ]
+    },
+    {
+      "required": [
+        "TemplateProviderDetails"
+      ]
+    }
   ],
   "tagging": {
     "taggable": true,
@@ -213,6 +323,7 @@
     "/properties/ProjectName",
     "/properties/ProjectDescription",
     "/properties/ServiceCatalogProvisioningDetails",
+    "/properties/TemplateProviderDetails",
     "/properties/Tags"
   ],
   "primaryIdentifier": [
@@ -229,7 +340,11 @@
         "servicecatalog:DescribeProvisioningArtifact",
         "servicecatalog:ProvisionProduct",
         "servicecatalog:DescribeProvisionedProduct",
-        "servicecatalog:TerminateProvisionedProduct"
+        "servicecatalog:TerminateProvisionedProduct",
+        "cloudformation:DescribeStacks",
+        "cloudformation:CreateStack",
+        "iam:PassRole",
+        "s3:GetObject"
       ]
     },
     "read": {
@@ -251,7 +366,9 @@
         "sagemaker:DeleteProject",
         "sagemaker:DescribeProject",
         "servicecatalog:TerminateProvisionedProduct",
-        "servicecatalog:DescribeRecord"
+        "servicecatalog:DescribeRecord",
+        "cloudformation:DescribeStacks",
+        "cloudformation:DeleteStack"
       ]
     },
     "list": {
