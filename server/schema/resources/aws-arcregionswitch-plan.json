@@ -1,0 +1,1315 @@
+{
+  "typeName": "AWS::ARCRegionSwitch::Plan",
+  "description": "Represents a plan that specifies Regions, IAM roles, and workflows of logic required to perform the desired change to your multi-Region application",
+  "definitions": {
+    "AlarmCondition": {
+      "type": "string",
+      "enum": [
+        "red",
+        "green"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: red | green  \nUpdate requires: No interruption\n"
+    },
+    "AlarmType": {
+      "type": "string",
+      "enum": [
+        "applicationHealth",
+        "trigger"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: applicationHealth | trigger  \nUpdate requires: No interruption\n"
+    },
+    "ArcRoutingControlConfiguration": {
+      "type": "object",
+      "properties": {
+        "TimeoutMinutes": {
+          "type": "number",
+          "default": 60,
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "CrossAccountRole": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[a-zA-Z0-9-]*:iam::[0-9]{12}:role/.+$  \nUpdate requires: No interruption\n"
+        },
+        "ExternalId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "RegionAndRoutingControls": {
+          "$ref": "#/definitions/RegionAndRoutingControls"
+        }
+      },
+      "required": [
+        "RegionAndRoutingControls"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ArcRoutingControlState": {
+      "type": "object",
+      "properties": {
+        "RoutingControlArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "State": {
+          "$ref": "#/definitions/RoutingControlStateChange"
+        }
+      },
+      "required": [
+        "RoutingControlArn",
+        "State"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Asg": {
+      "type": "object",
+      "properties": {
+        "CrossAccountRole": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[a-zA-Z0-9-]*:iam::[0-9]{12}:role/.+$  \nUpdate requires: No interruption\n"
+        },
+        "ExternalId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Arn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws:autoscaling:[a-z0-9-]+:\\d{12}:autoScalingGroup:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:autoScalingGroupName/[\\S\\s]{1,255}$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AssociatedAlarm": {
+      "type": "object",
+      "properties": {
+        "CrossAccountRole": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[a-zA-Z0-9-]*:iam::[0-9]{12}:role/.+$  \nUpdate requires: No interruption\n"
+        },
+        "ExternalId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ResourceIdentifier": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "AlarmType": {
+          "$ref": "#/definitions/AlarmType"
+        }
+      },
+      "required": [
+        "AlarmType",
+        "ResourceIdentifier"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AssociatedAlarmMap": {
+      "type": "object",
+      "patternProperties": {
+        ".+": {
+          "$ref": "#/definitions/AssociatedAlarm"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CustomActionLambdaConfiguration": {
+      "type": "object",
+      "properties": {
+        "TimeoutMinutes": {
+          "type": "number",
+          "default": 60,
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "Lambdas": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Lambdas"
+          },
+          "maxItems": 2,
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "RetryIntervalMinutes": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "RegionToRun": {
+          "$ref": "#/definitions/RegionToRunIn"
+        },
+        "Ungraceful": {
+          "$ref": "#/definitions/LambdaUngraceful"
+        }
+      },
+      "required": [
+        "Lambdas",
+        "RegionToRun",
+        "RetryIntervalMinutes"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Ec2AsgCapacityIncreaseConfiguration": {
+      "type": "object",
+      "properties": {
+        "TimeoutMinutes": {
+          "type": "number",
+          "default": 60,
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "Asgs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Asg"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "Ungraceful": {
+          "$ref": "#/definitions/Ec2Ungraceful"
+        },
+        "TargetPercent": {
+          "type": "number",
+          "default": 100,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "CapacityMonitoringApproach": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/Ec2AsgCapacityMonitoringApproach"
+            },
+            {
+              "default": "sampledMaxInLast24Hours"
+            }
+          ]
+        }
+      },
+      "required": [
+        "Asgs"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Ec2AsgCapacityMonitoringApproach": {
+      "type": "string",
+      "enum": [
+        "sampledMaxInLast24Hours",
+        "autoscalingMaxInLast24Hours"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: sampledMaxInLast24Hours | autoscalingMaxInLast24Hours  \nUpdate requires: No interruption\n"
+    },
+    "Ec2Ungraceful": {
+      "type": "object",
+      "properties": {
+        "MinimumSuccessPercentage": {
+          "type": "number",
+          "maximum": 99,
+          "minimum": 0,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "MinimumSuccessPercentage"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EcsCapacityIncreaseConfiguration": {
+      "type": "object",
+      "properties": {
+        "TimeoutMinutes": {
+          "type": "number",
+          "default": 60,
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "Services": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Service"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "Ungraceful": {
+          "$ref": "#/definitions/EcsUngraceful"
+        },
+        "TargetPercent": {
+          "type": "number",
+          "default": 100,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "CapacityMonitoringApproach": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/EcsCapacityMonitoringApproach"
+            },
+            {
+              "default": "sampledMaxInLast24Hours"
+            }
+          ]
+        }
+      },
+      "required": [
+        "Services"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EcsCapacityMonitoringApproach": {
+      "type": "string",
+      "enum": [
+        "sampledMaxInLast24Hours",
+        "containerInsightsMaxInLast24Hours"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: sampledMaxInLast24Hours | containerInsightsMaxInLast24Hours  \nUpdate requires: No interruption\n"
+    },
+    "EcsUngraceful": {
+      "type": "object",
+      "properties": {
+        "MinimumSuccessPercentage": {
+          "type": "number",
+          "maximum": 99,
+          "minimum": 0,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "MinimumSuccessPercentage"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EksCapacityMonitoringApproach": {
+      "type": "string",
+      "enum": [
+        "sampledMaxInLast24Hours"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: sampledMaxInLast24Hours  \nUpdate requires: No interruption\n"
+    },
+    "EksCluster": {
+      "type": "object",
+      "properties": {
+        "CrossAccountRole": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[a-zA-Z0-9-]*:iam::[0-9]{12}:role/.+$  \nUpdate requires: No interruption\n"
+        },
+        "ExternalId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ClusterArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:aws[a-zA-Z-]*:eks:[a-z0-9-]+:\\d{12}:cluster/[a-zA-Z0-9][a-zA-Z0-9-_]{0,99}$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ClusterArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EksResourceScalingConfiguration": {
+      "type": "object",
+      "properties": {
+        "TimeoutMinutes": {
+          "type": "number",
+          "default": 60,
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "KubernetesResourceType": {
+          "$ref": "#/definitions/KubernetesResourceType"
+        },
+        "ScalingResources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/KubernetesScalingApplication"
+          },
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "EksClusters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EksCluster"
+          },
+          "minItems": 2,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "Ungraceful": {
+          "$ref": "#/definitions/EksResourceScalingUngraceful"
+        },
+        "TargetPercent": {
+          "type": "number",
+          "default": 100,
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "CapacityMonitoringApproach": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/EksCapacityMonitoringApproach"
+            },
+            {
+              "default": "sampledMaxInLast24Hours"
+            }
+          ]
+        }
+      },
+      "required": [
+        "KubernetesResourceType"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EksResourceScalingUngraceful": {
+      "type": "object",
+      "properties": {
+        "MinimumSuccessPercentage": {
+          "type": "number",
+          "maximum": 99,
+          "minimum": 0,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "MinimumSuccessPercentage"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ExecutionApprovalConfiguration": {
+      "type": "object",
+      "properties": {
+        "TimeoutMinutes": {
+          "type": "number",
+          "default": 60,
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "ApprovalRole": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ApprovalRole"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ExecutionBlockConfiguration": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "CustomActionLambdaConfig",
+          "properties": {
+            "CustomActionLambdaConfig": {
+              "$ref": "#/definitions/CustomActionLambdaConfiguration"
+            }
+          },
+          "required": [
+            "CustomActionLambdaConfig"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Ec2AsgCapacityIncreaseConfig",
+          "properties": {
+            "Ec2AsgCapacityIncreaseConfig": {
+              "$ref": "#/definitions/Ec2AsgCapacityIncreaseConfiguration"
+            }
+          },
+          "required": [
+            "Ec2AsgCapacityIncreaseConfig"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "ExecutionApprovalConfig",
+          "properties": {
+            "ExecutionApprovalConfig": {
+              "$ref": "#/definitions/ExecutionApprovalConfiguration"
+            }
+          },
+          "required": [
+            "ExecutionApprovalConfig"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "ArcRoutingControlConfig",
+          "properties": {
+            "ArcRoutingControlConfig": {
+              "$ref": "#/definitions/ArcRoutingControlConfiguration"
+            }
+          },
+          "required": [
+            "ArcRoutingControlConfig"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "GlobalAuroraConfig",
+          "properties": {
+            "GlobalAuroraConfig": {
+              "$ref": "#/definitions/GlobalAuroraConfiguration"
+            }
+          },
+          "required": [
+            "GlobalAuroraConfig"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "ParallelConfig",
+          "properties": {
+            "ParallelConfig": {
+              "$ref": "#/definitions/ParallelExecutionBlockConfiguration"
+            }
+          },
+          "required": [
+            "ParallelConfig"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "RegionSwitchPlanConfig",
+          "properties": {
+            "RegionSwitchPlanConfig": {
+              "$ref": "#/definitions/RegionSwitchPlanConfiguration"
+            }
+          },
+          "required": [
+            "RegionSwitchPlanConfig"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "EcsCapacityIncreaseConfig",
+          "properties": {
+            "EcsCapacityIncreaseConfig": {
+              "$ref": "#/definitions/EcsCapacityIncreaseConfiguration"
+            }
+          },
+          "required": [
+            "EcsCapacityIncreaseConfig"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "EksResourceScalingConfig",
+          "properties": {
+            "EksResourceScalingConfig": {
+              "$ref": "#/definitions/EksResourceScalingConfiguration"
+            }
+          },
+          "required": [
+            "EksResourceScalingConfig"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Route53HealthCheckConfig",
+          "properties": {
+            "Route53HealthCheckConfig": {
+              "$ref": "#/definitions/Route53HealthCheckConfiguration"
+            }
+          },
+          "required": [
+            "Route53HealthCheckConfig"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ExecutionBlockType": {
+      "type": "string",
+      "enum": [
+        "CustomActionLambda",
+        "ManualApproval",
+        "AuroraGlobalDatabase",
+        "EC2AutoScaling",
+        "ARCRoutingControl",
+        "ARCRegionSwitchPlan",
+        "Parallel",
+        "ECSServiceScaling",
+        "EKSResourceScaling",
+        "Route53HealthCheck"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CustomActionLambda | ManualApproval | AuroraGlobalDatabase | EC2AutoScaling | ARCRoutingControl | ARCRegionSwitchPlan | Parallel | ECSServiceScaling | EKSResourceScaling | Route53HealthCheck  \nUpdate requires: No interruption\n"
+    },
+    "GlobalAuroraConfiguration": {
+      "type": "object",
+      "properties": {
+        "TimeoutMinutes": {
+          "type": "number",
+          "default": 60,
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "CrossAccountRole": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[a-zA-Z0-9-]*:iam::[0-9]{12}:role/.+$  \nUpdate requires: No interruption\n"
+        },
+        "ExternalId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Behavior": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/GlobalAuroraDefaultBehavior"
+            },
+            {
+              "default": "switchoverOnly"
+            }
+          ]
+        },
+        "Ungraceful": {
+          "$ref": "#/definitions/GlobalAuroraUngraceful"
+        },
+        "GlobalClusterIdentifier": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "DatabaseClusterArns": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Behavior",
+        "DatabaseClusterArns",
+        "GlobalClusterIdentifier"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "GlobalAuroraDefaultBehavior": {
+      "type": "string",
+      "enum": [
+        "switchoverOnly",
+        "failover"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: switchoverOnly | failover  \nUpdate requires: No interruption\n"
+    },
+    "GlobalAuroraUngraceful": {
+      "type": "object",
+      "properties": {
+        "Ungraceful": {
+          "$ref": "#/definitions/GlobalAuroraUngracefulBehavior"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "GlobalAuroraUngracefulBehavior": {
+      "type": "string",
+      "enum": [
+        "failover"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: failover  \nUpdate requires: No interruption\n"
+    },
+    "KubernetesResourceType": {
+      "type": "object",
+      "properties": {
+        "ApiVersion": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Kind": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ApiVersion",
+        "Kind"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "KubernetesScalingApplication": {
+      "type": "object",
+      "patternProperties": {
+        ".+": {
+          "$ref": "#/definitions/RegionalScalingResource"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "KubernetesScalingResource": {
+      "type": "object",
+      "properties": {
+        "Namespace": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$  \nUpdate requires: No interruption\n"
+        },
+        "Name": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "HpaName": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Name",
+        "Namespace"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LambdaUngraceful": {
+      "type": "object",
+      "properties": {
+        "Behavior": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/LambdaUngracefulBehavior"
+            },
+            {
+              "default": "skip"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LambdaUngracefulBehavior": {
+      "type": "string",
+      "enum": [
+        "skip"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: skip  \nUpdate requires: No interruption\n"
+    },
+    "Lambdas": {
+      "type": "object",
+      "properties": {
+        "CrossAccountRole": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[a-zA-Z0-9-]*:iam::[0-9]{12}:role/.+$  \nUpdate requires: No interruption\n"
+        },
+        "ExternalId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Arn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ParallelExecutionBlockConfiguration": {
+      "type": "object",
+      "properties": {
+        "Steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Step"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Steps"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RecoveryApproach": {
+      "type": "string",
+      "enum": [
+        "activeActive",
+        "activePassive"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: activeActive | activePassive  \nUpdate requires: No interruption\n"
+    },
+    "RegionAndRoutingControls": {
+      "type": "object",
+      "patternProperties": {
+        ".+": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ArcRoutingControlState"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RegionSwitchPlanConfiguration": {
+      "type": "object",
+      "properties": {
+        "CrossAccountRole": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[a-zA-Z0-9-]*:iam::[0-9]{12}:role/.+$  \nUpdate requires: No interruption\n"
+        },
+        "ExternalId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Arn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:aws[a-zA-Z-]*:arc-region-switch::[0-9]{12}:plan/([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,30}[a-zA-Z0-9])?):([a-z0-9]{6})$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Arn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RegionToRunIn": {
+      "type": "string",
+      "enum": [
+        "activatingRegion",
+        "deactivatingRegion"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: activatingRegion | deactivatingRegion  \nUpdate requires: No interruption\n"
+    },
+    "RegionalScalingResource": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}-[a-z-]+-\\d+$": {
+          "$ref": "#/definitions/KubernetesScalingResource"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Route53HealthCheckConfiguration": {
+      "type": "object",
+      "properties": {
+        "TimeoutMinutes": {
+          "type": "number",
+          "default": 60,
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "CrossAccountRole": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[a-zA-Z0-9-]*:iam::[0-9]{12}:role/.+$  \nUpdate requires: No interruption\n"
+        },
+        "ExternalId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "HostedZoneId": {
+          "type": "string",
+          "maxLength": 32,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 32  \nUpdate requires: No interruption\n"
+        },
+        "RecordName": {
+          "type": "string",
+          "maxLength": 1024,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+        },
+        "RecordSets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Route53ResourceRecordSet"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "HostedZoneId",
+        "RecordName"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Route53ResourceRecordSet": {
+      "type": "object",
+      "properties": {
+        "RecordSetIdentifier": {
+          "type": "string",
+          "maxLength": 1024,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+        },
+        "Region": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-z]{2}-[a-z-]+-\\d+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RoutingControlStateChange": {
+      "type": "string",
+      "enum": [
+        "On",
+        "Off"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: On | Off  \nUpdate requires: No interruption\n"
+    },
+    "Service": {
+      "type": "object",
+      "properties": {
+        "CrossAccountRole": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[a-zA-Z0-9-]*:iam::[0-9]{12}:role/.+$  \nUpdate requires: No interruption\n"
+        },
+        "ExternalId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ClusterArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws:ecs:[a-z0-9-]+:\\d{12}:cluster/[a-zA-Z0-9_-]{1,255}$  \nUpdate requires: No interruption\n"
+        },
+        "ServiceArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws:ecs:[a-z0-9-]+:\\d{12}:service/[a-zA-Z0-9_-]+/[a-zA-Z0-9_-]{1,255}$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Step": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Description": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ExecutionBlockConfiguration": {
+          "$ref": "#/definitions/ExecutionBlockConfiguration"
+        },
+        "ExecutionBlockType": {
+          "$ref": "#/definitions/ExecutionBlockType"
+        }
+      },
+      "required": [
+        "ExecutionBlockConfiguration",
+        "ExecutionBlockType",
+        "Name"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Tags": {
+      "type": "object",
+      "maxProperties": 200,
+      "minProperties": 0,
+      "patternProperties": {
+        ".+": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 0,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Trigger": {
+      "type": "object",
+      "properties": {
+        "Description": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "TargetRegion": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-z]{2}-[a-z-]+-\\d+$  \nUpdate requires: No interruption\n"
+        },
+        "Action": {
+          "$ref": "#/definitions/WorkflowTargetAction"
+        },
+        "Conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TriggerCondition"
+          },
+          "maxItems": 10,
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "MinDelayMinutesBetweenExecutions": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Action",
+        "Conditions",
+        "MinDelayMinutesBetweenExecutions",
+        "TargetRegion"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "TriggerCondition": {
+      "type": "object",
+      "properties": {
+        "AssociatedAlarmName": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Condition": {
+          "$ref": "#/definitions/AlarmCondition"
+        }
+      },
+      "required": [
+        "AssociatedAlarmName",
+        "Condition"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Workflow": {
+      "type": "object",
+      "properties": {
+        "Steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Step"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "WorkflowTargetAction": {
+          "$ref": "#/definitions/WorkflowTargetAction"
+        },
+        "WorkflowTargetRegion": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-z]{2}-[a-z-]+-\\d+$  \nUpdate requires: No interruption\n"
+        },
+        "WorkflowDescription": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "WorkflowTargetAction"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "WorkflowTargetAction": {
+      "type": "string",
+      "enum": [
+        "activate",
+        "deactivate"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: activate | deactivate  \nUpdate requires: No interruption\n"
+    },
+    "HealthCheckState": {
+      "type": "object",
+      "properties": {
+        "HealthCheckId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Region": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HealthChecks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/HealthCheckState"
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "HealthCheckIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "HealthCheckRecordNames": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "HealthCheckRegions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "HostedZoneIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "Arn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[a-zA-Z-]*:arc-region-switch::[0-9]{12}:plan/([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,30}[a-zA-Z0-9])?):([a-z0-9]{6})$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "AssociatedAlarms": {
+      "$ref": "#/definitions/AssociatedAlarmMap"
+    },
+    "Description": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "ExecutionRole": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:aws[a-zA-Z0-9-]*:iam::[0-9]{12}:role/.+$  \nUpdate requires: No interruption\n"
+    },
+    "Name": {
+      "type": "string",
+      "maxLength": 32,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 32  \nPattern: ^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,30}[a-zA-Z0-9])?$  \nUpdate requires: Replacement\n"
+    },
+    "Owner": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^\\d{12}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "PrimaryRegion": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-z]{2}-[a-z-]+-\\d+$  \nUpdate requires: Replacement\n"
+    },
+    "RecoveryApproach": {
+      "$ref": "#/definitions/RecoveryApproach"
+    },
+    "RecoveryTimeObjectiveMinutes": {
+      "type": "number",
+      "maximum": 10080,
+      "minimum": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+    },
+    "Regions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-z]{2}-[a-z-]+-\\d+$  \nUpdate requires: No interruption\n"
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: Replacement\n"
+    },
+    "Tags": {
+      "$ref": "#/definitions/Tags"
+    },
+    "Triggers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Trigger"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "Version": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Workflows": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Workflow"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "HealthChecksForPlan": {
+      "type": "object",
+      "patternProperties": {
+        ".+": {
+          "$ref": "#/definitions/HealthChecks"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Route53HealthChecks": {
+      "type": "object",
+      "properties": {
+        "HealthCheckIds": {
+          "$ref": "#/definitions/HealthCheckIds"
+        },
+        "RecordNames": {
+          "$ref": "#/definitions/HealthCheckRecordNames"
+        },
+        "Regions": {
+          "$ref": "#/definitions/HealthCheckRegions"
+        },
+        "HostedZoneIds": {
+          "$ref": "#/definitions/HostedZoneIds"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  },
+  "required": [
+    "ExecutionRole",
+    "Name",
+    "RecoveryApproach",
+    "Regions",
+    "Workflows"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/Owner",
+    "/properties/Version",
+    "/properties/HealthChecksForPlan",
+    "/properties/Route53HealthChecks"
+  ],
+  "createOnlyProperties": [
+    "/properties/Name",
+    "/properties/PrimaryRegion",
+    "/properties/RecoveryApproach",
+    "/properties/Regions"
+  ],
+  "deprecatedProperties": [
+    "/properties/HealthChecksForPlan"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "arc-region-switch:TagResource",
+      "arc-region-switch:UntagResource",
+      "arc-region-switch:ListTagsForResource"
+    ]
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "arc-region-switch:CreatePlan",
+        "arc-region-switch:GetPlan",
+        "arc-region-switch:ListRoute53HealthChecks",
+        "arc-region-switch:ListTagsForResource",
+        "arc-region-switch:TagResource",
+        "iam:PassRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "arc-region-switch:GetPlan",
+        "arc-region-switch:ListRoute53HealthChecks",
+        "arc-region-switch:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "arc-region-switch:GetPlan",
+        "arc-region-switch:ListRoute53HealthChecks",
+        "arc-region-switch:ListTagsForResource",
+        "arc-region-switch:TagResource",
+        "arc-region-switch:UntagResource",
+        "arc-region-switch:UpdatePlan",
+        "iam:PassRole"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "arc-region-switch:DeletePlan",
+        "arc-region-switch:GetPlan"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "arc-region-switch:ListPlans"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "attributes": {
+    "Arn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[a-zA-Z-]*:arc-region-switch::[0-9]{12}:plan/([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,30}[a-zA-Z0-9])?):([a-z0-9]{6})$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Owner": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^\\d{12}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Version": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "HealthChecksForPlan": {
+      "type": "object",
+      "patternProperties": {
+        ".+": {
+          "$ref": "#/definitions/HealthChecks"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Route53HealthChecks": {
+      "type": "object",
+      "properties": {
+        "HealthCheckIds": {
+          "$ref": "#/definitions/HealthCheckIds"
+        },
+        "RecordNames": {
+          "$ref": "#/definitions/HealthCheckRecordNames"
+        },
+        "Regions": {
+          "$ref": "#/definitions/HealthCheckRegions"
+        },
+        "HostedZoneIds": {
+          "$ref": "#/definitions/HostedZoneIds"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

@@ -3,6 +3,29 @@
   "description": "Resource schema for AWS::SES::ConfigurationSet.",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-ses.git",
   "definitions": {
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "TrackingOptions": {
       "description": "An object that defines the open and click tracking options for emails that you send using the configuration set.",
       "type": "object",
@@ -161,6 +184,17 @@
     },
     "VdmOptions": {
       "$ref": "#/definitions/VdmOptions"
+    },
+    "Tags": {
+      "description": "The tags (keys and values) associated with the contact list.",
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "minItems": 0,
+      "maxItems": 50,
+      "markdownDescription": "The tags (keys and values) associated with the contact list.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "createOnlyProperties": [
@@ -169,12 +203,27 @@
   "primaryIdentifier": [
     "/properties/Name"
   ],
-  "taggable": false,
   "additionalProperties": false,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "ses:TagResource",
+      "ses:UntagResource",
+      "ses:ListTagsForResource"
+    ]
+  },
   "handlers": {
     "create": {
       "permissions": [
-        "ses:CreateConfigurationSet"
+        "ses:CreateConfigurationSet",
+        "ses:UntagResource",
+        "ses:TagResource",
+        "ses:DescribeConfigurationSet",
+        "ses:GetConfigurationSet"
       ]
     },
     "read": {
@@ -190,7 +239,10 @@
         "ses:PutConfigurationSetReputationOptions",
         "ses:PutConfigurationSetSendingOptions",
         "ses:PutConfigurationSetSuppressionOptions",
-        "ses:PutConfigurationSetVdmOptions"
+        "ses:PutConfigurationSetVdmOptions",
+        "ses:DescribeConfigurationSet",
+        "ses:UntagResource",
+        "ses:TagResource"
       ]
     },
     "delete": {

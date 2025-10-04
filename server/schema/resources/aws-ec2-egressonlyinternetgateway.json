@@ -13,13 +13,52 @@
       "description": "The ID of the VPC for which to create the egress-only internet gateway.",
       "type": "string",
       "markdownDescription": "The ID of the VPC for which to create the egress-only internet gateway.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "Tags": {
+      "type": "array",
+      "description": "Any tags assigned to the egress only internet gateway.",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "Any tags assigned to the egress only internet gateway.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "definitions": {
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "maxLength": 256,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "tagging": {
-    "taggable": false,
-    "tagOnCreate": false,
-    "tagUpdatable": false,
-    "cloudFormationSystemTags": false
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "ec2:CreateTags",
+      "ec2:DeleteTags"
+    ]
   },
   "required": [
     "VpcId"
@@ -37,19 +76,29 @@
     "create": {
       "permissions": [
         "ec2:CreateEgressOnlyInternetGateway",
+        "ec2:CreateTags",
         "ec2:DescribeEgressOnlyInternetGateways"
       ]
     },
     "read": {
       "permissions": [
-        "ec2:DescribeEgressOnlyInternetGateways"
+        "ec2:DescribeEgressOnlyInternetGateways",
+        "ec2:DescribeTags"
       ]
     },
     "delete": {
       "permissions": [
         "ec2:DeleteEgressOnlyInternetGateway",
         "ec2:DescribeEgressOnlyInternetGateways",
-        "ec2:DescribeVpcs"
+        "ec2:DescribeVpcs",
+        "ec2:DeleteTags"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ec2:DeleteTags",
+        "ec2:CreateTags",
+        "ec2:DescribeEgressOnlyInternetGateways"
       ]
     },
     "list": {

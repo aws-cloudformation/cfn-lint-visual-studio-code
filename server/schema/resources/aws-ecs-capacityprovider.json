@@ -25,7 +25,10 @@
         "autoscaling:CreateOrUpdateTags",
         "ecs:CreateCapacityProvider",
         "ecs:DescribeCapacityProviders",
-        "ecs:TagResource"
+        "ecs:TagResource",
+        "ecs:PutClusterCapacityProviders",
+        "iam:CreateServiceLinkedRole",
+        "iam:PassRole"
       ]
     },
     "update": {
@@ -33,8 +36,10 @@
         "ecs:UpdateCapacityProvider",
         "ecs:DescribeCapacityProviders",
         "ecs:ListTagsForResource",
+        "ecs:PutClusterCapacityProviders",
         "ecs:TagResource",
-        "ecs:UntagResource"
+        "ecs:UntagResource",
+        "iam:PassRole"
       ]
     },
     "list": {
@@ -45,7 +50,8 @@
     "delete": {
       "permissions": [
         "ecs:DescribeCapacityProviders",
-        "ecs:DeleteCapacityProvider"
+        "ecs:DeleteCapacityProvider",
+        "ecs:PutClusterCapacityProviders"
       ]
     }
   },
@@ -53,7 +59,8 @@
   "description": "Resource Type definition for AWS::ECS::CapacityProvider.",
   "createOnlyProperties": [
     "/properties/AutoScalingGroupProvider/AutoScalingGroupArn",
-    "/properties/Name"
+    "/properties/Name",
+    "/properties/ClusterName"
   ],
   "additionalProperties": false,
   "primaryIdentifier": [
@@ -93,6 +100,347 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
     },
+    "AcceleratorCountRequest": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Min": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Max": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "MemoryGiBPerVCpuRequest": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Min": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "Max": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ManagedInstancesNetworkConfiguration": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "SecurityGroups": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "Subnets": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Subnets"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "InstanceRequirementsRequest": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "LocalStorageTypes": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "hdd",
+              "ssd"
+            ],
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: hdd | ssd  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "InstanceGenerations": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "current",
+              "previous"
+            ],
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: current | previous  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "NetworkInterfaceCount": {
+          "$ref": "#/definitions/NetworkInterfaceCountRequest"
+        },
+        "MemoryGiBPerVCpu": {
+          "$ref": "#/definitions/MemoryGiBPerVCpuRequest"
+        },
+        "AcceleratorTypes": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "gpu",
+              "fpga",
+              "inference"
+            ],
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: gpu | fpga | inference  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "VCpuCount": {
+          "$ref": "#/definitions/VCpuCountRangeRequest"
+        },
+        "ExcludedInstanceTypes": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "minLength": 1,
+            "type": "string",
+            "maxLength": 30,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 30  \nPattern: [a-zA-Z0-9\\.\\*]+  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "AcceleratorManufacturers": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "amazon-web-services",
+              "amd",
+              "habana",
+              "nvidia",
+              "xilinx"
+            ],
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: amazon-web-services | amd | habana | nvidia | xilinx  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "AllowedInstanceTypes": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "minLength": 1,
+            "type": "string",
+            "maxLength": 30,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 30  \nPattern: [a-zA-Z0-9\\.\\*]+  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "LocalStorage": {
+          "type": "string",
+          "enum": [
+            "included",
+            "required",
+            "excluded"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: included | required | excluded  \nUpdate requires: No interruption\n"
+        },
+        "CpuManufacturers": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "intel",
+              "amd",
+              "amazon-web-services"
+            ],
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: intel | amd | amazon-web-services  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "NetworkBandwidthGbps": {
+          "$ref": "#/definitions/NetworkBandwidthGbpsRequest"
+        },
+        "AcceleratorCount": {
+          "$ref": "#/definitions/AcceleratorCountRequest"
+        },
+        "BareMetal": {
+          "type": "string",
+          "enum": [
+            "included",
+            "required",
+            "excluded"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: included | required | excluded  \nUpdate requires: No interruption\n"
+        },
+        "RequireHibernateSupport": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "MaxSpotPriceAsPercentageOfOptimalOnDemandPrice": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "SpotMaxPricePercentageOverLowestPrice": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "BaselineEbsBandwidthMbps": {
+          "$ref": "#/definitions/BaselineEbsBandwidthMbpsRequest"
+        },
+        "OnDemandMaxPricePercentageOverLowestPrice": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "AcceleratorNames": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "a10g",
+              "a100",
+              "h100",
+              "inferentia",
+              "k520",
+              "k80",
+              "m60",
+              "radeon-pro-v520",
+              "t4",
+              "t4g",
+              "vu9p",
+              "v100"
+            ],
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: a10g | a100 | h100 | inferentia | k520 | k80 | m60 | radeon-pro-v520 | t4 | t4g | vu9p | v100  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "AcceleratorTotalMemoryMiB": {
+          "$ref": "#/definitions/AcceleratorTotalMemoryMiBRequest"
+        },
+        "BurstablePerformance": {
+          "type": "string",
+          "enum": [
+            "included",
+            "required",
+            "excluded"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: included | required | excluded  \nUpdate requires: No interruption\n"
+        },
+        "MemoryMiB": {
+          "$ref": "#/definitions/MemoryMiBRequest"
+        },
+        "TotalLocalStorageGB": {
+          "$ref": "#/definitions/TotalLocalStorageGBRequest"
+        }
+      },
+      "required": [
+        "VCpuCount",
+        "MemoryMiB"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "MemoryMiBRequest": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Min": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Max": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Min"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "TotalLocalStorageGBRequest": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Min": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "Max": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ManagedInstancesMonitoringOptions": {
+      "type": "string",
+      "enum": [
+        "BASIC",
+        "DETAILED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: BASIC | DETAILED  \nUpdate requires: No interruption\n"
+    },
+    "NetworkBandwidthGbpsRequest": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Min": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "Max": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "VCpuCountRangeRequest": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Min": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Max": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Min"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "BaselineEbsBandwidthMbpsRequest": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Min": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Max": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "ManagedScaling": {
       "description": "The managed scaling settings for the Auto Scaling group capacity provider.",
       "additionalProperties": false,
@@ -125,6 +473,50 @@
       },
       "markdownDescription": "The managed scaling settings for the Auto Scaling group capacity provider.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "NetworkInterfaceCountRequest": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Min": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Max": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ManagedInstancesStorageConfiguration": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "StorageSizeGiB": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "StorageSizeGiB"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AcceleratorTotalMemoryMiBRequest": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Min": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Max": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "Tag": {
       "additionalProperties": false,
       "type": "object",
@@ -141,11 +533,68 @@
         }
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "InstanceLaunchTemplate": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Ec2InstanceProfileArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "StorageConfiguration": {
+          "$ref": "#/definitions/ManagedInstancesStorageConfiguration"
+        },
+        "NetworkConfiguration": {
+          "$ref": "#/definitions/ManagedInstancesNetworkConfiguration"
+        },
+        "InstanceRequirements": {
+          "$ref": "#/definitions/InstanceRequirementsRequest"
+        },
+        "Monitoring": {
+          "$ref": "#/definitions/ManagedInstancesMonitoringOptions"
+        }
+      },
+      "required": [
+        "Ec2InstanceProfileArn",
+        "NetworkConfiguration"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ManagedInstancesProvider": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "InfrastructureRoleArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "PropagateTags": {
+          "type": "string",
+          "enum": [
+            "CAPACITY_PROVIDER",
+            "NONE"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CAPACITY_PROVIDER | NONE  \nUpdate requires: No interruption\n"
+        },
+        "InstanceLaunchTemplate": {
+          "$ref": "#/definitions/InstanceLaunchTemplate"
+        }
+      },
+      "required": [
+        "InfrastructureRoleArn",
+        "InstanceLaunchTemplate"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
     "AutoScalingGroupProvider": {
       "$ref": "#/definitions/AutoScalingGroupProvider"
+    },
+    "ClusterName": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
     },
     "Tags": {
       "type": "array",
@@ -157,6 +606,9 @@
     "Name": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "ManagedInstancesProvider": {
+      "$ref": "#/definitions/ManagedInstancesProvider"
     }
   },
   "attributes": {}

@@ -47,6 +47,28 @@
       "description": "the Amazon Resource Name (ARN) of the specified accesspoint.",
       "type": "string",
       "markdownDescription": "the Amazon Resource Name (ARN) of the specified accesspoint.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "maxLength": 256,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -108,6 +130,15 @@
         "arn:aws:s3:us-west-2:123456789012:accesspoint/test"
       ],
       "markdownDescription": "The Amazon Resource Name (ARN) of the specified accesspoint.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Tags": {
+      "description": "An arbitrary set of tags (key-value pairs) for this S3 Access Point.",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "type": "array",
+      "markdownDescription": "An arbitrary set of tags (key-value pairs) for this S3 Access Point.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "required": [
@@ -133,13 +164,15 @@
         "s3:CreateAccessPoint",
         "s3:PutAccessPointPolicy",
         "s3:GetAccessPoint",
-        "s3:PutAccessPointPublicAccessBlock"
+        "s3:PutAccessPointPublicAccessBlock",
+        "s3:TagResource"
       ]
     },
     "read": {
       "permissions": [
         "s3:GetAccessPoint",
-        "s3:GetAccessPointPolicy"
+        "s3:GetAccessPointPolicy",
+        "s3:ListTagsForResource"
       ]
     },
     "update": {
@@ -148,7 +181,9 @@
         "s3:PutAccessPointPublicAccessBlock",
         "s3:DeleteAccessPointPolicy",
         "s3:GetAccessPoint",
-        "s3:GetAccessPointPolicy"
+        "s3:GetAccessPointPolicy",
+        "s3:TagResource",
+        "s3:UntagResource"
       ]
     },
     "delete": {
@@ -164,7 +199,16 @@
     }
   },
   "tagging": {
-    "taggable": false
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "s3:TagResource",
+      "s3:UntagResource",
+      "s3:ListTagsForResource"
+    ]
   },
   "additionalProperties": false,
   "attributes": {
