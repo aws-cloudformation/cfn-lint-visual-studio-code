@@ -127,7 +127,17 @@ export async function activate(context: ExtensionContext) {
     }
   );
 
-  context.subscriptions.push(previewDisposable);
+  let clearAllDiagnostics = commands.registerCommand(
+    "extension.clearAllDiagnostics",
+    () => {
+      languageClient.sendNotification("cfn/clearAllDiagnostics");
+    }
+  );
+
+  context.subscriptions.push(
+      previewDisposable,
+      clearAllDiagnostics
+  );
 }
 
 function reloadSidePreview(file: string, languageClient: LanguageClient) {
