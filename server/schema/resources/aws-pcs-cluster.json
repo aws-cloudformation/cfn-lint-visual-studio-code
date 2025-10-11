@@ -1,360 +1,24 @@
 {
-  "typeName": "AWS::PCS::Cluster",
-  "description": "AWS::PCS::Cluster resource creates an AWS PCS cluster.",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-pcs.git",
-  "definitions": {
-    "Accounting": {
-      "type": "object",
-      "description": "The accounting configuration includes configurable settings for Slurm accounting.",
-      "properties": {
-        "DefaultPurgeTimeInDays": {
-          "type": "integer",
-          "description": "The default value for all purge settings for `slurmdbd.conf`. For more information, see the [slurmdbd.conf documentation at SchedMD](https://slurm.schedmd.com/slurmdbd.conf.html). The default value is `-1`. A value of `-1` means there is no purge time and records persist as long as the cluster exists.",
-          "default": -1,
-          "minimum": -1,
-          "maximum": 10000,
-          "markdownDescription": "The default value for all purge settings for `slurmdbd.conf`. For more information, see the [slurmdbd.conf documentation at SchedMD](https://slurm.schedmd.com/slurmdbd.conf.html). The default value is `-1`. A value of `-1` means there is no purge time and records persist as long as the cluster exists.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
-        },
-        "Mode": {
-          "type": "string",
-          "description": "The default value is `STANDARD`. A value of `STANDARD` means that Slurm accounting is enabled.",
-          "default": "NONE",
-          "enum": [
-            "STANDARD",
-            "NONE"
-          ],
-          "markdownDescription": "The default value is `STANDARD`. A value of `STANDARD` means that Slurm accounting is enabled.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: STANDARD | NONE  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Mode"
-      ],
-      "markdownDescription": "The accounting configuration includes configurable settings for Slurm accounting.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "AuthKey": {
-      "type": "object",
-      "description": "The shared Slurm key for authentication, also known as the cluster secret.",
-      "properties": {
-        "SecretArn": {
-          "type": "string",
-          "description": "The Amazon Resource Name (ARN) of the the shared Slurm key.",
-          "markdownDescription": "The Amazon Resource Name (ARN) of the the shared Slurm key.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "SecretVersion": {
-          "type": "string",
-          "description": "The version of the shared Slurm key.",
-          "markdownDescription": "The version of the shared Slurm key.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "SecretArn",
-        "SecretVersion"
-      ],
-      "additionalProperties": false,
-      "markdownDescription": "The shared Slurm key for authentication, also known as the cluster secret.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "Endpoint": {
-      "type": "object",
-      "description": "An endpoint available for interaction with the scheduler.",
-      "properties": {
-        "Port": {
-          "type": "string",
-          "description": "The endpoint's connection port number.",
-          "markdownDescription": "The endpoint's connection port number.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "PrivateIpAddress": {
-          "type": "string",
-          "description": "The endpoint's private IP address.",
-          "markdownDescription": "The endpoint's private IP address.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "Ipv6Address": {
-          "type": "string",
-          "description": "The endpoint's IPv6 address.",
-          "markdownDescription": "The endpoint's IPv6 address.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "Type": {
-          "type": "string",
-          "description": "Indicates the type of endpoint running at the specific IP address.",
-          "enum": [
-            "SLURMCTLD",
-            "SLURMDBD"
-          ],
-          "markdownDescription": "Indicates the type of endpoint running at the specific IP address.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: SLURMCTLD | SLURMDBD  \nUpdate requires: No interruption\n"
-        },
-        "PublicIpAddress": {
-          "type": "string",
-          "description": "The endpoint's public IP address.",
-          "markdownDescription": "The endpoint's public IP address.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Port",
-        "PrivateIpAddress",
-        "Type"
-      ],
-      "additionalProperties": false,
-      "markdownDescription": "An endpoint available for interaction with the scheduler.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "ErrorInfo": {
-      "type": "object",
-      "description": "An error that occurred during resource provisioning.",
-      "properties": {
-        "Code": {
-          "type": "string",
-          "description": "The short-form error code.",
-          "markdownDescription": "The short-form error code.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "Message": {
-          "type": "string",
-          "description": "The detailed error information.",
-          "markdownDescription": "The detailed error information.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "An error that occurred during resource provisioning.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "SecurityGroupId": {
-      "type": "string",
-      "description": "A VPC security group ID.",
-      "markdownDescription": "A VPC security group ID.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-    },
-    "SlurmCustomSetting": {
-      "type": "object",
-      "description": "Additional settings that directly map to Slurm settings.",
-      "properties": {
-        "ParameterName": {
-          "type": "string",
-          "description": "AWS PCS supports configuration of the following Slurm parameters for clusters: Prolog, Epilog, and SelectTypeParameters.",
-          "markdownDescription": "AWS PCS supports configuration of the following Slurm parameters for clusters: Prolog, Epilog, and SelectTypeParameters.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "ParameterValue": {
-          "type": "string",
-          "description": "The value for the configured Slurm setting.",
-          "markdownDescription": "The value for the configured Slurm setting.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "ParameterName",
-        "ParameterValue"
-      ],
-      "markdownDescription": "Additional settings that directly map to Slurm settings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "SubnetId": {
-      "type": "string",
-      "description": "A VPC subnet ID.",
-      "markdownDescription": "A VPC subnet ID.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-    },
-    "Tag": {
-      "type": "object",
-      "description": "A key-value pair to associate with a resource.",
-      "properties": {
-        "Key": {
-          "type": "string",
-          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
-          "minLength": 1,
-          "maxLength": 128,
-          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. \n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
-        },
-        "Value": {
-          "type": "string",
-          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
-          "minLength": 0,
-          "maxLength": 256,
-          "markdownDescription": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. \n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "Key"
-      ],
-      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    }
+  "tagging": {
+    "permissions": [
+      "pcs:TagResource",
+      "pcs:ListTagsForResource",
+      "pcs:UntagResource"
+    ],
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "tagProperty": "/properties/Tags",
+    "cloudFormationSystemTags": true
   },
-  "properties": {
-    "Arn": {
-      "type": "string",
-      "description": "The unique Amazon Resource Name (ARN) of the cluster.",
-      "markdownDescription": "The unique Amazon Resource Name (ARN) of the cluster.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "Endpoints": {
-      "type": "array",
-      "description": "The list of endpoints available for interaction with the scheduler.",
-      "insertionOrder": false,
-      "items": {
-        "$ref": "#/definitions/Endpoint"
-      },
-      "markdownDescription": "The list of endpoints available for interaction with the scheduler.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "ErrorInfo": {
-      "type": "array",
-      "description": "The list of errors that occurred during cluster provisioning.",
-      "insertionOrder": false,
-      "items": {
-        "$ref": "#/definitions/ErrorInfo"
-      },
-      "markdownDescription": "The list of errors that occurred during cluster provisioning.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "Id": {
-      "type": "string",
-      "description": "The generated unique ID of the cluster.",
-      "markdownDescription": "The generated unique ID of the cluster.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(pcs_[a-zA-Z0-9]+|[A-Za-z][A-Za-z0-9-]{1,40})$  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "Name": {
-      "type": "string",
-      "description": "The name that identifies the cluster.",
-      "markdownDescription": "The name that identifies the cluster.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
-    },
-    "Networking": {
-      "type": "object",
-      "description": "The networking configuration for the cluster's control plane.",
-      "properties": {
-        "SecurityGroupIds": {
-          "type": "array",
-          "description": "The list of security group IDs associated with the Elastic Network Interface (ENI) created in subnets.",
-          "insertionOrder": false,
-          "items": {
-            "$ref": "#/definitions/SecurityGroupId"
-          },
-          "markdownDescription": "The list of security group IDs associated with the Elastic Network Interface (ENI) created in subnets.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "SubnetIds": {
-          "type": "array",
-          "description": "The list of subnet IDs where AWS PCS creates an Elastic Network Interface (ENI) to enable communication between managed controllers and AWS PCS resources. The subnet must have an available IP address, cannot reside in AWS Outposts, AWS Wavelength, or an AWS Local Zone. AWS PCS currently supports only 1 subnet in this list.",
-          "insertionOrder": false,
-          "items": {
-            "$ref": "#/definitions/SubnetId"
-          },
-          "markdownDescription": "The list of subnet IDs where AWS PCS creates an Elastic Network Interface (ENI) to enable communication between managed controllers and AWS PCS resources. The subnet must have an available IP address, cannot reside in AWS Outposts, AWS Wavelength, or an AWS Local Zone. AWS PCS currently supports only 1 subnet in this list.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "NetworkType": {
-          "type": "string",
-          "description": "The IP of the cluster (IPV4 or IPV6)",
-          "enum": [
-            "IPV4",
-            "IPV6"
-          ],
-          "insertionOrder": false,
-          "markdownDescription": "The IP of the cluster (IPV4 or IPV6)\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: IPV4 | IPV6  \nUpdate requires: No interruption\n"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "The networking configuration for the cluster's control plane.\n\n---\n\nRequired: Yes  \nUpdate requires: Replacement\n"
-    },
-    "Scheduler": {
-      "type": "object",
-      "description": "The cluster management and job scheduling software associated with the cluster.",
-      "properties": {
-        "Type": {
-          "type": "string",
-          "description": "The software AWS PCS uses to manage cluster scaling and job scheduling.",
-          "enum": [
-            "SLURM"
-          ],
-          "markdownDescription": "The software AWS PCS uses to manage cluster scaling and job scheduling.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: SLURM  \nUpdate requires: No interruption\n"
-        },
-        "Version": {
-          "type": "string",
-          "description": "The version of the specified scheduling software that AWS PCS uses to manage cluster scaling and job scheduling.",
-          "markdownDescription": "The version of the specified scheduling software that AWS PCS uses to manage cluster scaling and job scheduling.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Type",
-        "Version"
-      ],
-      "additionalProperties": false,
-      "markdownDescription": "The cluster management and job scheduling software associated with the cluster.\n\n---\n\nRequired: Yes  \nUpdate requires: Replacement\n"
-    },
-    "Size": {
-      "type": "string",
-      "description": "The size of the cluster.",
-      "enum": [
-        "SMALL",
-        "MEDIUM",
-        "LARGE"
-      ],
-      "markdownDescription": "The size of the cluster.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: SMALL | MEDIUM | LARGE  \nUpdate requires: Replacement\n"
-    },
-    "SlurmConfiguration": {
-      "type": "object",
-      "description": "Additional options related to the Slurm scheduler.",
-      "properties": {
-        "Accounting": {
-          "$ref": "#/definitions/Accounting"
-        },
-        "AuthKey": {
-          "$ref": "#/definitions/AuthKey"
-        },
-        "ScaleDownIdleTimeInSeconds": {
-          "type": "integer",
-          "description": "The time before an idle node is scaled down.",
-          "minimum": 1,
-          "markdownDescription": "The time before an idle node is scaled down.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
-        },
-        "SlurmCustomSettings": {
-          "type": "array",
-          "description": "Additional Slurm-specific configuration that directly maps to Slurm settings.",
-          "insertionOrder": false,
-          "items": {
-            "$ref": "#/definitions/SlurmCustomSetting"
-          },
-          "markdownDescription": "Additional Slurm-specific configuration that directly maps to Slurm settings.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "Additional options related to the Slurm scheduler.\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
-    },
-    "Status": {
-      "type": "string",
-      "description": "The provisioning status of the cluster. The provisioning status doesn't indicate the overall health of the cluster.",
-      "enum": [
-        "CREATING",
-        "ACTIVE",
-        "UPDATING",
-        "DELETING",
-        "CREATE_FAILED",
-        "DELETE_FAILED",
-        "UPDATE_FAILED"
-      ],
-      "markdownDescription": "The provisioning status of the cluster. The provisioning status doesn't indicate the overall health of the cluster.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | ACTIVE | UPDATING | DELETING | CREATE_FAILED | DELETE_FAILED | UPDATE_FAILED  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "Tags": {
-      "description": "1 or more tags added to the resource. Each tag consists of a tag key and tag value. The tag value is optional and can be an empty string.",
-      "patternProperties": {
-        "^.+$": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "1 or more tags added to the resource. Each tag consists of a tag key and tag value. The tag value is optional and can be an empty string.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
-    }
-  },
-  "required": [
-    "Networking",
-    "Scheduler",
-    "Size"
-  ],
-  "additionalProperties": false,
-  "primaryIdentifier": [
-    "/properties/Arn"
-  ],
-  "createOnlyProperties": [
-    "/properties/Name",
-    "/properties/Networking",
-    "/properties/Scheduler",
-    "/properties/Size",
-    "/properties/SlurmConfiguration"
-  ],
-  "readOnlyProperties": [
-    "/properties/Arn",
-    "/properties/Endpoints",
-    "/properties/ErrorInfo",
-    "/properties/Id",
-    "/properties/Status"
-  ],
   "handlers": {
+    "read": {
+      "permissions": [
+        "pcs:GetCluster",
+        "pcs:ListTagsForResource"
+      ]
+    },
     "create": {
       "permissions": [
         "ec2:CreateNetworkInterface",
@@ -372,25 +36,13 @@
       ],
       "timeoutInMinutes": 60
     },
-    "read": {
-      "permissions": [
-        "pcs:GetCluster",
-        "pcs:ListTagsForResource"
-      ]
-    },
     "update": {
       "permissions": [
         "pcs:GetCluster",
+        "pcs:UpdateCluster",
         "pcs:ListTagsForResource",
         "pcs:TagResource",
         "pcs:UntagResource"
-      ],
-      "timeoutInMinutes": 60
-    },
-    "delete": {
-      "permissions": [
-        "pcs:DeleteCluster",
-        "pcs:GetCluster"
       ],
       "timeoutInMinutes": 60
     },
@@ -398,52 +50,221 @@
       "permissions": [
         "pcs:ListClusters"
       ]
+    },
+    "delete": {
+      "permissions": [
+        "pcs:DeleteCluster",
+        "pcs:GetCluster"
+      ],
+      "timeoutInMinutes": 60
     }
   },
-  "tagging": {
-    "taggable": true,
-    "tagOnCreate": true,
-    "tagUpdatable": true,
-    "cloudFormationSystemTags": true,
-    "tagProperty": "/properties/Tags",
-    "permissions": [
-      "pcs:TagResource",
-      "pcs:ListTagsForResource",
-      "pcs:UntagResource"
-    ]
-  },
-  "attributes": {
-    "Arn": {
-      "type": "string",
-      "description": "The unique Amazon Resource Name (ARN) of the cluster.",
-      "markdownDescription": "The unique Amazon Resource Name (ARN) of the cluster.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+  "typeName": "AWS::PCS::Cluster",
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/Endpoints",
+    "/properties/ErrorInfo",
+    "/properties/Id",
+    "/properties/Status"
+  ],
+  "description": "AWS::PCS::Cluster resource creates an AWS PCS cluster.",
+  "createOnlyProperties": [
+    "/properties/Name",
+    "/properties/Networking",
+    "/properties/Scheduler",
+    "/properties/Size"
+  ],
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "definitions": {
+    "Endpoint": {
+      "description": "An endpoint available for interaction with the scheduler.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "PublicIpAddress": {
+          "description": "The endpoint's public IP address.",
+          "type": "string",
+          "markdownDescription": "The endpoint's public IP address.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Type": {
+          "description": "Indicates the type of endpoint running at the specific IP address.",
+          "type": "string",
+          "enum": [
+            "SLURMCTLD",
+            "SLURMDBD"
+          ],
+          "markdownDescription": "Indicates the type of endpoint running at the specific IP address.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: SLURMCTLD | SLURMDBD  \nUpdate requires: No interruption\n"
+        },
+        "PrivateIpAddress": {
+          "description": "The endpoint's private IP address.",
+          "type": "string",
+          "markdownDescription": "The endpoint's private IP address.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Port": {
+          "description": "The endpoint's connection port number.",
+          "type": "string",
+          "markdownDescription": "The endpoint's connection port number.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Ipv6Address": {
+          "description": "The endpoint's IPv6 address.",
+          "type": "string",
+          "markdownDescription": "The endpoint's IPv6 address.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Port",
+        "PrivateIpAddress",
+        "Type"
+      ],
+      "markdownDescription": "An endpoint available for interaction with the scheduler.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "Accounting": {
+      "description": "The accounting configuration includes configurable settings for Slurm accounting.",
+      "type": "object",
+      "properties": {
+        "DefaultPurgeTimeInDays": {
+          "default": -1,
+          "description": "The default value for all purge settings for `slurmdbd.conf`. For more information, see the [slurmdbd.conf documentation at SchedMD](https://slurm.schedmd.com/slurmdbd.conf.html). The default value is `-1`. A value of `-1` means there is no purge time and records persist as long as the cluster exists.",
+          "maximum": 10000,
+          "type": "integer",
+          "minimum": -1,
+          "markdownDescription": "The default value for all purge settings for `slurmdbd.conf`. For more information, see the [slurmdbd.conf documentation at SchedMD](https://slurm.schedmd.com/slurmdbd.conf.html). The default value is `-1`. A value of `-1` means there is no purge time and records persist as long as the cluster exists.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Mode": {
+          "default": "NONE",
+          "description": "The default value is `STANDARD`. A value of `STANDARD` means that Slurm accounting is enabled.",
+          "type": "string",
+          "enum": [
+            "STANDARD",
+            "NONE"
+          ],
+          "markdownDescription": "The default value is `STANDARD`. A value of `STANDARD` means that Slurm accounting is enabled.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: STANDARD | NONE  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Mode"
+      ],
+      "markdownDescription": "The accounting configuration includes configurable settings for Slurm accounting.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ErrorInfo": {
+      "description": "An error that occurred during resource provisioning.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Message": {
+          "description": "The detailed error information.",
+          "type": "string",
+          "markdownDescription": "The detailed error information.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Code": {
+          "description": "The short-form error code.",
+          "type": "string",
+          "markdownDescription": "The short-form error code.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "An error that occurred during resource provisioning.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SecurityGroupId": {
+      "description": "A VPC security group ID.",
+      "type": "string",
+      "markdownDescription": "A VPC security group ID.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "AuthKey": {
+      "description": "The shared Slurm key for authentication, also known as the cluster secret.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "SecretArn": {
+          "description": "The Amazon Resource Name (ARN) of the the shared Slurm key.",
+          "type": "string",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the the shared Slurm key.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "SecretVersion": {
+          "description": "The version of the shared Slurm key.",
+          "type": "string",
+          "markdownDescription": "The version of the shared Slurm key.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "SecretArn",
+        "SecretVersion"
+      ],
+      "markdownDescription": "The shared Slurm key for authentication, also known as the cluster secret.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SubnetId": {
+      "description": "A VPC subnet ID.",
+      "type": "string",
+      "markdownDescription": "A VPC subnet ID.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "minLength": 0,
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "type": "string",
+          "maxLength": 256,
+          "markdownDescription": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. \n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        },
+        "Key": {
+          "minLength": 1,
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "type": "string",
+          "maxLength": 128,
+          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. \n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key"
+      ],
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SlurmCustomSetting": {
+      "description": "Additional settings that directly map to Slurm settings.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ParameterValue": {
+          "description": "The value for the configured Slurm setting.",
+          "type": "string",
+          "markdownDescription": "The value for the configured Slurm setting.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ParameterName": {
+          "description": "AWS PCS supports configuration of the following Slurm parameters for clusters: Prolog, Epilog, and SelectTypeParameters.",
+          "type": "string",
+          "markdownDescription": "AWS PCS supports configuration of the following Slurm parameters for clusters: Prolog, Epilog, and SelectTypeParameters.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ParameterName",
+        "ParameterValue"
+      ],
+      "markdownDescription": "Additional settings that directly map to Slurm settings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "required": [
+    "Networking",
+    "Scheduler",
+    "Size"
+  ],
+  "properties": {
     "Endpoints": {
-      "type": "array",
       "description": "The list of endpoints available for interaction with the scheduler.",
       "insertionOrder": false,
+      "type": "array",
       "items": {
         "$ref": "#/definitions/Endpoint"
       },
       "markdownDescription": "The list of endpoints available for interaction with the scheduler.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
     },
-    "ErrorInfo": {
-      "type": "array",
-      "description": "The list of errors that occurred during cluster provisioning.",
-      "insertionOrder": false,
-      "items": {
-        "$ref": "#/definitions/ErrorInfo"
-      },
-      "markdownDescription": "The list of errors that occurred during cluster provisioning.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "Id": {
-      "type": "string",
-      "description": "The generated unique ID of the cluster.",
-      "markdownDescription": "The generated unique ID of the cluster.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(pcs_[a-zA-Z0-9]+|[A-Za-z][A-Za-z0-9-]{1,40})$  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
     "Status": {
-      "type": "string",
       "description": "The provisioning status of the cluster. The provisioning status doesn't indicate the overall health of the cluster.",
+      "type": "string",
       "enum": [
         "CREATING",
         "ACTIVE",
@@ -454,6 +275,185 @@
         "UPDATE_FAILED"
       ],
       "markdownDescription": "The provisioning status of the cluster. The provisioning status doesn't indicate the overall health of the cluster.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | ACTIVE | UPDATING | DELETING | CREATE_FAILED | DELETE_FAILED | UPDATE_FAILED  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Networking": {
+      "description": "The networking configuration for the cluster's control plane.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "NetworkType": {
+          "description": "The IP of the cluster (IPV4 or IPV6)",
+          "insertionOrder": false,
+          "type": "string",
+          "enum": [
+            "IPV4",
+            "IPV6"
+          ],
+          "markdownDescription": "The IP of the cluster (IPV4 or IPV6)\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: IPV4 | IPV6  \nUpdate requires: No interruption\n"
+        },
+        "SecurityGroupIds": {
+          "description": "The list of security group IDs associated with the Elastic Network Interface (ENI) created in subnets.",
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SecurityGroupId"
+          },
+          "markdownDescription": "The list of security group IDs associated with the Elastic Network Interface (ENI) created in subnets.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "SubnetIds": {
+          "description": "The list of subnet IDs where AWS PCS creates an Elastic Network Interface (ENI) to enable communication between managed controllers and AWS PCS resources. The subnet must have an available IP address, cannot reside in AWS Outposts, AWS Wavelength, or an AWS Local Zone. AWS PCS currently supports only 1 subnet in this list.",
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SubnetId"
+          },
+          "markdownDescription": "The list of subnet IDs where AWS PCS creates an Elastic Network Interface (ENI) to enable communication between managed controllers and AWS PCS resources. The subnet must have an available IP address, cannot reside in AWS Outposts, AWS Wavelength, or an AWS Local Zone. AWS PCS currently supports only 1 subnet in this list.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "The networking configuration for the cluster's control plane.\n\n---\n\nRequired: Yes  \nUpdate requires: Replacement\n"
+    },
+    "Scheduler": {
+      "description": "The cluster management and job scheduling software associated with the cluster.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Type": {
+          "description": "The software AWS PCS uses to manage cluster scaling and job scheduling.",
+          "type": "string",
+          "enum": [
+            "SLURM"
+          ],
+          "markdownDescription": "The software AWS PCS uses to manage cluster scaling and job scheduling.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: SLURM  \nUpdate requires: No interruption\n"
+        },
+        "Version": {
+          "description": "The version of the specified scheduling software that AWS PCS uses to manage cluster scaling and job scheduling.",
+          "type": "string",
+          "markdownDescription": "The version of the specified scheduling software that AWS PCS uses to manage cluster scaling and job scheduling.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Type",
+        "Version"
+      ],
+      "markdownDescription": "The cluster management and job scheduling software associated with the cluster.\n\n---\n\nRequired: Yes  \nUpdate requires: Replacement\n"
+    },
+    "Size": {
+      "description": "The size of the cluster.",
+      "type": "string",
+      "enum": [
+        "SMALL",
+        "MEDIUM",
+        "LARGE"
+      ],
+      "markdownDescription": "The size of the cluster.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: SMALL | MEDIUM | LARGE  \nUpdate requires: Replacement\n"
+    },
+    "ErrorInfo": {
+      "description": "The list of errors that occurred during cluster provisioning.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ErrorInfo"
+      },
+      "markdownDescription": "The list of errors that occurred during cluster provisioning.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SlurmConfiguration": {
+      "description": "Additional options related to the Slurm scheduler.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Accounting": {
+          "$ref": "#/definitions/Accounting"
+        },
+        "AuthKey": {
+          "$ref": "#/definitions/AuthKey"
+        },
+        "ScaleDownIdleTimeInSeconds": {
+          "description": "The time before an idle node is scaled down.",
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "The time before an idle node is scaled down.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "SlurmCustomSettings": {
+          "description": "Additional Slurm-specific configuration that directly maps to Slurm settings.",
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SlurmCustomSetting"
+          },
+          "markdownDescription": "Additional Slurm-specific configuration that directly maps to Slurm settings.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Additional options related to the Slurm scheduler.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Id": {
+      "description": "The generated unique ID of the cluster.",
+      "type": "string",
+      "markdownDescription": "The generated unique ID of the cluster.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(pcs_[a-zA-Z0-9]+|[A-Za-z][A-Za-z0-9-]{1,40})$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Arn": {
+      "description": "The unique Amazon Resource Name (ARN) of the cluster.",
+      "type": "string",
+      "markdownDescription": "The unique Amazon Resource Name (ARN) of the cluster.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Tags": {
+      "patternProperties": {
+        "^.+$": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "description": "1 or more tags added to the resource. Each tag consists of a tag key and tag value. The tag value is optional and can be an empty string.",
+      "additionalProperties": false,
+      "markdownDescription": "1 or more tags added to the resource. Each tag consists of a tag key and tag value. The tag value is optional and can be an empty string.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "Name": {
+      "description": "The name that identifies the cluster.",
+      "type": "string",
+      "markdownDescription": "The name that identifies the cluster.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+    }
+  },
+  "attributes": {
+    "Endpoints": {
+      "description": "The list of endpoints available for interaction with the scheduler.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Endpoint"
+      },
+      "markdownDescription": "The list of endpoints available for interaction with the scheduler.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Status": {
+      "description": "The provisioning status of the cluster. The provisioning status doesn't indicate the overall health of the cluster.",
+      "type": "string",
+      "enum": [
+        "CREATING",
+        "ACTIVE",
+        "UPDATING",
+        "DELETING",
+        "CREATE_FAILED",
+        "DELETE_FAILED",
+        "UPDATE_FAILED"
+      ],
+      "markdownDescription": "The provisioning status of the cluster. The provisioning status doesn't indicate the overall health of the cluster.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | ACTIVE | UPDATING | DELETING | CREATE_FAILED | DELETE_FAILED | UPDATE_FAILED  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ErrorInfo": {
+      "description": "The list of errors that occurred during cluster provisioning.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ErrorInfo"
+      },
+      "markdownDescription": "The list of errors that occurred during cluster provisioning.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Id": {
+      "description": "The generated unique ID of the cluster.",
+      "type": "string",
+      "markdownDescription": "The generated unique ID of the cluster.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(pcs_[a-zA-Z0-9]+|[A-Za-z][A-Za-z0-9-]{1,40})$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Arn": {
+      "description": "The unique Amazon Resource Name (ARN) of the cluster.",
+      "type": "string",
+      "markdownDescription": "The unique Amazon Resource Name (ARN) of the cluster.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }
