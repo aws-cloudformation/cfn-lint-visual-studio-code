@@ -1,81 +1,195 @@
 {
-  "typeName": "AWS::Backup::BackupPlan",
-  "description": "Resource Type definition for AWS::Backup::BackupPlan",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
-  "properties": {
-    "BackupPlan": {
-      "$ref": "#/definitions/BackupPlanResourceType"
-    },
-    "BackupPlanTags": {
-      "type": "object",
-      "additionalProperties": false,
-      "patternProperties": {
-        "^.{1,128}$": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "BackupPlanArn": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "BackupPlanId": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "VersionId": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    }
-  },
-  "additionalProperties": false,
-  "required": [
-    "BackupPlan"
-  ],
   "tagging": {
-    "taggable": true,
-    "tagOnCreate": true,
-    "tagUpdatable": true,
-    "cloudFormationSystemTags": true,
-    "tagProperty": "/properties/BackupPlanTags",
     "permissions": [
       "backup:TagResource",
       "backup:UntagResource",
       "backup:ListTags"
-    ]
+    ],
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "tagProperty": "/properties/BackupPlanTags",
+    "cloudFormationSystemTags": true
   },
+  "handlers": {
+    "read": {
+      "permissions": [
+        "backup:GetBackupPlan",
+        "backup:ListTags"
+      ]
+    },
+    "create": {
+      "permissions": [
+        "backup:GetBackupPlan",
+        "backup:TagResource",
+        "backup:CreateBackupPlan"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "backup:UpdateBackupPlan",
+        "backup:ListTags",
+        "backup:TagResource",
+        "backup:UntagResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "backup:ListBackupPlans"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "backup:GetBackupPlan",
+        "backup:DeleteBackupPlan"
+      ]
+    }
+  },
+  "typeName": "AWS::Backup::BackupPlan",
   "readOnlyProperties": [
     "/properties/BackupPlanId",
     "/properties/VersionId",
     "/properties/BackupPlanArn"
   ],
+  "description": "Resource Type definition for AWS::Backup::BackupPlan",
+  "additionalProperties": false,
   "primaryIdentifier": [
     "/properties/BackupPlanId"
   ],
   "definitions": {
-    "BackupPlanResourceType": {
-      "type": "object",
+    "ResourceTypes": {
+      "uniqueItems": true,
+      "insertionOrder": true,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ResourceType"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "CopyActionResourceType": {
       "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Lifecycle": {
+          "$ref": "#/definitions/LifecycleResourceType"
+        },
+        "DestinationBackupVaultArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "DestinationBackupVaultArn"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "IndexActionsResourceType": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ResourceTypes": {
+          "$ref": "#/definitions/ResourceTypes"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "BackupRuleResourceType": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "CompletionWindowMinutes": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "ScheduleExpression": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "RecoveryPointTags": {
+          "patternProperties": {
+            "^.{1,128}$": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "CopyActions": {
+          "uniqueItems": false,
+          "insertionOrder": true,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CopyActionResourceType"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "EnableContinuousBackup": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "Lifecycle": {
+          "$ref": "#/definitions/LifecycleResourceType"
+        },
+        "IndexActions": {
+          "uniqueItems": false,
+          "insertionOrder": true,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/IndexActionsResourceType"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "TargetBackupVault": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "StartWindowMinutes": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "ScheduleExpressionTimezone": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "RuleName": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "TargetBackupVault",
+        "RuleName"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ResourceType": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "BackupPlanResourceType": {
+      "additionalProperties": false,
+      "type": "object",
       "properties": {
         "BackupPlanName": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         },
         "AdvancedBackupSettings": {
-          "type": "array",
-          "insertionOrder": true,
           "uniqueItems": false,
+          "insertionOrder": true,
+          "type": "array",
           "items": {
             "$ref": "#/definitions/AdvancedBackupSettingResourceType"
           },
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         },
         "BackupPlanRule": {
-          "type": "array",
-          "insertionOrder": true,
           "uniqueItems": false,
+          "insertionOrder": true,
+          "type": "array",
           "items": {
             "$ref": "#/definitions/BackupRuleResourceType"
           },
@@ -88,80 +202,9 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "BackupRuleResourceType": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "RuleName": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "TargetBackupVault": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "StartWindowMinutes": {
-          "type": "number",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
-        },
-        "CompletionWindowMinutes": {
-          "type": "number",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
-        },
-        "ScheduleExpression": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "ScheduleExpressionTimezone": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "IndexActions": {
-          "type": "array",
-          "insertionOrder": true,
-          "uniqueItems": false,
-          "items": {
-            "$ref": "#/definitions/IndexActionsResourceType"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "RecoveryPointTags": {
-          "type": "object",
-          "additionalProperties": false,
-          "patternProperties": {
-            "^.{1,128}$": {
-              "type": "string",
-              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-            }
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-        },
-        "CopyActions": {
-          "type": "array",
-          "insertionOrder": true,
-          "uniqueItems": false,
-          "items": {
-            "$ref": "#/definitions/CopyActionResourceType"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "Lifecycle": {
-          "$ref": "#/definitions/LifecycleResourceType"
-        },
-        "EnableContinuousBackup": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "TargetBackupVault",
-        "RuleName"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
     "AdvancedBackupSettingResourceType": {
-      "type": "object",
       "additionalProperties": false,
+      "type": "object",
       "properties": {
         "BackupOptions": {
           "type": "object",
@@ -178,102 +221,59 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "CopyActionResourceType": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "Lifecycle": {
-          "$ref": "#/definitions/LifecycleResourceType"
-        },
-        "DestinationBackupVaultArn": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "DestinationBackupVaultArn"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "IndexActionsResourceType": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "ResourceTypes": {
-          "$ref": "#/definitions/ResourceTypes"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "ResourceTypes": {
-      "type": "array",
-      "insertionOrder": true,
-      "uniqueItems": true,
-      "items": {
-        "$ref": "#/definitions/ResourceType"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-    },
-    "ResourceType": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-    },
     "LifecycleResourceType": {
-      "type": "object",
       "additionalProperties": false,
+      "type": "object",
       "properties": {
-        "MoveToColdStorageAfterDays": {
-          "type": "number",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        "OptInToArchiveForSupportedResources": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
         },
         "DeleteAfterDays": {
           "type": "number",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
         },
-        "OptInToArchiveForSupportedResources": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        "MoveToColdStorageAfterDays": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
         }
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
-  "handlers": {
-    "read": {
-      "permissions": [
-        "backup:GetBackupPlan",
-        "backup:ListTags"
-      ]
+  "properties": {
+    "VersionId": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
-    "create": {
-      "permissions": [
-        "backup:GetBackupPlan",
-        "backup:TagResource",
-        "backup:CreateBackupPlan"
-      ]
+    "BackupPlan": {
+      "$ref": "#/definitions/BackupPlanResourceType"
     },
-    "delete": {
-      "permissions": [
-        "backup:GetBackupPlan",
-        "backup:DeleteBackupPlan"
-      ]
+    "BackupPlanId": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
-    "update": {
-      "permissions": [
-        "backup:UpdateBackupPlan",
-        "backup:ListTags",
-        "backup:TagResource",
-        "backup:UntagResource"
-      ]
+    "BackupPlanTags": {
+      "patternProperties": {
+        "^.{1,128}$": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "list": {
-      "permissions": [
-        "backup:ListBackupPlans"
-      ]
+    "BackupPlanArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   },
+  "required": [
+    "BackupPlan"
+  ],
   "attributes": {
-    "BackupPlanArn": {
+    "VersionId": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
@@ -281,7 +281,7 @@
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
-    "VersionId": {
+    "BackupPlanArn": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     }

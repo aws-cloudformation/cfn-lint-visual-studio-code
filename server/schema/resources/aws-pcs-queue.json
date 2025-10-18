@@ -1,24 +1,163 @@
 {
+  "typeName": "AWS::PCS::Queue",
+  "description": "AWS::PCS::Queue resource creates an AWS PCS queue.",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-pcs.git",
-  "tagging": {
-    "permissions": [
-      "pcs:TagResource",
-      "pcs:ListTagsForResource",
-      "pcs:UntagResource"
-    ],
-    "taggable": true,
-    "tagOnCreate": true,
-    "tagUpdatable": true,
-    "tagProperty": "/properties/Tags",
-    "cloudFormationSystemTags": true
-  },
-  "handlers": {
-    "read": {
-      "permissions": [
-        "pcs:GetQueue",
-        "pcs:ListTagsForResource"
-      ]
+  "definitions": {
+    "ComputeNodeGroupConfiguration": {
+      "type": "object",
+      "description": "The compute node group configuration for a queue.",
+      "properties": {
+        "ComputeNodeGroupId": {
+          "type": "string",
+          "description": "The compute node group ID for the compute node group configuration.",
+          "markdownDescription": "The compute node group ID for the compute node group configuration.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The compute node group configuration for a queue.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "ErrorInfo": {
+      "type": "object",
+      "description": "An error that occurred during resource provisioning.",
+      "properties": {
+        "Code": {
+          "type": "string",
+          "description": "The short-form error code.",
+          "markdownDescription": "The short-form error code.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Message": {
+          "type": "string",
+          "description": "The detailed error information.",
+          "markdownDescription": "The detailed error information.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "An error that occurred during resource provisioning.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SlurmCustomSetting": {
+      "type": "object",
+      "description": "Additional settings that directly map to Slurm settings.",
+      "properties": {
+        "ParameterName": {
+          "type": "string",
+          "description": "AWS PCS supports configuration of the Slurm parameters for queues:.",
+          "markdownDescription": "AWS PCS supports configuration of the Slurm parameters for queues:.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ParameterValue": {
+          "type": "string",
+          "description": "The value for the configured Slurm setting.",
+          "markdownDescription": "The value for the configured Slurm setting.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "ParameterName",
+        "ParameterValue"
+      ],
+      "markdownDescription": "Additional settings that directly map to Slurm settings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "Arn": {
+      "type": "string",
+      "description": "The unique Amazon Resource Name (ARN) of the queue.",
+      "markdownDescription": "The unique Amazon Resource Name (ARN) of the queue.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(.*?)  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ClusterId": {
+      "type": "string",
+      "description": "The ID of the cluster of the queue.",
+      "markdownDescription": "The ID of the cluster of the queue.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "ComputeNodeGroupConfigurations": {
+      "type": "array",
+      "description": "The list of compute node group configurations associated with the queue. Queues assign jobs to associated compute node groups.",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/ComputeNodeGroupConfiguration"
+      },
+      "markdownDescription": "The list of compute node group configurations associated with the queue. Queues assign jobs to associated compute node groups.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "ErrorInfo": {
+      "type": "array",
+      "description": "The list of errors that occurred during queue provisioning.",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/ErrorInfo"
+      },
+      "markdownDescription": "The list of errors that occurred during queue provisioning.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Id": {
+      "type": "string",
+      "description": "The generated unique ID of the queue.",
+      "markdownDescription": "The generated unique ID of the queue.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Name": {
+      "type": "string",
+      "description": "The name that identifies the queue.",
+      "markdownDescription": "The name that identifies the queue.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "SlurmConfiguration": {
+      "type": "object",
+      "description": "The Slurm configuration for the queue.",
+      "properties": {
+        "SlurmCustomSettings": {
+          "type": "array",
+          "description": "Custom Slurm parameters that directly map to Slurm configuration settings.",
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/SlurmCustomSetting"
+          },
+          "markdownDescription": "Custom Slurm parameters that directly map to Slurm configuration settings.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The Slurm configuration for the queue.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Status": {
+      "type": "string",
+      "description": "The provisioning status of the queue. The provisioning status doesn't indicate the overall health of the queue.",
+      "enum": [
+        "CREATING",
+        "ACTIVE",
+        "UPDATING",
+        "DELETING",
+        "CREATE_FAILED",
+        "DELETE_FAILED",
+        "UPDATE_FAILED"
+      ],
+      "markdownDescription": "The provisioning status of the queue. The provisioning status doesn't indicate the overall health of the queue.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | ACTIVE | UPDATING | DELETING | CREATE_FAILED | DELETE_FAILED | UPDATE_FAILED  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Tags": {
+      "type": "object",
+      "description": "1 or more tags added to the resource. Each tag consists of a tag key and tag value. The tag value is optional and can be an empty string.",
+      "patternProperties": {
+        "^.+$": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "1 or more tags added to the resource. Each tag consists of a tag key and tag value. The tag value is optional and can be an empty string.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "required": [
+    "ClusterId"
+  ],
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "createOnlyProperties": [
+    "/properties/Name",
+    "/properties/ClusterId"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/ErrorInfo",
+    "/properties/Id",
+    "/properties/Status"
+  ],
+  "handlers": {
     "create": {
       "permissions": [
         "ec2:CreateNetworkInterface",
@@ -36,6 +175,12 @@
       ],
       "timeoutInMinutes": 60
     },
+    "read": {
+      "permissions": [
+        "pcs:GetQueue",
+        "pcs:ListTagsForResource"
+      ]
+    },
     "update": {
       "permissions": [
         "pcs:GetQueue",
@@ -46,11 +191,14 @@
       ],
       "timeoutInMinutes": 60
     },
-    "list": {
+    "delete": {
       "permissions": [
-        "pcs:ListClusters",
-        "pcs:ListQueues"
+        "pcs:DeleteQueue",
+        "pcs:GetQueue"
       ],
+      "timeoutInMinutes": 60
+    },
+    "list": {
       "handlerSchema": {
         "properties": {
           "ClusterId": {
@@ -60,138 +208,48 @@
         "required": [
           "ClusterId"
         ]
-      }
-    },
-    "delete": {
+      },
       "permissions": [
-        "pcs:DeleteQueue",
-        "pcs:GetQueue"
-      ],
-      "timeoutInMinutes": 60
+        "pcs:ListClusters",
+        "pcs:ListQueues"
+      ]
     }
   },
-  "typeName": "AWS::PCS::Queue",
-  "readOnlyProperties": [
-    "/properties/Arn",
-    "/properties/ErrorInfo",
-    "/properties/Id",
-    "/properties/Status"
-  ],
-  "description": "AWS::PCS::Queue resource creates an AWS PCS queue.",
-  "createOnlyProperties": [
-    "/properties/Name",
-    "/properties/ClusterId"
-  ],
-  "additionalProperties": false,
-  "primaryIdentifier": [
-    "/properties/Arn"
-  ],
-  "definitions": {
-    "ErrorInfo": {
-      "description": "An error that occurred during resource provisioning.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Message": {
-          "description": "The detailed error information.",
-          "type": "string",
-          "markdownDescription": "The detailed error information.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "Code": {
-          "description": "The short-form error code.",
-          "type": "string",
-          "markdownDescription": "The short-form error code.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "An error that occurred during resource provisioning.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "ComputeNodeGroupConfiguration": {
-      "description": "The compute node group configuration for a queue.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "ComputeNodeGroupId": {
-          "description": "The compute node group ID for the compute node group configuration.",
-          "type": "string",
-          "markdownDescription": "The compute node group ID for the compute node group configuration.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "The compute node group configuration for a queue.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    }
-  },
-  "required": [
-    "ClusterId"
-  ],
-  "properties": {
-    "Status": {
-      "description": "The provisioning status of the queue. The provisioning status doesn't indicate the overall health of the queue.",
-      "type": "string",
-      "enum": [
-        "CREATING",
-        "ACTIVE",
-        "UPDATING",
-        "DELETING",
-        "CREATE_FAILED",
-        "DELETE_FAILED",
-        "UPDATE_FAILED"
-      ],
-      "markdownDescription": "The provisioning status of the queue. The provisioning status doesn't indicate the overall health of the queue.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | ACTIVE | UPDATING | DELETING | CREATE_FAILED | DELETE_FAILED | UPDATE_FAILED  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "ClusterId": {
-      "description": "The ID of the cluster of the queue.",
-      "type": "string",
-      "markdownDescription": "The ID of the cluster of the queue.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
-    },
-    "ErrorInfo": {
-      "description": "The list of errors that occurred during queue provisioning.",
-      "insertionOrder": false,
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/ErrorInfo"
-      },
-      "markdownDescription": "The list of errors that occurred during queue provisioning.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "ComputeNodeGroupConfigurations": {
-      "description": "The list of compute node group configurations associated with the queue. Queues assign jobs to associated compute node groups.",
-      "insertionOrder": false,
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/ComputeNodeGroupConfiguration"
-      },
-      "markdownDescription": "The list of compute node group configurations associated with the queue. Queues assign jobs to associated compute node groups.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-    },
-    "Id": {
-      "description": "The generated unique ID of the queue.",
-      "type": "string",
-      "markdownDescription": "The generated unique ID of the queue.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "Arn": {
-      "description": "The unique Amazon Resource Name (ARN) of the queue.",
-      "type": "string",
-      "markdownDescription": "The unique Amazon Resource Name (ARN) of the queue.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(.*?)  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "Tags": {
-      "patternProperties": {
-        "^.+$": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "description": "1 or more tags added to the resource. Each tag consists of a tag key and tag value. The tag value is optional and can be an empty string.",
-      "additionalProperties": false,
-      "type": "object",
-      "markdownDescription": "1 or more tags added to the resource. Each tag consists of a tag key and tag value. The tag value is optional and can be an empty string.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "Name": {
-      "description": "The name that identifies the queue.",
-      "type": "string",
-      "markdownDescription": "The name that identifies the queue.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
-    }
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "pcs:TagResource",
+      "pcs:ListTagsForResource",
+      "pcs:UntagResource"
+    ]
   },
   "attributes": {
-    "Status": {
-      "description": "The provisioning status of the queue. The provisioning status doesn't indicate the overall health of the queue.",
+    "Arn": {
       "type": "string",
+      "description": "The unique Amazon Resource Name (ARN) of the queue.",
+      "markdownDescription": "The unique Amazon Resource Name (ARN) of the queue.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(.*?)  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ErrorInfo": {
+      "type": "array",
+      "description": "The list of errors that occurred during queue provisioning.",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/ErrorInfo"
+      },
+      "markdownDescription": "The list of errors that occurred during queue provisioning.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Id": {
+      "type": "string",
+      "description": "The generated unique ID of the queue.",
+      "markdownDescription": "The generated unique ID of the queue.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Status": {
+      "type": "string",
+      "description": "The provisioning status of the queue. The provisioning status doesn't indicate the overall health of the queue.",
       "enum": [
         "CREATING",
         "ACTIVE",
@@ -202,25 +260,6 @@
         "UPDATE_FAILED"
       ],
       "markdownDescription": "The provisioning status of the queue. The provisioning status doesn't indicate the overall health of the queue.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | ACTIVE | UPDATING | DELETING | CREATE_FAILED | DELETE_FAILED | UPDATE_FAILED  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "ErrorInfo": {
-      "description": "The list of errors that occurred during queue provisioning.",
-      "insertionOrder": false,
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/ErrorInfo"
-      },
-      "markdownDescription": "The list of errors that occurred during queue provisioning.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "Id": {
-      "description": "The generated unique ID of the queue.",
-      "type": "string",
-      "markdownDescription": "The generated unique ID of the queue.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "Arn": {
-      "description": "The unique Amazon Resource Name (ARN) of the queue.",
-      "type": "string",
-      "markdownDescription": "The unique Amazon Resource Name (ARN) of the queue.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(.*?)  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }
