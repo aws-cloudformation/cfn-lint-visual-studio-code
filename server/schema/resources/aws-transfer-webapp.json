@@ -2,6 +2,54 @@
   "typeName": "AWS::Transfer::WebApp",
   "description": "Resource Type definition for AWS::Transfer::WebApp",
   "definitions": {
+    "EndpointDetails": {
+      "type": "object",
+      "properties": {
+        "Vpc": {
+          "$ref": "#/definitions/Vpc"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
+    },
+    "Vpc": {
+      "type": "object",
+      "description": "You can provide a structure that contains the details for the VPC endpoint to use with your web app.",
+      "properties": {
+        "SubnetIds": {
+          "type": "array",
+          "maxItems": 10,
+          "insertionOrder": true,
+          "items": {
+            "type": "string",
+            "maxLength": 24,
+            "minLength": 15,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 15  \nMaximum Length: 24  \nPattern: ^subnet-[0-9a-f]{8,17}$  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "VpcId": {
+          "type": "string",
+          "maxLength": 21,
+          "minLength": 12,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 12  \nMaximum Length: 21  \nPattern: ^vpc-[0-9a-f]{8,17}$  \nUpdate requires: No interruption\n"
+        },
+        "SecurityGroupIds": {
+          "type": "array",
+          "maxItems": 10,
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "maxLength": 20,
+            "minLength": 11,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 11  \nMaximum Length: 20  \nPattern: ^sg-[0-9a-f]{8,17}$  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "You can provide a structure that contains the details for the VPC endpoint to use with your web app.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "IdentityProviderDetails": {
       "type": "object",
       "description": "You can provide a structure that contains the details for the identity provider to use with your web app.",
@@ -128,12 +176,21 @@
     "IdentityProviderDetails": {
       "$ref": "#/definitions/IdentityProviderDetails"
     },
+    "EndpointDetails": {
+      "$ref": "#/definitions/EndpointDetails"
+    },
     "AccessEndpoint": {
       "description": "The AccessEndpoint is the URL that you provide to your users for them to interact with the Transfer Family web app. You can specify a custom URL or use the default value.",
       "type": "string",
       "minLength": 1,
       "maxLength": 1024,
       "markdownDescription": "The AccessEndpoint is the URL that you provide to your users for them to interact with the Transfer Family web app. You can specify a custom URL or use the default value.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+    },
+    "VpcEndpointId": {
+      "type": "string",
+      "maxLength": 22,
+      "minLength": 13,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 13  \nMaximum Length: 22  \nPattern: ^vpce-[0-9a-f]{8,17}$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "WebAppUnits": {
       "$ref": "#/definitions/WebAppUnits"
@@ -162,11 +219,17 @@
   "readOnlyProperties": [
     "/properties/Arn",
     "/properties/WebAppId",
-    "/properties/IdentityProviderDetails/ApplicationArn"
+    "/properties/IdentityProviderDetails/ApplicationArn",
+    "/properties/VpcEndpointId"
   ],
   "createOnlyProperties": [
     "/properties/WebAppEndpointPolicy",
-    "/properties/IdentityProviderDetails/InstanceArn"
+    "/properties/IdentityProviderDetails/InstanceArn",
+    "/properties/EndpointDetails/Vpc/VpcId",
+    "/properties/EndpointDetails/Vpc/SecurityGroupIds"
+  ],
+  "writeOnlyProperties": [
+    "/properties/EndpointDetails/Vpc/SecurityGroupIds"
   ],
   "primaryIdentifier": [
     "/properties/Arn"
@@ -208,7 +271,9 @@
         "sso:ListApplicationAuthenticationMethods",
         "sso:PutApplicationAccessScope",
         "sso:GetApplicationAccessScope",
-        "sso:ListApplicationAccessScopes"
+        "sso:ListApplicationAccessScopes",
+        "ec2:CreateVpcEndpoint",
+        "ec2:DescribeVpcEndpoints"
       ]
     },
     "read": {
@@ -232,14 +297,17 @@
         "sso:ListApplicationGrants",
         "sso:UpdateApplication",
         "sso:DescribeApplication",
-        "sso:ListApplications"
+        "sso:ListApplications",
+        "ec2:ModifyVpcEndpoint"
       ]
     },
     "delete": {
       "permissions": [
         "transfer:DeleteWebApp",
         "sso:DescribeApplication",
-        "sso:DeleteApplication"
+        "sso:DeleteApplication",
+        "ec2:DescribeVpcEndpoints",
+        "ec2:DeleteVpcEndpoints"
       ]
     },
     "list": {
@@ -262,6 +330,12 @@
       "minLength": 24,
       "maxLength": 24,
       "markdownDescription": "A unique identifier for the web app.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 24  \nMaximum Length: 24  \nPattern: ^webapp-([0-9a-f]{17})$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "VpcEndpointId": {
+      "type": "string",
+      "maxLength": 22,
+      "minLength": 13,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 13  \nMaximum Length: 22  \nPattern: ^vpce-[0-9a-f]{8,17}$  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

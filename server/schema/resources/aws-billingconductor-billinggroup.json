@@ -18,7 +18,7 @@
         "PricingPlanArn": {
           "description": "ARN of the attached pricing plan",
           "type": "string",
-          "markdownDescription": "ARN of the attached pricing plan\n\n---\n\nRequired: Yes  \nType: String  \nPattern: arn:aws(-cn)?:billingconductor::[0-9]{12}:pricingplan/[a-zA-Z0-9]{10}  \nUpdate requires: No interruption\n"
+          "markdownDescription": "ARN of the attached pricing plan\n\n---\n\nRequired: Yes  \nType: String  \nPattern: arn:aws(-cn)?:billingconductor::(aws|[0-9]{12}):pricingplan/(BasicPricingPlan|[a-zA-Z0-9]{10})  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
@@ -39,16 +39,17 @@
             "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: [0-9]{12}  \nUpdate requires: No interruption\n"
           },
           "minItems": 1,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "ResponsibilityTransferArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: arn:[a-z0-9][a-z0-9-.]{0,62}:organizations::[0-9]{12}:transfer/o-[a-z0-9]{10,32}/(billing)/(inbound|outbound)/rt-[0-9a-z]{8,32}  \nUpdate requires: No interruption\n"
         },
         "AutoAssociate": {
           "type": "boolean",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
         }
       },
-      "required": [
-        "LinkedAccountIds"
-      ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Tag": {
@@ -79,13 +80,13 @@
     "Arn": {
       "description": "Billing Group ARN",
       "type": "string",
-      "markdownDescription": "Billing Group ARN\n\n---\n\nRequired: No  \nType: String  \nPattern: arn:aws(-cn)?:billingconductor::[0-9]{12}:billinggroup/?[0-9]{12}  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "Billing Group ARN\n\n---\n\nRequired: No  \nType: String  \nPattern: arn:aws(-cn)?:billingconductor::[0-9]{12}:billinggroup/?[a-zA-Z0-9]{10,12}  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Name": {
       "type": "string",
       "minLength": 1,
       "maxLength": 128,
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: [a-zA-Z0-9_\\+=\\.\\-@]+  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: [a-zA-Z0-9_\\+=\\.\\-@]+  \nUpdate requires: No interruption\n"
     },
     "Description": {
       "type": "string",
@@ -95,7 +96,7 @@
     "PrimaryAccountId": {
       "description": "This account will act as a virtual payer account of the billing group",
       "type": "string",
-      "markdownDescription": "This account will act as a virtual payer account of the billing group\n\n---\n\nRequired: Yes  \nType: String  \nPattern: [0-9]{12}  \nUpdate requires: Replacement\n"
+      "markdownDescription": "This account will act as a virtual payer account of the billing group\n\n---\n\nRequired: Conditional  \nType: String  \nPattern: [0-9]{12}  \nUpdate requires: Replacement\n"
     },
     "ComputationPreference": {
       "$ref": "#/definitions/ComputationPreference"
@@ -151,8 +152,33 @@
   "required": [
     "Name",
     "AccountGrouping",
-    "PrimaryAccountId",
     "ComputationPreference"
+  ],
+  "anyOf": [
+    {
+      "required": [
+        "PrimaryAccountId"
+      ],
+      "properties": {
+        "AccountGrouping": {
+          "required": [
+            "LinkedAccountIds"
+          ]
+        }
+      }
+    },
+    {
+      "required": [
+        "AccountGrouping"
+      ],
+      "properties": {
+        "AccountGrouping": {
+          "required": [
+            "ResponsibilityTransferArn"
+          ]
+        }
+      }
+    }
   ],
   "readOnlyProperties": [
     "/properties/Arn",
@@ -175,7 +201,8 @@
         "billingconductor:AssociateAccounts",
         "billingconductor:ListBillingGroups",
         "billingconductor:TagResource",
-        "billingconductor:ListTagsForResource"
+        "billingconductor:ListTagsForResource",
+        "organizations:DescribeResponsibilityTransfer"
       ]
     },
     "read": {
@@ -219,7 +246,7 @@
     "Arn": {
       "description": "Billing Group ARN",
       "type": "string",
-      "markdownDescription": "Billing Group ARN\n\n---\n\nRequired: No  \nType: String  \nPattern: arn:aws(-cn)?:billingconductor::[0-9]{12}:billinggroup/?[0-9]{12}  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "Billing Group ARN\n\n---\n\nRequired: No  \nType: String  \nPattern: arn:aws(-cn)?:billingconductor::[0-9]{12}:billinggroup/?[a-zA-Z0-9]{10,12}  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Size": {
       "description": "Number of accounts in the billing group",

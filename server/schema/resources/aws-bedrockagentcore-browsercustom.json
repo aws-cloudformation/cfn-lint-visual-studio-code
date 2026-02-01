@@ -16,10 +16,11 @@
     "BrowserNetworkMode": {
       "type": "string",
       "enum": [
-        "PUBLIC"
+        "PUBLIC",
+        "VPC"
       ],
       "description": "Network modes supported by browser",
-      "markdownDescription": "Network modes supported by browser\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PUBLIC  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Network modes supported by browser\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PUBLIC | VPC  \nUpdate requires: No interruption\n"
     },
     "BrowserNetworkConfiguration": {
       "type": "object",
@@ -27,6 +28,9 @@
         "NetworkMode": {
           "$ref": "#/definitions/BrowserNetworkMode",
           "default": "PUBLIC"
+        },
+        "VpcConfig": {
+          "$ref": "#/definitions/VpcConfig"
         }
       },
       "required": [
@@ -52,6 +56,19 @@
       "description": "Recording configuration for browser",
       "markdownDescription": "Recording configuration for browser\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "BrowserSigning": {
+      "type": "object",
+      "properties": {
+        "Enabled": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Browser signing configuration",
+      "markdownDescription": "Browser signing configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "S3Location": {
       "type": "object",
       "properties": {
@@ -72,6 +89,56 @@
       "additionalProperties": false,
       "description": "S3 Location Configuration",
       "markdownDescription": "S3 Location Configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "VpcConfig": {
+      "type": "object",
+      "description": "Network mode configuration for VPC",
+      "properties": {
+        "SecurityGroups": {
+          "$ref": "#/definitions/SecurityGroups"
+        },
+        "Subnets": {
+          "$ref": "#/definitions/Subnets"
+        }
+      },
+      "required": [
+        "SecurityGroups",
+        "Subnets"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Network mode configuration for VPC\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SecurityGroups": {
+      "type": "array",
+      "description": "Security groups for VPC",
+      "minItems": 1,
+      "maxItems": 16,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/SecurityGroupId"
+      },
+      "markdownDescription": "Security groups for VPC\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "SecurityGroupId": {
+      "type": "string",
+      "description": "Security group id",
+      "markdownDescription": "Security group id\n\n---\n\nRequired: No  \nType: String  \nPattern: ^sg-[0-9a-zA-Z]{8,17}$  \nUpdate requires: No interruption\n"
+    },
+    "Subnets": {
+      "type": "array",
+      "description": "Subnets for VPC",
+      "minItems": 1,
+      "maxItems": 16,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/SubnetId"
+      },
+      "markdownDescription": "Subnets for VPC\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "SubnetId": {
+      "type": "string",
+      "description": "Subnet id",
+      "markdownDescription": "Subnet id\n\n---\n\nRequired: No  \nType: String  \nPattern: ^subnet-[0-9a-zA-Z]{8,17}$  \nUpdate requires: No interruption\n"
     },
     "BrowserStatus": {
       "type": "string",
@@ -187,6 +254,11 @@
       "description": "Recording configuration for browser.",
       "markdownDescription": "Recording configuration for browser.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
     },
+    "BrowserSigning": {
+      "$ref": "#/definitions/BrowserSigning",
+      "description": "Browser signing configuration.",
+      "markdownDescription": "Browser signing configuration.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
+    },
     "ExecutionRoleArn": {
       "$ref": "#/definitions/RoleArn",
       "description": "The Amazon Resource Name (ARN) of the IAM role that the browser uses to access resources.",
@@ -196,6 +268,11 @@
       "$ref": "#/definitions/BrowserStatus",
       "description": "Status of browser.",
       "markdownDescription": "Status of browser.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "FailureReason": {
+      "type": "string",
+      "description": "The reason for failure if the browser creation or operation failed.",
+      "markdownDescription": "The reason for failure if the browser creation or operation failed.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "CreatedAt": {
       "type": "string",
@@ -222,6 +299,7 @@
     "/properties/BrowserId",
     "/properties/BrowserArn",
     "/properties/Status",
+    "/properties/FailureReason",
     "/properties/CreatedAt",
     "/properties/LastUpdatedAt"
   ],
@@ -238,6 +316,7 @@
     "/properties/Description",
     "/properties/NetworkConfiguration",
     "/properties/RecordingConfig",
+    "/properties/BrowserSigning",
     "/properties/ExecutionRoleArn"
   ],
   "handlers": {
@@ -247,6 +326,7 @@
         "bedrock-agentcore:GetBrowser",
         "bedrock-agentcore:TagResource",
         "bedrock-agentcore:ListTagsForResource",
+        "iam:CreateServiceLinkedRole",
         "iam:PassRole"
       ]
     },
@@ -304,6 +384,11 @@
       "$ref": "#/definitions/BrowserStatus",
       "description": "Status of browser.",
       "markdownDescription": "Status of browser.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "FailureReason": {
+      "type": "string",
+      "description": "The reason for failure if the browser creation or operation failed.",
+      "markdownDescription": "The reason for failure if the browser creation or operation failed.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "CreatedAt": {
       "type": "string",

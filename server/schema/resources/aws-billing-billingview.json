@@ -48,6 +48,12 @@
     "Arn": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: arn:aws[a-z-]*:(billing)::[0-9]{12}:billingview/[a-zA-Z0-9/:_\\+=\\.\\-@]{0,75}[a-zA-Z0-9]  \nUpdate requires: No interruption\n"
+    },
+    "Timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The time in ISO 8601 format, UTC time (YYYY-MM-DDTHH:MM:SSZ).",
+      "markdownDescription": "The time in ISO 8601 format, UTC time (YYYY-MM-DDTHH:MM:SSZ).\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -104,6 +110,19 @@
             }
           },
           "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "TimeRange": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "BeginDateInclusive": {
+              "$ref": "#/definitions/Timestamp"
+            },
+            "EndDateInclusive": {
+              "$ref": "#/definitions/Timestamp"
+            }
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
         }
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
@@ -148,7 +167,7 @@
         "type": "string",
         "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: arn:aws[a-z-]*:(billing)::[0-9]{12}:billingview/[a-zA-Z0-9_+=.@-]{1,75}  \nUpdate requires: No interruption\n"
       },
-      "markdownDescription": "An array of strings that define the billing view's source.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: Replacement\n"
+      "markdownDescription": "An array of strings that define the billing view's source.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
     },
     "UpdatedAt": {
       "description": "The time when the billing view was last updated.",
@@ -169,7 +188,6 @@
     "/properties/BillingViewType"
   ],
   "createOnlyProperties": [
-    "/properties/SourceViews",
     "/properties/Description",
     "/properties/Name"
   ],
@@ -192,10 +210,12 @@
     "create": {
       "permissions": [
         "billing:CreateBillingView",
+        "billing:AssociateSourceViews",
         "billing:TagResource",
         "billing:ListTagsForResource",
         "billing:GetBillingView",
-        "billing:ListSourceViewsForBillingView"
+        "billing:ListSourceViewsForBillingView",
+        "billing:UseSourceView"
       ]
     },
     "read": {
@@ -208,10 +228,13 @@
     "update": {
       "permissions": [
         "billing:UpdateBillingView",
+        "billing:DisassociateSourceViews",
+        "billing:AssociateSourceViews",
         "billing:GetBillingView",
         "billing:ListTagsForResource",
         "billing:TagResource",
         "billing:UntagResource",
+        "billing:UseSourceView",
         "billing:ListSourceViewsForBillingView"
       ]
     },

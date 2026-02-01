@@ -535,9 +535,9 @@
     "Description": {
       "description": "The description of the segment definition.",
       "type": "string",
-      "maxLength": 1000,
+      "maxLength": 4000,
       "minLength": 1,
-      "markdownDescription": "The description of the segment definition.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1000  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The description of the segment definition.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 4000  \nUpdate requires: No interruption\n"
     },
     "DisplayName": {
       "description": "The display name of the segment definition.",
@@ -563,7 +563,14 @@
     "SegmentGroups": {
       "description": "An array that defines the set of segment criteria to evaluate when handling segment groups for the segment.",
       "$ref": "#/definitions/SegmentGroup",
-      "markdownDescription": "An array that defines the set of segment criteria to evaluate when handling segment groups for the segment.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: Replacement\n"
+      "markdownDescription": "An array that defines the set of segment criteria to evaluate when handling segment groups for the segment.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
+    },
+    "SegmentSqlQuery": {
+      "description": "The SQL query that defines the segment criteria.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 50000,
+      "markdownDescription": "The SQL query that defines the segment criteria.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 50000  \nUpdate requires: Replacement\n"
     },
     "SegmentDefinitionArn": {
       "description": "The Amazon Resource Name (ARN) of the segment definition.",
@@ -571,6 +578,15 @@
       "maxLength": 255,
       "minLength": 1,
       "markdownDescription": "The Amazon Resource Name (ARN) of the segment definition.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SegmentType": {
+      "description": "The SQL query that defines the segment criteria.",
+      "type": "string",
+      "enum": [
+        "CLASSIC",
+        "ENHANCED"
+      ],
+      "markdownDescription": "The SQL query that defines the segment criteria.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CLASSIC | ENHANCED  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Tags": {
       "description": "The tags used to organize, track, or control access for this resource.",
@@ -588,18 +604,19 @@
   "required": [
     "DomainName",
     "DisplayName",
-    "SegmentDefinitionName",
-    "SegmentGroups"
+    "SegmentDefinitionName"
   ],
   "readOnlyProperties": [
     "/properties/CreatedAt",
-    "/properties/SegmentDefinitionArn"
+    "/properties/SegmentDefinitionArn",
+    "/properties/SegmentType"
   ],
   "createOnlyProperties": [
     "/properties/DomainName",
     "/properties/SegmentDefinitionName",
     "/properties/DisplayName",
-    "/properties/SegmentGroups"
+    "/properties/SegmentGroups",
+    "/properties/SegmentSqlQuery"
   ],
   "primaryIdentifier": [
     "/properties/DomainName",
@@ -609,24 +626,48 @@
     "create": {
       "permissions": [
         "profile:CreateSegmentDefinition",
-        "profile:TagResource"
+        "profile:TagResource",
+        "kms:CreateGrant",
+        "kms:DescribeKey",
+        "kms:GetKeyPolicy",
+        "kms:PutKeyPolicy",
+        "kms:ListGrants",
+        "kms:GenerateDataKey"
       ]
     },
     "read": {
       "permissions": [
-        "profile:GetSegmentDefinition"
+        "profile:GetSegmentDefinition",
+        "kms:CreateGrant",
+        "kms:DescribeKey",
+        "kms:GetKeyPolicy",
+        "kms:PutKeyPolicy",
+        "kms:ListGrants",
+        "kms:GenerateDataKey"
       ]
     },
     "update": {
       "permissions": [
         "profile:GetSegmentDefinition",
         "profile:UntagResource",
-        "profile:TagResource"
+        "profile:TagResource",
+        "kms:CreateGrant",
+        "kms:DescribeKey",
+        "kms:GetKeyPolicy",
+        "kms:PutKeyPolicy",
+        "kms:ListGrants",
+        "kms:GenerateDataKey"
       ]
     },
     "delete": {
       "permissions": [
-        "profile:DeleteSegmentDefinition"
+        "profile:DeleteSegmentDefinition",
+        "kms:CreateGrant",
+        "kms:DescribeKey",
+        "kms:GetKeyPolicy",
+        "kms:PutKeyPolicy",
+        "kms:ListGrants",
+        "kms:GenerateDataKey"
       ]
     },
     "list": {
@@ -641,7 +682,13 @@
         ]
       },
       "permissions": [
-        "profile:ListSegmentDefinitions"
+        "profile:ListSegmentDefinitions",
+        "kms:CreateGrant",
+        "kms:DescribeKey",
+        "kms:GetKeyPolicy",
+        "kms:PutKeyPolicy",
+        "kms:ListGrants",
+        "kms:GenerateDataKey"
       ]
     }
   },
@@ -671,6 +718,15 @@
       "maxLength": 255,
       "minLength": 1,
       "markdownDescription": "The Amazon Resource Name (ARN) of the segment definition.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SegmentType": {
+      "description": "The SQL query that defines the segment criteria.",
+      "type": "string",
+      "enum": [
+        "CLASSIC",
+        "ENHANCED"
+      ],
+      "markdownDescription": "The SQL query that defines the segment criteria.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CLASSIC | ENHANCED  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

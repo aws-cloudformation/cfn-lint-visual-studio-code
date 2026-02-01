@@ -1,15 +1,23 @@
 {
   "tagging": {
-    "taggable": false,
-    "tagOnCreate": false,
-    "tagUpdatable": false,
+    "permissions": [
+      "s3tables:TagResource",
+      "s3tables:UntagResource",
+      "s3tables:ListTagsForResource"
+    ],
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "tagProperty": "/properties/Tags",
     "cloudFormationSystemTags": false
   },
   "handlers": {
     "read": {
       "permissions": [
         "s3tables:GetTable",
-        "s3tables:GetTableMaintenanceConfiguration"
+        "s3tables:GetTableMaintenanceConfiguration",
+        "s3tables:GetTableStorageClass",
+        "s3tables:ListTagsForResource"
       ]
     },
     "create": {
@@ -17,14 +25,23 @@
         "s3tables:CreateTable",
         "s3tables:PutTableData",
         "s3tables:GetTable",
-        "s3tables:PutTableMaintenanceConfiguration"
+        "s3tables:PutTableMaintenanceConfiguration",
+        "s3tables:GetTableMaintenanceConfiguration",
+        "s3tables:PutTableStorageClass",
+        "s3tables:GetTableStorageClass",
+        "s3tables:TagResource",
+        "s3tables:ListTagsForResource"
       ]
     },
     "update": {
       "permissions": [
         "s3tables:GetTable",
         "s3tables:RenameTable",
-        "s3tables:PutTableMaintenanceConfiguration"
+        "s3tables:PutTableMaintenanceConfiguration",
+        "s3tables:GetTableMaintenanceConfiguration",
+        "s3tables:TagResource",
+        "s3tables:UntagResource",
+        "s3tables:ListTagsForResource"
       ]
     },
     "list": {
@@ -76,7 +93,8 @@
     "/properties/TableBucketARN",
     "/properties/OpenTableFormat",
     "/properties/IcebergMetadata",
-    "/properties/WithoutMetadata"
+    "/properties/WithoutMetadata",
+    "/properties/StorageClassConfiguration"
   ],
   "additionalProperties": false,
   "primaryIdentifier": [
@@ -90,6 +108,23 @@
         "Yes"
       ],
       "markdownDescription": "Indicates that you don't want to specify a schema for the table. This property is mutually exclusive to 'IcebergMetadata', and its only possible value is 'Yes'.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Yes  \nUpdate requires: No interruption\n"
+    },
+    "StorageClassConfiguration": {
+      "description": "Specifies storage class settings for the table",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "StorageClass": {
+          "description": "The storage class for the table",
+          "type": "string",
+          "enum": [
+            "STANDARD",
+            "INTELLIGENT_TIERING"
+          ],
+          "markdownDescription": "The storage class for the table\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: STANDARD | INTELLIGENT_TIERING  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Specifies storage class settings for the table\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Compaction": {
       "description": "Settings governing the Compaction maintenance action. Contains details about the compaction settings for an Iceberg table.",
@@ -217,6 +252,30 @@
       ],
       "markdownDescription": "Contains details about the metadata for an Iceberg table.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "Tag": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "description": "Tag value must be between 0 to 256 characters in length. Tag value can only contain alphanumeric characters, spaces, _, ., /, =, +, -, and @.",
+          "type": "string",
+          "maxLength": 256,
+          "markdownDescription": "Tag value must be between 0 to 256 characters in length. Tag value can only contain alphanumeric characters, spaces, _, ., /, =, +, -, and @.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        },
+        "Key": {
+          "minLength": 1,
+          "description": "Tag key must be between 1 to 128 characters in length. Tag key cannot start with 'aws:' and can only contain alphanumeric characters, spaces, _, ., /, =, +, -, and @.",
+          "type": "string",
+          "maxLength": 128,
+          "markdownDescription": "Tag key must be between 1 to 128 characters in length. Tag key cannot start with 'aws:' and can only contain alphanumeric characters, spaces, _, ., /, =, +, -, and @.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "WarehouseLocation": {
       "description": "The warehouse location of the table.",
       "type": "string",
@@ -262,6 +321,9 @@
     "WithoutMetadata": {
       "$ref": "#/definitions/WithoutMetadata"
     },
+    "StorageClassConfiguration": {
+      "$ref": "#/definitions/StorageClassConfiguration"
+    },
     "Compaction": {
       "$ref": "#/definitions/Compaction"
     },
@@ -291,6 +353,16 @@
     },
     "SnapshotManagement": {
       "$ref": "#/definitions/SnapshotManagement"
+    },
+    "Tags": {
+      "uniqueItems": true,
+      "description": "User tags (key-value pairs) to associate with the table.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "User tags (key-value pairs) to associate with the table.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "attributes": {

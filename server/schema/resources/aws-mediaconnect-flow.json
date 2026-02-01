@@ -212,6 +212,17 @@
             "$ref": "#/definitions/MediaStreamSourceConfiguration"
           },
           "markdownDescription": "The media stream that is associated with the source, and the parameters for that association.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "RouterIntegrationState": {
+          "type": "string",
+          "enum": [
+            "ENABLED",
+            "DISABLED"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption\n"
+        },
+        "RouterIntegrationTransitDecryption": {
+          "$ref": "#/definitions/FlowTransitEncryption"
         }
       },
       "additionalProperties": false,
@@ -871,6 +882,91 @@
         "VpcInterfaceAdapter"
       ],
       "markdownDescription": "Specifies the configuration settings for individual NDI discovery servers. A maximum of 3 servers is allowed.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "FlowTransitEncryption": {
+      "type": "object",
+      "description": "The configuration that defines how content is encrypted during transit between the MediaConnect router and a MediaConnect flow.",
+      "properties": {
+        "EncryptionKeyType": {
+          "$ref": "#/definitions/FlowTransitEncryptionKeyType"
+        },
+        "EncryptionKeyConfiguration": {
+          "$ref": "#/definitions/FlowTransitEncryptionKeyConfiguration"
+        }
+      },
+      "required": [
+        "EncryptionKeyConfiguration"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The configuration that defines how content is encrypted during transit between the MediaConnect router and a MediaConnect flow.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "FlowTransitEncryptionKeyConfiguration": {
+      "description": "Configuration settings for flow transit encryption keys.",
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "SecretsManager",
+          "properties": {
+            "SecretsManager": {
+              "$ref": "#/definitions/SecretsManagerEncryptionKeyConfiguration"
+            }
+          },
+          "required": [
+            "SecretsManager"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Automatic",
+          "properties": {
+            "Automatic": {
+              "$ref": "#/definitions/AutomaticEncryptionKeyConfiguration"
+            }
+          },
+          "required": [
+            "Automatic"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "Configuration settings for flow transit encryption keys.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "FlowTransitEncryptionKeyType": {
+      "type": "string",
+      "enum": [
+        "SECRETS_MANAGER",
+        "AUTOMATIC"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SECRETS_MANAGER | AUTOMATIC  \nUpdate requires: No interruption\n"
+    },
+    "SecretsManagerEncryptionKeyConfiguration": {
+      "type": "object",
+      "description": "The configuration settings for transit encryption of a flow source using AWS Secrets Manager, including the secret ARN and role ARN.",
+      "properties": {
+        "SecretArn": {
+          "type": "string",
+          "description": "The ARN of the AWS Secrets Manager secret used for transit encryption from the router output.",
+          "markdownDescription": "The ARN of the AWS Secrets Manager secret used for transit encryption from the router output.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:(aws[a-zA-Z-]*):secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:[a-zA-Z0-9/_+=.@-]+$  \nUpdate requires: No interruption\n"
+        },
+        "RoleArn": {
+          "type": "string",
+          "description": "The ARN of the IAM role used for transit encryption from the router output using AWS Secrets Manager.",
+          "markdownDescription": "The ARN of the IAM role used for transit encryption from the router output using AWS Secrets Manager.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:(aws[a-zA-Z-]*):iam::[0-9]{12}:role/[a-zA-Z0-9_+=,.@-]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "RoleArn",
+        "SecretArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The configuration settings for transit encryption of a flow source using AWS Secrets Manager, including the secret ARN and role ARN.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AutomaticEncryptionKeyConfiguration": {
+      "type": "object",
+      "description": "Configuration settings for automatic encryption key management, where MediaConnect handles key creation and rotation.",
+      "additionalProperties": false,
+      "markdownDescription": "Configuration settings for automatic encryption key management, where MediaConnect handles key creation and rotation.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "required": [

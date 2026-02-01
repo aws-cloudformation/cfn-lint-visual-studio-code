@@ -187,6 +187,18 @@
       "type": "object",
       "markdownDescription": "Defines the configuration for attaching additional storage to the instances in the SageMaker HyperPod cluster instance group.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "ClusterKubernetesLabels": {
+      "patternProperties": {
+        "^.+$": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "description": "A map of Kubernetes labels to apply to cluster nodes.",
+      "additionalProperties": false,
+      "type": "object",
+      "markdownDescription": "A map of Kubernetes labels to apply to cluster nodes.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "VpcConfig": {
       "description": "Specifies an Amazon Virtual Private Cloud (VPC) that your SageMaker jobs, hosted models, and compute resources have access to. You can control access to and from your resources by configuring a VPC.",
       "additionalProperties": false,
@@ -224,6 +236,38 @@
         "Subnets"
       ],
       "markdownDescription": "Specifies an Amazon Virtual Private Cloud (VPC) that your SageMaker jobs, hosted models, and compute resources have access to. You can control access to and from your resources by configuring a VPC.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ClusterKubernetesTaint": {
+      "description": "A Kubernetes taint to apply to cluster nodes.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "description": "The value of the taint.",
+          "type": "string",
+          "markdownDescription": "The value of the taint.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Effect": {
+          "description": "The effect of the taint.",
+          "type": "string",
+          "enum": [
+            "NoSchedule",
+            "PreferNoSchedule",
+            "NoExecute"
+          ],
+          "markdownDescription": "The effect of the taint.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: NoSchedule | PreferNoSchedule | NoExecute  \nUpdate requires: No interruption\n"
+        },
+        "Key": {
+          "description": "The key of the taint.",
+          "type": "string",
+          "markdownDescription": "The key of the taint.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Effect"
+      ],
+      "markdownDescription": "A Kubernetes taint to apply to cluster nodes.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "ClusterRestrictedInstanceGroup": {
       "description": "Details of a restricted instance group in a SageMaker HyperPod cluster.",
@@ -296,12 +340,32 @@
       },
       "markdownDescription": "An array that contains the alarms that SageMaker monitors to know whether to roll back the AMI update.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     },
+    "ClusterCapacityRequirements": {
+      "description": "Specifies the capacity requirements configuration for an instance group",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Spot": {
+          "$ref": "#/definitions/ClusterSpotOptions"
+        },
+        "OnDemand": {
+          "$ref": "#/definitions/ClusterOnDemandOptions"
+        }
+      },
+      "markdownDescription": "Specifies the capacity requirements configuration for an instance group\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "ImageId": {
       "minLength": 7,
       "description": "AMI Id to be used for launching EC2 instances - HyperPodPublicAmiId or CustomAmiId",
       "type": "string",
       "maxLength": 21,
       "markdownDescription": "AMI Id to be used for launching EC2 instances - HyperPodPublicAmiId or CustomAmiId\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 7  \nMaximum Length: 21  \nPattern: ^ami-[0-9a-fA-F]{8,17}|default$  \nUpdate requires: No interruption\n"
+    },
+    "ClusterSpotOptions": {
+      "description": "Options for Spot capacity",
+      "additionalProperties": false,
+      "type": "object",
+      "markdownDescription": "Options for Spot capacity\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "CapacitySizeConfig": {
       "description": "The configuration of the size measurements of the AMI update. Using this configuration, you can specify whether SageMaker should update your instance group by an amount or percentage of instances.",
@@ -365,6 +429,12 @@
       "maxLength": 63,
       "markdownDescription": "The name of the instance group of a SageMaker HyperPod cluster.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 63  \nPattern: ^[a-zA-Z0-9](-*[a-zA-Z0-9])*$  \nUpdate requires: No interruption\n"
     },
+    "ClusterOnDemandOptions": {
+      "description": "Options for OnDemand capacity",
+      "additionalProperties": false,
+      "type": "object",
+      "markdownDescription": "Options for OnDemand capacity\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "ClusterInstanceGroupsList": {
       "minItems": 1,
       "description": "The instance groups of the SageMaker HyperPod cluster.",
@@ -384,6 +454,20 @@
         "$ref": "#/definitions/ClusterRestrictedInstanceGroup"
       },
       "markdownDescription": "The restricted instance groups of the SageMaker HyperPod cluster.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement\nRead only property: Yes"
+    },
+    "ClusterKubernetesConfig": {
+      "description": "Kubernetes configuration for cluster nodes including labels and taints.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Labels": {
+          "$ref": "#/definitions/ClusterKubernetesLabels"
+        },
+        "Taints": {
+          "$ref": "#/definitions/ClusterKubernetesTaints"
+        }
+      },
+      "markdownDescription": "Kubernetes configuration for cluster nodes including labels and taints.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Orchestrator": {
       "description": "Specifies parameter(s) specific to the orchestrator, e.g. specify the EKS cluster.",
@@ -458,16 +542,32 @@
       },
       "markdownDescription": "Nodes will undergo advanced stress test to detect and replace faulty instances, based on the type of deep health check(s) passed in.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     },
+    "ClusterKubernetesTaints": {
+      "maxItems": 50,
+      "description": "A list of Kubernetes taints to apply to cluster nodes. Maximum of 50 taints.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ClusterKubernetesTaint"
+      },
+      "markdownDescription": "A list of Kubernetes taints to apply to cluster nodes. Maximum of 50 taints.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
     "ClusterInstanceGroup": {
       "description": "Details of an instance group in a SageMaker HyperPod cluster.",
       "additionalProperties": false,
       "type": "object",
       "properties": {
+        "CapacityRequirements": {
+          "$ref": "#/definitions/ClusterCapacityRequirements"
+        },
         "InstanceGroupName": {
           "$ref": "#/definitions/InstanceGroupName"
         },
         "InstanceStorageConfigs": {
           "$ref": "#/definitions/ClusterInstanceStorageConfigs"
+        },
+        "KubernetesConfig": {
+          "$ref": "#/definitions/ClusterKubernetesConfig"
         },
         "LifeCycleConfig": {
           "$ref": "#/definitions/ClusterLifeCycleConfig"
@@ -515,6 +615,12 @@
         },
         "ExecutionRole": {
           "$ref": "#/definitions/ExecutionRole"
+        },
+        "MinInstanceCount": {
+          "description": "The minimum number of instances required for the instance group to be InService. MinInstanceCount must be less than or equal to InstanceCount.",
+          "type": "integer",
+          "minimum": 0,
+          "markdownDescription": "The minimum number of instances required for the instance group to be InService. MinInstanceCount must be less than or equal to InstanceCount.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
@@ -633,6 +739,31 @@
       },
       "markdownDescription": "The configuration to use when updating the AMI versions.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "TieredStorageConfig": {
+      "description": "Configuration for tiered storage in the SageMaker HyperPod cluster.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Mode": {
+          "description": "The mode of tiered storage.",
+          "type": "string",
+          "enum": [
+            "Enable",
+            "Disable"
+          ],
+          "markdownDescription": "The mode of tiered storage.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: Enable | Disable  \nUpdate requires: No interruption\n"
+        },
+        "InstanceMemoryAllocationPercentage": {
+          "description": "The percentage of instance memory to allocate for tiered storage.",
+          "type": "integer",
+          "markdownDescription": "The percentage of instance memory to allocate for tiered storage.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Mode"
+      ],
+      "markdownDescription": "Configuration for tiered storage in the SageMaker HyperPod cluster.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "FSxLustreConfig": {
       "description": "Configuration settings for an Amazon FSx for Lustre file system to be used with the cluster.",
       "additionalProperties": false,
@@ -748,6 +879,9 @@
         "$ref": "#/definitions/Tag"
       },
       "markdownDescription": "Custom tags for managing the SageMaker HyperPod cluster as an AWS resource. You can add tags to your cluster in the same way you add them in other AWS services that support tagging.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "TieredStorageConfig": {
+      "$ref": "#/definitions/TieredStorageConfig"
     }
   },
   "attributes": {

@@ -13,9 +13,10 @@
     "AdMarkerHls": {
       "type": "string",
       "enum": [
-        "DATERANGE"
+        "DATERANGE",
+        "SCTE35_ENHANCED"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DATERANGE  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DATERANGE | SCTE35_ENHANCED  \nUpdate requires: No interruption\n"
     },
     "CmafEncryptionMethod": {
       "type": "string",
@@ -29,9 +30,10 @@
       "type": "string",
       "enum": [
         "TS",
-        "CMAF"
+        "CMAF",
+        "ISM"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: TS | CMAF  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: TS | CMAF | ISM  \nUpdate requires: No interruption\n"
     },
     "DashBaseUrl": {
       "type": "object",
@@ -367,6 +369,9 @@
         },
         "CmafEncryptionMethod": {
           "$ref": "#/definitions/CmafEncryptionMethod"
+        },
+        "IsmEncryptionMethod": {
+          "$ref": "#/definitions/IsmEncryptionMethod"
         }
       },
       "additionalProperties": false,
@@ -392,6 +397,13 @@
           "minLength": 1,
           "description": "<p>Optionally specify one or more manifest filters for all of your manifest egress requests. When you include a manifest filter, note that you cannot use an identical manifest filter query parameter for this manifest's endpoint URL.</p>",
           "markdownDescription": "<p>Optionally specify one or more manifest filters for all of your manifest egress requests. When you include a manifest filter, note that you cannot use an identical manifest filter query parameter for this manifest's endpoint URL.</p>\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+        },
+        "DrmSettings": {
+          "type": "string",
+          "maxLength": 1024,
+          "minLength": 1,
+          "description": "<p>Optionally specify one or more DRM settings for all of your manifest egress requests. When you include a DRM setting, note that you cannot use an identical DRM setting query parameter for this manifest's endpoint URL.</p>",
+          "markdownDescription": "<p>Optionally specify one or more DRM settings for all of your manifest egress requests. When you include a DRM setting, note that you cannot use an identical DRM setting query parameter for this manifest's endpoint URL.</p>\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
         },
         "Start": {
           "type": "string",
@@ -641,6 +653,50 @@
       "additionalProperties": false,
       "markdownDescription": "<p>Retrieve the low-latency HTTP live streaming (HLS) manifest configuration.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "MssManifestConfiguration": {
+      "type": "object",
+      "description": "<p>Configuration details for a Microsoft Smooth Streaming (MSS) manifest associated with an origin endpoint. This includes all the settings and properties that define how the MSS content is packaged and delivered.</p>",
+      "properties": {
+        "ManifestName": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 1,
+          "description": "<p>The name of the MSS manifest. This name is appended to the origin endpoint URL to create the unique path for accessing this specific MSS manifest.</p>",
+          "markdownDescription": "<p>The name of the MSS manifest. This name is appended to the origin endpoint URL to create the unique path for accessing this specific MSS manifest.</p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^[a-zA-Z0-9-]+$  \nUpdate requires: No interruption\n"
+        },
+        "FilterConfiguration": {
+          "$ref": "#/definitions/FilterConfiguration"
+        },
+        "ManifestWindowSeconds": {
+          "type": "integer",
+          "description": "<p>The duration (in seconds) of the manifest window. This represents the total amount of content available in the manifest at any given time.</p>",
+          "markdownDescription": "<p>The duration (in seconds) of the manifest window. This represents the total amount of content available in the manifest at any given time.</p>\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "ManifestLayout": {
+          "$ref": "#/definitions/MssManifestLayout"
+        }
+      },
+      "required": [
+        "ManifestName"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "<p>Configuration details for a Microsoft Smooth Streaming (MSS) manifest associated with an origin endpoint. This includes all the settings and properties that define how the MSS content is packaged and delivered.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "IsmEncryptionMethod": {
+      "type": "string",
+      "enum": [
+        "CENC"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CENC  \nUpdate requires: No interruption\n"
+    },
+    "MssManifestLayout": {
+      "type": "string",
+      "enum": [
+        "FULL",
+        "COMPACT"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: FULL | COMPACT  \nUpdate requires: No interruption\n"
+    },
     "PresetSpeke20Audio": {
       "type": "string",
       "enum": [
@@ -681,6 +737,9 @@
           "minItems": 0,
           "description": "<p>The SCTE-35 message types that you want to be treated as ad markers in the output.</p>",
           "markdownDescription": "<p>The SCTE-35 message types that you want to be treated as ad markers in the output.</p>\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "ScteInSegments": {
+          "$ref": "#/definitions/ScteInSegments"
         }
       },
       "additionalProperties": false,
@@ -722,6 +781,14 @@
       },
       "additionalProperties": false,
       "markdownDescription": "<p>The SCTE configuration.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ScteInSegments": {
+      "type": "string",
+      "enum": [
+        "NONE",
+        "ALL"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: NONE | ALL  \nUpdate requires: No interruption\n"
     },
     "Segment": {
       "type": "object",
@@ -803,6 +870,13 @@
           "minLength": 1,
           "description": "<p>The URL of the API Gateway proxy that you set up to talk to your key server. The API Gateway proxy must reside in the same AWS Region as MediaPackage and must start with https://.</p> <p>The following example shows a URL: <code>https://1wm2dx1f33.execute-api.us-west-2.amazonaws.com/SpekeSample/copyProtection</code> </p>",
           "markdownDescription": "<p>The URL of the API Gateway proxy that you set up to talk to your key server. The API Gateway proxy must reside in the same AWS Region as MediaPackage and must start with https://.</p> <p>The following example shows a URL: <code>https://1wm2dx1f33.execute-api.us-west-2.amazonaws.com/SpekeSample/copyProtection</code> </p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+        },
+        "CertificateArn": {
+          "type": "string",
+          "maxLength": 2048,
+          "minLength": 20,
+          "description": "<p>The ARN for the certificate that you imported to AWS Certificate Manager to add content key encryption to this endpoint. For this feature to work, your DRM key provider must support content key encryption.</p>",
+          "markdownDescription": "<p>The ARN for the certificate that you imported to AWS Certificate Manager to add content key encryption to this endpoint. For this feature to work, your DRM key provider must support content key encryption.</p>\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:([^:\\n]+):acm:([^:\\n]+):([0-9]+):certificate/[a-zA-Z0-9-_]+$  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
@@ -927,6 +1001,14 @@
       "format": "date-time",
       "markdownDescription": "<p>The date and time the origin endpoint was modified.</p>\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
+    "MssManifests": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/MssManifestConfiguration"
+      },
+      "description": "<p>The Microsoft Smooth Streaming (MSS) manifest configurations associated with this origin endpoint.</p>",
+      "markdownDescription": "<p>The Microsoft Smooth Streaming (MSS) manifest configurations associated with this origin endpoint.</p>\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
     "OriginEndpointName": {
       "type": "string",
       "maxLength": 256,
@@ -944,6 +1026,14 @@
       "markdownDescription": "<p>The size of the window (in seconds) to create a window of the live stream that's available for on-demand viewing. Viewers can start-over or catch-up on content that falls within the window. The maximum startover window is 1,209,600 seconds (14 days).</p>\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
     },
     "DashManifestUrls": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "MssManifestUrls": {
       "type": "array",
       "items": {
         "type": "string",
@@ -986,6 +1076,7 @@
     "/properties/Arn",
     "/properties/CreatedAt",
     "/properties/DashManifestUrls",
+    "/properties/MssManifestUrls",
     "/properties/HlsManifestUrls",
     "/properties/LowLatencyHlsManifestUrls",
     "/properties/ModifiedAt",
@@ -1005,7 +1096,8 @@
       "permissions": [
         "mediapackagev2:TagResource",
         "mediapackagev2:CreateOriginEndpoint",
-        "iam:PassRole"
+        "iam:PassRole",
+        "acm:DescribeCertificate"
       ]
     },
     "read": {
@@ -1019,7 +1111,8 @@
         "mediapackagev2:UntagResource",
         "mediapackagev2:ListTagsForResource",
         "mediapackagev2:UpdateOriginEndpoint",
-        "iam:PassRole"
+        "iam:PassRole",
+        "acm:DescribeCertificate"
       ]
     },
     "delete": {
@@ -1088,6 +1181,14 @@
       "markdownDescription": "<p>The date and time the origin endpoint was modified.</p>\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "DashManifestUrls": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "MssManifestUrls": {
       "type": "array",
       "items": {
         "type": "string",

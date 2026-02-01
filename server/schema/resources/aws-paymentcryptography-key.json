@@ -154,6 +154,17 @@
       ],
       "markdownDescription": "Defines the source of a key\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: EXTERNAL | AWS_PAYMENT_CRYPTOGRAPHY  \nUpdate requires: No interruption\n"
     },
+    "KeyReplicationState": {
+      "type": "string",
+      "description": "Defines the replication state of a key",
+      "enum": [
+        "IN_PROGRESS",
+        "DELETE_IN_PROGRESS",
+        "FAILED",
+        "SYNCHRONIZED"
+      ],
+      "markdownDescription": "Defines the replication state of a key\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: IN_PROGRESS | DELETE_IN_PROGRESS | FAILED | SYNCHRONIZED  \nUpdate requires: No interruption\n"
+    },
     "KeyState": {
       "type": "string",
       "description": "Defines the state of a key",
@@ -181,6 +192,7 @@
         "TR31_K0_KEY_ENCRYPTION_KEY",
         "TR31_K1_KEY_BLOCK_PROTECTION_KEY",
         "TR31_K3_ASYMMETRIC_KEY_FOR_KEY_AGREEMENT",
+        "TR31_M0_ISO_16609_MAC_KEY",
         "TR31_M3_ISO_9797_3_MAC_KEY",
         "TR31_M1_ISO_9797_1_MAC_KEY",
         "TR31_M6_ISO_9797_5_CMAC_KEY",
@@ -192,7 +204,34 @@
         "TR31_V2_VISA_PIN_VERIFICATION_KEY",
         "TR31_K2_TR34_ASYMMETRIC_KEY"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: TR31_B0_BASE_DERIVATION_KEY | TR31_C0_CARD_VERIFICATION_KEY | TR31_D0_SYMMETRIC_DATA_ENCRYPTION_KEY | TR31_D1_ASYMMETRIC_KEY_FOR_DATA_ENCRYPTION | TR31_E0_EMV_MKEY_APP_CRYPTOGRAMS | TR31_E1_EMV_MKEY_CONFIDENTIALITY | TR31_E2_EMV_MKEY_INTEGRITY | TR31_E4_EMV_MKEY_DYNAMIC_NUMBERS | TR31_E5_EMV_MKEY_CARD_PERSONALIZATION | TR31_E6_EMV_MKEY_OTHER | TR31_K0_KEY_ENCRYPTION_KEY | TR31_K1_KEY_BLOCK_PROTECTION_KEY | TR31_K3_ASYMMETRIC_KEY_FOR_KEY_AGREEMENT | TR31_M3_ISO_9797_3_MAC_KEY | TR31_M1_ISO_9797_1_MAC_KEY | TR31_M6_ISO_9797_5_CMAC_KEY | TR31_M7_HMAC_KEY | TR31_P0_PIN_ENCRYPTION_KEY | TR31_P1_PIN_GENERATION_KEY | TR31_S0_ASYMMETRIC_KEY_FOR_DIGITAL_SIGNATURE | TR31_V1_IBM3624_PIN_VERIFICATION_KEY | TR31_V2_VISA_PIN_VERIFICATION_KEY | TR31_K2_TR34_ASYMMETRIC_KEY  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: TR31_B0_BASE_DERIVATION_KEY | TR31_C0_CARD_VERIFICATION_KEY | TR31_D0_SYMMETRIC_DATA_ENCRYPTION_KEY | TR31_D1_ASYMMETRIC_KEY_FOR_DATA_ENCRYPTION | TR31_E0_EMV_MKEY_APP_CRYPTOGRAMS | TR31_E1_EMV_MKEY_CONFIDENTIALITY | TR31_E2_EMV_MKEY_INTEGRITY | TR31_E4_EMV_MKEY_DYNAMIC_NUMBERS | TR31_E5_EMV_MKEY_CARD_PERSONALIZATION | TR31_E6_EMV_MKEY_OTHER | TR31_K0_KEY_ENCRYPTION_KEY | TR31_K1_KEY_BLOCK_PROTECTION_KEY | TR31_K3_ASYMMETRIC_KEY_FOR_KEY_AGREEMENT | TR31_M0_ISO_16609_MAC_KEY | TR31_M3_ISO_9797_3_MAC_KEY | TR31_M1_ISO_9797_1_MAC_KEY | TR31_M6_ISO_9797_5_CMAC_KEY | TR31_M7_HMAC_KEY | TR31_P0_PIN_ENCRYPTION_KEY | TR31_P1_PIN_GENERATION_KEY | TR31_S0_ASYMMETRIC_KEY_FOR_DIGITAL_SIGNATURE | TR31_V1_IBM3624_PIN_VERIFICATION_KEY | TR31_V2_VISA_PIN_VERIFICATION_KEY | TR31_K2_TR34_ASYMMETRIC_KEY  \nUpdate requires: No interruption\n"
+    },
+    "ReplicationStatus": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}-[a-z]{1,16}-[0-9]+$": {
+          "$ref": "#/definitions/ReplicationStatusType"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ReplicationStatusType": {
+      "type": "object",
+      "properties": {
+        "Status": {
+          "$ref": "#/definitions/KeyReplicationState"
+        },
+        "StatusMessage": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Status"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Tag": {
       "type": "object",
@@ -248,6 +287,17 @@
     "KeyState": {
       "$ref": "#/definitions/KeyState"
     },
+    "ReplicationRegions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-z]{2}-[a-z]{1,16}-[0-9]+$  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "ReplicationStatus": {
+      "$ref": "#/definitions/ReplicationStatus"
+    },
     "Tags": {
       "type": "array",
       "items": {
@@ -266,7 +316,11 @@
   "readOnlyProperties": [
     "/properties/KeyIdentifier",
     "/properties/KeyOrigin",
-    "/properties/KeyState"
+    "/properties/KeyState",
+    "/properties/ReplicationStatus"
+  ],
+  "writeOnlyProperties": [
+    "/properties/ReplicationRegions"
   ],
   "primaryIdentifier": [
     "/properties/KeyIdentifier"
@@ -292,7 +346,9 @@
         "payment-cryptography:TagResource",
         "payment-cryptography:UntagResource",
         "payment-cryptography:StartKeyUsage",
-        "payment-cryptography:StopKeyUsage"
+        "payment-cryptography:StopKeyUsage",
+        "payment-cryptography:AddKeyReplicationRegions",
+        "payment-cryptography:RemoveKeyReplicationRegions"
       ]
     },
     "delete": {
@@ -332,6 +388,9 @@
     },
     "KeyState": {
       "$ref": "#/definitions/KeyState"
+    },
+    "ReplicationStatus": {
+      "$ref": "#/definitions/ReplicationStatus"
     }
   }
 }

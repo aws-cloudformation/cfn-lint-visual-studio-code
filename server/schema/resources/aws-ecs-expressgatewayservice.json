@@ -1,0 +1,610 @@
+{
+  "tagging": {
+    "permissions": [
+      "ecs:TagResource",
+      "ecs:UntagResource",
+      "ecs:ListTagsForResource"
+    ],
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": false,
+    "tagProperty": "/properties/Tags",
+    "cloudFormationSystemTags": false
+  },
+  "typeName": "AWS::ECS::ExpressGatewayService",
+  "readOnlyProperties": [
+    "/properties/ServiceArn",
+    "/properties/ActiveConfigurations",
+    "/properties/Status",
+    "/properties/CreatedAt",
+    "/properties/UpdatedAt",
+    "/properties/Endpoint",
+    "/properties/ECSManagedResourceArns",
+    "/properties/ECSManagedResourceArns/ServiceSecurityGroups",
+    "/properties/ECSManagedResourceArns/AutoScaling",
+    "/properties/ECSManagedResourceArns/AutoScaling/ScalableTarget",
+    "/properties/ECSManagedResourceArns/AutoScaling/ApplicationAutoScalingPolicies",
+    "/properties/ECSManagedResourceArns/LogGroups",
+    "/properties/ECSManagedResourceArns/MetricAlarms",
+    "/properties/ECSManagedResourceArns/IngressPath",
+    "/properties/ECSManagedResourceArns/IngressPath/CertificateArn",
+    "/properties/ECSManagedResourceArns/IngressPath/LoadBalancerSecurityGroups",
+    "/properties/ECSManagedResourceArns/IngressPath/ListenerRuleArn",
+    "/properties/ECSManagedResourceArns/IngressPath/ListenerArn",
+    "/properties/ECSManagedResourceArns/IngressPath/LoadBalancerArn",
+    "/properties/ECSManagedResourceArns/IngressPath/TargetGroupArns"
+  ],
+  "description": "Resource Type definition for AWS::ECS::ExpressGatewayService",
+  "createOnlyProperties": [
+    "/properties/ServiceName",
+    "/properties/Cluster",
+    "/properties/InfrastructureRoleArn",
+    "/properties/Tags"
+  ],
+  "primaryIdentifier": [
+    "/properties/ServiceArn"
+  ],
+  "required": [
+    "ExecutionRoleArn",
+    "InfrastructureRoleArn",
+    "PrimaryContainer"
+  ],
+  "propertyTransform": {
+    "/properties/Cluster": "Cluster $OR $join([\"arn:(aws)[-]{0,1}[a-z]{0,3}[-]{0,1}[a-z]{0,3}:ecs:[a-z0-9-]+:[0-9]{12}:cluster/{1}\", Cluster])"
+  },
+  "handlers": {
+    "read": {
+      "permissions": [
+        "ecs:DescribeExpressGatewayService",
+        "ecs:DescribeServiceRevisions"
+      ]
+    },
+    "create": {
+      "permissions": [
+        "ecs:CreateExpressGatewayService",
+        "ecs:CreateCluster",
+        "ecs:DescribeExpressGatewayService",
+        "ecs:DescribeServiceDeployments",
+        "ecs:ListServiceDeployments",
+        "ecs:RegisterTaskDefinition",
+        "ecs:TagResource",
+        "iam:PassRole"
+      ],
+      "timeoutInMinutes": 180
+    },
+    "update": {
+      "permissions": [
+        "ecs:UpdateExpressGatewayService",
+        "ecs:DescribeExpressGatewayService",
+        "ecs:DescribeServiceDeployments",
+        "ecs:ListServiceDeployments",
+        "ecs:RegisterTaskDefinition",
+        "iam:PassRole"
+      ],
+      "timeoutInMinutes": 180
+    },
+    "delete": {
+      "permissions": [
+        "ecs:DeleteExpressGatewayService",
+        "ecs:DescribeExpressGatewayService",
+        "ecs:DescribeServices"
+      ],
+      "timeoutInMinutes": 30
+    }
+  },
+  "writeOnlyProperties": [
+    "/properties/ExecutionRoleArn",
+    "/properties/TaskRoleArn",
+    "/properties/HealthCheckPath",
+    "/properties/PrimaryContainer",
+    "/properties/NetworkConfiguration",
+    "/properties/Cpu",
+    "/properties/Memory",
+    "/properties/ScalingTarget"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "IngressPathSummary": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Endpoint": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "AccessType": {
+          "$ref": "#/definitions/AccessType"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ExpressGatewayRepositoryCredentials": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "CredentialsParameter": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "CredentialsParameter"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ExpressGatewayScalingTarget": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "MinTaskCount": {
+          "default": 1,
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "MaxTaskCount": {
+          "default": 1,
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "AutoScalingMetric": {
+          "$ref": "#/definitions/ExpressGatewayServiceScalingMetric"
+        },
+        "AutoScalingTargetValue": {
+          "default": 60,
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "KeyValuePair": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Name": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Name",
+        "Value"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ExpressGatewayContainer": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "RepositoryCredentials": {
+          "$ref": "#/definitions/ExpressGatewayRepositoryCredentials"
+        },
+        "Secrets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Secret"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "Command": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "AwsLogsConfiguration": {
+          "$ref": "#/definitions/ExpressGatewayServiceAwsLogsConfiguration"
+        },
+        "ContainerPort": {
+          "default": 80,
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Environment": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/KeyValuePair"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "Image": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Image"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ExpressGatewayServiceAwsLogsConfiguration": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "LogStreamPrefix": {
+          "default": "ecs",
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "LogGroup": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "LogGroup",
+        "LogStreamPrefix"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ECSManagedResourceArns": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "LogGroups": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "ServiceSecurityGroups": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "MetricAlarms": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "IngressPath": {
+          "$ref": "#/definitions/IngressPathArns"
+        },
+        "AutoScaling": {
+          "$ref": "#/definitions/AutoScalingArns"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "AutoScalingArns": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ScalableTarget": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ApplicationAutoScalingPolicies": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Secret": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ValueFrom": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Name": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Name",
+        "ValueFrom"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ExpressGatewayServiceScalingMetric": {
+      "default": "AVERAGE_CPU",
+      "type": "string",
+      "enum": [
+        "AVERAGE_CPU",
+        "AVERAGE_MEMORY",
+        "REQUEST_COUNT_PER_TARGET"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AVERAGE_CPU | AVERAGE_MEMORY | REQUEST_COUNT_PER_TARGET  \nUpdate requires: No interruption\n"
+    },
+    "ExpressGatewayServiceConfiguration": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ServiceRevisionArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ExecutionRoleArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "TaskRoleArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ScalingTarget": {
+          "$ref": "#/definitions/ExpressGatewayScalingTarget"
+        },
+        "IngressPaths": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/IngressPathSummary"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "PrimaryContainer": {
+          "$ref": "#/definitions/ExpressGatewayContainer"
+        },
+        "Memory": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "HealthCheckPath": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "CreatedAt": {
+          "format": "date-time",
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Cpu": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "NetworkConfiguration": {
+          "$ref": "#/definitions/ExpressGatewayServiceNetworkConfiguration"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Key": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ExpressGatewayServiceStatusCode": {
+      "type": "string",
+      "enum": [
+        "ACTIVE",
+        "DRAINING",
+        "INACTIVE"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ACTIVE | DRAINING | INACTIVE  \nUpdate requires: No interruption\n"
+    },
+    "IngressPathArns": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ListenerArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "LoadBalancerArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "TargetGroupArns": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "ListenerRuleArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "LoadBalancerSecurityGroups": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "CertificateArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ExpressGatewayServiceNetworkConfiguration": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "SecurityGroups": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "Subnets": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AccessType": {
+      "type": "string",
+      "enum": [
+        "PUBLIC",
+        "PRIVATE"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PUBLIC | PRIVATE  \nUpdate requires: No interruption\n"
+    },
+    "ExpressGatewayServiceStatus": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "StatusCode": {
+          "$ref": "#/definitions/ExpressGatewayServiceStatusCode"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "Status": {
+      "$ref": "#/definitions/ExpressGatewayServiceStatus"
+    },
+    "TaskRoleArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "PrimaryContainer": {
+      "$ref": "#/definitions/ExpressGatewayContainer"
+    },
+    "Memory": {
+      "default": "512",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "HealthCheckPath": {
+      "default": "HTTP:80/ping",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "CreatedAt": {
+      "format": "date-time",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Cluster": {
+      "default": "default",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "Cpu": {
+      "default": "256",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "ServiceArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ECSManagedResourceArns": {
+      "$ref": "#/definitions/ECSManagedResourceArns"
+    },
+    "UpdatedAt": {
+      "format": "date-time",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ExecutionRoleArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "InfrastructureRoleArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "ScalingTarget": {
+      "$ref": "#/definitions/ExpressGatewayScalingTarget"
+    },
+    "ActiveConfigurations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ExpressGatewayServiceConfiguration"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Endpoint": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ServiceName": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "NetworkConfiguration": {
+      "$ref": "#/definitions/ExpressGatewayServiceNetworkConfiguration"
+    },
+    "Tags": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement\n"
+    }
+  },
+  "attributes": {
+    "Status": {
+      "$ref": "#/definitions/ExpressGatewayServiceStatus"
+    },
+    "CreatedAt": {
+      "format": "date-time",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ServiceArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ECSManagedResourceArns": {
+      "$ref": "#/definitions/ECSManagedResourceArns"
+    },
+    "UpdatedAt": {
+      "format": "date-time",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ActiveConfigurations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ExpressGatewayServiceConfiguration"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Endpoint": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

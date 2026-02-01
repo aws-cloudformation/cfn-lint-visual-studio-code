@@ -53,6 +53,24 @@
         "DISABLED"
       ],
       "markdownDescription": "The possible standby replicas for the collection\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption\n"
+    },
+    "EncryptionConfig": {
+      "type": "object",
+      "description": "Encryption settings for the collection",
+      "properties": {
+        "AWSOwnedKey": {
+          "type": "boolean",
+          "description": "Indicates whether to use an AWS owned key for encryption.",
+          "markdownDescription": "Indicates whether to use an AWS owned key for encryption.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "KmsKeyArn": {
+          "type": "string",
+          "description": "Key Management Service key used to encrypt the collection.",
+          "markdownDescription": "Key Management Service key used to encrypt the collection.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Encryption settings for the collection\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -107,6 +125,19 @@
     },
     "StandbyReplicas": {
       "$ref": "#/definitions/StandbyReplicas"
+    },
+    "CollectionGroupName": {
+      "type": "string",
+      "description": "The name of the collection group to associate with the collection.",
+      "markdownDescription": "The name of the collection group to associate with the collection.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "EncryptionConfig": {
+      "$ref": "#/definitions/EncryptionConfig"
+    },
+    "KmsKeyArn": {
+      "type": "string",
+      "description": "Key Management Service key used to encrypt the collection.",
+      "markdownDescription": "Key Management Service key used to encrypt the collection.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   },
   "required": [
@@ -116,15 +147,20 @@
     "/properties/Id",
     "/properties/Arn",
     "/properties/CollectionEndpoint",
-    "/properties/DashboardEndpoint"
+    "/properties/DashboardEndpoint",
+    "/properties/KmsKeyArn"
   ],
   "writeOnlyProperties": [
-    "/properties/Tags"
+    "/properties/Tags",
+    "/properties/EncryptionConfig"
   ],
   "createOnlyProperties": [
     "/properties/Name",
     "/properties/Tags",
-    "/properties/Type"
+    "/properties/Type",
+    "/properties/StandbyReplicas",
+    "/properties/CollectionGroupName",
+    "/properties/EncryptionConfig"
   ],
   "primaryIdentifier": [
     "/properties/Id"
@@ -142,7 +178,10 @@
       "permissions": [
         "aoss:CreateCollection",
         "aoss:BatchGetCollection",
-        "iam:CreateServiceLinkedRole"
+        "aoss:AddCollectionToCollectionGroup",
+        "iam:CreateServiceLinkedRole",
+        "kms:CreateGrant",
+        "kms:DescribeKey"
       ]
     },
     "delete": {
@@ -191,6 +230,11 @@
       "description": "The OpenSearch Dashboards endpoint for the collection.",
       "type": "string",
       "markdownDescription": "The OpenSearch Dashboards endpoint for the collection.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "KmsKeyArn": {
+      "type": "string",
+      "description": "Key Management Service key used to encrypt the collection.",
+      "markdownDescription": "Key Management Service key used to encrypt the collection.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

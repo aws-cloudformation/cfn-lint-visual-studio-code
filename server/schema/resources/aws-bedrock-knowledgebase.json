@@ -47,9 +47,10 @@
         "RDS",
         "MONGO_DB_ATLAS",
         "NEPTUNE_ANALYTICS",
+        "S3_VECTORS",
         "OPENSEARCH_MANAGED_CLUSTER"
       ],
-      "markdownDescription": "The storage type of a knowledge base.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: OPENSEARCH_SERVERLESS | PINECONE | RDS | MONGO_DB_ATLAS | NEPTUNE_ANALYTICS | OPENSEARCH_MANAGED_CLUSTER  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The storage type of a knowledge base.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: OPENSEARCH_SERVERLESS | PINECONE | RDS | MONGO_DB_ATLAS | NEPTUNE_ANALYTICS | S3_VECTORS | OPENSEARCH_MANAGED_CLUSTER  \nUpdate requires: No interruption\n"
     },
     "KnowledgeBaseType": {
       "type": "string",
@@ -530,6 +531,44 @@
       "additionalProperties": false,
       "markdownDescription": "Contains the configurations to use Neptune Analytics as Vector Store.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "S3VectorsConfiguration": {
+      "type": "object",
+      "description": "Contains the storage configuration of the knowledge base for S3 vectors.",
+      "properties": {
+        "VectorBucketArn": {
+          "type": "string",
+          "description": "The Amazon Resource Name (ARN) of the S3 bucket where vector embeddings are stored. This bucket contains the vector data used by the knowledge base.",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the S3 bucket where vector embeddings are stored. This bucket contains the vector data used by the knowledge base.\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "IndexArn": {
+          "type": "string",
+          "description": "The Amazon Resource Name (ARN) of the vector index used for the knowledge base. This ARN identifies the specific vector index resource within Amazon Bedrock.",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the vector index used for the knowledge base. This ARN identifies the specific vector index resource within Amazon Bedrock.\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "IndexName": {
+          "type": "string",
+          "maxLength": 63,
+          "minLength": 3,
+          "description": "The name of the vector index used for the knowledge base. This name identifies the vector index within the Amazon Bedrock service.",
+          "markdownDescription": "The name of the vector index used for the knowledge base. This name identifies the vector index within the Amazon Bedrock service.\n\n---\n\nRequired: Conditional  \nType: String  \nMinimum Length: 3  \nMaximum Length: 63  \nUpdate requires: No interruption\n"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "IndexArn"
+          ]
+        },
+        {
+          "required": [
+            "VectorBucketArn",
+            "IndexName"
+          ]
+        }
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Contains the storage configuration of the knowledge base for S3 vectors.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "StorageConfiguration": {
       "type": "object",
       "description": "The vector store service in which the knowledge base is stored.",
@@ -551,6 +590,9 @@
         },
         "NeptuneAnalyticsConfiguration": {
           "$ref": "#/definitions/NeptuneAnalyticsConfiguration"
+        },
+        "S3VectorsConfiguration": {
+          "$ref": "#/definitions/S3VectorsConfiguration"
         },
         "OpensearchManagedClusterConfiguration": {
           "$ref": "#/definitions/OpenSearchManagedClusterConfiguration"
@@ -582,6 +624,11 @@
         },
         {
           "required": [
+            "S3VectorsConfiguration"
+          ]
+        },
+        {
+          "required": [
             "MongoDbAtlasConfiguration"
           ]
         },
@@ -609,6 +656,91 @@
       "additionalProperties": false,
       "markdownDescription": "A map of tag keys and values\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "FixedLengthDuration": {
+      "type": "integer",
+      "description": "Duration in seconds to segment the multi modal media",
+      "minimum": 1,
+      "maximum": 30,
+      "markdownDescription": "Duration in seconds to segment the multi modal media\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    },
+    "AudioSegmentationConfiguration": {
+      "type": "object",
+      "description": "Configure the audio segmentation configuration for multi modal ingestion.",
+      "properties": {
+        "FixedLengthDuration": {
+          "$ref": "#/definitions/FixedLengthDuration"
+        }
+      },
+      "required": [
+        "FixedLengthDuration"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configure the audio segmentation configuration for multi modal ingestion.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "VideoSegmentationConfiguration": {
+      "type": "object",
+      "description": "Configure the video segmentation configuration for multi modal ingestion.",
+      "properties": {
+        "FixedLengthDuration": {
+          "$ref": "#/definitions/FixedLengthDuration"
+        }
+      },
+      "required": [
+        "FixedLengthDuration"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configure the video segmentation configuration for multi modal ingestion.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AudioConfiguration": {
+      "type": "object",
+      "description": "Configure the audio configuration for multi modal ingestion.",
+      "properties": {
+        "SegmentationConfiguration": {
+          "$ref": "#/definitions/AudioSegmentationConfiguration"
+        }
+      },
+      "required": [
+        "SegmentationConfiguration"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configure the audio configuration for multi modal ingestion.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "VideoConfiguration": {
+      "type": "object",
+      "description": "Configure the video configuration for multi modal ingestion.",
+      "properties": {
+        "SegmentationConfiguration": {
+          "$ref": "#/definitions/VideoSegmentationConfiguration"
+        }
+      },
+      "required": [
+        "SegmentationConfiguration"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configure the video configuration for multi modal ingestion.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AudioConfigurations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/AudioConfiguration"
+      },
+      "maxItems": 1,
+      "minItems": 1,
+      "description": "List of audio configurations for multi modal ingestion.",
+      "insertionOrder": false,
+      "markdownDescription": "List of audio configurations for multi modal ingestion.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "VideoConfigurations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/VideoConfiguration"
+      },
+      "maxItems": 1,
+      "minItems": 1,
+      "description": "List of video configurations for multi modal ingestion.",
+      "insertionOrder": false,
+      "markdownDescription": "List of video configurations for multi modal ingestion.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
     "BedrockEmbeddingModelConfiguration": {
       "type": "object",
       "description": "The vector configuration details for the Bedrock embeddings model.",
@@ -628,6 +760,12 @@
             "BINARY"
           ],
           "markdownDescription": "The data type for the vectors when using a model to convert text into vector embeddings.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: FLOAT32 | BINARY  \nUpdate requires: No interruption\n"
+        },
+        "Audio": {
+          "$ref": "#/definitions/AudioConfigurations"
+        },
+        "Video": {
+          "$ref": "#/definitions/VideoConfigurations"
         }
       },
       "additionalProperties": false,

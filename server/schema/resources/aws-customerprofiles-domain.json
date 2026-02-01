@@ -380,6 +380,42 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "The process of matching duplicate profiles using the Rule-Based matching. If RuleBasedMatching = true, Amazon Connect Customer Profiles will start to match and merge your profiles according to your configuration in the RuleBasedMatchingRequest. You can use the ListRuleBasedMatches and GetSimilarProfiles API to return and review the results. Also, if you have configured ExportingConfig in the RuleBasedMatchingRequest, you can download the results from S3.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Readiness": {
+      "description": "Progress information for data store setup.",
+      "type": "object",
+      "properties": {
+        "ProgressPercentage": {
+          "description": "The percentage of progress completed.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "markdownDescription": "The percentage of progress completed.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Message": {
+          "description": "A message describing the current progress.",
+          "type": "string",
+          "markdownDescription": "A message describing the current progress.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Progress information for data store setup.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DataStore": {
+      "description": "Configuration and status of the data store for the domain.",
+      "type": "object",
+      "properties": {
+        "Enabled": {
+          "description": "Whether the data store is enabled.",
+          "type": "boolean",
+          "markdownDescription": "Whether the data store is enabled.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "Readiness": {
+          "$ref": "#/definitions/Readiness"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Configuration and status of the data store for the domain.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   },
   "properties": {
@@ -416,6 +452,9 @@
     },
     "RuleBasedMatching": {
       "$ref": "#/definitions/RuleBasedMatching"
+    },
+    "DataStore": {
+      "$ref": "#/definitions/DataStore"
     },
     "Stats": {
       "$ref": "#/definitions/DomainStats"
@@ -462,7 +501,8 @@
     "/properties/LastUpdatedAt",
     "/properties/CreatedAt",
     "/properties/RuleBasedMatching/Status",
-    "/properties/Stats"
+    "/properties/Stats",
+    "/properties/DataStore/Readiness"
   ],
   "createOnlyProperties": [
     "/properties/DomainName"
@@ -474,12 +514,22 @@
     "create": {
       "permissions": [
         "profile:CreateDomain",
-        "profile:TagResource"
+        "profile:TagResource",
+        "kms:CreateGrant",
+        "kms:DescribeKey",
+        "kms:GetKeyPolicy",
+        "kms:PutKeyPolicy",
+        "kms:ListGrants"
       ]
     },
     "read": {
       "permissions": [
-        "profile:GetDomain"
+        "profile:GetDomain",
+        "kms:CreateGrant",
+        "kms:DescribeKey",
+        "kms:GetKeyPolicy",
+        "kms:PutKeyPolicy",
+        "kms:ListGrants"
       ]
     },
     "update": {
@@ -487,12 +537,22 @@
         "profile:GetDomain",
         "profile:UpdateDomain",
         "profile:UntagResource",
-        "profile:TagResource"
+        "profile:TagResource",
+        "kms:CreateGrant",
+        "kms:DescribeKey",
+        "kms:GetKeyPolicy",
+        "kms:PutKeyPolicy",
+        "kms:ListGrants"
       ]
     },
     "delete": {
       "permissions": [
-        "profile:DeleteDomain"
+        "profile:DeleteDomain",
+        "kms:CreateGrant",
+        "kms:DescribeKey",
+        "kms:GetKeyPolicy",
+        "kms:PutKeyPolicy",
+        "kms:ListGrants"
       ]
     },
     "list": {

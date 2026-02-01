@@ -2,6 +2,29 @@
   "typeName": "AWS::Location::APIKey",
   "description": "Definition of AWS::Location::APIKey Resource Type",
   "definitions": {
+    "AndroidApp": {
+      "type": "object",
+      "properties": {
+        "Package": {
+          "type": "string",
+          "maxLength": 255,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^([A-Za-z][A-Za-z\\d_]*\\.)+[A-Za-z][A-Za-z\\d_]*$  \nUpdate requires: No interruption\n"
+        },
+        "CertificateFingerprint": {
+          "type": "string",
+          "maxLength": 59,
+          "minLength": 59,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 59  \nMaximum Length: 59  \nPattern: ^([A-Fa-f0-9]{2}:){19}[A-Fa-f0-9]{2}$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "CertificateFingerprint",
+        "Package"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "ApiKeyRestrictions": {
       "type": "object",
       "properties": {
@@ -35,10 +58,30 @@
           "items": {
             "type": "string",
             "maxLength": 253,
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 253  \nPattern: ^([$\\-._+!*\\x{60}(),;/?:@=&\\w]|%([0-9a-fA-F?]{2}|[0-9a-fA-F?]?[*]))+$  \nUpdate requires: No interruption\n"
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 253  \nPattern: ^([\\w!$&()*+,./:;=?@\\x{60}-]|%([\\dA-Fa-f]{2}|[\\dA-Fa-f]?\\*))+$  \nUpdate requires: No interruption\n"
           },
           "maxItems": 5,
-          "minItems": 1,
+          "minItems": 0,
+          "insertionOrder": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "AllowAndroidApps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AndroidApp"
+          },
+          "maxItems": 5,
+          "minItems": 0,
+          "insertionOrder": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "AllowAppleApps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AppleApp"
+          },
+          "maxItems": 5,
+          "minItems": 0,
           "insertionOrder": false,
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         }
@@ -46,6 +89,22 @@
       "required": [
         "AllowActions",
         "AllowResources"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AppleApp": {
+      "type": "object",
+      "properties": {
+        "BundleId": {
+          "type": "string",
+          "maxLength": 155,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 155  \nPattern: ^[A-Za-z0-9\\-]+(\\.[A-Za-z0-9\\-]+)+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "BundleId"
       ],
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
@@ -215,6 +274,17 @@
         "geo-routes:SnapToRoads"
       ]
     },
+    "delete": {
+      "permissions": [
+        "geo:DeleteKey",
+        "geo:DescribeKey"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "geo:ListKeys"
+      ]
+    },
     "read": {
       "permissions": [
         "geo:DescribeKey"
@@ -251,17 +321,6 @@
         "geo-routes:OptimizeWaypoints",
         "geo-routes:SnapToRoads",
         "geo:UpdateKey"
-      ]
-    },
-    "delete": {
-      "permissions": [
-        "geo:DeleteKey",
-        "geo:DescribeKey"
-      ]
-    },
-    "list": {
-      "permissions": [
-        "geo:ListKeys"
       ]
     }
   },

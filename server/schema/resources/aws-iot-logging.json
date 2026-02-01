@@ -3,7 +3,45 @@
   "description": "Logging Options enable you to configure your IoT V2 logging role and default logging level so that you can monitor progress events logs as it passes from your devices through Iot core service.",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-iot.git",
   "documentationUrl": "https://docs.aws.amazon.com/iot/latest/developerguide/configure-logging.html",
-  "definitions": {},
+  "definitions": {
+    "EventConfiguration": {
+      "description": "Configuration for event-based logging that specifies which event types to log and their logging settings. Used for account-level logging overrides.",
+      "type": "object",
+      "properties": {
+        "EventType": {
+          "description": "The type of event to log. These include event types like Connect, Publish, and Disconnect.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "markdownDescription": "The type of event to log. These include event types like Connect, Publish, and Disconnect.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nUpdate requires: No interruption\n"
+        },
+        "LogLevel": {
+          "description": "The logging level for the specified event type. Determines the verbosity of log messages generated for this event type.",
+          "type": "string",
+          "enum": [
+            "ERROR",
+            "WARN",
+            "INFO",
+            "DEBUG",
+            "DISABLED"
+          ],
+          "markdownDescription": "The logging level for the specified event type. Determines the verbosity of log messages generated for this event type.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ERROR | WARN | INFO | DEBUG | DISABLED  \nUpdate requires: No interruption\n"
+        },
+        "LogDestination": {
+          "description": "CloudWatch Log Group for event-based logging. Specifies where log events should be sent. The log destination for event-based logging overrides default Log Group for the specified event type and applies to all resources associated with that event.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "markdownDescription": "CloudWatch Log Group for event-based logging. Specifies where log events should be sent. The log destination for event-based logging overrides default Log Group for the specified event type and applies to all resources associated with that event.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^(?!aws/)[a-zA-Z0-9_\\-/.#]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "EventType"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for event-based logging that specifies which event types to log and their logging settings. Used for account-level logging overrides.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
   "properties": {
     "AccountId": {
       "description": "Your 12-digit account ID (used as the primary identifier for the CloudFormation resource).",
@@ -30,6 +68,15 @@
         "DISABLED"
       ],
       "markdownDescription": "The log level to use. Valid values are: ERROR, WARN, INFO, DEBUG, or DISABLED.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: ERROR | WARN | INFO | DEBUG | DISABLED  \nUpdate requires: No interruption\n"
+    },
+    "EventConfigurations": {
+      "description": "Configurations for event-based logging that specifies which event types to log and their logging settings. Overrides account-level logging for the specified event",
+      "type": "array",
+      "insertionOrder": true,
+      "items": {
+        "$ref": "#/definitions/EventConfiguration"
+      },
+      "markdownDescription": "Configurations for event-based logging that specifies which event types to log and their logging settings. Overrides account-level logging for the specified event\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "additionalProperties": false,

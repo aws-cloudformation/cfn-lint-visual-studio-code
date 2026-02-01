@@ -28,12 +28,100 @@
       "additionalProperties": false,
       "markdownDescription": "Creates a key-value pair for a specific resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "ServerId": {
+      "description": "A unique identifier for the server.",
+      "type": "string",
+      "minLength": 19,
+      "maxLength": 19,
+      "markdownDescription": "A unique identifier for the server.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 19  \nMaximum Length: 19  \nPattern: ^s-([0-9a-f]{17})$  \nUpdate requires: No interruption\n"
+    },
     "SftpConnectorTrustedHostKey": {
       "description": "The public host key for the external server to which you are connecting.",
       "type": "string",
       "minLength": 1,
       "maxLength": 2048,
       "markdownDescription": "The public host key for the external server to which you are connecting.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: No interruption\n"
+    },
+    "ConnectorEgressType": {
+      "type": "string",
+      "enum": [
+        "SERVICE_MANAGED",
+        "VPC_LATTICE"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SERVICE_MANAGED | VPC_LATTICE  \nUpdate requires: No interruption\n"
+    },
+    "ConnectorVpcLatticeEgressConfig": {
+      "type": "object",
+      "properties": {
+        "ResourceConfigurationArn": {
+          "type": "string",
+          "description": "ARN of the VPC Lattice resource configuration",
+          "minLength": 1,
+          "maxLength": 2048,
+          "markdownDescription": "ARN of the VPC Lattice resource configuration\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:[a-z0-9\\-]+:vpc-lattice:[a-zA-Z0-9\\-]+:\\d{12}:resourceconfiguration/rcfg-[0-9a-z]{17}$  \nUpdate requires: No interruption\n"
+        },
+        "PortNumber": {
+          "type": "integer",
+          "description": "Port to connect to on the target VPC Lattice resource",
+          "minimum": 1,
+          "maximum": 65535,
+          "markdownDescription": "Port to connect to on the target VPC Lattice resource\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ResourceConfigurationArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ConnectorEgressConfig": {
+      "type": "object",
+      "properties": {
+        "VpcLattice": {
+          "$ref": "#/definitions/ConnectorVpcLatticeEgressConfig"
+        }
+      },
+      "required": [
+        "VpcLattice"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ConnectorStatus": {
+      "type": "string",
+      "enum": [
+        "ACTIVE",
+        "PENDING",
+        "ERRORED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ACTIVE | PENDING | ERRORED  \nUpdate requires: No interruption\n"
+    },
+    "ConnectorAsyncMdnConfig": {
+      "type": "object",
+      "properties": {
+        "Url": {
+          "type": "string",
+          "description": "URL of the server to receive the MDN response on",
+          "markdownDescription": "URL of the server to receive the MDN response on\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ServerIds": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10,
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/ServerId"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Url",
+        "ServerIds"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -120,9 +208,10 @@
           "description": "MDN Response setting for this AS2 connector configuration.",
           "enum": [
             "SYNC",
+            "ASYNC",
             "NONE"
           ],
-          "markdownDescription": "MDN Response setting for this AS2 connector configuration.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SYNC | NONE  \nUpdate requires: No interruption\n"
+          "markdownDescription": "MDN Response setting for this AS2 connector configuration.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SYNC | ASYNC | NONE  \nUpdate requires: No interruption\n"
         },
         "BasicAuthSecretId": {
           "type": "string",
@@ -139,10 +228,28 @@
             "DISABLED"
           ],
           "markdownDescription": "Specifies whether to use the AWS S3 object content-type as the content-type for the AS2 message.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption\n"
+        },
+        "AsyncMdnConfig": {
+          "description": "Configuration for an AS2 connector with ASYNC MDN Response",
+          "$ref": "#/definitions/ConnectorAsyncMdnConfig",
+          "markdownDescription": "Configuration for an AS2 connector with ASYNC MDN Response\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
         }
       },
       "additionalProperties": false,
       "markdownDescription": "Configuration for an AS2 connector.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EgressType": {
+      "description": "Specifies the egress type for the connector.",
+      "$ref": "#/definitions/ConnectorEgressType",
+      "markdownDescription": "Specifies the egress type for the connector.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "EgressConfig": {
+      "description": "Egress configuration for the connector.",
+      "$ref": "#/definitions/ConnectorEgressConfig",
+      "markdownDescription": "Egress configuration for the connector.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "Status": {
+      "$ref": "#/definitions/ConnectorStatus"
     },
     "SftpConfig": {
       "description": "Configuration for an SFTP connector.",
@@ -224,24 +331,31 @@
       "description": "URL for Connector",
       "type": "string",
       "maxLength": 255,
-      "markdownDescription": "URL for Connector\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+      "markdownDescription": "URL for Connector\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
     },
     "SecurityPolicyName": {
       "description": "Security policy for SFTP Connector",
       "type": "string",
       "maxLength": 50,
       "markdownDescription": "Security policy for SFTP Connector\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 50  \nPattern: TransferSFTPConnectorSecurityPolicy-[A-Za-z0-9-]+  \nUpdate requires: No interruption\n"
+    },
+    "ErrorMessage": {
+      "description": "Detailed error message when Connector in ERRORED status",
+      "type": "string",
+      "maxLength": 2048,
+      "markdownDescription": "Detailed error message when Connector in ERRORED status\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   },
   "additionalProperties": false,
   "required": [
-    "AccessRole",
-    "Url"
+    "AccessRole"
   ],
   "readOnlyProperties": [
     "/properties/Arn",
     "/properties/ConnectorId",
-    "/properties/ServiceManagedEgressIpAddresses"
+    "/properties/ServiceManagedEgressIpAddresses",
+    "/properties/Status",
+    "/properties/ErrorMessage"
   ],
   "primaryIdentifier": [
     "/properties/ConnectorId"
@@ -262,8 +376,12 @@
     "create": {
       "permissions": [
         "transfer:CreateConnector",
+        "transfer:DescribeConnector",
         "transfer:TagResource",
-        "iam:PassRole"
+        "iam:PassRole",
+        "vpc-lattice:CreateServiceNetworkResourceAssociation",
+        "vpc-lattice:GetResourceConfiguration",
+        "vpc-lattice:AssociateViaAWSService"
       ]
     },
     "read": {
@@ -274,9 +392,13 @@
     "update": {
       "permissions": [
         "transfer:UpdateConnector",
+        "transfer:DescribeConnector",
         "transfer:UnTagResource",
         "transfer:TagResource",
-        "iam:PassRole"
+        "iam:PassRole",
+        "vpc-lattice:CreateServiceNetworkResourceAssociation",
+        "vpc-lattice:GetResourceConfiguration",
+        "vpc-lattice:AssociateViaAWSService"
       ]
     },
     "delete": {
@@ -291,6 +413,9 @@
     }
   },
   "attributes": {
+    "Status": {
+      "$ref": "#/definitions/ConnectorStatus"
+    },
     "Arn": {
       "description": "Specifies the unique Amazon Resource Name (ARN) for the connector.",
       "type": "string",
@@ -314,6 +439,12 @@
         "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$  \nUpdate requires: No interruption\n"
       },
       "markdownDescription": "The list of egress IP addresses of this connector. These IP addresses are assigned automatically when you create the connector.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ErrorMessage": {
+      "description": "Detailed error message when Connector in ERRORED status",
+      "type": "string",
+      "maxLength": 2048,
+      "markdownDescription": "Detailed error message when Connector in ERRORED status\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

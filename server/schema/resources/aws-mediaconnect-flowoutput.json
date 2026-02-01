@@ -167,6 +167,91 @@
         "CompressionFactor"
       ],
       "markdownDescription": "A collection of parameters that determine how MediaConnect will convert the content. These fields only apply to outputs on flows that have a CDI source.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "FlowTransitEncryption": {
+      "type": "object",
+      "description": "The configuration that defines how content is encrypted during transit between the MediaConnect router and a MediaConnect flow.",
+      "properties": {
+        "EncryptionKeyType": {
+          "$ref": "#/definitions/FlowTransitEncryptionKeyType"
+        },
+        "EncryptionKeyConfiguration": {
+          "$ref": "#/definitions/FlowTransitEncryptionKeyConfiguration"
+        }
+      },
+      "required": [
+        "EncryptionKeyConfiguration"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The configuration that defines how content is encrypted during transit between the MediaConnect router and a MediaConnect flow.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "FlowTransitEncryptionKeyConfiguration": {
+      "description": "Configuration settings for flow transit encryption keys.",
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "SecretsManager",
+          "properties": {
+            "SecretsManager": {
+              "$ref": "#/definitions/SecretsManagerEncryptionKeyConfiguration"
+            }
+          },
+          "required": [
+            "SecretsManager"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Automatic",
+          "properties": {
+            "Automatic": {
+              "$ref": "#/definitions/AutomaticEncryptionKeyConfiguration"
+            }
+          },
+          "required": [
+            "Automatic"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "Configuration settings for flow transit encryption keys.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "FlowTransitEncryptionKeyType": {
+      "type": "string",
+      "enum": [
+        "SECRETS_MANAGER",
+        "AUTOMATIC"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SECRETS_MANAGER | AUTOMATIC  \nUpdate requires: No interruption\n"
+    },
+    "SecretsManagerEncryptionKeyConfiguration": {
+      "type": "object",
+      "description": "The configuration settings for transit encryption of a flow output using AWS Secrets Manager, including the secret ARN and role ARN.",
+      "properties": {
+        "SecretArn": {
+          "type": "string",
+          "description": "The ARN of the AWS Secrets Manager secret used for transit encryption to the router input.",
+          "markdownDescription": "The ARN of the AWS Secrets Manager secret used for transit encryption to the router input.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:(aws[a-zA-Z-]*):secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:[a-zA-Z0-9/_+=.@-]+$  \nUpdate requires: No interruption\n"
+        },
+        "RoleArn": {
+          "type": "string",
+          "description": "The ARN of the IAM role used for transit encryption to the router input using AWS Secrets Manager.",
+          "markdownDescription": "The ARN of the IAM role used for transit encryption to the router input using AWS Secrets Manager.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:(aws[a-zA-Z-]*):iam::[0-9]{12}:role/[a-zA-Z0-9_+=,.@-]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "RoleArn",
+        "SecretArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The configuration settings for transit encryption of a flow output using AWS Secrets Manager, including the secret ARN and role ARN.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AutomaticEncryptionKeyConfiguration": {
+      "type": "object",
+      "description": "Configuration settings for automatic encryption key management, where MediaConnect handles key creation and rotation.",
+      "additionalProperties": false,
+      "markdownDescription": "Configuration settings for automatic encryption key management, where MediaConnect handles key creation and rotation.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -240,7 +325,7 @@
         "ndi-speed-hq"
       ],
       "description": "The protocol that is used by the source or output.",
-      "markdownDescription": "The protocol that is used by the source or output.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: zixi-push | rtp-fec | rtp | zixi-pull | rist | fujitsu-qos | srt-listener | srt-caller | st2110-jpegxs | cdi | ndi-speed-hq  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The protocol that is used by the source or output.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: zixi-push | rtp-fec | rtp | zixi-pull | rist | fujitsu-qos | srt-listener | srt-caller | st2110-jpegxs | cdi | ndi-speed-hq  \nUpdate requires: No interruption\n"
     },
     "RemoteId": {
       "type": "string",
@@ -288,12 +373,22 @@
       "type": "integer",
       "description": "A quality setting for the NDI Speed HQ encoder.",
       "markdownDescription": "A quality setting for the NDI Speed HQ encoder.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    },
+    "RouterIntegrationState": {
+      "type": "string",
+      "enum": [
+        "ENABLED",
+        "DISABLED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption\n"
+    },
+    "RouterIntegrationTransitEncryption": {
+      "$ref": "#/definitions/FlowTransitEncryption"
     }
   },
   "additionalProperties": false,
   "required": [
-    "FlowArn",
-    "Protocol"
+    "FlowArn"
   ],
   "createOnlyProperties": [
     "/properties/Name"
@@ -313,7 +408,8 @@
     },
     "read": {
       "permissions": [
-        "mediaconnect:DescribeFlow"
+        "mediaconnect:DescribeFlow",
+        "mediaconnect:ListFlows"
       ]
     },
     "update": {
@@ -325,6 +421,7 @@
     "delete": {
       "permissions": [
         "mediaconnect:DescribeFlow",
+        "mediaconnect:ListFlows",
         "mediaconnect:RemoveFlowOutput"
       ]
     },

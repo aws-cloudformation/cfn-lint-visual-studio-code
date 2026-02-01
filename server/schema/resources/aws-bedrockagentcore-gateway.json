@@ -1,0 +1,593 @@
+{
+  "typeName": "AWS::BedrockAgentCore::Gateway",
+  "description": "Definition of AWS::BedrockAgentCore::Gateway Resource Type",
+  "definitions": {
+    "AuthorizerConfiguration": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "CustomJWTAuthorizer",
+          "properties": {
+            "CustomJWTAuthorizer": {
+              "$ref": "#/definitions/CustomJWTAuthorizerConfiguration"
+            }
+          },
+          "required": [
+            "CustomJWTAuthorizer"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "AuthorizerType": {
+      "type": "string",
+      "enum": [
+        "CUSTOM_JWT",
+        "AWS_IAM",
+        "NONE"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CUSTOM_JWT | AWS_IAM | NONE  \nUpdate requires: No interruption\n"
+    },
+    "CustomJWTAuthorizerConfiguration": {
+      "type": "object",
+      "properties": {
+        "DiscoveryUrl": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^.+/\\.well-known/openid-configuration$  \nUpdate requires: No interruption\n"
+        },
+        "AllowedAudience": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "AllowedClients": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "AllowedScopes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AllowedScope"
+          },
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "CustomClaims": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CustomClaimValidationType"
+          },
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "DiscoveryUrl"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AllowedScope": {
+      "type": "string",
+      "description": "Allowed scope value",
+      "markdownDescription": "Allowed scope value\n\n---\n\nRequired: No  \nType: String  \nPattern: [\\x21\\x23-\\x5B\\x5D-\\x7E]+  \nUpdate requires: No interruption\n"
+    },
+    "CustomClaimValidationType": {
+      "type": "object",
+      "description": "Required custom claim",
+      "properties": {
+        "AuthorizingClaimMatchValue": {
+          "$ref": "#/definitions/AuthorizingClaimMatchValueType"
+        },
+        "InboundTokenClaimName": {
+          "$ref": "#/definitions/InboundTokenClaimName"
+        },
+        "InboundTokenClaimValueType": {
+          "$ref": "#/definitions/InboundTokenClaimValueType"
+        }
+      },
+      "required": [
+        "AuthorizingClaimMatchValue",
+        "InboundTokenClaimName",
+        "InboundTokenClaimValueType"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Required custom claim\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "InboundTokenClaimName": {
+      "type": "string",
+      "description": "The name of the custom claim to validate",
+      "markdownDescription": "The name of the custom claim to validate\n\n---\n\nRequired: No  \nType: String  \nPattern: [A-Za-z0-9_.-:]+  \nUpdate requires: No interruption\n"
+    },
+    "InboundTokenClaimValueType": {
+      "type": "string",
+      "description": "Token claim data type",
+      "enum": [
+        "STRING",
+        "STRING_ARRAY"
+      ],
+      "markdownDescription": "Token claim data type\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: STRING | STRING_ARRAY  \nUpdate requires: No interruption\n"
+    },
+    "AuthorizingClaimMatchValueType": {
+      "type": "object",
+      "description": "The value or values in the custom claim to match and relationship of match",
+      "properties": {
+        "ClaimMatchOperator": {
+          "$ref": "#/definitions/ClaimMatchOperator"
+        },
+        "ClaimMatchValue": {
+          "$ref": "#/definitions/ClaimMatchValueType"
+        }
+      },
+      "required": [
+        "ClaimMatchOperator",
+        "ClaimMatchValue"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The value or values in the custom claim to match and relationship of match\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ClaimMatchOperator": {
+      "type": "string",
+      "description": "The relationship between the claim field value and the value or values being matched",
+      "enum": [
+        "EQUALS",
+        "CONTAINS",
+        "CONTAINS_ANY"
+      ],
+      "markdownDescription": "The relationship between the claim field value and the value or values being matched\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: EQUALS | CONTAINS | CONTAINS_ANY  \nUpdate requires: No interruption\n"
+    },
+    "ClaimMatchValueType": {
+      "type": "object",
+      "description": "The value or values in the custom claim to match for",
+      "oneOf": [
+        {
+          "required": [
+            "MatchValueString"
+          ]
+        },
+        {
+          "required": [
+            "MatchValueStringList"
+          ]
+        }
+      ],
+      "properties": {
+        "MatchValueString": {
+          "$ref": "#/definitions/MatchValueString"
+        },
+        "MatchValueStringList": {
+          "$ref": "#/definitions/MatchValueStringList"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The value or values in the custom claim to match for\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "MatchValueString": {
+      "type": "string",
+      "description": "The string value to match for",
+      "markdownDescription": "The string value to match for\n\n---\n\nRequired: No  \nType: String  \nPattern: [A-Za-z0-9_.-]+  \nUpdate requires: No interruption\n"
+    },
+    "MatchValueStringList": {
+      "type": "array",
+      "description": "The list of strings to check for a match",
+      "minItems": 1,
+      "maxItems": 255,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/MatchValueString"
+      },
+      "markdownDescription": "The list of strings to check for a match\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "ExceptionLevel": {
+      "type": "string",
+      "enum": [
+        "DEBUG"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DEBUG  \nUpdate requires: No interruption\n"
+    },
+    "GatewayInterceptionPoint": {
+      "type": "string",
+      "enum": [
+        "REQUEST",
+        "RESPONSE"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: REQUEST | RESPONSE  \nUpdate requires: No interruption\n"
+    },
+    "GatewayInterceptorConfiguration": {
+      "type": "object",
+      "properties": {
+        "Interceptor": {
+          "$ref": "#/definitions/InterceptorConfiguration"
+        },
+        "InterceptionPoints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GatewayInterceptionPoint"
+          },
+          "minItems": 1,
+          "maxItems": 2,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "InputConfiguration": {
+          "$ref": "#/definitions/InterceptorInputConfiguration"
+        }
+      },
+      "required": [
+        "Interceptor",
+        "InterceptionPoints"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "InterceptorConfiguration": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "Lambda",
+          "properties": {
+            "Lambda": {
+              "$ref": "#/definitions/LambdaInterceptorConfiguration"
+            }
+          },
+          "required": [
+            "Lambda"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "InterceptorInputConfiguration": {
+      "type": "object",
+      "properties": {
+        "PassRequestHeaders": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "PassRequestHeaders"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LambdaInterceptorConfiguration": {
+      "type": "object",
+      "properties": {
+        "Arn": {
+          "type": "string",
+          "maxLength": 170,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 170  \nPattern: ^arn:(aws[a-zA-Z-]*)?:lambda:([a-z]{2}(-gov)?-[a-z]+-\\d{1}):(\\d{12}):function:([a-zA-Z0-9-_.]+)(:(\\$LATEST|[a-zA-Z0-9-_]+))?$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Arn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "GatewayProtocolConfiguration": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "Mcp",
+          "properties": {
+            "Mcp": {
+              "$ref": "#/definitions/MCPGatewayConfiguration"
+            }
+          },
+          "required": [
+            "Mcp"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "GatewayProtocolType": {
+      "type": "string",
+      "enum": [
+        "MCP"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MCP  \nUpdate requires: No interruption\n"
+    },
+    "GatewayStatus": {
+      "type": "string",
+      "enum": [
+        "CREATING",
+        "UPDATING",
+        "UPDATE_UNSUCCESSFUL",
+        "DELETING",
+        "READY",
+        "FAILED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | UPDATING | UPDATE_UNSUCCESSFUL | DELETING | READY | FAILED  \nUpdate requires: No interruption\n"
+    },
+    "MCPGatewayConfiguration": {
+      "type": "object",
+      "properties": {
+        "SupportedVersions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "default": "2025-03-26",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "Instructions": {
+          "type": "string",
+          "maxLength": 2048,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: No interruption\n"
+        },
+        "SearchType": {
+          "$ref": "#/definitions/SearchType"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SearchType": {
+      "type": "string",
+      "enum": [
+        "SEMANTIC"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SEMANTIC  \nUpdate requires: No interruption\n"
+    },
+    "TagsMap": {
+      "type": "object",
+      "maxProperties": 50,
+      "minProperties": 0,
+      "patternProperties": {
+        "^[a-zA-Z0-9\\s._:/=+@-]*$": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 0,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nPattern: ^[a-zA-Z0-9\\s._:/=+@-]*$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "WorkloadIdentityDetails": {
+      "type": "object",
+      "properties": {
+        "WorkloadIdentityArn": {
+          "type": "string",
+          "maxLength": 1024,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "WorkloadIdentityArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "AuthorizerConfiguration": {
+      "$ref": "#/definitions/AuthorizerConfiguration"
+    },
+    "AuthorizerType": {
+      "$ref": "#/definitions/AuthorizerType"
+    },
+    "CreatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Description": {
+      "type": "string",
+      "maxLength": 200,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 200  \nUpdate requires: No interruption\n"
+    },
+    "ExceptionLevel": {
+      "$ref": "#/definitions/ExceptionLevel"
+    },
+    "InterceptorConfigurations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/GatewayInterceptorConfiguration"
+      },
+      "minItems": 1,
+      "maxItems": 2,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "GatewayArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws(|-cn|-us-gov):bedrock-agentcore:[a-z0-9-]{1,20}:[0-9]{12}:gateway/([0-9a-z][-]?){1,100}-[a-z0-9]{10}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "GatewayIdentifier": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^([0-9a-z][-]?){1,100}-[0-9a-z]{10}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "GatewayUrl": {
+      "type": "string",
+      "maxLength": 1024,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "KmsKeyArn": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws(|-cn|-us-gov):kms:[a-zA-Z0-9-]*:[0-9]{12}:key/[a-zA-Z0-9-]{36}$  \nUpdate requires: No interruption\n"
+    },
+    "Name": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^([0-9a-zA-Z][-]?){1,100}$  \nUpdate requires: No interruption\n"
+    },
+    "ProtocolConfiguration": {
+      "$ref": "#/definitions/GatewayProtocolConfiguration"
+    },
+    "ProtocolType": {
+      "$ref": "#/definitions/GatewayProtocolType"
+    },
+    "RoleArn": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws(-[^:]+)?:iam::([0-9]{12})?:role/.+$  \nUpdate requires: No interruption\n"
+    },
+    "Status": {
+      "$ref": "#/definitions/GatewayStatus"
+    },
+    "StatusReasons": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 2048,
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nUpdate requires: No interruption\n"
+      },
+      "maxItems": 100,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Tags": {
+      "$ref": "#/definitions/TagsMap"
+    },
+    "UpdatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "WorkloadIdentityDetails": {
+      "$ref": "#/definitions/WorkloadIdentityDetails"
+    }
+  },
+  "required": [
+    "AuthorizerType",
+    "Name",
+    "ProtocolType",
+    "RoleArn"
+  ],
+  "readOnlyProperties": [
+    "/properties/CreatedAt",
+    "/properties/GatewayArn",
+    "/properties/GatewayIdentifier",
+    "/properties/GatewayUrl",
+    "/properties/Status",
+    "/properties/StatusReasons",
+    "/properties/UpdatedAt",
+    "/properties/WorkloadIdentityDetails"
+  ],
+  "primaryIdentifier": [
+    "/properties/GatewayIdentifier"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "bedrock-agentcore:CreateGateway",
+        "bedrock-agentcore:CreateWorkloadIdentity",
+        "bedrock-agentcore:DeleteWorkloadIdentity",
+        "bedrock-agentcore:GetGateway",
+        "bedrock-agentcore:ListTagsForResource",
+        "bedrock-agentcore:SynchronizeGatewayTargets",
+        "bedrock-agentcore:TagResource",
+        "iam:PassRole",
+        "kms:CreateGrant",
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:GenerateDataKey"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "bedrock-agentcore:GetGateway",
+        "bedrock-agentcore:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "bedrock-agentcore:GetGateway",
+        "bedrock-agentcore:ListTagsForResource",
+        "bedrock-agentcore:TagResource",
+        "bedrock-agentcore:UntagResource",
+        "bedrock-agentcore:UpdateGateway",
+        "iam:PassRole",
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:GenerateDataKey",
+        "kms:ListGrants"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "bedrock-agentcore:DeleteGateway",
+        "bedrock-agentcore:DeleteWorkloadIdentity",
+        "bedrock-agentcore:GetGateway"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "bedrock-agentcore:ListGateways"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "bedrock-agentcore:ListTagsForResource",
+      "bedrock-agentcore:TagResource",
+      "bedrock-agentcore:UntagResource"
+    ]
+  },
+  "attributes": {
+    "CreatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "GatewayArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws(|-cn|-us-gov):bedrock-agentcore:[a-z0-9-]{1,20}:[0-9]{12}:gateway/([0-9a-z][-]?){1,100}-[a-z0-9]{10}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "GatewayIdentifier": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^([0-9a-z][-]?){1,100}-[0-9a-z]{10}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "GatewayUrl": {
+      "type": "string",
+      "maxLength": 1024,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Status": {
+      "$ref": "#/definitions/GatewayStatus"
+    },
+    "StatusReasons": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 2048,
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nUpdate requires: No interruption\n"
+      },
+      "maxItems": 100,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "UpdatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "WorkloadIdentityDetails": {
+      "$ref": "#/definitions/WorkloadIdentityDetails"
+    }
+  }
+}

@@ -38,6 +38,17 @@
         "OnDemandCapacity": {
           "type": "integer",
           "minimum": 0,
+          "description": "This shape is deprecated.",
+          "markdownDescription": "This shape is deprecated.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "TargetIdleCapacity": {
+          "type": "integer",
+          "minimum": 0,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "MaximumCapacity": {
+          "type": "integer",
+          "minimum": 0,
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
         }
       },
@@ -141,6 +152,18 @@
         "gameliftstreams:AssociateApplications"
       ]
     },
+    "delete": {
+      "permissions": [
+        "gameliftstreams:DeleteStreamGroup",
+        "gameliftstreams:GetStreamGroup"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "gameliftstreams:ListStreamGroups",
+        "gameliftstreams:ListTagsForResource"
+      ]
+    },
     "read": {
       "permissions": [
         "gameliftstreams:GetStreamGroup",
@@ -155,18 +178,6 @@
         "gameliftstreams:RemoveStreamGroupLocations",
         "gameliftstreams:TagResource",
         "gameliftstreams:UntagResource",
-        "gameliftstreams:ListTagsForResource"
-      ]
-    },
-    "delete": {
-      "permissions": [
-        "gameliftstreams:DeleteStreamGroup",
-        "gameliftstreams:GetStreamGroup"
-      ]
-    },
-    "list": {
-      "permissions": [
-        "gameliftstreams:ListStreamGroups",
         "gameliftstreams:ListTagsForResource"
       ]
     }
@@ -184,10 +195,17 @@
       "gameliftstreams:ListTagsForResource"
     ]
   },
+  "propertyTransform": {
+    "/properties/LocationConfiguration/OnDemandCapacity": "$exists(LocationConfiguration.MaximumCapacity) ? (LocationConfiguration.MaximumCapacity - LocationConfiguration.AlwaysOnCapacity) : 0",
+    "/properties/LocationConfiguration/MaximumCapacity": "($exists(LocationConfiguration.OnDemandCapacity) ? LocationConfiguration.OnDemandCapacity : 0) + LocationConfiguration.AlwaysOnCapacity"
+  },
   "additionalIdentifiers": [
     [
       "/properties/Id"
     ]
+  ],
+  "deprecatedProperties": [
+    "/properties/LocationConfiguration/OnDemandCapacity"
   ],
   "attributes": {
     "Arn": {
