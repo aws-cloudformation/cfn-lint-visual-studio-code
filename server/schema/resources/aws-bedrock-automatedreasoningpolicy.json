@@ -11,7 +11,16 @@
     "/properties/PolicyArn",
     "/properties/DefinitionHash",
     "/properties/CreatedAt",
-    "/properties/UpdatedAt"
+    "/properties/UpdatedAt",
+    "/properties/KmsKeyArn"
+  ],
+  "createOnlyProperties": [
+    "/properties/KmsKeyId",
+    "/properties/ForceDelete"
+  ],
+  "writeOnlyProperties": [
+    "/properties/KmsKeyId",
+    "/properties/ForceDelete"
   ],
   "definitions": {
     "Name": {
@@ -209,6 +218,20 @@
       "maxLength": 2048,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws(-[^:]+)?:bedrock:[a-z0-9-]{1,20}:[0-9]{12}:automated-reasoning-policy\\/[a-z0-9]{12}$  \nUpdate requires: No interruption\n"
     },
+    "KmsKeyId": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 1,
+      "description": "The KMS key with which the Policy's assets will be encrypted at rest.",
+      "markdownDescription": "The KMS key with which the Policy's assets will be encrypted at rest.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^(arn:aws(-[^:]+)?:kms:[a-zA-Z0-9-]*:[0-9]{12}:((key/[a-zA-Z0-9-]{36})|(alias/[a-zA-Z0-9-_/]+)))|([a-zA-Z0-9-]{36})|(alias/[a-zA-Z0-9-_/]+)$  \nUpdate requires: No interruption\n"
+    },
+    "KmsKeyArn": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 1,
+      "description": "The KMS key with which the Policy's assets will be encrypted at rest.",
+      "markdownDescription": "The KMS key with which the Policy's assets will be encrypted at rest.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws(-[^:]+)?:kms:[a-zA-Z0-9-]*:[0-9]{12}:key/[a-zA-Z0-9-]{36}$  \nUpdate requires: No interruption\n"
+    },
     "Version": {
       "type": "string",
       "description": "Version of the policy that was created. This will always be `DRAFT`",
@@ -273,6 +296,12 @@
         "$ref": "#/definitions/Tag"
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "ForceDelete": {
+      "type": "boolean",
+      "description": "Specifies whether to force delete the automated reasoning policy even if it has active resources. When false , Amazon Bedrock validates if all artifacts have been deleted (e.g. policy version, test case, test result) for a policy before deletion. When true , Amazon Bedrock will delete the policy and all its artifacts without validation. Default is false",
+      "default": false,
+      "markdownDescription": "Specifies whether to force delete the automated reasoning policy even if it has active resources. When false , Amazon Bedrock validates if all artifacts have been deleted (e.g. policy version, test case, test result) for a policy before deletion. When true , Amazon Bedrock will delete the policy and all its artifacts without validation. Default is false\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -287,6 +316,12 @@
     },
     "PolicyArn": {
       "$ref": "#/definitions/PolicyArn"
+    },
+    "KmsKeyId": {
+      "$ref": "#/definitions/KmsKeyId"
+    },
+    "KmsKeyArn": {
+      "$ref": "#/definitions/KmsKeyArn"
     },
     "Version": {
       "$ref": "#/definitions/Version"
@@ -305,6 +340,9 @@
     },
     "Tags": {
       "$ref": "#/definitions/Tags"
+    },
+    "ForceDelete": {
+      "$ref": "#/definitions/ForceDelete"
     }
   },
   "required": [
@@ -317,14 +355,20 @@
         "bedrock:GetAutomatedReasoningPolicy",
         "bedrock:ExportAutomatedReasoningPolicyVersion",
         "bedrock:TagResource",
-        "bedrock:ListTagsForResource"
+        "bedrock:ListTagsForResource",
+        "kms:DescribeKey",
+        "kms:GenerateDataKey",
+        "kms:Decrypt"
       ]
     },
     "read": {
       "permissions": [
         "bedrock:GetAutomatedReasoningPolicy",
         "bedrock:ExportAutomatedReasoningPolicyVersion",
-        "bedrock:ListTagsForResource"
+        "bedrock:ListTagsForResource",
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:GenerateDataKey"
       ]
     },
     "update": {
@@ -334,7 +378,10 @@
         "bedrock:ExportAutomatedReasoningPolicyVersion",
         "bedrock:ListTagsForResource",
         "bedrock:TagResource",
-        "bedrock:UntagResource"
+        "bedrock:UntagResource",
+        "kms:DescribeKey",
+        "kms:GenerateDataKey",
+        "kms:Decrypt"
       ]
     },
     "delete": {
@@ -364,6 +411,9 @@
   "attributes": {
     "PolicyArn": {
       "$ref": "#/definitions/PolicyArn"
+    },
+    "KmsKeyArn": {
+      "$ref": "#/definitions/KmsKeyArn"
     },
     "Version": {
       "$ref": "#/definitions/Version"

@@ -194,7 +194,7 @@
       "required": [
         "TotalTargetCapacity"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
     },
     "FleetLaunchTemplateSpecificationRequest": {
       "type": "object",
@@ -373,6 +373,10 @@
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
         },
         "AvailabilityZone": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "AvailabilityZoneId": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
@@ -628,9 +632,10 @@
             "enum": [
               "gpu",
               "fpga",
-              "inference"
+              "inference",
+              "media"
             ],
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: gpu | fpga | inference  \nUpdate requires: No interruption\n"
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: gpu | fpga | inference | media  \nUpdate requires: No interruption\n"
           },
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         },
@@ -670,9 +675,16 @@
               "t4",
               "t4g",
               "vu9p",
-              "v100"
+              "v100",
+              "l40s",
+              "l4",
+              "gaudi-hl-205",
+              "inferentia2",
+              "trainium",
+              "trainium2",
+              "u30"
             ],
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: a10g | a100 | h100 | inferentia | k520 | k80 | m60 | radeon-pro-v520 | t4 | t4g | vu9p | v100  \nUpdate requires: No interruption\n"
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: a10g | a100 | h100 | inferentia | k520 | k80 | m60 | radeon-pro-v520 | t4 | t4g | vu9p | v100 | l40s | l4 | gaudi-hl-205 | inferentia2 | trainium | trainium2 | u30  \nUpdate requires: No interruption\n"
           },
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         },
@@ -681,6 +693,10 @@
         },
         "BaselinePerformanceFactors": {
           "$ref": "#/definitions/BaselinePerformanceFactorsRequest"
+        },
+        "RequireEncryptionInTransit": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
         }
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
@@ -899,7 +915,18 @@
     "/properties/TerminateInstancesWithExpiration",
     "/properties/Type",
     "/properties/ValidFrom",
-    "/properties/ValidUntil"
+    "/properties/ValidUntil",
+    "/properties/TargetCapacitySpecification/TargetCapacityUnitType",
+    "/properties/TargetCapacitySpecification/DefaultTargetCapacityType"
+  ],
+  "writeOnlyProperties": [
+    "/properties/LaunchTemplateConfigs/*/Overrides/*/Placement/HostResourceGroupArn",
+    "/properties/LaunchTemplateConfigs/*/Overrides/*/Placement/Affinity",
+    "/properties/LaunchTemplateConfigs/*/Overrides/*/Placement/SpreadDomain",
+    "/properties/LaunchTemplateConfigs/*/Overrides/*/Placement/AvailabilityZone",
+    "/properties/LaunchTemplateConfigs/*/Overrides/*/Placement/PartitionNumber",
+    "/properties/LaunchTemplateConfigs/*/Overrides/*/Placement/HostId",
+    "/properties/LaunchTemplateConfigs/*/Overrides/*/Placement/Tenancy"
   ],
   "primaryIdentifier": [
     "/properties/FleetId"
@@ -911,14 +938,22 @@
     "create": {
       "permissions": [
         "ec2:CreateFleet",
-        "ec2:DescribeFleets"
+        "ec2:DescribeFleets",
+        "ec2:CreateTags",
+        "ec2:RunInstances",
+        "iam:PassRole",
+        "ec2:DescribeCapacityReservations"
       ]
     },
     "delete": {
       "permissions": [
         "ec2:DescribeFleets",
-        "ec2:DeleteFleets"
-      ]
+        "ec2:DescribeFleetInstances",
+        "ec2:DescribeInstanceStatus",
+        "ec2:DeleteFleets",
+        "ec2:TerminateInstances"
+      ],
+      "timeoutInMinutes": 40
     },
     "list": {
       "handlerSchema": {

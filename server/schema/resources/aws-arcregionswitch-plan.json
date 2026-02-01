@@ -76,7 +76,7 @@
         },
         "Arn": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws:autoscaling:[a-z0-9-]+:\\d{12}:autoScalingGroup:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:autoScalingGroupName/[\\S\\s]{1,255}$  \nUpdate requires: No interruption\n"
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[a-zA-Z-]*:autoscaling:[a-z0-9-]+:\\d{12}:autoScalingGroup:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:autoScalingGroupName/[\\S\\s]{1,255}$  \nUpdate requires: No interruption\n"
         }
       },
       "additionalProperties": false,
@@ -154,6 +154,82 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DocumentDbConfiguration": {
+      "type": "object",
+      "properties": {
+        "TimeoutMinutes": {
+          "type": "number",
+          "default": 60,
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "CrossAccountRole": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[a-zA-Z0-9-]*:iam::[0-9]{12}:role/.+$  \nUpdate requires: No interruption\n"
+        },
+        "ExternalId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Behavior": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/DocumentDbDefaultBehavior"
+            },
+            {
+              "default": "switchoverOnly"
+            }
+          ]
+        },
+        "Ungraceful": {
+          "$ref": "#/definitions/DocumentDbUngraceful"
+        },
+        "GlobalClusterIdentifier": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[A-Za-z][0-9A-Za-z-:._]*$  \nUpdate requires: No interruption\n"
+        },
+        "DatabaseClusterArns": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[a-zA-Z-]*:rds:[a-z0-9-]+:\\d{12}:cluster:[a-zA-Z0-9][a-zA-Z0-9-_]{0,99}$  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Behavior",
+        "DatabaseClusterArns",
+        "GlobalClusterIdentifier"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DocumentDbDefaultBehavior": {
+      "type": "string",
+      "enum": [
+        "switchoverOnly",
+        "failover"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: switchoverOnly | failover  \nUpdate requires: No interruption\n"
+    },
+    "DocumentDbUngraceful": {
+      "type": "object",
+      "properties": {
+        "Ungraceful": {
+          "$ref": "#/definitions/DocumentDbUngracefulBehavior"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DocumentDbUngracefulBehavior": {
+      "type": "string",
+      "enum": [
+        "failover"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: failover  \nUpdate requires: No interruption\n"
     },
     "Ec2AsgCapacityIncreaseConfiguration": {
       "type": "object",
@@ -539,6 +615,19 @@
             "Route53HealthCheckConfig"
           ],
           "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "DocumentDbConfig",
+          "properties": {
+            "DocumentDbConfig": {
+              "$ref": "#/definitions/DocumentDbConfiguration"
+            }
+          },
+          "required": [
+            "DocumentDbConfig"
+          ],
+          "additionalProperties": false
         }
       ]
     },
@@ -554,9 +643,10 @@
         "Parallel",
         "ECSServiceScaling",
         "EKSResourceScaling",
-        "Route53HealthCheck"
+        "Route53HealthCheck",
+        "DocumentDb"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CustomActionLambda | ManualApproval | AuroraGlobalDatabase | EC2AutoScaling | ARCRoutingControl | ARCRegionSwitchPlan | Parallel | ECSServiceScaling | EKSResourceScaling | Route53HealthCheck  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CustomActionLambda | ManualApproval | AuroraGlobalDatabase | EC2AutoScaling | ARCRoutingControl | ARCRegionSwitchPlan | Parallel | ECSServiceScaling | EKSResourceScaling | Route53HealthCheck | DocumentDb  \nUpdate requires: No interruption\n"
     },
     "GlobalAuroraConfiguration": {
       "type": "object",
@@ -808,6 +898,39 @@
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "ReportConfiguration": {
+      "type": "object",
+      "properties": {
+        "ReportOutput": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ReportOutputConfiguration"
+          },
+          "maxItems": 1,
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ReportOutputConfiguration": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "S3Configuration",
+          "properties": {
+            "S3Configuration": {
+              "$ref": "#/definitions/S3ReportOutputConfiguration"
+            }
+          },
+          "required": [
+            "S3Configuration"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
     "Route53HealthCheckConfiguration": {
       "type": "object",
       "properties": {
@@ -877,6 +1000,23 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: On | Off  \nUpdate requires: No interruption\n"
     },
+    "S3ReportOutputConfiguration": {
+      "type": "object",
+      "properties": {
+        "BucketPath": {
+          "type": "string",
+          "maxLength": 512,
+          "minLength": 3,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 512  \nPattern: ^(?:s3://)?[a-z0-9][a-z0-9-]{1,61}[a-z0-9](?:/[^/ ][^/]*)*/?$  \nUpdate requires: No interruption\n"
+        },
+        "BucketOwner": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^\\d{12}$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "Service": {
       "type": "object",
       "properties": {
@@ -890,11 +1030,11 @@
         },
         "ClusterArn": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws:ecs:[a-z0-9-]+:\\d{12}:cluster/[a-zA-Z0-9_-]{1,255}$  \nUpdate requires: No interruption\n"
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[a-zA-Z-]*:ecs:[a-z0-9-]+:\\d{12}:cluster/[a-zA-Z0-9_-]{1,255}$  \nUpdate requires: No interruption\n"
         },
         "ServiceArn": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws:ecs:[a-z0-9-]+:\\d{12}:service/[a-zA-Z0-9_-]+/[a-zA-Z0-9_-]{1,255}$  \nUpdate requires: No interruption\n"
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[a-zA-Z-]*:ecs:[a-z0-9-]+:\\d{12}:service/[a-zA-Z0-9_-]+/[a-zA-Z0-9_-]{1,255}$  \nUpdate requires: No interruption\n"
         }
       },
       "additionalProperties": false,
@@ -1138,6 +1278,9 @@
       "minItems": 2,
       "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: Replacement\n"
     },
+    "ReportConfiguration": {
+      "$ref": "#/definitions/ReportConfiguration"
+    },
     "Tags": {
       "$ref": "#/definitions/Tags"
     },
@@ -1187,6 +1330,14 @@
       },
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "PlanHealthChecks": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   },
   "required": [
@@ -1201,7 +1352,8 @@
     "/properties/Owner",
     "/properties/Version",
     "/properties/HealthChecksForPlan",
-    "/properties/Route53HealthChecks"
+    "/properties/Route53HealthChecks",
+    "/properties/PlanHealthChecks"
   ],
   "createOnlyProperties": [
     "/properties/Name",
@@ -1210,7 +1362,8 @@
     "/properties/Regions"
   ],
   "deprecatedProperties": [
-    "/properties/HealthChecksForPlan"
+    "/properties/HealthChecksForPlan",
+    "/properties/Route53HealthChecks"
   ],
   "primaryIdentifier": [
     "/properties/Arn"
@@ -1310,6 +1463,14 @@
       },
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "PlanHealthChecks": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

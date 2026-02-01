@@ -17,10 +17,11 @@
       "type": "string",
       "enum": [
         "PUBLIC",
-        "SANDBOX"
+        "SANDBOX",
+        "VPC"
       ],
       "description": "Network modes supported by code interpreter",
-      "markdownDescription": "Network modes supported by code interpreter\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PUBLIC | SANDBOX  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Network modes supported by code interpreter\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PUBLIC | SANDBOX | VPC  \nUpdate requires: No interruption\n"
     },
     "CodeInterpreterNetworkConfiguration": {
       "type": "object",
@@ -28,6 +29,9 @@
         "NetworkMode": {
           "$ref": "#/definitions/CodeInterpreterNetworkMode",
           "default": "SANDBOX"
+        },
+        "VpcConfig": {
+          "$ref": "#/definitions/VpcConfig"
         }
       },
       "required": [
@@ -112,6 +116,56 @@
       "description": "List of code interpreters",
       "markdownDescription": "List of code interpreters\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     },
+    "VpcConfig": {
+      "type": "object",
+      "description": "Network mode configuration for VPC",
+      "properties": {
+        "SecurityGroups": {
+          "$ref": "#/definitions/SecurityGroups"
+        },
+        "Subnets": {
+          "$ref": "#/definitions/Subnets"
+        }
+      },
+      "required": [
+        "SecurityGroups",
+        "Subnets"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Network mode configuration for VPC\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SecurityGroups": {
+      "type": "array",
+      "description": "Security groups for VPC",
+      "minItems": 1,
+      "maxItems": 16,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/SecurityGroupId"
+      },
+      "markdownDescription": "Security groups for VPC\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "SecurityGroupId": {
+      "type": "string",
+      "description": "Security group id",
+      "markdownDescription": "Security group id\n\n---\n\nRequired: No  \nType: String  \nPattern: ^sg-[0-9a-zA-Z]{8,17}$  \nUpdate requires: No interruption\n"
+    },
+    "Subnets": {
+      "type": "array",
+      "description": "Subnets for VPC",
+      "minItems": 1,
+      "maxItems": 16,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/SubnetId"
+      },
+      "markdownDescription": "Subnets for VPC\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "SubnetId": {
+      "type": "string",
+      "description": "Subnet id",
+      "markdownDescription": "Subnet id\n\n---\n\nRequired: No  \nType: String  \nPattern: ^subnet-[0-9a-zA-Z]{8,17}$  \nUpdate requires: No interruption\n"
+    },
     "TagsMap": {
       "type": "object",
       "description": "A map of tag keys and values",
@@ -164,6 +218,11 @@
       "description": "Status of code interpreter.",
       "markdownDescription": "Status of code interpreter.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
     },
+    "FailureReason": {
+      "type": "string",
+      "description": "The reason for failure if the code interpreter creation or operation failed.",
+      "markdownDescription": "The reason for failure if the code interpreter creation or operation failed.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
     "CreatedAt": {
       "type": "string",
       "format": "date-time",
@@ -189,6 +248,7 @@
     "/properties/CodeInterpreterId",
     "/properties/CodeInterpreterArn",
     "/properties/Status",
+    "/properties/FailureReason",
     "/properties/CreatedAt",
     "/properties/LastUpdatedAt"
   ],
@@ -213,6 +273,7 @@
         "bedrock-agentcore:GetCodeInterpreter",
         "bedrock-agentcore:TagResource",
         "bedrock-agentcore:ListTagsForResource",
+        "iam:CreateServiceLinkedRole",
         "iam:PassRole"
       ]
     },
@@ -270,6 +331,11 @@
       "$ref": "#/definitions/CodeInterpreterStatus",
       "description": "Status of code interpreter.",
       "markdownDescription": "Status of code interpreter.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "FailureReason": {
+      "type": "string",
+      "description": "The reason for failure if the code interpreter creation or operation failed.",
+      "markdownDescription": "The reason for failure if the code interpreter creation or operation failed.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "CreatedAt": {
       "type": "string",

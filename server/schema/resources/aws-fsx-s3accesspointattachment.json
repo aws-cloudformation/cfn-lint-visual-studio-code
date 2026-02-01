@@ -4,29 +4,35 @@
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
   "properties": {
     "Name": {
-      "description": "The Name of the S3AccessPointAttachment",
+      "description": "The name of the S3 access point attachment; also used for the name of the S3 access point.",
       "type": "string",
       "minLength": 3,
       "maxLength": 50,
-      "markdownDescription": "The Name of the S3AccessPointAttachment\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 3  \nMaximum Length: 50  \nPattern: ^(?=[a-z0-9])[a-z0-9-]{1,48}[a-z0-9]$  \nUpdate requires: Replacement\n"
+      "markdownDescription": "The name of the S3 access point attachment; also used for the name of the S3 access point.\n\n---\n\nRequired: Conditional  \nType: String  \nMinimum Length: 3  \nMaximum Length: 50  \nPattern: ^(?=[a-z0-9])[a-z0-9-]{1,48}[a-z0-9]$  \nUpdate requires: Replacement\n"
     },
     "Type": {
-      "description": "",
+      "description": "The type of Amazon FSx volume that the S3 access point is attached to.",
       "type": "string",
       "enum": [
-        "OPENZFS"
+        "OPENZFS",
+        "ONTAP"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: OPENZFS  \nUpdate requires: Replacement\n"
+      "markdownDescription": "The type of Amazon FSx volume that the S3 access point is attached to.\n\n---\n\nRequired: Conditional  \nType: String  \nAllowed Values: OPENZFS | ONTAP  \nUpdate requires: Replacement\n"
+    },
+    "OntapConfiguration": {
+      "description": "The OntapConfiguration of the S3 access point attachment.",
+      "$ref": "#/definitions/S3AccessPointOntapConfiguration",
+      "markdownDescription": "The OntapConfiguration of the S3 access point attachment.\n\n---\n\nRequired: Conditional  \nType:   \nUpdate requires: Replacement\n"
     },
     "OpenZFSConfiguration": {
-      "description": "",
+      "description": "The OpenZFSConfiguration of the S3 access point attachment.",
       "$ref": "#/definitions/S3AccessPointOpenZFSConfiguration",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: Replacement\n"
+      "markdownDescription": "The OpenZFSConfiguration of the S3 access point attachment.\n\n---\n\nRequired: Conditional  \nType:   \nUpdate requires: Replacement\n"
     },
     "S3AccessPoint": {
-      "description": "",
+      "description": "The S3 access point configuration of the S3 access point attachment.",
       "$ref": "#/definitions/S3AccessPoint",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\nRead only property: Yes"
+      "markdownDescription": "The S3 access point configuration of the S3 access point attachment.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\nRead only property: Yes"
     }
   },
   "definitions": {
@@ -35,11 +41,11 @@
       "additionalProperties": false,
       "properties": {
         "VpcId": {
-          "description": "",
+          "description": "Specifies the virtual private cloud (VPC) for the S3 access point VPC configuration, if one exists.",
           "type": "string",
           "minLength": 12,
           "maxLength": 21,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 12  \nMaximum Length: 21  \nPattern: ^(vpc-[0-9a-f]{8,})$  \nUpdate requires: No interruption\n"
+          "markdownDescription": "Specifies the virtual private cloud (VPC) for the S3 access point VPC configuration, if one exists.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 12  \nMaximum Length: 21  \nPattern: ^(vpc-[0-9a-f]{8,})$  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
@@ -52,51 +58,132 @@
       "additionalProperties": false,
       "properties": {
         "ResourceARN": {
-          "description": "",
+          "description": "The S3 access point's ARN.",
           "type": "string",
           "minLength": 8,
           "maxLength": 1024,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 8  \nMaximum Length: 1024  \nPattern: ^arn:[^:]{1,63}:[^:]{0,63}:[^:]{0,63}:(?:|\\d{12}):[^/].{0,1023}$  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The S3 access point's ARN.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 8  \nMaximum Length: 1024  \nPattern: ^arn:[^:]{1,63}:[^:]{0,63}:[^:]{0,63}:(?:|\\d{12}):[^/].{0,1023}$  \nUpdate requires: No interruption\n"
         },
         "Alias": {
-          "description": "",
+          "description": "The S3 access point's alias.",
           "type": "string",
           "minLength": 1,
           "maxLength": 63,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 63  \nPattern: ^[0-9a-z\\\\-]{1,63}  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The S3 access point's alias.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 63  \nPattern: ^[0-9a-z\\\\-]{1,63}  \nUpdate requires: No interruption\n"
         },
         "VpcConfiguration": {
-          "description": "",
+          "description": "The S3 access point's virtual private cloud (VPC) configuration.",
           "$ref": "#/definitions/S3AccessPointVpcConfiguration",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+          "markdownDescription": "The S3 access point's virtual private cloud (VPC) configuration.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
         },
         "Policy": {
-          "description": "",
+          "description": "The S3 access point's policy.",
           "type": [
             "object",
             "string"
           ],
           "minLength": 1,
           "maxLength": 200000,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: ['object', 'string']  \nMinimum Length: 1  \nMaximum Length: 200000  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The S3 access point's policy.\n\n---\n\nRequired: No  \nType: ['object', 'string']  \nMinimum Length: 1  \nMaximum Length: 200000  \nUpdate requires: No interruption\n"
         }
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\nRead only property: Yes"
     },
-    "FileSystemGID": {
+    "OntapUnixFileSystemUser": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "Gid": {
-          "description": "",
-          "type": "number",
-          "minimum": 0,
-          "maximum": 4294967295,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption\n"
+        "Name": {
+          "description": "The name of the UNIX user.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "markdownDescription": "The name of the UNIX user.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^[^\\u0000\\u0085\\u2028\\u2029\\r\\n]{1,256}$  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "Gid"
+        "Name"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "OntapWindowsFileSystemUser": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Name": {
+          "description": "The name of the Windows user.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "markdownDescription": "The name of the Windows user.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^[^\\u0000\\u0085\\u2028\\u2029\\r\\n]{1,256}$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Name"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "OntapFileSystemIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Type": {
+          "description": "Specifies the FSx for ONTAP user identity type, accepts either UNIX or WINDOWS.",
+          "type": "string",
+          "enum": [
+            "UNIX",
+            "WINDOWS"
+          ],
+          "markdownDescription": "Specifies the FSx for ONTAP user identity type, accepts either UNIX or WINDOWS.\n\n---\n\nRequired: Conditional  \nType: String  \nAllowed Values: UNIX | WINDOWS  \nUpdate requires: No interruption\n"
+        },
+        "UnixUser": {
+          "description": "Specifies the properties of the file system UNIX user.",
+          "$ref": "#/definitions/OntapUnixFileSystemUser",
+          "markdownDescription": "Specifies the properties of the file system UNIX user.\n\n---\n\nRequired: Conditional  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "WindowsUser": {
+          "description": "Specifies the properties of the file system Windows user.",
+          "$ref": "#/definitions/OntapWindowsFileSystemUser",
+          "markdownDescription": "Specifies the properties of the file system Windows user.\n\n---\n\nRequired: Conditional  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "oneOf": [
+        {
+          "required": [
+            "UnixUser"
+          ]
+        },
+        {
+          "required": [
+            "WindowsUser"
+          ]
+        }
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "S3AccessPointOntapConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "VolumeId": {
+          "description": "The ID of the FSx for ONTAP volume that the S3 access point is attached to.",
+          "type": "string",
+          "minLength": 23,
+          "maxLength": 23,
+          "markdownDescription": "The ID of the FSx for ONTAP volume that the S3 access point is attached to.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 23  \nMaximum Length: 23  \nPattern: ^(fsvol-[0-9a-f]{17,})$  \nUpdate requires: No interruption\n"
+        },
+        "FileSystemIdentity": {
+          "description": "The file system identity used to authorize file access requests made using the S3 access point.",
+          "$ref": "#/definitions/OntapFileSystemIdentity",
+          "markdownDescription": "The file system identity used to authorize file access requests made using the S3 access point.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "VolumeId",
+        "FileSystemIdentity"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
@@ -105,26 +192,26 @@
       "additionalProperties": false,
       "properties": {
         "Uid": {
-          "description": "",
+          "description": "The UID of the file system user.",
           "type": "number",
           "minimum": 0,
           "maximum": 4294967295,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The UID of the file system user.\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption\n"
         },
         "Gid": {
-          "description": "",
+          "description": "The GID of the file system user.",
           "type": "number",
           "minimum": 0,
           "maximum": 4294967295,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The GID of the file system user.\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption\n"
         },
         "SecondaryGids": {
-          "description": "",
+          "description": "The list of secondary GIDs for the file system user.",
           "type": "array",
           "items": {
             "$ref": "#/definitions/FileSystemGID"
           },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The list of secondary GIDs for the file system user.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
@@ -138,17 +225,17 @@
       "additionalProperties": false,
       "properties": {
         "Type": {
-          "description": "",
+          "description": "Specifies the FSx for OpenZFS user identity type, accepts only POSIX.",
           "type": "string",
           "enum": [
             "POSIX"
           ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: POSIX  \nUpdate requires: No interruption\n"
+          "markdownDescription": "Specifies the FSx for OpenZFS user identity type, accepts only POSIX.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: POSIX  \nUpdate requires: No interruption\n"
         },
         "PosixUser": {
-          "description": "",
+          "description": "Specifies the UID and GIDs of the file system POSIX user.",
           "$ref": "#/definitions/OpenZFSPosixFileSystemUser",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+          "markdownDescription": "Specifies the UID and GIDs of the file system POSIX user.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
         }
       },
       "required": [
@@ -162,21 +249,38 @@
       "additionalProperties": false,
       "properties": {
         "VolumeId": {
-          "description": "",
+          "description": "The ID of the FSx for OpenZFS volume that the S3 access point is attached to.",
           "type": "string",
           "minLength": 23,
           "maxLength": 23,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 23  \nMaximum Length: 23  \nPattern: ^(fsvol-[0-9a-f]{17,})$  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The ID of the FSx for OpenZFS volume that the S3 access point is attached to.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 23  \nMaximum Length: 23  \nPattern: ^(fsvol-[0-9a-f]{17,})$  \nUpdate requires: No interruption\n"
         },
         "FileSystemIdentity": {
-          "description": "",
+          "description": "The file system identity used to authorize file access requests made using the S3 access point.",
           "$ref": "#/definitions/OpenZFSFileSystemIdentity",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+          "markdownDescription": "The file system identity used to authorize file access requests made using the S3 access point.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
         }
       },
       "required": [
         "VolumeId",
         "FileSystemIdentity"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "FileSystemGID": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Gid": {
+          "description": "The GID of the file system user.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 4294967295,
+          "markdownDescription": "The GID of the file system user.\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Gid"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
@@ -185,12 +289,24 @@
   "replacementStrategy": "delete_then_create",
   "required": [
     "Name",
-    "Type",
-    "OpenZFSConfiguration"
+    "Type"
+  ],
+  "oneOf": [
+    {
+      "required": [
+        "OntapConfiguration"
+      ]
+    },
+    {
+      "required": [
+        "OpenZFSConfiguration"
+      ]
+    }
   ],
   "createOnlyProperties": [
     "/properties/Name",
     "/properties/Type",
+    "/properties/OntapConfiguration",
     "/properties/OpenZFSConfiguration",
     "/properties/S3AccessPoint"
   ],

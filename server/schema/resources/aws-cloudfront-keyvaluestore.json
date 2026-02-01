@@ -22,6 +22,30 @@
       "type": "object",
       "description": "The import source for the key value store.",
       "markdownDescription": "The import source for the key value store.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 0,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: ^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "type": "object",
+      "description": "",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "description": "The key value store. Use this to separate data from function code, allowing you to update data without having to publish a new version of a function. The key value store holds keys and their corresponding values.",
@@ -30,6 +54,7 @@
       "permissions": [
         "cloudfront:CreateKeyValueStore",
         "cloudfront:DescribeKeyValueStore",
+        "cloudfront:TagResource",
         "s3:GetObject",
         "s3:HeadObject",
         "s3:GetBucketLocation"
@@ -48,13 +73,16 @@
     },
     "read": {
       "permissions": [
-        "cloudfront:DescribeKeyValueStore"
+        "cloudfront:DescribeKeyValueStore",
+        "cloudfront:ListTagsForResource"
       ]
     },
     "update": {
       "permissions": [
         "cloudfront:UpdateKeyValueStore",
-        "cloudfront:DescribeKeyValueStore"
+        "cloudfront:DescribeKeyValueStore",
+        "cloudfront:TagResource",
+        "cloudfront:UntagResource"
       ]
     }
   },
@@ -88,6 +116,15 @@
       "$ref": "#/definitions/ImportSource",
       "description": "The import source for the key value store.",
       "markdownDescription": "The import source for the key value store.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "Tags": {
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "description": "",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "primaryIdentifier": [
@@ -109,9 +146,15 @@
   ],
   "tagging": {
     "cloudFormationSystemTags": false,
-    "tagOnCreate": false,
-    "tagUpdatable": false,
-    "taggable": false
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "cloudfront:TagResource",
+      "cloudfront:UntagResource",
+      "cloudfront:ListTagsForResource"
+    ]
   },
   "typeName": "AWS::CloudFront::KeyValueStore",
   "attributes": {

@@ -1,6 +1,6 @@
 {
   "typeName": "AWS::Lex::Bot",
-  "description": "Amazon Lex conversational bot performing automated tasks such as ordering a pizza, booking a hotel, and so on.",
+  "description": "Resource Type definition for an Amazon Lex conversational bot performing automated tasks such as ordering a pizza, booking a hotel, and so on.",
   "sourceUrl": "https://docs.aws.amazon.com/lexv2/latest/dg/build-create.html",
   "definitions": {
     "ReplicaRegion": {
@@ -315,6 +315,12 @@
       "maxLength": 100,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: ^([0-9a-zA-Z][_-]?)+$  \nUpdate requires: No interruption\n"
     },
+    "DisplayName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nUpdate requires: No interruption\n"
+    },
     "Description": {
       "description": "A description of the resource",
       "type": "string",
@@ -433,6 +439,34 @@
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "UnifiedSpeechSettings": {
+      "type": "object",
+      "properties": {
+        "SpeechFoundationModel": {
+          "type": "object",
+          "properties": {
+            "ModelArn": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+            },
+            "VoiceId": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            }
+          },
+          "required": [
+            "ModelArn"
+          ],
+          "additionalProperties": false,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "SpeechFoundationModel"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "GenerativeAISettings": {
       "type": "object",
       "properties": {
@@ -486,6 +520,17 @@
                 "Enabled": {
                   "type": "boolean",
                   "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption\n"
+                },
+                "AssistedNluMode": {
+                  "type": "string",
+                  "enum": [
+                    "Primary",
+                    "Fallback"
+                  ],
+                  "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Primary | Fallback  \nUpdate requires: No interruption\n"
+                },
+                "IntentDisambiguationSettings": {
+                  "$ref": "#/definitions/IntentDisambiguationSettings"
                 }
               },
               "required": [
@@ -524,6 +569,15 @@
       "minimum": 0,
       "maximum": 1,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+    },
+    "SpeechDetectionSensitivity": {
+      "type": "string",
+      "enum": [
+        "Default",
+        "HighNoiseTolerance",
+        "MaximumNoiseTolerance"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Default | HighNoiseTolerance | MaximumNoiseTolerance  \nUpdate requires: No interruption\n"
     },
     "ParentIntentSignature": {
       "type": "string",
@@ -1267,6 +1321,32 @@
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "IntentDisambiguationSettings": {
+      "type": "object",
+      "properties": {
+        "Enabled": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "MaxDisambiguationIntents": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 5,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "CustomDisambiguationMessage": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1000  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Enabled"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "KendraConfiguration": {
       "type": "object",
       "properties": {
@@ -1532,10 +1612,13 @@
         "Name": {
           "$ref": "#/definitions/Name"
         },
+        "DisplayName": {
+          "$ref": "#/definitions/DisplayName"
+        },
         "Description": {
-          "description": "Description of thr intent.",
+          "description": "Resource Type definition for the intent.",
           "$ref": "#/definitions/Description",
-          "markdownDescription": "Description of thr intent.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+          "markdownDescription": "Resource Type definition for the intent.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
         },
         "ParentIntentSignature": {
           "$ref": "#/definitions/ParentIntentSignature"
@@ -1795,15 +1878,29 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 100,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: ^([0-9a-zA-Z][_-]?){1,100}$  \nUpdate requires: No interruption\n"
+          "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: ^([0-9a-zA-Z][_-]?){1,100}$  \nUpdate requires: No interruption\n"
         },
         "SlotTypeId": {
           "$ref": "#/definitions/SlotTypeId"
+        },
+        "SlotTypeName": {
+          "$ref": "#/definitions/SlotTypeName"
         }
       },
       "required": [
-        "Name",
-        "SlotTypeId"
+        "Name"
+      ],
+      "oneOf": [
+        {
+          "required": [
+            "SlotTypeId"
+          ]
+        },
+        {
+          "required": [
+            "SlotTypeName"
+          ]
+        }
       ],
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
@@ -1839,13 +1936,27 @@
         "SlotTypeId": {
           "$ref": "#/definitions/SlotTypeId"
         },
+        "SlotTypeName": {
+          "$ref": "#/definitions/SlotTypeName"
+        },
         "ValueElicitationSetting": {
           "$ref": "#/definitions/SubSlotValueElicitationSetting"
         }
       },
       "required": [
-        "SlotTypeId",
         "ValueElicitationSetting"
+      ],
+      "oneOf": [
+        {
+          "required": [
+            "SlotTypeId"
+          ]
+        },
+        {
+          "required": [
+            "SlotTypeName"
+          ]
+        }
       ],
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
@@ -2127,11 +2238,17 @@
         "VoiceSettings": {
           "$ref": "#/definitions/VoiceSettings"
         },
+        "UnifiedSpeechSettings": {
+          "$ref": "#/definitions/UnifiedSpeechSettings"
+        },
         "GenerativeAISettings": {
           "$ref": "#/definitions/GenerativeAISettings"
         },
         "NluConfidenceThreshold": {
           "$ref": "#/definitions/ConfidenceThreshold"
+        },
+        "SpeechDetectionSensitivity": {
+          "$ref": "#/definitions/SpeechDetectionSensitivity"
         },
         "Intents": {
           "type": "array",
@@ -2668,7 +2785,6 @@
       "$ref": "#/definitions/Replication"
     }
   },
-  "taggable": true,
   "additionalProperties": false,
   "required": [
     "Name",
@@ -2687,9 +2803,9 @@
     "/properties/BotLocales",
     "/properties/BotFileS3Location",
     "/properties/AutoBuildBotLocales",
-    "/properties/BotTags",
     "/properties/TestBotAliasTags",
-    "/properties/Replication"
+    "/properties/Replication",
+    "/properties/TestBotAliasSettings"
   ],
   "handlers": {
     "create": {
@@ -2701,6 +2817,7 @@
         "lex:DescribeImport",
         "lex:ListTagsForResource",
         "lex:TagResource",
+        "lex:UntagResource",
         "lex:CreateBot",
         "lex:CreateBotLocale",
         "lex:CreateIntent",
@@ -2728,14 +2845,33 @@
         "iam:GetRole",
         "lex:CreateBotReplica",
         "lex:DescribeBotReplica",
-        "lex:DeleteBotReplica"
+        "lex:DeleteBotReplica",
+        "lex:CreateBotAlias",
+        "lex:DescribeBotAlias",
+        "lex:ListBotAliases",
+        "lex:BuildBotLocale",
+        "s3:PutObject",
+        "kms:GenerateDataKey",
+        "kms:Decrypt",
+        "cloudwatch:PutMetricData",
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
       ]
     },
     "read": {
       "permissions": [
         "lex:DescribeBot",
         "lex:ListTagsForResource",
-        "lex:DescribeBotReplica"
+        "lex:DescribeBotReplica",
+        "lex:ListBotAliases",
+        "lex:ListBotLocales",
+        "lex:ListIntents",
+        "lex:ListSlots",
+        "lex:ListSlotTypes",
+        "lex:ListCustomVocabularies",
+        "lex:DescribeBotAlias",
+        "lex:GetBotAlias"
       ]
     },
     "update": {
@@ -2773,13 +2909,20 @@
         "lex:UpdateBotAlias",
         "lex:CreateBotReplica",
         "lex:DescribeBotReplica",
-        "lex:DeleteBotReplica"
+        "lex:DeleteBotReplica",
+        "lex:CreateBotAlias",
+        "lex:DescribeBotAlias",
+        "lex:ListBotAliases",
+        "lex:UpdateBotAlias",
+        "s3:PutObject"
       ]
     },
     "delete": {
       "permissions": [
         "lex:DeleteBot",
+        "lex:BatchDeleteCustomVocabularyItem",
         "lex:DescribeBot",
+        "lex:DescribeBotAlias",
         "lex:DeleteBotLocale",
         "lex:DeleteIntent",
         "lex:DeleteSlotType",
@@ -2788,15 +2931,42 @@
         "lex:DeleteBotChannel",
         "lex:DeleteBotAlias",
         "lex:DeleteCustomVocabulary",
-        "lex:DeleteBotReplica"
+        "lex:DeleteBotReplica",
+        "lex:DeleteExport",
+        "lex:DeleteUtterances",
+        "lex:DeleteImport",
+        "lex:DeleteSession",
+        "lex:DeleteTestSet",
+        "lex:DeleteResourcePolicyStatement",
+        "lex:DeleteResourcePolicy",
+        "lex:UntagResource"
       ]
     },
     "list": {
       "permissions": [
         "lex:ListBots",
-        "lex:ListBotReplicas"
+        "lex:ListBotReplicas",
+        "lex:ListBotAliases",
+        "lex:ListBotLocales",
+        "lex:ListIntents",
+        "lex:ListSlots",
+        "lex:ListSlotTypes",
+        "lex:ListCustomVocabularies",
+        "lex:ListTagsForResource"
       ]
     }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagProperty": "/properties/BotTags",
+    "tagOnCreate": true,
+    "permissions": [
+      "lex:ListTagsForResource",
+      "lex:TagResource",
+      "lex:UntagResource"
+    ],
+    "cloudFormationSystemTags": true,
+    "tagUpdatable": true
   },
   "attributes": {
     "Id": {

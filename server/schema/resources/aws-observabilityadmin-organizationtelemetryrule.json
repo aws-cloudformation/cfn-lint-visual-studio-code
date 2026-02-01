@@ -19,9 +19,13 @@
       "description": "Resource Type associated with the Organization Telemetry Rule",
       "type": "string",
       "enum": [
-        "AWS::EC2::VPC"
+        "AWS::EC2::VPC",
+        "AWS::WAFv2::WebACL",
+        "AWS::CloudTrail",
+        "AWS::EKS::Cluster",
+        "AWS::ElasticLoadBalancingV2::LoadBalancer"
       ],
-      "markdownDescription": "Resource Type associated with the Organization Telemetry Rule\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AWS::EC2::VPC  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Resource Type associated with the Organization Telemetry Rule\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AWS::EC2::VPC | AWS::WAFv2::WebACL | AWS::CloudTrail | AWS::EKS::Cluster | AWS::ElasticLoadBalancingV2::LoadBalancer  \nUpdate requires: No interruption\n"
     },
     "TelemetryType": {
       "description": "Telemetry Type associated with the Organization Telemetry Rule",
@@ -83,6 +87,91 @@
       "additionalProperties": false,
       "markdownDescription": "Telemetry parameters for VPC Flow logs\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "WAFLoggingParameters": {
+      "description": "Telemetry parameters for WAF v2 Web ACL",
+      "type": "object",
+      "properties": {
+        "RedactedFields": {
+          "description": "Fields not to be included in the logs.",
+          "$ref": "#/definitions/RedactedFields",
+          "markdownDescription": "Fields not to be included in the logs.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "LoggingFilter": {
+          "$ref": "#/definitions/LoggingFilter"
+        },
+        "LogType": {
+          "$ref": "#/definitions/WAFLogType"
+        }
+      },
+      "markdownDescription": "Telemetry parameters for WAF v2 Web ACL\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CloudtrailParameters": {
+      "description": "Telemetry parameters for Cloudtrail",
+      "type": "object",
+      "properties": {
+        "AdvancedEventSelectors": {
+          "description": "Create fine-grained selectors for AWS CloudTrail management and data.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/AdvancedEventSelector"
+          },
+          "markdownDescription": "Create fine-grained selectors for AWS CloudTrail management and data.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "AdvancedEventSelectors"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Telemetry parameters for Cloudtrail\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AdvancedEventSelector": {
+      "description": "An advanced event selector that includes optional name and field selectors",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "An optional descriptive name for the advanced event selector",
+          "type": "string",
+          "markdownDescription": "An optional descriptive name for the advanced event selector\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "FieldSelectors": {
+          "description": "Contains all selector statements in an advanced event selector.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/AdvancedFieldSelector"
+          },
+          "markdownDescription": "Contains all selector statements in an advanced event selector.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "FieldSelectors"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "An advanced event selector that includes optional name and field selectors\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ELBLoadBalancerLoggingParameters": {
+      "description": "Telemetry parameters for ELB/NLB Load Balancer Logs",
+      "type": "object",
+      "properties": {
+        "OutputFormat": {
+          "type": "string",
+          "enum": [
+            "plain",
+            "json"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: plain | json  \nUpdate requires: No interruption\n"
+        },
+        "FieldDelimiter": {
+          "description": "A delimiter to delineate log fields",
+          "type": "string",
+          "markdownDescription": "A delimiter to delineate log fields\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Telemetry parameters for ELB/NLB Load Balancer Logs\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "TelemetryDestinationConfiguration": {
       "description": "The destination configuration for telemetry data",
       "type": "object",
@@ -98,6 +187,15 @@
         },
         "VPCFlowLogParameters": {
           "$ref": "#/definitions/VPCFlowLogParameters"
+        },
+        "CloudtrailParameters": {
+          "$ref": "#/definitions/CloudtrailParameters"
+        },
+        "ELBLoadBalancerLoggingParameters": {
+          "$ref": "#/definitions/ELBLoadBalancerLoggingParameters"
+        },
+        "WAFLoggingParameters": {
+          "$ref": "#/definitions/WAFLoggingParameters"
         }
       },
       "required": [],
@@ -113,6 +211,9 @@
         },
         "TelemetryType": {
           "$ref": "#/definitions/TelemetryType"
+        },
+        "TelemetrySourceTypes": {
+          "$ref": "#/definitions/TelemetrySourceTypes"
         },
         "DestinationConfiguration": {
           "$ref": "#/definitions/TelemetryDestinationConfiguration"
@@ -156,6 +257,291 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "A key-value pair to associate with a resource\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AdvancedFieldSelector": {
+      "description": "A single selector statement in an advanced event selector.",
+      "type": "object",
+      "properties": {
+        "Field": {
+          "description": "A field in a CloudTrail event record on which to filter events to be logged",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000,
+          "markdownDescription": "A field in a CloudTrail event record on which to filter events to be logged\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1000  \nUpdate requires: No interruption\n"
+        },
+        "EndsWith": {
+          "description": "An operator that includes events that match the last few characters of the event record field specified as the value of Field.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "An operator that includes events that match the last few characters of the event record field specified as the value of Field.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "Equals": {
+          "description": "An operator that includes events that match the exact value of the event record field specified as the value of Field.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "An operator that includes events that match the exact value of the event record field specified as the value of Field.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "NotEndsWith": {
+          "description": "An operator that excludes events that match the last few characters of the event record field specified as the value of Field.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "An operator that excludes events that match the last few characters of the event record field specified as the value of Field.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "NotEquals": {
+          "description": "An operator that excludes events that match the exact value of the event record field specified as the value of Field.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "An operator that excludes events that match the exact value of the event record field specified as the value of Field.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "NotStartsWith": {
+          "description": "An operator that excludes events that match the first few characters of the event record field specified as the value of Field.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "An operator that excludes events that match the first few characters of the event record field specified as the value of Field.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "StartsWith": {
+          "description": "An operator that includes events that match the first few characters of the event record field specified as the value of Field.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "An operator that includes events that match the first few characters of the event record field specified as the value of Field.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "A single selector statement in an advanced event selector.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RedactedFields": {
+      "description": "Fields not to be included in the logs.",
+      "type": "array",
+      "maxItems": 100,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/FieldToMatch"
+      },
+      "markdownDescription": "Fields not to be included in the logs.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "FieldToMatch": {
+      "description": "The field that we want to match this rule to.",
+      "type": "object",
+      "properties": {
+        "SingleHeader": {
+          "$ref": "#/definitions/SingleHeader"
+        },
+        "UriPath": {
+          "description": "This is the URI path to match this rule to.",
+          "type": "string",
+          "markdownDescription": "This is the URI path to match this rule to.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "QueryString": {
+          "description": "The query string to find the resource to match this field to.",
+          "type": "string",
+          "markdownDescription": "The query string to find the resource to match this field to.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Method": {
+          "description": "The method with which to match this rule.",
+          "type": "string",
+          "markdownDescription": "The method with which to match this rule.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "The field that we want to match this rule to.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SingleHeader": {
+      "description": "Header for the field to match.",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "The name of the header",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "markdownDescription": "The name of the header\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Name"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Header for the field to match.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LoggingFilter": {
+      "description": "Default handling for logs that don't match any of the specified filtering conditions.",
+      "type": "object",
+      "properties": {
+        "Filters": {
+          "$ref": "#/definitions/Filters"
+        },
+        "DefaultBehavior": {
+          "$ref": "#/definitions/FilterBehavior"
+        }
+      },
+      "markdownDescription": "Default handling for logs that don't match any of the specified filtering conditions.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Filters": {
+      "description": "A list of filters to be applied.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "minLength": 1,
+      "items": {
+        "$ref": "#/definitions/Filter"
+      },
+      "markdownDescription": "A list of filters to be applied.\n\n---\n\nRequired: No  \nType: Array  \nMinimum Length: 1  \nUpdate requires: No interruption\n"
+    },
+    "Filter": {
+      "description": "A filter to be applied",
+      "type": "object",
+      "properties": {
+        "Behavior": {
+          "$ref": "#/definitions/FilterBehavior"
+        },
+        "Requirement": {
+          "$ref": "#/definitions/FilterRequirement"
+        },
+        "Conditions": {
+          "$ref": "#/definitions/Conditions"
+        }
+      },
+      "markdownDescription": "A filter to be applied\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "FilterBehavior": {
+      "description": "The behavior required of the filter.",
+      "type": "string",
+      "enum": [
+        "KEEP",
+        "DROP"
+      ],
+      "markdownDescription": "The behavior required of the filter.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: KEEP | DROP  \nUpdate requires: No interruption\n"
+    },
+    "FilterRequirement": {
+      "description": "The requirement portion of the filter.",
+      "type": "string",
+      "enum": [
+        "MEETS_ALL",
+        "MEETS_ANY"
+      ],
+      "markdownDescription": "The requirement portion of the filter.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MEETS_ALL | MEETS_ANY  \nUpdate requires: No interruption\n"
+    },
+    "Conditions": {
+      "description": "A list of conditions for a filter.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "minLength": 1,
+      "items": {
+        "$ref": "#/definitions/Condition"
+      },
+      "markdownDescription": "A list of conditions for a filter.\n\n---\n\nRequired: No  \nType: Array  \nMinimum Length: 1  \nUpdate requires: No interruption\n"
+    },
+    "Condition": {
+      "description": "A condition for a filter.",
+      "type": "object",
+      "properties": {
+        "ActionCondition": {
+          "$ref": "#/definitions/ActionCondition"
+        },
+        "LabelNameCondition": {
+          "$ref": "#/definitions/LabelNameCondition"
+        }
+      },
+      "markdownDescription": "A condition for a filter.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ActionCondition": {
+      "description": "The condition of the action desired in the filter.",
+      "type": "object",
+      "properties": {
+        "Action": {
+          "$ref": "#/definitions/Action"
+        }
+      },
+      "markdownDescription": "The condition of the action desired in the filter.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Action": {
+      "description": "The enumerated action to take.",
+      "type": "string",
+      "enum": [
+        "ALLOW",
+        "BLOCK",
+        "COUNT",
+        "CAPTCHA",
+        "CHALLENGE",
+        "EXCLUDED_AS_COUNT"
+      ],
+      "markdownDescription": "The enumerated action to take.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ALLOW | BLOCK | COUNT | CAPTCHA | CHALLENGE | EXCLUDED_AS_COUNT  \nUpdate requires: No interruption\n"
+    },
+    "LabelNameCondition": {
+      "description": "The label name of the condition.",
+      "type": "object",
+      "properties": {
+        "LabelName": {
+          "description": "The label name of the condition.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "markdownDescription": "The label name of the condition.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nPattern: ^[0-9A-Za-z_\\-:]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "The label name of the condition.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "WAFLogType": {
+      "description": "The type of logs to generate for WAF.",
+      "type": "string",
+      "enum": [
+        "WAF_LOGS"
+      ],
+      "markdownDescription": "The type of logs to generate for WAF.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: WAF_LOGS  \nUpdate requires: No interruption\n"
+    },
+    "TelemetrySourceTypes": {
+      "description": "The telemetry source types for a telemetry rule.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/TelemetrySourceType"
+      },
+      "markdownDescription": "The telemetry source types for a telemetry rule.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "TelemetrySourceType": {
+      "description": "The telemetry source type that goes into the array.",
+      "type": "string",
+      "enum": [
+        "VPC_FLOW_LOGS",
+        "ROUTE53_RESOLVER_QUERY_LOGS",
+        "EKS_AUDIT_LOGS",
+        "EKS_AUTHENTICATOR_LOGS",
+        "EKS_CONTROLLER_MANAGER_LOGS",
+        "EKS_SCHEDULER_LOGS",
+        "EKS_API_LOGS"
+      ],
+      "markdownDescription": "The telemetry source type that goes into the array.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: VPC_FLOW_LOGS | ROUTE53_RESOLVER_QUERY_LOGS | EKS_AUDIT_LOGS | EKS_AUTHENTICATOR_LOGS | EKS_CONTROLLER_MANAGER_LOGS | EKS_SCHEDULER_LOGS | EKS_API_LOGS  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {

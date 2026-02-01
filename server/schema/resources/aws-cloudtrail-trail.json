@@ -39,6 +39,7 @@
         "CloudTrail:ListTags",
         "CloudTrail:GetEventSelectors",
         "CloudTrail:GetInsightSelectors",
+        "CloudTrail:GetEventConfiguration",
         "CloudTrail:DescribeTrails"
       ]
     },
@@ -49,6 +50,7 @@
         "CloudTrail:AddTags",
         "CloudTrail:PutEventSelectors",
         "CloudTrail:PutInsightSelectors",
+        "CloudTrail:PutEventConfiguration",
         "iam:GetRole",
         "iam:PassRole",
         "iam:CreateServiceLinkedRole",
@@ -65,6 +67,7 @@
         "CloudTrail:RemoveTags",
         "CloudTrail:PutEventSelectors",
         "CloudTrail:PutInsightSelectors",
+        "CloudTrail:PutEventConfiguration",
         "iam:GetRole",
         "iam:PassRole",
         "iam:CreateServiceLinkedRole",
@@ -94,7 +97,7 @@
   "additionalProperties": false,
   "definitions": {
     "AdvancedEventSelector": {
-      "description": "Advanced event selectors let you create fine-grained selectors for the following AWS CloudTrail event record \ufb01elds. They help you control costs by logging only those events that are important to you.",
+      "description": "Advanced event selectors let you create fine-grained selectors for the following AWS CloudTrail event record fields. They help you control costs by logging only those events that are important to you.",
       "additionalProperties": false,
       "type": "object",
       "properties": {
@@ -120,7 +123,16 @@
       "required": [
         "FieldSelectors"
       ],
-      "markdownDescription": "Advanced event selectors let you create fine-grained selectors for the following AWS CloudTrail event record \ufb01elds. They help you control costs by logging only those events that are important to you.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Advanced event selectors let you create fine-grained selectors for the following AWS CloudTrail event record fields. They help you control costs by logging only those events that are important to you.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SourceEventCategory": {
+      "description": "Event category for an insight selector.",
+      "type": "string",
+      "enum": [
+        "Management",
+        "Data"
+      ],
+      "markdownDescription": "Event category for an insight selector.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Management | Data  \nUpdate requires: No interruption\n"
     },
     "InsightSelector": {
       "description": "A string that contains insight types that are logged on a trail.",
@@ -131,9 +143,51 @@
           "description": "The type of insight to log on a trail.",
           "type": "string",
           "markdownDescription": "The type of insight to log on a trail.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "EventCategories": {
+          "uniqueItems": true,
+          "description": "The categories of events for which to log insights. By default, insights are logged for management events only.",
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SourceEventCategory"
+          },
+          "markdownDescription": "The categories of events for which to log insights. By default, insights are logged for management events only.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         }
       },
       "markdownDescription": "A string that contains insight types that are logged on a trail.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AggregationConfiguration": {
+      "description": "Configure to add aggregation rules to aggregate CloudTrail Events.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "EventCategory": {
+          "description": "The category of events to be aggregated.",
+          "type": "string",
+          "enum": [
+            "Data"
+          ],
+          "markdownDescription": "The category of events to be aggregated.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: Data  \nUpdate requires: No interruption\n"
+        },
+        "Templates": {
+          "minItems": 1,
+          "maxItems": 50,
+          "uniqueItems": true,
+          "description": "Contains all templates in an aggregation configuration.",
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Template"
+          },
+          "markdownDescription": "Contains all templates in an aggregation configuration.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "EventCategory",
+        "Templates"
+      ],
+      "markdownDescription": "Configure to add aggregation rules to aggregate CloudTrail Events.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "EventSelector": {
       "description": "The type of email sending events to publish to the event destination.",
@@ -328,6 +382,16 @@
         "Field"
       ],
       "markdownDescription": "A single selector statement in an advanced event selector.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Template": {
+      "description": "A template used to configure aggregation rules.",
+      "type": "string",
+      "enum": [
+        "API_ACTIVITY",
+        "RESOURCE_ACCESS",
+        "USER_ACTIONS"
+      ],
+      "markdownDescription": "A template used to configure aggregation rules.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: API_ACTIVITY | RESOURCE_ACCESS | USER_ACTIONS  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -351,6 +415,17 @@
       "description": "Specifies the KMS key ID to use to encrypt the logs delivered by CloudTrail. The value can be an alias name prefixed by 'alias/', a fully specified ARN to an alias, a fully specified ARN to a key, or a globally unique identifier.",
       "type": "string",
       "markdownDescription": "Specifies the KMS key ID to use to encrypt the logs delivered by CloudTrail. The value can be an alias name prefixed by 'alias/', a fully specified ARN to an alias, a fully specified ARN to a key, or a globally unique identifier.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "AggregationConfigurations": {
+      "maxItems": 1,
+      "uniqueItems": true,
+      "description": "Specifies the aggregation configuration to aggregate CloudTrail Events. A maximum of 1 aggregation configuration is allowed.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/AggregationConfiguration"
+      },
+      "markdownDescription": "Specifies the aggregation configuration to aggregate CloudTrail Events. A maximum of 1 aggregation configuration is allowed.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     },
     "CloudWatchLogsRoleArn": {
       "description": "Specifies the role for the CloudWatch Logs endpoint to assume to write to a user's log group.",

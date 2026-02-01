@@ -17,19 +17,40 @@
         },
         "Mode": {
           "type": "string",
-          "description": "The default value is `STANDARD`. A value of `STANDARD` means that Slurm accounting is enabled.",
+          "description": "The default value is `NONE`. A value of `STANDARD` means that Slurm accounting is enabled.",
           "default": "NONE",
           "enum": [
             "STANDARD",
             "NONE"
           ],
-          "markdownDescription": "The default value is `STANDARD`. A value of `STANDARD` means that Slurm accounting is enabled.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: STANDARD | NONE  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The default value is `NONE`. A value of `STANDARD` means that Slurm accounting is enabled.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: STANDARD | NONE  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
         "Mode"
       ],
       "markdownDescription": "The accounting configuration includes configurable settings for Slurm accounting.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SlurmRest": {
+      "type": "object",
+      "description": "The SlurmRest configuration includes configurable settings for Slurm Rest.",
+      "properties": {
+        "Mode": {
+          "type": "string",
+          "description": "The default value is `NONE`. A value of `STANDARD` means that Slurm Rest is enabled.",
+          "default": "NONE",
+          "enum": [
+            "STANDARD",
+            "NONE"
+          ],
+          "markdownDescription": "The default value is `NONE`. A value of `STANDARD` means that Slurm Rest is enabled.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: STANDARD | NONE  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Mode"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The SlurmRest configuration includes configurable settings for Slurm Rest.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "AuthKey": {
       "type": "object",
@@ -52,6 +73,39 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "The shared Slurm key for authentication, also known as the cluster secret.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "JwtAuth": {
+      "type": "object",
+      "description": "JWT authentication configuration for Slurm.",
+      "properties": {
+        "JwtKey": {
+          "$ref": "#/definitions/JwtKey"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "JWT authentication configuration for Slurm.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "JwtKey": {
+      "type": "object",
+      "description": "JWT key configuration.",
+      "properties": {
+        "SecretArn": {
+          "type": "string",
+          "description": "The Amazon Resource Name (ARN) of the JWT key secret.",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the JWT key secret.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "SecretVersion": {
+          "type": "string",
+          "description": "The version of the JWT key secret.",
+          "markdownDescription": "The version of the JWT key secret.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "SecretArn",
+        "SecretVersion"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "JWT key configuration.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Endpoint": {
       "type": "object",
@@ -77,9 +131,10 @@
           "description": "Indicates the type of endpoint running at the specific IP address.",
           "enum": [
             "SLURMCTLD",
-            "SLURMDBD"
+            "SLURMDBD",
+            "SLURMRESTD"
           ],
-          "markdownDescription": "Indicates the type of endpoint running at the specific IP address.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: SLURMCTLD | SLURMDBD  \nUpdate requires: No interruption\n"
+          "markdownDescription": "Indicates the type of endpoint running at the specific IP address.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: SLURMCTLD | SLURMDBD | SLURMRESTD  \nUpdate requires: No interruption\n"
         },
         "PublicIpAddress": {
           "type": "string",
@@ -283,8 +338,14 @@
         "Accounting": {
           "$ref": "#/definitions/Accounting"
         },
+        "SlurmRest": {
+          "$ref": "#/definitions/SlurmRest"
+        },
         "AuthKey": {
           "$ref": "#/definitions/AuthKey"
+        },
+        "JwtAuth": {
+          "$ref": "#/definitions/JwtAuth"
         },
         "ScaleDownIdleTimeInSeconds": {
           "type": "integer",
@@ -303,7 +364,7 @@
         }
       },
       "additionalProperties": false,
-      "markdownDescription": "Additional options related to the Slurm scheduler.\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
+      "markdownDescription": "Additional options related to the Slurm scheduler.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Status": {
       "type": "string",
@@ -344,8 +405,7 @@
     "/properties/Name",
     "/properties/Networking",
     "/properties/Scheduler",
-    "/properties/Size",
-    "/properties/SlurmConfiguration"
+    "/properties/Size"
   ],
   "readOnlyProperties": [
     "/properties/Arn",
@@ -381,6 +441,7 @@
     "update": {
       "permissions": [
         "pcs:GetCluster",
+        "pcs:UpdateCluster",
         "pcs:ListTagsForResource",
         "pcs:TagResource",
         "pcs:UntagResource"

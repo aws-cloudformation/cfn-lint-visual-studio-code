@@ -105,6 +105,24 @@
         "Value"
       ],
       "markdownDescription": "An arbitrary set of tags (key-value pairs) to associate with the Kinesis stream.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "WarmThroughputObject": {
+      "description": "Warm throughput configuration details for the stream. Only present for ON_DEMAND streams.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "TargetMiBps": {
+          "description": "Target warm throughput in MiB/s that a customer can write to a stream at any given time",
+          "type": "integer",
+          "markdownDescription": "Target warm throughput in MiB/s that a customer can write to a stream at any given time\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "CurrentMiBps": {
+          "description": "Current warm throughput in MiB/s",
+          "type": "integer",
+          "markdownDescription": "Current warm throughput in MiB/s\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Warm throughput configuration details for the stream. Only present for ON_DEMAND streams.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -157,7 +175,7 @@
       "markdownDescription": "When specified, enables or updates server-side encryption using an AWS KMS key for a specified stream.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
     },
     "Tags": {
-      "description": "An arbitrary set of tags (key\u2013value pairs) to associate with the Kinesis stream.",
+      "description": "An arbitrary set of tags (key-value pairs) to associate with the Kinesis stream.",
       "type": "array",
       "uniqueItems": false,
       "insertionOrder": false,
@@ -165,18 +183,39 @@
       "items": {
         "$ref": "#/definitions/Tag"
       },
-      "markdownDescription": "An arbitrary set of tags (key\u2013value pairs) to associate with the Kinesis stream.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+      "markdownDescription": "An arbitrary set of tags (key-value pairs) to associate with the Kinesis stream.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "MaxRecordSizeInKiB": {
+      "description": "Maximum size of a data record in KiB allowed to be put into Kinesis stream.",
+      "type": "integer",
+      "minimum": 1024,
+      "maximum": 10240,
+      "markdownDescription": "Maximum size of a data record in KiB allowed to be put into Kinesis stream.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    },
+    "WarmThroughputMiBps": {
+      "description": "Target warm throughput in MiB/s for the stream. This property can ONLY be set when StreamMode is ON_DEMAND.",
+      "type": "integer",
+      "markdownDescription": "Target warm throughput in MiB/s for the stream. This property can ONLY be set when StreamMode is ON_DEMAND.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    },
+    "WarmThroughputObject": {
+      "description": "Warm throughput configuration details for the stream. Only present for ON_DEMAND streams.",
+      "$ref": "#/definitions/WarmThroughputObject",
+      "markdownDescription": "Warm throughput configuration details for the stream. Only present for ON_DEMAND streams.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
     }
   },
   "additionalProperties": false,
   "readOnlyProperties": [
-    "/properties/Arn"
+    "/properties/Arn",
+    "/properties/WarmThroughputObject"
   ],
   "createOnlyProperties": [
     "/properties/Name"
   ],
   "primaryIdentifier": [
     "/properties/Name"
+  ],
+  "writeOnlyProperties": [
+    "/properties/WarmThroughputMiBps"
   ],
   "$comment": "Do not set SystemTags to true without implementing a fail-open mechanism. It should not fail when adding systemTags for customers without AddTagsToStream Permission. Cloudformation will automatically add system tags even if customer does not have the AddTagsToStream permission. COE: https://www.coe.a2z.com/coe/236297/content",
   "tagging": {
@@ -204,7 +243,9 @@
         "kinesis:StartStreamEncryption",
         "kinesis:AddTagsToStream",
         "kinesis:ListTagsForStream",
-        "kinesis:ListTagsForResource"
+        "kinesis:ListTagsForResource",
+        "kinesis:UpdateMaxRecordSize",
+        "kinesis:UpdateStreamWarmThroughput"
       ]
     },
     "read": {
@@ -230,7 +271,9 @@
         "kinesis:RemoveTagsFromStream",
         "kinesis:UntagResource",
         "kinesis:ListTagsForStream",
-        "kinesis:ListTagsForResource"
+        "kinesis:ListTagsForResource",
+        "kinesis:UpdateMaxRecordSize",
+        "kinesis:UpdateStreamWarmThroughput"
       ],
       "timeoutInMinutes": 240
     },
@@ -253,6 +296,11 @@
       "description": "The Amazon resource name (ARN) of the Kinesis stream",
       "type": "string",
       "markdownDescription": "The Amazon resource name (ARN) of the Kinesis stream\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "WarmThroughputObject": {
+      "description": "Warm throughput configuration details for the stream. Only present for ON_DEMAND streams.",
+      "$ref": "#/definitions/WarmThroughputObject",
+      "markdownDescription": "Warm throughput configuration details for the stream. Only present for ON_DEMAND streams.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

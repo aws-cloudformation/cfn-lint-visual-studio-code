@@ -4,15 +4,49 @@
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk",
   "definitions": {
     "AssociationData": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "KnowledgeBaseId": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
+            }
+          },
+          "required": [
+            "KnowledgeBaseId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "ExternalBedrockKnowledgeBaseConfig": {
+              "$ref": "#/definitions/ExternalBedrockKnowledgeBaseConfig"
+            }
+          },
+          "required": [
+            "ExternalBedrockKnowledgeBaseConfig"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ExternalBedrockKnowledgeBaseConfig": {
       "type": "object",
       "properties": {
-        "KnowledgeBaseId": {
+        "BedrockKnowledgeBaseArn": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$  \nUpdate requires: No interruption\n"
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:aws(|-cn|-us-gov):bedrock:[a-zA-Z0-9-]*:[0-9]{12}:knowledge-base/[0-9a-zA-Z]+$  \nUpdate requires: No interruption\n"
+        },
+        "AccessRoleArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:aws:iam::[0-9]{12}:role/(?:service-role/)?[a-zA-Z0-9_+=,.@-]{1,64}$  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "KnowledgeBaseId"
+        "BedrockKnowledgeBaseArn",
+        "AccessRoleArn"
       ],
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
@@ -20,9 +54,10 @@
     "AssociationType": {
       "type": "string",
       "enum": [
-        "KNOWLEDGE_BASE"
+        "KNOWLEDGE_BASE",
+        "EXTERNAL_BEDROCK_KNOWLEDGE_BASE"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: KNOWLEDGE_BASE  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: KNOWLEDGE_BASE | EXTERNAL_BEDROCK_KNOWLEDGE_BASE  \nUpdate requires: No interruption\n"
     },
     "Tag": {
       "additionalProperties": false,
@@ -123,7 +158,8 @@
     "create": {
       "permissions": [
         "wisdom:CreateAssistantAssociation",
-        "wisdom:TagResource"
+        "wisdom:TagResource",
+        "iam:PassRole"
       ]
     },
     "update": {

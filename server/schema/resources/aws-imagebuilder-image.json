@@ -15,7 +15,12 @@
     "/properties/Arn",
     "/properties/Name",
     "/properties/ImageId",
-    "/properties/ImageUri"
+    "/properties/ImageUri",
+    "/properties/LatestVersion",
+    "/properties/LatestVersion/Arn",
+    "/properties/LatestVersion/Major",
+    "/properties/LatestVersion/Minor",
+    "/properties/LatestVersion/Patch"
   ],
   "description": "Resource schema for AWS::ImageBuilder::Image",
   "createOnlyProperties": [
@@ -30,6 +35,9 @@
   ],
   "primaryIdentifier": [
     "/properties/Arn"
+  ],
+  "conditionalCreateOnlyProperties": [
+    "/properties/ImagePipelineExecutionSettings"
   ],
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-imagebuilder",
   "oneOf": [
@@ -48,11 +56,6 @@
     {
       "required": [
         "ImagePipelineExecutionSettings"
-      ]
-    },
-    {
-      "required": [
-        "ImportDiskImageSettings"
       ]
     }
   ],
@@ -107,8 +110,25 @@
       ]
     }
   },
+  "writeOnlyProperties": [
+    "/properties/DeletionSettings",
+    "/properties/ImagePipelineExecutionSettings"
+  ],
   "additionalProperties": false,
   "definitions": {
+    "ImageLoggingConfiguration": {
+      "description": "The logging configuration settings for the image.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "LogGroupName": {
+          "description": "The name of the log group for image build logs.",
+          "type": "string",
+          "markdownDescription": "The name of the log group for image build logs.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "The logging configuration settings for the image.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "ImageScanningConfiguration": {
       "description": "Contains settings for Image Builder image resource and container image scans.",
       "additionalProperties": false,
@@ -186,6 +206,34 @@
       },
       "markdownDescription": "Settings for Image Builder to configure the ECR repository and output container images that are scanned.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "LatestVersion": {
+      "description": "The latest version references of the image.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Major": {
+          "description": "The latest version ARN of the created image, with the same major version.",
+          "type": "string",
+          "markdownDescription": "The latest version ARN of the created image, with the same major version.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Minor": {
+          "description": "The latest version ARN of the created image, with the same minor version.",
+          "type": "string",
+          "markdownDescription": "The latest version ARN of the created image, with the same minor version.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Arn": {
+          "description": "The latest version ARN of the created image.",
+          "type": "string",
+          "markdownDescription": "The latest version ARN of the created image.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Patch": {
+          "description": "The latest version ARN of the created image, with the same patch version.",
+          "type": "string",
+          "markdownDescription": "The latest version ARN of the created image, with the same patch version.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "The latest version references of the image.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
     "WorkflowParameterValue": {
       "description": "The value associated with the workflow parameter",
       "type": "string",
@@ -229,6 +277,22 @@
       },
       "markdownDescription": "The image tests configuration used when creating this image.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "DeletionSettings": {
+      "description": "The deletion settings of the image, indicating whether to delete the underlying resources in addition to the image.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ExecutionRole": {
+          "description": "The execution role to use for deleting the image, as well as underlying resources.",
+          "type": "string",
+          "markdownDescription": "The execution role to use for deleting the image, as well as underlying resources.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ExecutionRole"
+      ],
+      "markdownDescription": "The deletion settings of the image, indicating whether to delete the underlying resources in addition to the image.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "WorkflowParameter": {
       "description": "A parameter associated with the workflow",
       "additionalProperties": false,
@@ -270,6 +334,67 @@
       },
       "markdownDescription": "Workflows to define the image build process\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement\n"
     },
+    "ImagePipelineExecutionSettings": {
+      "description": "The image pipeline execution settings of the image.",
+      "$ref": "#/definitions/ImagePipelineExecutionSettings",
+      "dependencies": {
+        "ImagePipelineExecutionSettings": {
+          "oneOf": [
+            {
+              "required": [
+                "ImageRecipeArn"
+              ]
+            },
+            {
+              "required": [
+                "ContainerRecipeArn"
+              ]
+            },
+            {
+              "required": [
+                "InfrastructureConfigurationArn"
+              ]
+            },
+            {
+              "required": [
+                "Workflows"
+              ]
+            },
+            {
+              "required": [
+                "DistributionConfigurationArn"
+              ]
+            },
+            {
+              "required": [
+                "ImageTestsConfiguration"
+              ]
+            },
+            {
+              "required": [
+                "ImageScanningConfiguration"
+              ]
+            },
+            {
+              "required": [
+                "EnhancedImageMetadataEnabled"
+              ]
+            },
+            {
+              "required": [
+                "ImportDiskImageSettings"
+              ]
+            }
+          ]
+        }
+      },
+      "markdownDescription": "The image pipeline execution settings of the image.\n\n---\n\nRequired: Conditional  \nType:   \nUpdate requires: Some interruptions\n"
+    },
+    "DeletionSettings": {
+      "description": "The deletion settings of the image, indicating whether to delete the underlying resources in addition to the image.",
+      "$ref": "#/definitions/DeletionSettings",
+      "markdownDescription": "The deletion settings of the image, indicating whether to delete the underlying resources in addition to the image.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
     "ImageUri": {
       "description": "URI for containers created in current Region with default ECR image tag",
       "type": "string",
@@ -294,6 +419,16 @@
       "description": "The Amazon Resource Name (ARN) of the distribution configuration.",
       "type": "string",
       "markdownDescription": "The Amazon Resource Name (ARN) of the distribution configuration.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "LatestVersion": {
+      "description": "The latest version references of the image.",
+      "$ref": "#/definitions/LatestVersion",
+      "markdownDescription": "The latest version references of the image.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "LoggingConfiguration": {
+      "description": "The logging configuration settings for the image.",
+      "$ref": "#/definitions/ImageLoggingConfiguration",
+      "markdownDescription": "The logging configuration settings for the image.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
     },
     "ImageId": {
       "description": "The AMI ID of the EC2 AMI in current region.",
@@ -343,6 +478,11 @@
       "description": "The name of the image.",
       "type": "string",
       "markdownDescription": "The name of the image.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "LatestVersion": {
+      "description": "The latest version references of the image.",
+      "$ref": "#/definitions/LatestVersion",
+      "markdownDescription": "The latest version references of the image.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "ImageId": {
       "description": "The AMI ID of the EC2 AMI in current region.",

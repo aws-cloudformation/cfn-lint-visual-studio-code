@@ -30,6 +30,14 @@
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws|aws-us-gov|aws-cn):kms:.*:[0-9]+:.*$  \nUpdate requires: No interruption\n"
     },
+    "CustomerProfilesDomainArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws|aws-us-gov|aws-cn):profile:[a-z]{2}-[a-z]{1,10}-[0-9]:[0-9]{12}:(domains/[a-zA-Z_0-9-]{1,255})$  \nUpdate requires: No interruption\n"
+    },
+    "CustomerProfilesObjectTypeArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws|aws-us-gov|aws-cn):profile:[a-z]{2}-[a-z]{1,10}-[0-9]:[0-9]{12}:(domains/[a-zA-Z_0-9-]{1,255}/object-types/[a-zA-Z_0-9-]{1,255})$  \nUpdate requires: No interruption\n"
+    },
     "MatchingWorkflowArn": {
       "description": "The default MatchingWorkflow arn",
       "type": "string",
@@ -76,7 +84,7 @@
         "OutputS3Path": {
           "description": "The S3 path to which Entity Resolution will write the output table",
           "type": "string",
-          "markdownDescription": "The S3 path to which Entity Resolution will write the output table\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^s3://([^/]+)/?(.*?([^/]+)/?)$  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The S3 path to which Entity Resolution will write the output table\n\n---\n\nRequired: No  \nType: String  \nPattern: ^s3://([^/]+)/?(.*?([^/]+)/?)$  \nUpdate requires: No interruption\n"
         },
         "Output": {
           "type": "array",
@@ -94,11 +102,13 @@
         "ApplyNormalization": {
           "type": "boolean",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "CustomerProfilesIntegrationConfig": {
+          "$ref": "#/definitions/CustomerProfilesIntegrationConfig"
         }
       },
       "required": [
-        "Output",
-        "OutputS3Path"
+        "Output"
       ],
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
@@ -172,7 +182,7 @@
           "type": "array",
           "insertionOrder": false,
           "minItems": 1,
-          "maxItems": 15,
+          "maxItems": 25,
           "items": {
             "$ref": "#/definitions/Rule"
           },
@@ -209,7 +219,7 @@
           "type": "array",
           "insertionOrder": false,
           "minItems": 1,
-          "maxItems": 15,
+          "maxItems": 25,
           "items": {
             "$ref": "#/definitions/RuleCondition"
           },
@@ -304,6 +314,23 @@
       },
       "required": [
         "IntermediateS3Path"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CustomerProfilesIntegrationConfig": {
+      "type": "object",
+      "properties": {
+        "DomainArn": {
+          "$ref": "#/definitions/CustomerProfilesDomainArn"
+        },
+        "ObjectTypeArn": {
+          "$ref": "#/definitions/CustomerProfilesObjectTypeArn"
+        }
+      },
+      "required": [
+        "DomainArn",
+        "ObjectTypeArn"
       ],
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
@@ -432,7 +459,8 @@
         "events:PutRule",
         "events:DeleteRule",
         "events:PutTargets",
-        "events:ListTargetsByRule"
+        "events:ListTargetsByRule",
+        "profile:PutIntegration"
       ]
     },
     "read": {
@@ -450,7 +478,8 @@
         "events:DeleteRule",
         "events:PutTargets",
         "events:RemoveTargets",
-        "events:ListTargetsByRule"
+        "events:ListTargetsByRule",
+        "profile:DeleteIntegration"
       ]
     },
     "list": {
