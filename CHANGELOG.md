@@ -1,6 +1,44 @@
 # Change Log
 All notable changes to the "vscode-cfn-lint" extension will be documented in this file.
 
+## 0.27.0
+## What's Changed
+* Bump glob from 11.0.2 to 11.0.3 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/477
+* Bump brace-expansion from 2.0.1 to 2.0.2 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/474
+* Bump @types/lodash from 4.17.17 to 4.17.19 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/478
+* Bump @types/vscode from 1.100.0 to 1.101.0 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/475
+* Bump mocha from 11.6.0 to 11.7.1 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/476
+* Bump yaml-language-server from 1.18.0 to 1.19.1 in /server by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/491
+* Bump actions/setup-python from 5 to 6 by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/490
+* Bump actions/setup-node from 4 to 5 by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/489
+* Bump mocha from 11.7.1 to 11.7.3 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/487
+* Bump form-data from 4.0.2 to 4.0.4 in /server by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/480
+* Bump @types/vscode from 1.101.0 to 1.104.0 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/488
+* Bump actions/checkout from 4 to 5 by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/483
+* CloudFormation Template Schema upgrade by @github-actions in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/473
+* Update GitHub Actions permissions by @kddejong in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/511
+* fix: run cfn-lint without a shell to prevent command injection by @kddejong in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/515
+* Bump peter-evans/create-pull-request from 7 to 8 by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/509
+* Bump lodash from 4.17.21 to 4.17.23 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/510
+* Bump fast-uri from 3.0.6 to 3.1.3 in /server by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/521
+* Bump form-data from 4.0.4 to 4.0.6 in /server by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/520
+* Bump js-yaml from 4.1.0 to 4.3.0 by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/518
+* Bump js-yaml from 4.1.0 to 4.3.0 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/519
+* Bump actions/checkout from 5 to 7 by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/505
+* fix: treat backslash as a literal char in tokenizeCommand so Windows paths work by @kddejong in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/522
+* Bump flatted from 3.3.3 to 3.4.2 by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/524
+* Bump lodash from 4.17.23 to 4.18.1 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/516
+* Bump minimatch from 3.1.2 to 3.1.5 by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/526
+* Bump actions/setup-node from 5 to 6 by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/498
+* CloudFormation Template Schema upgrade by @github-actions in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/492
+* Bump mocha from 11.7.3 to 11.7.6 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/506
+* Bump @types/lodash from 4.17.20 to 4.17.24 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/507
+* Bump @types/vscode from 1.104.0 to 1.125.0 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/508
+* Bump semver from 7.7.2 to 7.8.5 in /server by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/500
+* Bump glob from 11.0.3 to 12.0.0 in /client by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/527
+
+**Full Changelog**: https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/compare/v0.26.6...v0.27.0
+
 ## 0.26.6
 ## What's Changed
 * Bump yaml-language-server from 1.17.0 to 1.18.0 in /server by @dependabot in https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/pull/466
