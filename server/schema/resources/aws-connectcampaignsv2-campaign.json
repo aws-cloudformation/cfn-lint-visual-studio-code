@@ -10,6 +10,15 @@
       "description": "Campaign name",
       "markdownDescription": "Campaign name\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 127  \nUpdate requires: No interruption\n"
     },
+    "CampaignType": {
+      "type": "string",
+      "enum": [
+        "MANAGED",
+        "JOURNEY"
+      ],
+      "description": "Campaign type",
+      "markdownDescription": "Campaign type\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MANAGED | JOURNEY  \nUpdate requires: No interruption\n"
+    },
     "InstanceId": {
       "type": "string",
       "maxLength": 256,
@@ -23,6 +32,20 @@
       "minimum": 0.01,
       "description": "Allocates outbound capacity for the specific channel of this campaign between multiple active campaigns",
       "markdownDescription": "Allocates outbound capacity for the specific channel of this campaign between multiple active campaigns\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+    },
+    "TimeoutDuration": {
+      "type": "integer",
+      "maximum": 300,
+      "minimum": 1,
+      "description": "Timeout duration for a preview contact in seconds",
+      "markdownDescription": "Timeout duration for a preview contact in seconds\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    },
+    "RingTimeout": {
+      "type": "integer",
+      "maximum": 60,
+      "minimum": 15,
+      "description": "Maximum ring time for outbound calls in seconds",
+      "markdownDescription": "Maximum ring time for outbound calls in seconds\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
     },
     "QueueId": {
       "type": "string",
@@ -58,10 +81,10 @@
     },
     "SourceEmailAddressDisplayName": {
       "type": "string",
-      "maxLength": 127,
-      "minLength": 1,
+      "maxLength": 256,
+      "minLength": 0,
       "description": "The name of the source email address display name",
-      "markdownDescription": "The name of the source email address display name\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 127  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The name of the source email address display name\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
     },
     "BandwidthAllocation": {
       "type": "number",
@@ -86,7 +109,7 @@
       "description": "Time duration in ISO 8601 format",
       "maxLength": 50,
       "minLength": 0,
-      "markdownDescription": "Time duration in ISO 8601 format\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 50  \nPattern: ^[a-zA-Z0-9.]*$  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Time duration in ISO 8601 format\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 50  \nPattern: ^P(?:([-+]?[0-9]+)D)?(T(?:([-+]?[0-9]+)H)?(?:([-+]?[0-9]+)M)?(?:([-+]?[0-9]+)(?:[.,]([0-9]{0,9}))?S)?)?$  \nUpdate requires: No interruption\n"
     },
     "Iso8601Date": {
       "type": "string",
@@ -111,6 +134,33 @@
         "SUNDAY"
       ],
       "markdownDescription": "Day of week\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MONDAY | TUESDAY | WEDNESDAY | THURSDAY | FRIDAY | SATURDAY | SUNDAY  \nUpdate requires: No interruption\n"
+    },
+    "AgentAction": {
+      "type": "string",
+      "description": "Actions that can performed on a contact by an agent",
+      "enum": [
+        "DISCARD"
+      ],
+      "markdownDescription": "Actions that can performed on a contact by an agent\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DISCARD  \nUpdate requires: No interruption\n"
+    },
+    "AgentActions": {
+      "type": "array",
+      "insertionOrder": false,
+      "description": "Actions that can be performed by agent during preview phase",
+      "items": {
+        "$ref": "#/definitions/AgentAction"
+      },
+      "markdownDescription": "Actions that can be performed by agent during preview phase\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "TimeoutConfig": {
+      "type": "object",
+      "description": "Timeout Config for preview contacts",
+      "properties": {
+        "DurationInSeconds": {
+          "$ref": "#/definitions/TimeoutDuration"
+        }
+      },
+      "markdownDescription": "Timeout Config for preview contacts\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "PredictiveConfig": {
       "type": "object",
@@ -147,6 +197,27 @@
       "additionalProperties": false,
       "markdownDescription": "Agentless config\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "PreviewConfig": {
+      "type": "object",
+      "description": "Preview config",
+      "properties": {
+        "BandwidthAllocation": {
+          "$ref": "#/definitions/BandwidthAllocation"
+        },
+        "TimeoutConfig": {
+          "$ref": "#/definitions/TimeoutConfig"
+        },
+        "AgentActions": {
+          "$ref": "#/definitions/AgentActions"
+        }
+      },
+      "required": [
+        "BandwidthAllocation",
+        "TimeoutConfig"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Preview config\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "TelephonyOutboundMode": {
       "type": "object",
       "description": "Telephony Outbound Mode",
@@ -159,6 +230,9 @@
         },
         "AgentlessConfig": {
           "$ref": "#/definitions/AgentlessConfig"
+        },
+        "PreviewConfig": {
+          "$ref": "#/definitions/PreviewConfig"
         }
       },
       "oneOf": [
@@ -175,6 +249,11 @@
         {
           "required": [
             "AgentlessConfig"
+          ]
+        },
+        {
+          "required": [
+            "PreviewConfig"
           ]
         }
       ],
@@ -214,6 +293,9 @@
         },
         "AnswerMachineDetectionConfig": {
           "$ref": "#/definitions/AnswerMachineDetectionConfig"
+        },
+        "RingTimeout": {
+          "$ref": "#/definitions/RingTimeout"
         }
       },
       "required": [
@@ -309,7 +391,7 @@
     },
     "EmailOutboundConfig": {
       "type": "object",
-      "description": "Default SMS outbound config",
+      "description": "Default Email outbound config",
       "properties": {
         "ConnectSourceEmailAddress": {
           "$ref": "#/definitions/EmailAddress"
@@ -326,7 +408,7 @@
         "WisdomTemplateArn"
       ],
       "additionalProperties": false,
-      "markdownDescription": "Default SMS outbound config\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Default Email outbound config\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "EmailChannelSubtypeConfig": {
       "type": "object",
@@ -349,6 +431,56 @@
       "additionalProperties": false,
       "markdownDescription": "Email Channel Subtype config\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "WhatsAppOutboundMode": {
+      "type": "object",
+      "description": "WhatsApp Outbound Mode",
+      "properties": {
+        "AgentlessConfig": {
+          "$ref": "#/definitions/AgentlessConfig"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "WhatsApp Outbound Mode\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "WhatsAppOutboundConfig": {
+      "type": "object",
+      "description": "Default WhatsApp outbound config",
+      "properties": {
+        "ConnectSourcePhoneNumberArn": {
+          "$ref": "#/definitions/Arn"
+        },
+        "WisdomTemplateArn": {
+          "$ref": "#/definitions/Arn"
+        }
+      },
+      "required": [
+        "ConnectSourcePhoneNumberArn",
+        "WisdomTemplateArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Default WhatsApp outbound config\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "WhatsAppChannelSubtypeConfig": {
+      "type": "object",
+      "description": "WhatsApp Channel Subtype config",
+      "properties": {
+        "Capacity": {
+          "$ref": "#/definitions/Capacity"
+        },
+        "OutboundMode": {
+          "$ref": "#/definitions/WhatsAppOutboundMode"
+        },
+        "DefaultOutboundConfig": {
+          "$ref": "#/definitions/WhatsAppOutboundConfig"
+        }
+      },
+      "required": [
+        "OutboundMode",
+        "DefaultOutboundConfig"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "WhatsApp Channel Subtype config\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "ChannelSubtypeConfig": {
       "type": "object",
       "description": "The possible types of channel subtype config parameters",
@@ -361,6 +493,9 @@
         },
         "Email": {
           "$ref": "#/definitions/EmailChannelSubtypeConfig"
+        },
+        "WhatsApp": {
+          "$ref": "#/definitions/WhatsAppChannelSubtypeConfig"
         }
       },
       "anyOf": [
@@ -377,6 +512,11 @@
         {
           "required": [
             "Email"
+          ]
+        },
+        {
+          "required": [
+            "WhatsApp"
           ]
         }
       ],
@@ -583,6 +723,15 @@
       ],
       "markdownDescription": "Local TimeZone Detection method\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ZIP_CODE | AREA_CODE  \nUpdate requires: No interruption\n"
     },
+    "LocalTimeZoneDetectionScope": {
+      "type": "string",
+      "description": "Local TimeZone Detection scope",
+      "enum": [
+        "PRIMARY_ONLY",
+        "ALL_AVAILABLE"
+      ],
+      "markdownDescription": "Local TimeZone Detection scope\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PRIMARY_ONLY | ALL_AVAILABLE  \nUpdate requires: No interruption\n"
+    },
     "LocalTimeZoneDetection": {
       "type": "array",
       "description": "Local TimeZone Detection method list",
@@ -601,6 +750,9 @@
         },
         "LocalTimeZoneDetection": {
           "$ref": "#/definitions/LocalTimeZoneDetection"
+        },
+        "LocalTimeZoneDetectionScope": {
+          "$ref": "#/definitions/LocalTimeZoneDetectionScope"
         }
       },
       "additionalProperties": false,
@@ -620,6 +772,9 @@
           "$ref": "#/definitions/TimeWindow"
         },
         "Email": {
+          "$ref": "#/definitions/TimeWindow"
+        },
+        "WhatsApp": {
           "$ref": "#/definitions/TimeWindow"
         }
       },
@@ -726,6 +881,29 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EntryLimitsConfig": {
+      "type": "object",
+      "description": "Entry limits config for a campaign",
+      "properties": {
+        "MaxEntryCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Maximum number of entries per participant. 0 indicates unlimited entries.",
+          "markdownDescription": "Maximum number of entries per participant. 0 indicates unlimited entries.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "MinEntryInterval": {
+          "$ref": "#/definitions/Iso8601Duration",
+          "description": "Minimum time interval between entries for the same participant in ISO 8601 duration format",
+          "markdownDescription": "Minimum time interval between entries for the same participant in ISO 8601 duration format\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "MaxEntryCount",
+        "MinEntryInterval"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Entry limits config for a campaign\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -738,6 +916,9 @@
     },
     "Name": {
       "$ref": "#/definitions/CampaignName"
+    },
+    "Type": {
+      "$ref": "#/definitions/CampaignType"
     },
     "ConnectInstanceId": {
       "$ref": "#/definitions/InstanceId"
@@ -760,6 +941,9 @@
     "CommunicationLimitsOverride": {
       "$ref": "#/definitions/CommunicationLimitsConfig"
     },
+    "EntryLimitsConfig": {
+      "$ref": "#/definitions/EntryLimitsConfig"
+    },
     "Tags": {
       "type": "array",
       "maxItems": 50,
@@ -776,7 +960,7 @@
     "taggable": true,
     "tagOnCreate": true,
     "tagUpdatable": true,
-    "cloudFormationSystemTags": false,
+    "cloudFormationSystemTags": true,
     "tagProperty": "/properties/Tags",
     "permissions": [
       "connect-campaigns:UntagResource",
@@ -785,8 +969,7 @@
   },
   "required": [
     "Name",
-    "ConnectInstanceId",
-    "ChannelSubtypeConfig"
+    "ConnectInstanceId"
   ],
   "readOnlyProperties": [
     "/properties/Arn"
@@ -822,7 +1005,8 @@
         "connect-campaigns:DeleteCampaign",
         "connect-campaigns:DeleteCampaignChannelSubtypeConfig",
         "connect-campaigns:DeleteCampaignCommunicationLimits",
-        "connect-campaigns:DeleteCampaignCommunicationTime"
+        "connect-campaigns:DeleteCampaignCommunicationTime",
+        "connect-campaigns:DeleteCampaignEntryLimits"
       ]
     },
     "list": {
@@ -845,9 +1029,11 @@
         "connect-campaigns:DeleteCampaignChannelSubtypeConfig",
         "connect-campaigns:DeleteCampaignCommunicationLimits",
         "connect-campaigns:DeleteCampaignCommunicationTime",
+        "connect-campaigns:DeleteCampaignEntryLimits",
         "connect-campaigns:UpdateCampaignChannelSubtypeConfig",
         "connect-campaigns:UpdateCampaignCommunicationLimits",
         "connect-campaigns:UpdateCampaignCommunicationTime",
+        "connect-campaigns:UpdateCampaignEntryLimits",
         "connect-campaigns:UpdateCampaignName",
         "connect-campaigns:UpdateCampaignFlowAssociation",
         "connect-campaigns:UpdateCampaignSchedule",

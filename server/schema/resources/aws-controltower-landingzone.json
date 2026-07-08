@@ -1,23 +1,123 @@
 {
+  "typeName": "AWS::ControlTower::LandingZone",
+  "description": "Definition of AWS::ControlTower::LandingZone Resource Type",
+  "definitions": {
+    "LandingZoneDriftStatus": {
+      "type": "string",
+      "enum": [
+        "DRIFTED",
+        "IN_SYNC"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DRIFTED | IN_SYNC  \nUpdate requires: No interruption\n"
+    },
+    "LandingZoneStatus": {
+      "type": "string",
+      "enum": [
+        "ACTIVE",
+        "PROCESSING",
+        "FAILED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ACTIVE | PROCESSING | FAILED  \nUpdate requires: No interruption\n"
+    },
+    "RemediationTypes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "INHERITANCE_DRIFT"
+        ],
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: INHERITANCE_DRIFT  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 0,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "LandingZoneIdentifier": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Arn": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 20,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:aws[0-9a-zA-Z_\\-:\\/]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Status": {
+      "$ref": "#/definitions/LandingZoneStatus"
+    },
+    "LatestAvailableVersion": {
+      "type": "string",
+      "maxLength": 10,
+      "minLength": 3,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 10  \nPattern: \\d+.\\d+  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "DriftStatus": {
+      "$ref": "#/definitions/LandingZoneDriftStatus"
+    },
+    "Manifest": {},
+    "Version": {
+      "type": "string",
+      "maxLength": 10,
+      "minLength": 3,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 3  \nMaximum Length: 10  \nPattern: \\d+.\\d+  \nUpdate requires: No interruption\n"
+    },
+    "RemediationTypes": {
+      "$ref": "#/definitions/RemediationTypes"
+    },
+    "Tags": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "required": [
+    "Manifest",
+    "Version"
+  ],
+  "readOnlyProperties": [
+    "/properties/LandingZoneIdentifier",
+    "/properties/Arn",
+    "/properties/Status",
+    "/properties/LatestAvailableVersion",
+    "/properties/DriftStatus"
+  ],
+  "primaryIdentifier": [
+    "/properties/LandingZoneIdentifier"
+  ],
   "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
     "permissions": [
       "controltower:UntagResource",
       "controltower:TagResource",
       "controltower:ListTagsForResource"
-    ],
-    "taggable": true,
-    "tagOnCreate": true,
-    "tagUpdatable": true,
-    "tagProperty": "/properties/Tags",
-    "cloudFormationSystemTags": true
+    ]
   },
   "handlers": {
-    "read": {
-      "permissions": [
-        "controltower:GetLandingZone",
-        "controltower:ListTagsForResource"
-      ]
-    },
     "create": {
       "permissions": [
         "controltower:CreateLandingZone",
@@ -53,6 +153,12 @@
         "iam:CreateServiceLinkedRole",
         "cloudformation:EnableOrganizationsAccess",
         "sso:RegisterRegion"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "controltower:GetLandingZone",
+        "controltower:ListTagsForResource"
       ]
     },
     "update": {
@@ -93,11 +199,6 @@
         "sso:RegisterRegion"
       ]
     },
-    "list": {
-      "permissions": [
-        "controltower:ListLandingZones"
-      ]
-    },
     "delete": {
       "permissions": [
         "controltower:DeleteLandingZone",
@@ -125,123 +226,36 @@
         "cloudformation:EnableOrganizationsAccess",
         "iam:DeleteRole"
       ]
+    },
+    "list": {
+      "permissions": [
+        "controltower:ListLandingZones"
+      ]
     }
   },
-  "typeName": "AWS::ControlTower::LandingZone",
-  "readOnlyProperties": [
-    "/properties/LandingZoneIdentifier",
-    "/properties/Arn",
-    "/properties/Status",
-    "/properties/LatestAvailableVersion",
-    "/properties/DriftStatus"
-  ],
-  "description": "Definition of AWS::ControlTower::LandingZone Resource Type",
   "additionalProperties": false,
-  "primaryIdentifier": [
-    "/properties/LandingZoneIdentifier"
-  ],
-  "definitions": {
-    "Tag": {
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Value": {
-          "minLength": 0,
-          "type": "string",
-          "maxLength": 256,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
-        },
-        "Key": {
-          "minLength": 1,
-          "type": "string",
-          "maxLength": 256,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "LandingZoneStatus": {
-      "type": "string",
-      "enum": [
-        "ACTIVE",
-        "PROCESSING",
-        "FAILED"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ACTIVE | PROCESSING | FAILED  \nUpdate requires: No interruption\n"
-    },
-    "LandingZoneDriftStatus": {
-      "type": "string",
-      "enum": [
-        "DRIFTED",
-        "IN_SYNC"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DRIFTED | IN_SYNC  \nUpdate requires: No interruption\n"
-    }
-  },
-  "properties": {
-    "Status": {
-      "$ref": "#/definitions/LandingZoneStatus"
-    },
-    "LatestAvailableVersion": {
-      "minLength": 3,
-      "type": "string",
-      "maxLength": 10,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 10  \nPattern: \\d+.\\d+  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "Version": {
-      "minLength": 3,
-      "type": "string",
-      "maxLength": 10,
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 3  \nMaximum Length: 10  \nPattern: \\d+.\\d+  \nUpdate requires: No interruption\n"
-    },
-    "DriftStatus": {
-      "$ref": "#/definitions/LandingZoneDriftStatus"
-    },
-    "Arn": {
-      "minLength": 20,
-      "type": "string",
-      "maxLength": 2048,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:aws[0-9a-zA-Z_\\-:\\/]+$  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "Manifest": {},
-    "LandingZoneIdentifier": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "Tags": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/Tag"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-    }
-  },
-  "required": [
-    "Manifest",
-    "Version"
-  ],
   "attributes": {
+    "LandingZoneIdentifier": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Arn": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 20,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:aws[0-9a-zA-Z_\\-:\\/]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
     "Status": {
       "$ref": "#/definitions/LandingZoneStatus"
     },
     "LatestAvailableVersion": {
-      "minLength": 3,
       "type": "string",
       "maxLength": 10,
+      "minLength": 3,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 10  \nPattern: \\d+.\\d+  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "DriftStatus": {
       "$ref": "#/definitions/LandingZoneDriftStatus"
-    },
-    "Arn": {
-      "minLength": 20,
-      "type": "string",
-      "maxLength": 2048,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:aws[0-9a-zA-Z_\\-:\\/]+$  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "LandingZoneIdentifier": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

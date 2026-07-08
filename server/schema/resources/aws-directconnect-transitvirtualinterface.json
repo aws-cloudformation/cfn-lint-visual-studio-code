@@ -1,0 +1,282 @@
+{
+  "tagging": {
+    "permissions": [
+      "directconnect:TagResource",
+      "directconnect:UntagResource"
+    ],
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "tagProperty": "/properties/Tags",
+    "cloudFormationSystemTags": true
+  },
+  "typeName": "AWS::DirectConnect::TransitVirtualInterface",
+  "readOnlyProperties": [
+    "/properties/BgpPeers/*/BgpPeerId",
+    "/properties/VirtualInterfaceArn",
+    "/properties/VirtualInterfaceId"
+  ],
+  "description": "Resource Type definition for AWS::DirectConnect::TransitVirtualInterface",
+  "createOnlyProperties": [
+    "/properties/AllocateTransitVirtualInterfaceRoleArn",
+    "/properties/DirectConnectGatewayId",
+    "/properties/Vlan"
+  ],
+  "primaryIdentifier": [
+    "/properties/VirtualInterfaceArn"
+  ],
+  "required": [
+    "BgpPeers",
+    "ConnectionId",
+    "DirectConnectGatewayId",
+    "VirtualInterfaceName",
+    "Vlan"
+  ],
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "propertyTransform": {
+    "/properties/DirectConnectGatewayId": "$substringAfter(DirectConnectGatewayId, \"/\")",
+    "/properties/ConnectionId": "$lowercase($substringAfter(ConnectionId, \"/\"))"
+  },
+  "handlers": {
+    "read": {
+      "permissions": [
+        "directconnect:DescribeVirtualInterfaces"
+      ]
+    },
+    "create": {
+      "permissions": [
+        "directconnect:CreateTransitVirtualInterface",
+        "directconnect:ConfirmTransitVirtualInterface",
+        "directconnect:DescribeVirtualInterfaces",
+        "directconnect:CreateBGPPeer",
+        "directconnect:TagResource",
+        "sts:AssumeRole"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "directconnect:UpdateVirtualInterfaceAttributes",
+        "directconnect:AssociateVirtualInterface",
+        "directconnect:DescribeVirtualInterfaces",
+        "directconnect:CreateBGPPeer",
+        "directconnect:DeleteBGPPeer",
+        "directconnect:TagResource",
+        "directconnect:UntagResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "directconnect:DescribeVirtualInterfaces"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "directconnect:DeleteVirtualInterface",
+        "directconnect:DescribeVirtualInterfaces"
+      ]
+    }
+  },
+  "writeOnlyProperties": [
+    "/properties/AllocateTransitVirtualInterfaceRoleArn"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/VirtualInterfaceId"
+    ]
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "BgpPeer": {
+      "description": "A key-value pair to associate with a resource.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "BgpPeerId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^dxpeer-[a-z0-9]{8}$  \nUpdate requires: No interruption\n"
+        },
+        "AuthKey": {
+          "description": "The authentication key for BGP configuration. This string has a minimum length of 6 characters and and a maximum length of 80 characters.",
+          "type": "string",
+          "markdownDescription": "The authentication key for BGP configuration. This string has a minimum length of 6 characters and and a maximum length of 80 characters.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[A-Za-z0-9\\\\!\"#$%&'()*+,\\-./:;<=>?@\\[\\]\\^_`{|}~]{6,80}$  \nUpdate requires: No interruption\n"
+        },
+        "AddressFamily": {
+          "description": "The address family for the BGP peer.",
+          "type": "string",
+          "markdownDescription": "The address family for the BGP peer.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^(ipv4)|(ipv6)$  \nUpdate requires: No interruption\n"
+        },
+        "AmazonAddress": {
+          "description": "The IP address assigned to the Amazon interface.",
+          "type": "string",
+          "markdownDescription": "The IP address assigned to the Amazon interface.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[0-9a-fA-F:.]+/[0-9]+$  \nUpdate requires: No interruption\n"
+        },
+        "Asn": {
+          "description": "The autonomous system (AS) number for Border Gateway Protocol (BGP) configuration.",
+          "type": "string",
+          "markdownDescription": "The autonomous system (AS) number for Border Gateway Protocol (BGP) configuration.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[1-9][0-9]*$  \nUpdate requires: No interruption\n"
+        },
+        "CustomerAddress": {
+          "description": "The IP address assigned to the customer interface.",
+          "type": "string",
+          "markdownDescription": "The IP address assigned to the customer interface.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[0-9a-fA-F:.]+/[0-9]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "AddressFamily",
+        "Asn"
+      ],
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "minLength": 0,
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "type": "string",
+          "maxLength": 256,
+          "markdownDescription": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        },
+        "Key": {
+          "minLength": 1,
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "type": "string",
+          "maxLength": 128,
+          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "replacementStrategy": "delete_then_create",
+  "properties": {
+    "BgpPeers": {
+      "minItems": 1,
+      "maxItems": 2,
+      "uniqueItems": true,
+      "description": "The BGP peers configured on this virtual interface..",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/BgpPeer"
+      },
+      "markdownDescription": "The BGP peers configured on this virtual interface..\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "ConnectionId": {
+      "description": "The ID or ARN of the connection or LAG.",
+      "anyOf": [
+        {
+          "relationshipRef": {
+            "typeName": "AWS::DirectConnect::Connection",
+            "propertyPath": "/properties/ConnectionId"
+          }
+        },
+        {
+          "relationshipRef": {
+            "typeName": "AWS::DirectConnect::Connection",
+            "propertyPath": "/properties/ConnectionArn"
+          }
+        },
+        {
+          "relationshipRef": {
+            "typeName": "AWS::DirectConnect::Lag",
+            "propertyPath": "/properties/LagId"
+          }
+        },
+        {
+          "relationshipRef": {
+            "typeName": "AWS::DirectConnect::Lag",
+            "propertyPath": "/properties/LagArn"
+          }
+        }
+      ],
+      "type": "string",
+      "markdownDescription": "The ID or ARN of the connection or LAG.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^((arn:aws[a-z-]*:directconnect:[a-z0-9-]+:[0-9]{12}:(dxcon/dxcon|dxlag/dxlag))|dx(con|lag))-[a-z0-9A-Z]{8,21}$  \nUpdate requires: No interruption\n"
+    },
+    "DirectConnectGatewayId": {
+      "description": "The ID or ARN of the Direct Connect gateway.",
+      "anyOf": [
+        {
+          "relationshipRef": {
+            "typeName": "AWS::DirectConnect::DirectConnectGateway",
+            "propertyPath": "/properties/DirectConnectGatewayId"
+          }
+        },
+        {
+          "relationshipRef": {
+            "typeName": "AWS::DirectConnect::DirectConnectGateway",
+            "propertyPath": "/properties/DirectConnectGatewayArn"
+          }
+        }
+      ],
+      "type": "string",
+      "markdownDescription": "The ID or ARN of the Direct Connect gateway.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^(arn:aws[a-z-]*:directconnect::[0-9]{12}:dx-gateway/)?[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$  \nUpdate requires: Replacement\n"
+    },
+    "EnableSiteLink": {
+      "description": "Indicates whether to enable or disable SiteLink.",
+      "type": "boolean",
+      "markdownDescription": "Indicates whether to enable or disable SiteLink.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+    },
+    "VirtualInterfaceId": {
+      "description": "The ID of the virtual interface.",
+      "type": "string",
+      "markdownDescription": "The ID of the virtual interface.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^dxvif-[a-z0-9]{8}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "VirtualInterfaceName": {
+      "description": "The name of the virtual interface assigned by the customer network. The name has a maximum of 100 characters. The following are valid characters: a-z, 0-9 and a hyphen (-).",
+      "type": "string",
+      "markdownDescription": "The name of the virtual interface assigned by the customer network. The name has a maximum of 100 characters. The following are valid characters: a-z, 0-9 and a hyphen (-).\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[\\w \\-_,\\/]{1,100}$  \nUpdate requires: No interruption\n"
+    },
+    "VirtualInterfaceArn": {
+      "description": "The ARN of the virtual interface.",
+      "type": "string",
+      "markdownDescription": "The ARN of the virtual interface.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[a-z-]*:directconnect:[a-z0-9-]+:[0-9]{12}:dxvif/dxvif-[a-z0-9]{8}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Vlan": {
+      "description": "The ID of the VLAN.",
+      "maximum": 4095,
+      "type": "integer",
+      "minimum": 0,
+      "markdownDescription": "The ID of the VLAN.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: Replacement\n"
+    },
+    "AllocateTransitVirtualInterfaceRoleArn": {
+      "description": "The Amazon Resource Name (ARN) of the role to allocate the TransitVifAllocation. Needs directconnect:AllocateTransitVirtualInterface permissions and tag permissions if applicable.",
+      "type": "string",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the role to allocate the TransitVifAllocation. Needs directconnect:AllocateTransitVirtualInterface permissions and tag permissions if applicable.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[a-z-]*:iam::[0-9]{12}:role/.+$  \nUpdate requires: Replacement\n"
+    },
+    "Tags": {
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "The tags associated with the private virtual interface.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "The tags associated with the private virtual interface.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "Mtu": {
+      "description": "The maximum transmission unit (MTU), in bytes. The supported values are 1500 and 9001. The default value is 1500.",
+      "type": "integer",
+      "markdownDescription": "The maximum transmission unit (MTU), in bytes. The supported values are 1500 and 9001. The default value is 1500.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    }
+  },
+  "attributes": {
+    "VirtualInterfaceId": {
+      "description": "The ID of the virtual interface.",
+      "type": "string",
+      "markdownDescription": "The ID of the virtual interface.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^dxvif-[a-z0-9]{8}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "VirtualInterfaceArn": {
+      "description": "The ARN of the virtual interface.",
+      "type": "string",
+      "markdownDescription": "The ARN of the virtual interface.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[a-z-]*:directconnect:[a-z0-9-]+:[0-9]{12}:dxvif/dxvif-[a-z0-9]{8}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

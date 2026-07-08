@@ -523,6 +523,84 @@
         "PROFILE"
       ],
       "markdownDescription": "The type of profile.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ACCOUNT_PROFILE | PROFILE  \nUpdate requires: No interruption\n"
+    },
+    "SegmentSort": {
+      "description": "Defines how segments should be sorted and ordered in the results.",
+      "type": "object",
+      "properties": {
+        "Attributes": {
+          "description": "A list of attributes used to sort the segments and their ordering preferences.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SortAttribute"
+          },
+          "minItems": 1,
+          "maxItems": 10,
+          "markdownDescription": "A list of attributes used to sort the segments and their ordering preferences.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Attributes"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Defines how segments should be sorted and ordered in the results.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SortAttribute": {
+      "description": "Defines the characteristics and rules for sorting by a specific attribute.",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "The name of the attribute to sort by.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "The name of the attribute to sort by.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+        },
+        "Order": {
+          "$ref": "#/definitions/SegmentSortOrder"
+        },
+        "DataType": {
+          "$ref": "#/definitions/SegmentSortDataType"
+        },
+        "Type": {
+          "$ref": "#/definitions/SortAttributeType",
+          "default": "PROFILE"
+        }
+      },
+      "required": [
+        "Name",
+        "Order"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Defines the characteristics and rules for sorting by a specific attribute.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SegmentSortOrder": {
+      "description": "The sort order for the attribute (ascending or descending).",
+      "type": "string",
+      "enum": [
+        "ASC",
+        "DESC"
+      ],
+      "markdownDescription": "The sort order for the attribute (ascending or descending).\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ASC | DESC  \nUpdate requires: No interruption\n"
+    },
+    "SegmentSortDataType": {
+      "description": "The data type of the sort attribute (e.g., string, number, date).",
+      "type": "string",
+      "enum": [
+        "STRING",
+        "NUMBER",
+        "DATE"
+      ],
+      "markdownDescription": "The data type of the sort attribute (e.g., string, number, date).\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: STRING | NUMBER | DATE  \nUpdate requires: No interruption\n"
+    },
+    "SortAttributeType": {
+      "description": "The type of attribute (e.g., profile, calculated).",
+      "type": "string",
+      "enum": [
+        "PROFILE",
+        "CALCULATED"
+      ],
+      "markdownDescription": "The type of attribute (e.g., profile, calculated).\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PROFILE | CALCULATED  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -535,9 +613,9 @@
     "Description": {
       "description": "The description of the segment definition.",
       "type": "string",
-      "maxLength": 1000,
+      "maxLength": 4000,
       "minLength": 1,
-      "markdownDescription": "The description of the segment definition.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1000  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The description of the segment definition.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 4000  \nUpdate requires: No interruption\n"
     },
     "DisplayName": {
       "description": "The display name of the segment definition.",
@@ -563,7 +641,14 @@
     "SegmentGroups": {
       "description": "An array that defines the set of segment criteria to evaluate when handling segment groups for the segment.",
       "$ref": "#/definitions/SegmentGroup",
-      "markdownDescription": "An array that defines the set of segment criteria to evaluate when handling segment groups for the segment.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: Replacement\n"
+      "markdownDescription": "An array that defines the set of segment criteria to evaluate when handling segment groups for the segment.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
+    },
+    "SegmentSqlQuery": {
+      "description": "The SQL query that defines the segment criteria.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 50000,
+      "markdownDescription": "The SQL query that defines the segment criteria.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 50000  \nUpdate requires: Replacement\n"
     },
     "SegmentDefinitionArn": {
       "description": "The Amazon Resource Name (ARN) of the segment definition.",
@@ -571,6 +656,15 @@
       "maxLength": 255,
       "minLength": 1,
       "markdownDescription": "The Amazon Resource Name (ARN) of the segment definition.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SegmentType": {
+      "description": "The SQL query that defines the segment criteria.",
+      "type": "string",
+      "enum": [
+        "CLASSIC",
+        "ENHANCED"
+      ],
+      "markdownDescription": "The SQL query that defines the segment criteria.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CLASSIC | ENHANCED  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Tags": {
       "description": "The tags used to organize, track, or control access for this resource.",
@@ -583,23 +677,29 @@
       "minItems": 0,
       "maxItems": 50,
       "markdownDescription": "The tags used to organize, track, or control access for this resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "SegmentSort": {
+      "description": "The segment sort configuration for ordering segment results.",
+      "$ref": "#/definitions/SegmentSort",
+      "markdownDescription": "The segment sort configuration for ordering segment results.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
     }
   },
   "required": [
     "DomainName",
     "DisplayName",
-    "SegmentDefinitionName",
-    "SegmentGroups"
+    "SegmentDefinitionName"
   ],
   "readOnlyProperties": [
     "/properties/CreatedAt",
-    "/properties/SegmentDefinitionArn"
+    "/properties/SegmentDefinitionArn",
+    "/properties/SegmentType"
   ],
   "createOnlyProperties": [
     "/properties/DomainName",
     "/properties/SegmentDefinitionName",
     "/properties/DisplayName",
-    "/properties/SegmentGroups"
+    "/properties/SegmentGroups",
+    "/properties/SegmentSqlQuery"
   ],
   "primaryIdentifier": [
     "/properties/DomainName",
@@ -609,24 +709,50 @@
     "create": {
       "permissions": [
         "profile:CreateSegmentDefinition",
-        "profile:TagResource"
+        "profile:TagResource",
+        "kms:CreateGrant",
+        "kms:DescribeKey",
+        "kms:GetKeyPolicy",
+        "kms:PutKeyPolicy",
+        "kms:ListGrants",
+        "kms:GenerateDataKey"
       ]
     },
     "read": {
       "permissions": [
-        "profile:GetSegmentDefinition"
+        "profile:GetSegmentDefinition",
+        "profile:ListTagsForResource",
+        "kms:CreateGrant",
+        "kms:DescribeKey",
+        "kms:GetKeyPolicy",
+        "kms:PutKeyPolicy",
+        "kms:ListGrants",
+        "kms:GenerateDataKey"
       ]
     },
     "update": {
       "permissions": [
         "profile:GetSegmentDefinition",
+        "profile:ListTagsForResource",
         "profile:UntagResource",
-        "profile:TagResource"
+        "profile:TagResource",
+        "kms:CreateGrant",
+        "kms:DescribeKey",
+        "kms:GetKeyPolicy",
+        "kms:PutKeyPolicy",
+        "kms:ListGrants",
+        "kms:GenerateDataKey"
       ]
     },
     "delete": {
       "permissions": [
-        "profile:DeleteSegmentDefinition"
+        "profile:DeleteSegmentDefinition",
+        "kms:CreateGrant",
+        "kms:DescribeKey",
+        "kms:GetKeyPolicy",
+        "kms:PutKeyPolicy",
+        "kms:ListGrants",
+        "kms:GenerateDataKey"
       ]
     },
     "list": {
@@ -641,7 +767,13 @@
         ]
       },
       "permissions": [
-        "profile:ListSegmentDefinitions"
+        "profile:ListSegmentDefinitions",
+        "kms:CreateGrant",
+        "kms:DescribeKey",
+        "kms:GetKeyPolicy",
+        "kms:PutKeyPolicy",
+        "kms:ListGrants",
+        "kms:GenerateDataKey"
       ]
     }
   },
@@ -671,6 +803,15 @@
       "maxLength": 255,
       "minLength": 1,
       "markdownDescription": "The Amazon Resource Name (ARN) of the segment definition.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SegmentType": {
+      "description": "The SQL query that defines the segment criteria.",
+      "type": "string",
+      "enum": [
+        "CLASSIC",
+        "ENHANCED"
+      ],
+      "markdownDescription": "The SQL query that defines the segment criteria.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CLASSIC | ENHANCED  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

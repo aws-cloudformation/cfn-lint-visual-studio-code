@@ -1,12 +1,22 @@
 {
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-ssm",
   "tagging": {
-    "taggable": false
+    "permissions": [
+      "ssm:AddTagsToResource",
+      "ssm:ListTagsForResource",
+      "ssm:RemoveTagsFromResource"
+    ],
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "tagProperty": "/properties/Tags",
+    "cloudFormationSystemTags": true
   },
   "handlers": {
     "read": {
       "permissions": [
         "ssm:DescribeAssociation",
+        "ssm:ListTagsForResource",
         "resource-groups:GetGroupQuery",
         "resource-groups:ListGroups",
         "resource-groups:ListGroupResources"
@@ -19,14 +29,19 @@
         "iam:CreateServiceLinkedRole",
         "ssm:CreateAssociation",
         "ssm:DescribeAssociation",
-        "ssm:GetCalendarState"
+        "ssm:GetCalendarState",
+        "ssm:AddTagsToResource",
+        "ssm:ListTagsForResource"
       ]
     },
     "update": {
       "permissions": [
         "iam:PassRole",
         "ssm:UpdateAssociation",
-        "ssm:GetCalendarState"
+        "ssm:GetCalendarState",
+        "ssm:AddTagsToResource",
+        "ssm:RemoveTagsFromResource",
+        "ssm:ListTagsForResource"
       ]
     },
     "list": {
@@ -133,6 +148,32 @@
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "Tag": {
+      "description": "Metadata that you assign to your AWS resources.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "minLength": 0,
+          "description": "The value of the tag.",
+          "type": "string",
+          "maxLength": 256,
+          "markdownDescription": "The value of the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: ^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$  \nUpdate requires: No interruption\n"
+        },
+        "Key": {
+          "minLength": 1,
+          "description": "The name of the tag.",
+          "type": "string",
+          "maxLength": 128,
+          "markdownDescription": "The name of the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "Metadata that you assign to your AWS resources.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "ParameterValues": {
       "type": "array",
       "items": {
@@ -207,6 +248,16 @@
       "description": "The ID of the instance that the SSM document is associated with.",
       "type": "string",
       "markdownDescription": "The ID of the instance that the SSM document is associated with.\n\n---\n\nRequired: No  \nType: String  \nPattern: (^i-(\\w{8}|\\w{17})$)|(^mi-\\w{17}$)  \nUpdate requires: No interruption\n"
+    },
+    "AssociationDispatchAssumeRole": {
+      "examples": [
+        "arn:aws:iam::123456789012:role/myAssociationDispatchAssumeRole"
+      ],
+      "minLength": 1,
+      "description": "A role used by association to take actions on your behalf.",
+      "type": "string",
+      "maxLength": 512,
+      "markdownDescription": "A role used by association to take actions on your behalf.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: arn:aws(-[^:]+)?:iam::[0-9]{12}:role/.+  \nUpdate requires: No interruption\n"
     },
     "WaitForSuccessTimeoutSeconds": {
       "maximum": 172800,
@@ -294,6 +345,18 @@
       "type": "string",
       "maxLength": 50,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 50  \nUpdate requires: No interruption\n"
+    },
+    "Tags": {
+      "minItems": 0,
+      "maxItems": 1000,
+      "uniqueItems": false,
+      "description": "A key-value pair to associate with a resource.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "required": [

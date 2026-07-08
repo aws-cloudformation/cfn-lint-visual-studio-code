@@ -1,6 +1,6 @@
 {
   "typeName": "AWS::Deadline::Fleet",
-  "description": "Definition of AWS::Deadline::Fleet Resource Type",
+  "description": "Resource Type definition for AWS::Deadline::Fleet",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-deadline",
   "definitions": {
     "AcceleratorCountRange": {
@@ -70,11 +70,39 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: x86_64 | arm64  \nUpdate requires: No interruption\n"
     },
+    "CustomerManagedAutoScalingConfiguration": {
+      "type": "object",
+      "properties": {
+        "StandbyWorkerCount": {
+          "type": "integer",
+          "maximum": 2147483647,
+          "minimum": 0,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "WorkerIdleDurationSeconds": {
+          "type": "integer",
+          "maximum": 2147483647,
+          "minimum": 0,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "ScaleOutWorkersPerMinute": {
+          "type": "integer",
+          "maximum": 2147483647,
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "CustomerManagedFleetConfiguration": {
       "type": "object",
       "properties": {
         "Mode": {
           "$ref": "#/definitions/AutoScalingMode"
+        },
+        "AutoScalingConfiguration": {
+          "$ref": "#/definitions/CustomerManagedAutoScalingConfiguration"
         },
         "WorkerCapabilities": {
           "$ref": "#/definitions/CustomerManagedWorkerCapabilities"
@@ -194,9 +222,10 @@
             "t4",
             "a10g",
             "l4",
-            "l40s"
+            "l40s",
+            "rtx-pro-server-6000"
           ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: t4 | a10g | l4 | l40s  \nUpdate requires: No interruption\n"
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: t4 | a10g | l4 | l40s | rtx-pro-server-6000  \nUpdate requires: No interruption\n"
         },
         "Runtime": {
           "type": "string",
@@ -407,6 +436,75 @@
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "ServiceManagedEc2AutoScalingConfiguration": {
+      "type": "object",
+      "properties": {
+        "StandbyWorkerCount": {
+          "type": "integer",
+          "maximum": 2147483647,
+          "minimum": 0,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "WorkerIdleDurationSeconds": {
+          "type": "integer",
+          "maximum": 86400,
+          "minimum": 0,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "ScaleOutWorkersPerMinute": {
+          "type": "integer",
+          "maximum": 2147483647,
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PersistentVolumeConfiguration": {
+      "type": "object",
+      "properties": {
+        "SizeGiB": {
+          "type": "integer",
+          "default": 250,
+          "maximum": 65536,
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Iops": {
+          "type": "integer",
+          "default": 3000,
+          "maximum": 80000,
+          "minimum": 100,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "ThroughputMiB": {
+          "type": "integer",
+          "default": 125,
+          "maximum": 2000,
+          "minimum": 125,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "MountPath": {
+          "type": "string",
+          "maxLength": 255,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+        },
+        "LastUsedTtlHours": {
+          "type": "integer",
+          "default": 168,
+          "maximum": 8760,
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "MountPath"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "ServiceManagedEc2FleetConfiguration": {
       "type": "object",
       "properties": {
@@ -422,6 +520,12 @@
         "StorageProfileId": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^sp-[0-9a-f]{32}$  \nUpdate requires: No interruption\n"
+        },
+        "PersistentVolumeConfiguration": {
+          "$ref": "#/definitions/PersistentVolumeConfiguration"
+        },
+        "AutoScalingConfiguration": {
+          "$ref": "#/definitions/ServiceManagedEc2AutoScalingConfiguration"
         }
       },
       "required": [
@@ -469,7 +573,9 @@
           "type": "array",
           "items": {
             "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9]+\\.[a-zA-Z0-9]+$  \nUpdate requires: No interruption\n"
+            "maxLength": 100,
+            "minLength": 1,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nUpdate requires: No interruption\n"
           },
           "maxItems": 100,
           "minItems": 1,
@@ -479,7 +585,9 @@
           "type": "array",
           "items": {
             "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9]+\\.[a-zA-Z0-9]+$  \nUpdate requires: No interruption\n"
+            "maxLength": 100,
+            "minLength": 1,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nUpdate requires: No interruption\n"
           },
           "maxItems": 100,
           "minItems": 1,

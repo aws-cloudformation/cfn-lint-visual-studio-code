@@ -11,15 +11,16 @@
     "BrowserArn": {
       "type": "string",
       "description": "The ARN of a Browser resource.",
-      "markdownDescription": "The ARN of a Browser resource.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws(-[^:]+)?:bedrock-agentcore:[a-z0-9-]+:(aws|[0-9]{12}):browser(-custom)?\\/(aws\\.browser\\.v1|[a-zA-Z][a-zA-Z0-9_]{0,47}-[a-zA-Z0-9]{10})$  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The ARN of a Browser resource.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws(?:-cn|-us-gov|-iso(?:-[bef])?)?):bedrock-agentcore:[a-z0-9-]+:(aws|[0-9]{12}):browser(-custom)?\\/(aws\\.browser\\.v1|[a-zA-Z][a-zA-Z0-9_]{0,47}-[a-zA-Z0-9]{10})$  \nUpdate requires: No interruption\n"
     },
     "BrowserNetworkMode": {
       "type": "string",
       "enum": [
-        "PUBLIC"
+        "PUBLIC",
+        "VPC"
       ],
       "description": "Network modes supported by browser",
-      "markdownDescription": "Network modes supported by browser\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PUBLIC  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Network modes supported by browser\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PUBLIC | VPC  \nUpdate requires: No interruption\n"
     },
     "BrowserNetworkConfiguration": {
       "type": "object",
@@ -27,6 +28,9 @@
         "NetworkMode": {
           "$ref": "#/definitions/BrowserNetworkMode",
           "default": "PUBLIC"
+        },
+        "VpcConfig": {
+          "$ref": "#/definitions/VpcConfig"
         }
       },
       "required": [
@@ -52,6 +56,104 @@
       "description": "Recording configuration for browser",
       "markdownDescription": "Recording configuration for browser\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "BrowserSigning": {
+      "type": "object",
+      "properties": {
+        "Enabled": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Browser signing configuration",
+      "markdownDescription": "Browser signing configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CertificateLocation": {
+      "type": "object",
+      "properties": {
+        "SecretArn": {
+          "type": "string",
+          "description": "Secrets Manager secret ARN.",
+          "markdownDescription": "Secrets Manager secret ARN.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:(aws(?:-cn|-us-gov|-iso(?:-[bef])?)?):secretsmanager:[a-z0-9-]+:\\d{12}:secret:[a-zA-Z0-9/_+=.@-]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "SecretArn"
+      ],
+      "additionalProperties": false,
+      "description": "Certificate location in Secrets Manager.",
+      "markdownDescription": "Certificate location in Secrets Manager.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Certificate": {
+      "type": "object",
+      "properties": {
+        "CertificateLocation": {
+          "$ref": "#/definitions/CertificateLocation",
+          "description": "Certificate location in Secrets Manager.",
+          "markdownDescription": "Certificate location in Secrets Manager.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "CertificateLocation"
+      ],
+      "additionalProperties": false,
+      "description": "A root CA certificate configuration.",
+      "markdownDescription": "A root CA certificate configuration.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CertificateList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Certificate"
+      },
+      "insertionOrder": false,
+      "minItems": 0,
+      "maxItems": 10,
+      "description": "List of root CA certificates.",
+      "markdownDescription": "List of root CA certificates.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "BrowserEnterprisePolicyType": {
+      "type": "string",
+      "enum": [
+        "MANAGED",
+        "RECOMMENDED"
+      ],
+      "description": "The type of browser enterprise policy.",
+      "markdownDescription": "The type of browser enterprise policy.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MANAGED | RECOMMENDED  \nUpdate requires: No interruption\n"
+    },
+    "BrowserEnterprisePolicy": {
+      "type": "object",
+      "properties": {
+        "Location": {
+          "$ref": "#/definitions/S3Location",
+          "description": "The S3 location of the enterprise policy file.",
+          "markdownDescription": "The S3 location of the enterprise policy file.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "Type": {
+          "$ref": "#/definitions/BrowserEnterprisePolicyType",
+          "description": "The type of browser enterprise policy.",
+          "markdownDescription": "The type of browser enterprise policy.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Location",
+        "Type"
+      ],
+      "additionalProperties": false,
+      "description": "Browser enterprise policy configuration.",
+      "markdownDescription": "Browser enterprise policy configuration.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "BrowserEnterprisePolicies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/BrowserEnterprisePolicy"
+      },
+      "insertionOrder": false,
+      "minItems": 0,
+      "maxItems": 10,
+      "description": "List of browser enterprise policies.",
+      "markdownDescription": "List of browser enterprise policies.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
     "S3Location": {
       "type": "object",
       "properties": {
@@ -72,6 +174,56 @@
       "additionalProperties": false,
       "description": "S3 Location Configuration",
       "markdownDescription": "S3 Location Configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "VpcConfig": {
+      "type": "object",
+      "description": "Network mode configuration for VPC",
+      "properties": {
+        "SecurityGroups": {
+          "$ref": "#/definitions/SecurityGroups"
+        },
+        "Subnets": {
+          "$ref": "#/definitions/Subnets"
+        }
+      },
+      "required": [
+        "SecurityGroups",
+        "Subnets"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Network mode configuration for VPC\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SecurityGroups": {
+      "type": "array",
+      "description": "Security groups for VPC",
+      "minItems": 1,
+      "maxItems": 16,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/SecurityGroupId"
+      },
+      "markdownDescription": "Security groups for VPC\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "SecurityGroupId": {
+      "type": "string",
+      "description": "Security group id",
+      "markdownDescription": "Security group id\n\n---\n\nRequired: No  \nType: String  \nPattern: ^sg-[0-9a-zA-Z]{8,17}$  \nUpdate requires: No interruption\n"
+    },
+    "Subnets": {
+      "type": "array",
+      "description": "Subnets for VPC",
+      "minItems": 1,
+      "maxItems": 16,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/SubnetId"
+      },
+      "markdownDescription": "Subnets for VPC\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "SubnetId": {
+      "type": "string",
+      "description": "Subnet id",
+      "markdownDescription": "Subnet id\n\n---\n\nRequired: No  \nType: String  \nPattern: ^subnet-[0-9a-zA-Z]{8,17}$  \nUpdate requires: No interruption\n"
     },
     "BrowserStatus": {
       "type": "string",
@@ -138,7 +290,7 @@
     "RoleArn": {
       "type": "string",
       "description": "The Amazon Resource Name (ARN) of the IAM role.",
-      "markdownDescription": "The Amazon Resource Name (ARN) of the IAM role.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws(-[a-z]+)*:iam::[0-9]{12}:role/.+$  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The Amazon Resource Name (ARN) of the IAM role.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws(?:-cn|-us-gov|-iso(?:-[bef])?)?):iam::[0-9]{12}:role/.+$  \nUpdate requires: No interruption\n"
     },
     "TagsMap": {
       "type": "object",
@@ -187,6 +339,21 @@
       "description": "Recording configuration for browser.",
       "markdownDescription": "Recording configuration for browser.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
     },
+    "BrowserSigning": {
+      "$ref": "#/definitions/BrowserSigning",
+      "description": "Browser signing configuration.",
+      "markdownDescription": "Browser signing configuration.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
+    },
+    "Certificates": {
+      "$ref": "#/definitions/CertificateList",
+      "description": "List of root CA certificates in PEM format.",
+      "markdownDescription": "List of root CA certificates in PEM format.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
+    },
+    "EnterprisePolicies": {
+      "$ref": "#/definitions/BrowserEnterprisePolicies",
+      "description": "A list of enterprise policy files for the browser.",
+      "markdownDescription": "A list of enterprise policy files for the browser.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
+    },
     "ExecutionRoleArn": {
       "$ref": "#/definitions/RoleArn",
       "description": "The Amazon Resource Name (ARN) of the IAM role that the browser uses to access resources.",
@@ -196,6 +363,11 @@
       "$ref": "#/definitions/BrowserStatus",
       "description": "Status of browser.",
       "markdownDescription": "Status of browser.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "FailureReason": {
+      "type": "string",
+      "description": "The reason for failure if the browser creation or operation failed.",
+      "markdownDescription": "The reason for failure if the browser creation or operation failed.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "CreatedAt": {
       "type": "string",
@@ -222,6 +394,7 @@
     "/properties/BrowserId",
     "/properties/BrowserArn",
     "/properties/Status",
+    "/properties/FailureReason",
     "/properties/CreatedAt",
     "/properties/LastUpdatedAt"
   ],
@@ -238,6 +411,9 @@
     "/properties/Description",
     "/properties/NetworkConfiguration",
     "/properties/RecordingConfig",
+    "/properties/BrowserSigning",
+    "/properties/Certificates",
+    "/properties/EnterprisePolicies",
     "/properties/ExecutionRoleArn"
   ],
   "handlers": {
@@ -247,7 +423,9 @@
         "bedrock-agentcore:GetBrowser",
         "bedrock-agentcore:TagResource",
         "bedrock-agentcore:ListTagsForResource",
-        "iam:PassRole"
+        "iam:CreateServiceLinkedRole",
+        "iam:PassRole",
+        "secretsmanager:GetSecretValue"
       ]
     },
     "read": {
@@ -304,6 +482,11 @@
       "$ref": "#/definitions/BrowserStatus",
       "description": "Status of browser.",
       "markdownDescription": "Status of browser.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "FailureReason": {
+      "type": "string",
+      "description": "The reason for failure if the browser creation or operation failed.",
+      "markdownDescription": "The reason for failure if the browser creation or operation failed.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "CreatedAt": {
       "type": "string",

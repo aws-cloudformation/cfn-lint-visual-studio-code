@@ -92,16 +92,18 @@
         "Attribute": {
           "type": "string",
           "enum": [
-            "LINE_ITEM_TYPE"
+            "LINE_ITEM_TYPE",
+            "SERVICE"
           ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: LINE_ITEM_TYPE  \nUpdate requires: No interruption\n"
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: LINE_ITEM_TYPE | SERVICE  \nUpdate requires: No interruption\n"
         },
         "MatchOption": {
           "type": "string",
           "enum": [
-            "NOT_EQUAL"
+            "NOT_EQUAL",
+            "EQUAL"
           ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: NOT_EQUAL  \nUpdate requires: No interruption\n"
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: NOT_EQUAL | EQUAL  \nUpdate requires: No interruption\n"
         },
         "Values": {
           "type": "array",
@@ -110,13 +112,21 @@
           "items": {
             "$ref": "#/definitions/LineItemFilterValue"
           },
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "AttributeValues": {
+          "type": "array",
+          "insertionOrder": false,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/AttributeValue"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
         "Attribute",
-        "MatchOption",
-        "Values"
+        "MatchOption"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
@@ -126,6 +136,12 @@
         "SAVINGS_PLAN_NEGATION"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SAVINGS_PLAN_NEGATION  \nUpdate requires: No interruption\n"
+    },
+    "AttributeValue": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^[a-zA-Z0-9]+$  \nUpdate requires: No interruption\n"
     },
     "CustomLineItemChargeDetails": {
       "type": "object",
@@ -178,6 +194,29 @@
       "maxLength": 128,
       "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: [a-zA-Z0-9_\\+=\\.\\-@]+  \nUpdate requires: No interruption\n"
     },
+    "ComputationRule": {
+      "description": "The display settings of the Custom Line Item.",
+      "type": "string",
+      "enum": [
+        "CONSOLIDATED",
+        "ITEMIZED"
+      ],
+      "markdownDescription": "The display settings of the Custom Line Item.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CONSOLIDATED | ITEMIZED  \nUpdate requires: Replacement\n"
+    },
+    "PresentationDetails": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Service": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z0-9]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Service"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
+    },
     "Description": {
       "type": "string",
       "maxLength": 255,
@@ -189,7 +228,7 @@
     "BillingGroupArn": {
       "description": "Billing Group ARN",
       "type": "string",
-      "markdownDescription": "Billing Group ARN\n\n---\n\nRequired: Yes  \nType: String  \nPattern: arn:aws(-cn)?:billingconductor::[0-9]{12}:billinggroup/?[0-9]{12}  \nUpdate requires: Replacement\n"
+      "markdownDescription": "Billing Group ARN\n\n---\n\nRequired: Yes  \nType: String  \nPattern: arn:aws(-cn)?:billingconductor::[0-9]{12}:billinggroup/?[a-zA-Z0-9]{10,12}  \nUpdate requires: Replacement\n"
     },
     "BillingPeriodRange": {
       "$ref": "#/definitions/BillingPeriodRange"
@@ -271,6 +310,8 @@
   "createOnlyProperties": [
     "/properties/BillingGroupArn",
     "/properties/AccountId",
+    "/properties/ComputationRule",
+    "/properties/PresentationDetails",
     "/properties/BillingPeriodRange/InclusiveStartBillingPeriod",
     "/properties/BillingPeriodRange/ExclusiveEndBillingPeriod",
     "/properties/CustomLineItemChargeDetails/Type"

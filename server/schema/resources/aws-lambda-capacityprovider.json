@@ -1,0 +1,462 @@
+{
+  "typeName": "AWS::Lambda::CapacityProvider",
+  "description": "Creates a capacity provider that manages compute resources for Lambda functions",
+  "definitions": {
+    "Architecture": {
+      "description": "Specifications for the types of EC2 instances that the capacity provider can use.",
+      "type": "string",
+      "enum": [
+        "x86_64",
+        "arm64"
+      ],
+      "markdownDescription": "Specifications for the types of EC2 instances that the capacity provider can use.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: x86_64 | arm64  \nUpdate requires: No interruption\n"
+    },
+    "CapacityProviderPermissionsConfig": {
+      "description": "Configuration that specifies the permissions required for the capacity provider to manage compute resources.",
+      "type": "object",
+      "properties": {
+        "CapacityProviderOperatorRoleArn": {
+          "description": "The ARN of the IAM role that the capacity provider uses to manage compute instances and other AWS resources.",
+          "type": "string",
+          "maxLength": 10000,
+          "minLength": 0,
+          "markdownDescription": "The ARN of the IAM role that the capacity provider uses to manage compute instances and other AWS resources.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 10000  \nPattern: ^arn:(aws[a-zA-Z-]*)?:iam::\\d{12}:role/?[a-zA-Z_0-9+=,.@\\-_/]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "CapacityProviderOperatorRoleArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration that specifies the permissions required for the capacity provider to manage compute resources.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CapacityProviderPredefinedMetricType": {
+      "description": "The predefined metric for target tracking.",
+      "type": "string",
+      "enum": [
+        "LambdaCapacityProviderAverageCPUUtilization"
+      ],
+      "markdownDescription": "The predefined metric for target tracking.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: LambdaCapacityProviderAverageCPUUtilization  \nUpdate requires: No interruption\n"
+    },
+    "CapacityProviderScalingConfig": {
+      "description": "Configuration that defines how the capacity provider scales compute instances based on demand and policies.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "MaxVCpuCount": {
+          "description": "The maximum number of vCPUs that the capacity provider can provision across all compute instances.",
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 15000,
+          "markdownDescription": "The maximum number of vCPUs that the capacity provider can provision across all compute instances.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "ScalingMode": {
+          "$ref": "#/definitions/CapacityProviderScalingMode",
+          "description": "The scaling mode that determines how the capacity provider responds to changes in demand.",
+          "markdownDescription": "The scaling mode that determines how the capacity provider responds to changes in demand.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "ScalingPolicies": {
+          "description": "A list of target tracking scaling policies for the capacity provider.",
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/TargetTrackingScalingPolicy"
+          },
+          "maxItems": 10,
+          "minItems": 1,
+          "markdownDescription": "A list of target tracking scaling policies for the capacity provider.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Configuration that defines how the capacity provider scales compute instances based on demand and policies.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CapacityProviderScalingMode": {
+      "description": "The scaling mode for the capacity provider.",
+      "type": "string",
+      "enum": [
+        "Auto",
+        "Manual"
+      ],
+      "markdownDescription": "The scaling mode for the capacity provider.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Auto | Manual  \nUpdate requires: No interruption\n"
+    },
+    "CapacityProviderState": {
+      "description": "The current state of the capacity provider. Indicates whether the provider is being created, is active and ready for use, has failed, or is being deleted.",
+      "type": "string",
+      "enum": [
+        "Pending",
+        "Active",
+        "Failed",
+        "Deleting"
+      ],
+      "markdownDescription": "The current state of the capacity provider. Indicates whether the provider is being created, is active and ready for use, has failed, or is being deleted.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Pending | Active | Failed | Deleting  \nUpdate requires: No interruption\n"
+    },
+    "CapacityProviderVpcConfig": {
+      "description": "VPC configuration that specifies the network settings for compute instances managed by the capacity provider.",
+      "type": "object",
+      "properties": {
+        "SubnetIds": {
+          "description": "A list of subnet IDs where the capacity provider launches compute instances.",
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 0,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nPattern: ^subnet-[0-9a-z]*$  \nUpdate requires: No interruption\n"
+          },
+          "maxItems": 16,
+          "minItems": 1,
+          "markdownDescription": "A list of subnet IDs where the capacity provider launches compute instances.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "SecurityGroupIds": {
+          "description": "A list of security group IDs that control network access for compute instances managed by the capacity provider.",
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 0,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nPattern: ^sg-[0-9a-zA-Z]*$  \nUpdate requires: No interruption\n"
+          },
+          "maxItems": 5,
+          "minItems": 0,
+          "markdownDescription": "A list of security group IDs that control network access for compute instances managed by the capacity provider.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "SubnetIds",
+        "SecurityGroupIds"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "VPC configuration that specifies the network settings for compute instances managed by the capacity provider.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "InstanceRequirements": {
+      "description": "Specifications that define the characteristics and constraints for compute instances used by the capacity provider.",
+      "type": "object",
+      "properties": {
+        "Architectures": {
+          "description": "A list of supported CPU architectures for compute instances. Valid values include ``x86_64`` and ``arm64``.",
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/Architecture"
+          },
+          "maxItems": 1,
+          "minItems": 1,
+          "markdownDescription": "A list of supported CPU architectures for compute instances. Valid values include ``x86_64`` and ``arm64``.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "AllowedInstanceTypes": {
+          "description": "A list of EC2 instance types that the capacity provider is allowed to use. If not specified, all compatible instance types are allowed.",
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "maxLength": 30,
+            "minLength": 1,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 30  \nPattern: ^[a-zA-Z0-9\\.\\-]+$  \nUpdate requires: No interruption\n"
+          },
+          "maxItems": 400,
+          "minItems": 0,
+          "markdownDescription": "A list of EC2 instance types that the capacity provider is allowed to use. If not specified, all compatible instance types are allowed.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "ExcludedInstanceTypes": {
+          "description": "A list of EC2 instance types that the capacity provider should not use, even if they meet other requirements.",
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "maxLength": 30,
+            "minLength": 1,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 30  \nPattern: ^[a-zA-Z0-9\\.\\-]+$  \nUpdate requires: No interruption\n"
+          },
+          "maxItems": 400,
+          "minItems": 0,
+          "markdownDescription": "A list of EC2 instance types that the capacity provider should not use, even if they meet other requirements.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Specifications that define the characteristics and constraints for compute instances used by the capacity provider.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PropagateTagsConfig": {
+      "description": "Configuration that defines how tags are propagated to managed resources.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Mode": {
+          "$ref": "#/definitions/PropagateTagsMode",
+          "description": "The mode for tag propagation. Use ``Explicit`` to propagate specific tags, or ``None`` to disable propagation.",
+          "markdownDescription": "The mode for tag propagation. Use ``Explicit`` to propagate specific tags, or ``None`` to disable propagation.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "ExplicitTags": {
+          "description": "A list of tags to explicitly propagate to managed resources. Maximum of 40 tags.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "maxItems": 40,
+          "minItems": 0,
+          "items": {
+            "$ref": "#/definitions/Tag"
+          },
+          "markdownDescription": "A list of tags to explicitly propagate to managed resources. Maximum of 40 tags.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Configuration that defines how tags are propagated to managed resources.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PropagateTagsMode": {
+      "description": "The mode for tag propagation.",
+      "type": "string",
+      "enum": [
+        "None",
+        "Explicit"
+      ],
+      "markdownDescription": "The mode for tag propagation.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: None | Explicit  \nUpdate requires: No interruption\n"
+    },
+    "CapacityProviderTelemetryConfig": {
+      "description": "",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "LoggingConfig": {
+          "description": "",
+          "$ref": "#/definitions/CapacityProviderLoggingConfig",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CapacityProviderLoggingConfig": {
+      "description": "",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "LogGroup": {
+          "type": "string",
+          "description": "",
+          "minLength": 1,
+          "maxLength": 512,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: [\\.\\-_/#A-Za-z0-9]+  \nUpdate requires: No interruption\n"
+        },
+        "SystemLogLevel": {
+          "type": "string",
+          "description": "",
+          "enum": [
+            "DEBUG",
+            "INFO",
+            "WARN"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DEBUG | INFO | WARN  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "description": "A key-value pair that provides metadata for the capacity provider.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The key name of the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag.",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The value for the tag.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key"
+      ],
+      "markdownDescription": "A key-value pair that provides metadata for the capacity provider.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "TargetTrackingScalingPolicy": {
+      "description": "A scaling policy for the capacity provider that automatically adjusts capacity to maintain a target value for a specific metric.",
+      "type": "object",
+      "properties": {
+        "PredefinedMetricType": {
+          "$ref": "#/definitions/CapacityProviderPredefinedMetricType",
+          "description": "The predefined metric type to track for scaling decisions.",
+          "markdownDescription": "The predefined metric type to track for scaling decisions.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "TargetValue": {
+          "description": "The target value for the metric that the scaling policy attempts to maintain through scaling actions.",
+          "type": "number",
+          "minimum": 0,
+          "markdownDescription": "The target value for the metric that the scaling policy attempts to maintain through scaling actions.\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "PredefinedMetricType",
+        "TargetValue"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A scaling policy for the capacity provider that automatically adjusts capacity to maintain a target value for a specific metric.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "Arn": {
+      "description": "",
+      "type": "string",
+      "maxLength": 140,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 140  \nPattern: ^arn:aws[a-zA-Z-]*:lambda:(eusc-)?[a-z]{2}((-gov)|(-iso([a-z]?)))?-[a-z]+-\\d{1}:\\d{12}:capacity-provider:[a-zA-Z0-9-_]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CapacityProviderName": {
+      "description": "",
+      "type": "string",
+      "maxLength": 140,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 140  \nPattern: ^(arn:aws[a-zA-Z-]*:lambda:(eusc-)?[a-z]{2}((-gov)|(-iso([a-z]?)))?-[a-z]+-\\d{1}:\\d{12}:capacity-provider:[a-zA-Z0-9-_]+)|[a-zA-Z0-9-_]+$  \nUpdate requires: Replacement\n"
+    },
+    "CapacityProviderScalingConfig": {
+      "description": "The scaling configuration for the capacity provider.",
+      "$ref": "#/definitions/CapacityProviderScalingConfig",
+      "markdownDescription": "The scaling configuration for the capacity provider.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "InstanceRequirements": {
+      "description": "The instance requirements for compute resources managed by the capacity provider.",
+      "$ref": "#/definitions/InstanceRequirements",
+      "markdownDescription": "The instance requirements for compute resources managed by the capacity provider.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
+    },
+    "KmsKeyArn": {
+      "description": "The ARN of the KMS key used to encrypt the capacity provider's resources.",
+      "type": "string",
+      "maxLength": 10000,
+      "minLength": 0,
+      "markdownDescription": "The ARN of the KMS key used to encrypt the capacity provider's resources.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 10000  \nPattern: ^(arn:(aws[a-zA-Z-]*)?:[a-z0-9-.]+:.*)|()$  \nUpdate requires: Replacement\n"
+    },
+    "PermissionsConfig": {
+      "description": "The permissions configuration for the capacity provider.",
+      "$ref": "#/definitions/CapacityProviderPermissionsConfig",
+      "markdownDescription": "The permissions configuration for the capacity provider.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: Replacement\n"
+    },
+    "State": {
+      "description": "",
+      "$ref": "#/definitions/CapacityProviderState",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Tags": {
+      "description": "A key-value pair that provides metadata for the capacity provider.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "A key-value pair that provides metadata for the capacity provider.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "VpcConfig": {
+      "description": "The VPC configuration for the capacity provider.",
+      "$ref": "#/definitions/CapacityProviderVpcConfig",
+      "markdownDescription": "The VPC configuration for the capacity provider.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: Replacement\n"
+    },
+    "PropagateTags": {
+      "description": "Configuration for tag propagation to managed resources launched by the capacity provider.",
+      "$ref": "#/definitions/PropagateTagsConfig",
+      "markdownDescription": "Configuration for tag propagation to managed resources launched by the capacity provider.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "TelemetryConfig": {
+      "description": "",
+      "$ref": "#/definitions/CapacityProviderTelemetryConfig",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    }
+  },
+  "required": [
+    "PermissionsConfig",
+    "VpcConfig"
+  ],
+  "readOnlyProperties": [
+    "/properties/State",
+    "/properties/Arn"
+  ],
+  "createOnlyProperties": [
+    "/properties/CapacityProviderName",
+    "/properties/VpcConfig",
+    "/properties/InstanceRequirements",
+    "/properties/PermissionsConfig",
+    "/properties/KmsKeyArn"
+  ],
+  "primaryIdentifier": [
+    "/properties/CapacityProviderName"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "lambda:TagResource",
+      "lambda:UntagResource"
+    ]
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "lambda:CreateCapacityProvider",
+        "lambda:GetCapacityProvider",
+        "lambda:TagResource",
+        "iam:PassRole",
+        "iam:CreateServiceLinkedRole",
+        "kms:DescribeKey"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "lambda:GetCapacityProvider",
+        "lambda:ListTags"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "lambda:UpdateCapacityProvider",
+        "lambda:TagResource",
+        "lambda:UntagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "lambda:DeleteCapacityProvider",
+        "lambda:GetCapacityProvider"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "State": {
+            "description": "The current state of the capacity provider. Indicates whether the provider is being created, is active and ready for use, has failed, or is being deleted.",
+            "type": "string",
+            "enum": [
+              "Pending",
+              "Active",
+              "Failed",
+              "Deleting"
+            ],
+            "markdownDescription": "The current state of the capacity provider. Indicates whether the provider is being created, is active and ready for use, has failed, or is being deleted.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Pending | Active | Failed | Deleting  \nUpdate requires: No interruption\n"
+          }
+        }
+      },
+      "permissions": [
+        "lambda:ListCapacityProviders"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "attributes": {
+    "Arn": {
+      "description": "",
+      "type": "string",
+      "maxLength": 140,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 140  \nPattern: ^arn:aws[a-zA-Z-]*:lambda:(eusc-)?[a-z]{2}((-gov)|(-iso([a-z]?)))?-[a-z]+-\\d{1}:\\d{12}:capacity-provider:[a-zA-Z0-9-_]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "State": {
+      "description": "",
+      "$ref": "#/definitions/CapacityProviderState",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

@@ -32,6 +32,9 @@
         },
         "S3RecordingConfig": {
           "$ref": "#/definitions/S3RecordingConfig"
+        },
+        "TelemetrySinkConfig": {
+          "$ref": "#/definitions/TelemetrySinkConfig"
         }
       },
       "additionalProperties": false,
@@ -124,6 +127,10 @@
     "RoleArn": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:[^:\\n]+:iam::[^:\\n]+:role\\/.+$  \nUpdate requires: No interruption\n"
+    },
+    "KinesisDataStreamArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:[a-z0-9-.]{1,63}:kinesis:[-a-z0-9]{1,50}:[0-9]{12}:stream/[a-zA-Z0-9_.-]{1,128}$  \nUpdate requires: No interruption\n"
     },
     "UplinkSpectrumConfig": {
       "type": "object",
@@ -276,6 +283,64 @@
           "$ref": "#/definitions/S3KeyPrefix"
         }
       },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "TelemetrySinkType": {
+      "type": "string",
+      "enum": [
+        "KINESIS_DATA_STREAM"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: KINESIS_DATA_STREAM  \nUpdate requires: No interruption\n"
+    },
+    "KinesisDataStreamData": {
+      "type": "object",
+      "properties": {
+        "KinesisRoleArn": {
+          "$ref": "#/definitions/RoleArn"
+        },
+        "KinesisDataStreamArn": {
+          "$ref": "#/definitions/KinesisDataStreamArn"
+        }
+      },
+      "required": [
+        "KinesisRoleArn",
+        "KinesisDataStreamArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "TelemetrySinkData": {
+      "type": "object",
+      "oneOf": [
+        {
+          "required": [
+            "KinesisDataStreamData"
+          ]
+        }
+      ],
+      "properties": {
+        "KinesisDataStreamData": {
+          "$ref": "#/definitions/KinesisDataStreamData"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "TelemetrySinkConfig": {
+      "type": "object",
+      "properties": {
+        "TelemetrySinkType": {
+          "$ref": "#/definitions/TelemetrySinkType"
+        },
+        "TelemetrySinkData": {
+          "$ref": "#/definitions/TelemetrySinkData"
+        }
+      },
+      "required": [
+        "TelemetrySinkType",
+        "TelemetrySinkData"
+      ],
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },

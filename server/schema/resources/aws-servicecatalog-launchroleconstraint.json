@@ -1,40 +1,60 @@
 {
   "typeName": "AWS::ServiceCatalog::LaunchRoleConstraint",
   "description": "Resource Type definition for AWS::ServiceCatalog::LaunchRoleConstraint",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-servicecatalog/tree/master/aws-servicecatalog-launchroleconstraint.git",
   "additionalProperties": false,
   "properties": {
     "Description": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-    },
-    "LocalRoleName": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      "description": "The description of the launch role constraint.",
+      "markdownDescription": "The description of the launch role constraint.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
     },
     "AcceptLanguage": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      "description": "The language code for the constraint.",
+      "markdownDescription": "The language code for the constraint.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
     },
     "PortfolioId": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
+      "description": "The ID of the portfolio to which this launch role constraint applies.",
+      "markdownDescription": "The ID of the portfolio to which this launch role constraint applies.\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: Replacement\n"
     },
     "ProductId": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
+      "description": "The ID of the product to which this launch role constraint applies.",
+      "markdownDescription": "The ID of the product to which this launch role constraint applies.\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: Replacement\n"
     },
     "Id": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+      "description": "The unique identifier for the launch role constraint.",
+      "markdownDescription": "The unique identifier for the launch role constraint.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "LocalRoleName": {
+      "type": "string",
+      "description": "The local IAM role name to use in the launch constraint.",
+      "markdownDescription": "The local IAM role name to use in the launch constraint.\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: No interruption\n"
     },
     "RoleArn": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      "description": "The ARN of the IAM role used for the launch constraint.",
+      "markdownDescription": "The ARN of the IAM role used for the launch constraint.\n\n---\n\nRequired: Conditional  \nType: String  \nPattern: arn:(aws|aws-cn|aws-us-gov):iam::[0-9]*:(role)\\/.*  \nUpdate requires: No interruption\n"
     }
   },
   "required": [
     "PortfolioId",
     "ProductId"
+  ],
+  "oneOf": [
+    {
+      "required": [
+        "LocalRoleName"
+      ]
+    },
+    {
+      "required": [
+        "RoleArn"
+      ]
+    }
   ],
   "createOnlyProperties": [
     "/properties/PortfolioId",
@@ -46,10 +66,60 @@
   "readOnlyProperties": [
     "/properties/Id"
   ],
+  "writeOnlyProperties": [
+    "/properties/AcceptLanguage"
+  ],
+  "tagging": {
+    "taggable": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "servicecatalog:CreateConstraint",
+        "servicecatalog:DescribeConstraint",
+        "iam:GetRole",
+        "iam:PassRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "servicecatalog:DescribeConstraint"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "servicecatalog:UpdateConstraint",
+        "servicecatalog:DescribeConstraint",
+        "iam:GetRole",
+        "iam:PassRole"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "servicecatalog:DeleteConstraint"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "PortfolioId": {
+            "$ref": "resource-schema.json#/properties/PortfolioId"
+          }
+        },
+        "required": [
+          "PortfolioId"
+        ]
+      },
+      "permissions": [
+        "servicecatalog:ListConstraintsForPortfolio"
+      ]
+    }
+  },
   "attributes": {
     "Id": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+      "description": "The unique identifier for the launch role constraint.",
+      "markdownDescription": "The unique identifier for the launch role constraint.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

@@ -77,6 +77,11 @@
         "$ref": "#/definitions/Tag"
       },
       "markdownDescription": "A collection of tags associated with a resource\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "LogDelivery": {
+      "description": "Configuration for log delivery for the replicator.",
+      "$ref": "#/definitions/LogDelivery",
+      "markdownDescription": "Configuration for log delivery for the replicator.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
     }
   },
   "definitions": {
@@ -249,12 +254,26 @@
           "description": "Whether to periodically check for new consumer groups.",
           "type": "boolean",
           "markdownDescription": "Whether to periodically check for new consumer groups.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "ConsumerGroupOffsetSyncMode": {
+          "description": "The consumer group offset synchronization mode.",
+          "$ref": "#/definitions/ConsumerGroupOffsetSyncMode",
+          "markdownDescription": "The consumer group offset synchronization mode.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
         }
       },
       "required": [
         "ConsumerGroupsToReplicate"
       ],
       "markdownDescription": "Configuration relating to consumer group replication.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ConsumerGroupOffsetSyncMode": {
+      "description": "The consumer group offset synchronization mode.",
+      "type": "string",
+      "enum": [
+        "LEGACY",
+        "ENHANCED"
+      ],
+      "markdownDescription": "The consumer group offset synchronization mode.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: LEGACY | ENHANCED  \nUpdate requires: No interruption\n"
     },
     "ReplicationInfo": {
       "description": "Specifies configuration for replication between a source and target Kafka cluster.",
@@ -264,12 +283,22 @@
         "SourceKafkaClusterArn": {
           "description": "Amazon Resource Name of the source Kafka cluster.",
           "type": "string",
-          "markdownDescription": "Amazon Resource Name of the source Kafka cluster.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: arn:(aws|aws-us-gov|aws-cn):kafka:.*  \nUpdate requires: No interruption\n"
+          "markdownDescription": "Amazon Resource Name of the source Kafka cluster.\n\n---\n\nRequired: No  \nType: String  \nPattern: arn:(aws|aws-us-gov|aws-cn):kafka:.*  \nUpdate requires: No interruption\n"
+        },
+        "SourceKafkaClusterId": {
+          "description": "The ID of the source Kafka cluster.",
+          "type": "string",
+          "markdownDescription": "The ID of the source Kafka cluster.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
         "TargetKafkaClusterArn": {
           "description": "Amazon Resource Name of the target Kafka cluster.",
           "type": "string",
-          "markdownDescription": "Amazon Resource Name of the target Kafka cluster.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: arn:(aws|aws-us-gov|aws-cn):kafka:.*  \nUpdate requires: No interruption\n"
+          "markdownDescription": "Amazon Resource Name of the target Kafka cluster.\n\n---\n\nRequired: No  \nType: String  \nPattern: arn:(aws|aws-us-gov|aws-cn):kafka:.*  \nUpdate requires: No interruption\n"
+        },
+        "TargetKafkaClusterId": {
+          "description": "The ID of the target Kafka cluster.",
+          "type": "string",
+          "markdownDescription": "The ID of the target Kafka cluster.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
         "TargetCompressionType": {
           "description": "The type of compression to use writing records to target Kafka cluster.",
@@ -295,8 +324,6 @@
         }
       },
       "required": [
-        "SourceKafkaClusterArn",
-        "TargetKafkaClusterArn",
         "TopicReplication",
         "ConsumerGroupReplication",
         "TargetCompressionType"
@@ -362,21 +389,255 @@
       "additionalProperties": false,
       "properties": {
         "AmazonMskCluster": {
-          "description": "Details of an Amazon MSK cluster. Exactly one of AmazonMskCluster is required.",
+          "description": "Details of an Amazon MSK cluster.",
           "$ref": "#/definitions/AmazonMskCluster",
-          "markdownDescription": "Details of an Amazon MSK cluster. Exactly one of AmazonMskCluster is required.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+          "markdownDescription": "Details of an Amazon MSK cluster.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "ApacheKafkaCluster": {
+          "description": "Details of an Apache Kafka cluster.",
+          "$ref": "#/definitions/ApacheKafkaCluster",
+          "markdownDescription": "Details of an Apache Kafka cluster.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
         },
         "VpcConfig": {
           "description": "Details of an Amazon VPC which has network connectivity to the Apache Kafka cluster.",
           "$ref": "#/definitions/KafkaClusterClientVpcConfig",
-          "markdownDescription": "Details of an Amazon VPC which has network connectivity to the Apache Kafka cluster.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+          "markdownDescription": "Details of an Amazon VPC which has network connectivity to the Apache Kafka cluster.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "ClientAuthentication": {
+          "description": "Details of the client authentication used by the Apache Kafka cluster.",
+          "$ref": "#/definitions/KafkaClusterClientAuthentication",
+          "markdownDescription": "Details of the client authentication used by the Apache Kafka cluster.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "EncryptionInTransit": {
+          "description": "Details of encryption in transit to the Apache Kafka cluster.",
+          "$ref": "#/definitions/KafkaClusterEncryptionInTransit",
+          "markdownDescription": "Details of encryption in transit to the Apache Kafka cluster.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [],
+      "markdownDescription": "Details of a Kafka cluster for replication.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ApacheKafkaCluster": {
+      "description": "Details of an Apache Kafka cluster.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ApacheKafkaClusterId": {
+          "description": "The ID of the Apache Kafka cluster.",
+          "type": "string",
+          "markdownDescription": "The ID of the Apache Kafka cluster.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "BootstrapBrokerString": {
+          "description": "The bootstrap broker string of the Apache Kafka cluster.",
+          "type": "string",
+          "markdownDescription": "The bootstrap broker string of the Apache Kafka cluster.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "AmazonMskCluster",
-        "VpcConfig"
+        "ApacheKafkaClusterId",
+        "BootstrapBrokerString"
       ],
-      "markdownDescription": "Details of a Kafka cluster for replication.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Details of an Apache Kafka cluster.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "KafkaClusterClientAuthentication": {
+      "description": "Details of the client authentication used by the Apache Kafka cluster.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "SaslScram": {
+          "description": "Details for SASL/SCRAM client authentication.",
+          "$ref": "#/definitions/KafkaClusterSaslScramAuthentication",
+          "markdownDescription": "Details for SASL/SCRAM client authentication.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "MTLS": {
+          "description": "Details for mTLS client authentication.",
+          "$ref": "#/definitions/KafkaClusterMtlsAuthentication",
+          "markdownDescription": "Details for mTLS client authentication.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Details of the client authentication used by the Apache Kafka cluster.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "KafkaClusterMtlsAuthentication": {
+      "description": "Details for mTLS client authentication.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "SecretArn": {
+          "description": "The Amazon Resource Name (ARN) of the Secrets Manager secret.",
+          "type": "string",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the Secrets Manager secret.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "SecretArn"
+      ],
+      "markdownDescription": "Details for mTLS client authentication.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "KafkaClusterSaslScramAuthentication": {
+      "description": "Details for SASL/SCRAM client authentication.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Mechanism": {
+          "description": "The SASL/SCRAM authentication mechanism.",
+          "$ref": "#/definitions/KafkaClusterSaslScramMechanism",
+          "markdownDescription": "The SASL/SCRAM authentication mechanism.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "SecretArn": {
+          "description": "The Amazon Resource Name (ARN) of the Secrets Manager secret.",
+          "type": "string",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the Secrets Manager secret.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Mechanism",
+        "SecretArn"
+      ],
+      "markdownDescription": "Details for SASL/SCRAM client authentication.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "KafkaClusterSaslScramMechanism": {
+      "description": "The SASL/SCRAM authentication mechanism.",
+      "type": "string",
+      "enum": [
+        "SHA256",
+        "SHA512"
+      ],
+      "markdownDescription": "The SASL/SCRAM authentication mechanism.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SHA256 | SHA512  \nUpdate requires: No interruption\n"
+    },
+    "KafkaClusterEncryptionInTransit": {
+      "description": "Details of encryption in transit to the Apache Kafka cluster.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "EncryptionType": {
+          "description": "The type of encryption in transit to the Apache Kafka cluster.",
+          "$ref": "#/definitions/KafkaClusterEncryptionInTransitType",
+          "markdownDescription": "The type of encryption in transit to the Apache Kafka cluster.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "RootCaCertificate": {
+          "description": "The root CA certificate.",
+          "type": "string",
+          "markdownDescription": "The root CA certificate.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "EncryptionType"
+      ],
+      "markdownDescription": "Details of encryption in transit to the Apache Kafka cluster.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "KafkaClusterEncryptionInTransitType": {
+      "description": "The type of encryption in transit to the Apache Kafka cluster.",
+      "type": "string",
+      "enum": [
+        "TLS"
+      ],
+      "markdownDescription": "The type of encryption in transit to the Apache Kafka cluster.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: TLS  \nUpdate requires: No interruption\n"
+    },
+    "LogDelivery": {
+      "description": "Configuration for log delivery for the replicator.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ReplicatorLogDelivery": {
+          "description": "The replicator logs configuration.",
+          "$ref": "#/definitions/ReplicatorLogDelivery",
+          "markdownDescription": "The replicator logs configuration.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [],
+      "markdownDescription": "Configuration for log delivery for the replicator.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ReplicatorLogDelivery": {
+      "description": "Details of the log delivery for the replicator.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "CloudWatchLogs": {
+          "description": "Details of the CloudWatch Logs destination for replicator logs.",
+          "$ref": "#/definitions/CloudWatchLogs",
+          "markdownDescription": "Details of the CloudWatch Logs destination for replicator logs.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "Firehose": {
+          "description": "Details of the Kinesis Data Firehose delivery stream that is the destination for replicator logs.",
+          "$ref": "#/definitions/Firehose",
+          "markdownDescription": "Details of the Kinesis Data Firehose delivery stream that is the destination for replicator logs.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "S3": {
+          "description": "Details of the Amazon S3 destination for replicator logs.",
+          "$ref": "#/definitions/S3",
+          "markdownDescription": "Details of the Amazon S3 destination for replicator logs.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [],
+      "markdownDescription": "Details of the log delivery for the replicator.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CloudWatchLogs": {
+      "description": "Details about delivering logs to CloudWatch Logs.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Enabled": {
+          "description": "Whether log delivery to CloudWatch Logs is enabled.",
+          "type": "boolean",
+          "markdownDescription": "Whether log delivery to CloudWatch Logs is enabled.\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "LogGroup": {
+          "description": "The CloudWatch log group that is the destination for log delivery.",
+          "type": "string",
+          "markdownDescription": "The CloudWatch log group that is the destination for log delivery.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Enabled"
+      ],
+      "markdownDescription": "Details about delivering logs to CloudWatch Logs.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Firehose": {
+      "description": "Details about delivering logs to Firehose.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Enabled": {
+          "description": "Whether log delivery to Firehose is enabled.",
+          "type": "boolean",
+          "markdownDescription": "Whether log delivery to Firehose is enabled.\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "DeliveryStream": {
+          "description": "The Firehose delivery stream that is the destination for log delivery.",
+          "type": "string",
+          "markdownDescription": "The Firehose delivery stream that is the destination for log delivery.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Enabled"
+      ],
+      "markdownDescription": "Details about delivering logs to Firehose.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "S3": {
+      "description": "Details about delivering logs to S3.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Enabled": {
+          "description": "Whether log delivery to S3 is enabled.",
+          "type": "boolean",
+          "markdownDescription": "Whether log delivery to S3 is enabled.\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "Bucket": {
+          "description": "The S3 bucket that is the destination for log delivery.",
+          "type": "string",
+          "markdownDescription": "The S3 bucket that is the destination for log delivery.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Prefix": {
+          "description": "The S3 prefix that is the destination for log delivery.",
+          "type": "string",
+          "markdownDescription": "The S3 prefix that is the destination for log delivery.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Enabled"
+      ],
+      "markdownDescription": "Details about delivering logs to S3.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "required": [
@@ -403,8 +664,11 @@
     "/properties/KafkaClusters",
     "/properties/ServiceExecutionRoleArn",
     "/properties/ReplicationInfoList/*/SourceKafkaClusterArn",
+    "/properties/ReplicationInfoList/*/SourceKafkaClusterId",
     "/properties/ReplicationInfoList/*/TargetKafkaClusterArn",
+    "/properties/ReplicationInfoList/*/TargetKafkaClusterId",
     "/properties/ReplicationInfoList/*/TargetCompressionType",
+    "/properties/ReplicationInfoList/*/ConsumerGroupReplication/ConsumerGroupOffsetSyncMode",
     "/properties/ReplicationInfoList/*/TopicReplication/StartingPosition",
     "/properties/ReplicationInfoList/*/TopicReplication/TopicNameConfiguration"
   ],
@@ -423,7 +687,15 @@
         "kafka:DescribeReplicator",
         "kafka:GetBootstrapBrokers",
         "kafka:ListTagsForResource",
-        "kafka:TagResource"
+        "kafka:TagResource",
+        "logs:CreateLogDelivery",
+        "logs:DescribeLogGroups",
+        "logs:DescribeResourcePolicies",
+        "logs:ListLogDeliveries",
+        "logs:PutResourcePolicy",
+        "s3:GetBucketPolicy",
+        "s3:PutBucketPolicy",
+        "firehose:TagDeliveryStream"
       ]
     },
     "read": {
@@ -438,7 +710,16 @@
         "kafka:ListTagsForResource",
         "kafka:TagResource",
         "kafka:UntagResource",
-        "kafka:UpdateReplicationInfo"
+        "kafka:UpdateReplicationInfo",
+        "logs:CreateLogDelivery",
+        "logs:DeleteLogDelivery",
+        "logs:DescribeLogGroups",
+        "logs:DescribeResourcePolicies",
+        "logs:ListLogDeliveries",
+        "logs:PutResourcePolicy",
+        "s3:GetBucketPolicy",
+        "s3:PutBucketPolicy",
+        "firehose:TagDeliveryStream"
       ]
     },
     "delete": {
@@ -446,7 +727,9 @@
         "kafka:DeleteReplicator",
         "kafka:DescribeReplicator",
         "kafka:ListTagsForResource",
-        "kafka:UntagResource"
+        "kafka:UntagResource",
+        "logs:DeleteLogDelivery",
+        "logs:ListLogDeliveries"
       ]
     },
     "list": {

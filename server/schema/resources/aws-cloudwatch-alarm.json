@@ -22,7 +22,7 @@
     "ComparisonOperator": {
       "description": "The arithmetic operation to use when comparing the specified statistic and threshold. The specified statistic value is used as the first operand.",
       "type": "string",
-      "markdownDescription": "The arithmetic operation to use when comparing the specified statistic and threshold. The specified statistic value is used as the first operand.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The arithmetic operation to use when comparing the specified statistic and threshold. The specified statistic value is used as the first operand.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
     },
     "TreatMissingData": {
       "description": "Sets how this alarm is to handle missing data points. Valid values are ``breaching``, ``notBreaching``, ``ignore``, and ``missing``. For more information, see [Configuring How Alarms Treat Missing Data](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html#alarms-and-missing-data) in the *Amazon User Guide*.\n If you omit this parameter, the default behavior of ``missing`` is used.",
@@ -47,7 +47,7 @@
     "EvaluationPeriods": {
       "description": "The number of periods over which data is compared to the specified threshold. If you are setting an alarm that requires that a number of consecutive data points be breaching to trigger the alarm, this value specifies that number. If you are setting an \"M out of N\" alarm, this value is the N, and ``DatapointsToAlarm`` is the M.\n For more information, see [Evaluating an Alarm](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html#alarm-evaluation) in the *User Guide*.",
       "type": "integer",
-      "markdownDescription": "The number of periods over which data is compared to the specified threshold. If you are setting an alarm that requires that a number of consecutive data points be breaching to trigger the alarm, this value specifies that number. If you are setting an \"M out of N\" alarm, this value is the N, and ``DatapointsToAlarm`` is the M.\n For more information, see [Evaluating an Alarm](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html#alarm-evaluation) in the *User Guide*.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The number of periods over which data is compared to the specified threshold. If you are setting an alarm that requires that a number of consecutive data points be breaching to trigger the alarm, this value specifies that number. If you are setting an \"M out of N\" alarm, this value is the N, and ``DatapointsToAlarm`` is the M.\n For more information, see [Evaluating an Alarm](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html#alarm-evaluation) in the *User Guide*.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
     },
     "Unit": {
       "description": "The unit of the metric associated with the alarm. Specify this only if you are creating an alarm based on a single metric. Do not specify this if you are specifying a ``Metrics`` array.\n  You can specify the following values: Seconds, Microseconds, Milliseconds, Bytes, Kilobytes, Megabytes, Gigabytes, Terabytes, Bits, Kilobits, Megabits, Gigabits, Terabits, Percent, Count, Bytes/Second, Kilobytes/Second, Megabytes/Second, Gigabytes/Second, Terabytes/Second, Bits/Second, Kilobits/Second, Megabits/Second, Gigabits/Second, Terabits/Second, Count/Second, or None.",
@@ -148,9 +148,55 @@
         "$ref": "#/definitions/Tag"
       },
       "markdownDescription": "A list of key-value pairs to associate with the alarm. You can associate as many as 50 tags with an alarm. To be able to associate tags with the alarm when you create the alarm, you must have the ``cloudwatch:TagResource`` permission.\n Tags can help you organize and categorize your resources. You can also use them to scope user permissions by granting a user permission to access or change only resources with certain tag values.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "EvaluationCriteria": {
+      "description": "The evaluation criteria for the alarm.",
+      "$ref": "#/definitions/EvaluationCriteria",
+      "markdownDescription": "The evaluation criteria for the alarm.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "EvaluationInterval": {
+      "description": "The frequency, in seconds, at which the alarm is evaluated.",
+      "type": "integer",
+      "markdownDescription": "The frequency, in seconds, at which the alarm is evaluated.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
     }
   },
   "definitions": {
+    "EvaluationCriteria": {
+      "description": "The evaluation criteria for an alarm. This is a union type that currently supports ``PromQLCriteria``.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "PromQLCriteria": {
+          "$ref": "#/definitions/AlarmPromQLCriteria",
+          "description": "The PromQL criteria for the alarm evaluation.",
+          "markdownDescription": "The PromQL criteria for the alarm evaluation.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "The evaluation criteria for an alarm. This is a union type that currently supports ``PromQLCriteria``.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AlarmPromQLCriteria": {
+      "description": "Contains the configuration that determines how a PromQL alarm evaluates its contributors, including the query to run and the durations that define when contributors transition between states.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Query": {
+          "description": "The PromQL query that the alarm evaluates. The query must return a result of vector type. Each entry in the vector result represents an alarm contributor.",
+          "type": "string",
+          "markdownDescription": "The PromQL query that the alarm evaluates. The query must return a result of vector type. Each entry in the vector result represents an alarm contributor.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "PendingPeriod": {
+          "description": "The duration, in seconds, that a contributor must be continuously breaching before it transitions to the ``ALARM`` state.",
+          "type": "integer",
+          "markdownDescription": "The duration, in seconds, that a contributor must be continuously breaching before it transitions to the ``ALARM`` state.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "RecoveryPeriod": {
+          "description": "The duration, in seconds, that a contributor must continuously not be breaching before it transitions back to the ``OK`` state.",
+          "type": "integer",
+          "markdownDescription": "The duration, in seconds, that a contributor must continuously not be breaching before it transitions back to the ``OK`` state.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Contains the configuration that determines how a PromQL alarm evaluates its contributors, including the query to run and the durations that define when contributors transition between states.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "MetricStat": {
       "description": "This structure defines the metric to be returned, along with the statistics, period, and units.\n ``MetricStat`` is a property of the [MetricDataQuery](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudwatch-alarm-metricdataquery.html) property type.",
       "type": "object",
@@ -307,10 +353,6 @@
       "markdownDescription": "One of the key-value pairs associated with the alarm. Tags can help you organize and categorize your resources.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
-  "required": [
-    "ComparisonOperator",
-    "EvaluationPeriods"
-  ],
   "handlers": {
     "create": {
       "permissions": [

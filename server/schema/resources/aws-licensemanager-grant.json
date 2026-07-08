@@ -7,6 +7,28 @@
       "type": "string",
       "maxLength": 2048,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag.",
+          "markdownDescription": "The key name of the tag.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag.",
+          "markdownDescription": "The value for the tag.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -55,6 +77,16 @@
     "Status": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "Tags": {
+      "description": "A list of tags to attach.",
+      "type": "array",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "A list of tags to attach.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "additionalProperties": false,
@@ -74,22 +106,33 @@
   "handlers": {
     "create": {
       "permissions": [
-        "license-manager:CreateGrant"
+        "license-manager:CreateGrant",
+        "license-manager:CreateGrantVersion",
+        "license-manager:GetGrant",
+        "license-manager:TagResource",
+        "license-manager:ListTagsForResource"
       ]
     },
     "read": {
       "permissions": [
-        "license-manager:GetGrant"
+        "license-manager:GetGrant",
+        "license-manager:ListTagsForResource"
       ]
     },
     "update": {
       "permissions": [
-        "license-manager:CreateGrantVersion"
+        "license-manager:CreateGrantVersion",
+        "license-manager:GetGrant",
+        "license-manager:TagResource",
+        "license-manager:UntagResource",
+        "license-manager:ListTagsForResource"
       ]
     },
     "delete": {
       "permissions": [
-        "license-manager:DeleteGrant"
+        "license-manager:DeleteGrant",
+        "license-manager:GetGrant",
+        "license-manager:ListTagsForResource"
       ]
     },
     "list": {
@@ -97,6 +140,18 @@
         "license-manager:ListDistributedGrants"
       ]
     }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "license-manager:TagResource",
+      "license-manager:UntagResource",
+      "license-manager:ListTagsForResource"
+    ]
   },
   "attributes": {
     "GrantArn": {

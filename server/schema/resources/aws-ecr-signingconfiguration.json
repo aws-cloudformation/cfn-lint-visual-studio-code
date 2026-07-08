@@ -1,0 +1,135 @@
+{
+  "typeName": "AWS::ECR::SigningConfiguration",
+  "description": "The AWS::ECR::SigningConfiguration resource creates or updates the signing configuration for an Amazon ECR registry.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-ecr.git",
+  "definitions": {
+    "Rule": {
+      "type": "object",
+      "properties": {
+        "SigningProfileArn": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "AWS Signer signing profile ARN to use for matched repositories.",
+          "markdownDescription": "AWS Signer signing profile ARN to use for matched repositories.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 200  \nPattern: ^arn:aws(-[a-z]+)*:signer:[a-z0-9-]+:[0-9]{12}:\\/signing-profiles\\/[a-zA-Z0-9_]{2,}$  \nUpdate requires: No interruption\n"
+        },
+        "RepositoryFilters": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 100,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/RepositoryFilter"
+          },
+          "description": "Optional array of repository filters. If omitted, the rule matches all repositories. If provided, must contain at least one filter. Empty arrays are not allowed.",
+          "markdownDescription": "Optional array of repository filters. If omitted, the rule matches all repositories. If provided, must contain at least one filter. Empty arrays are not allowed.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "SigningProfileArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RepositoryFilter": {
+      "type": "object",
+      "properties": {
+        "Filter": {
+          "$ref": "#/definitions/Filter"
+        },
+        "FilterType": {
+          "$ref": "#/definitions/FilterType"
+        }
+      },
+      "description": "An array of objects representing the details of a repository filter.",
+      "required": [
+        "Filter",
+        "FilterType"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "An array of objects representing the details of a repository filter.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Filter": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "Repository name pattern (supports '*' wildcard).",
+      "markdownDescription": "Repository name pattern (supports '*' wildcard).\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^(?:[a-z0-9*]+(?:[._-][a-z0-9*]+)*/)*[a-z0-9*]+(?:[._-][a-z0-9*]+)*$  \nUpdate requires: No interruption\n"
+    },
+    "FilterType": {
+      "description": "Type of repository filter",
+      "type": "string",
+      "enum": [
+        "WILDCARD_MATCH"
+      ],
+      "markdownDescription": "Type of repository filter\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: WILDCARD_MATCH  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "RegistryId": {
+      "type": "string",
+      "description": "12-digit AWS account ID of the ECR registry.",
+      "markdownDescription": "12-digit AWS account ID of the ECR registry.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[0-9]{12}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Rules": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 50,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Rule"
+      },
+      "description": "Array of signing rules that define which repositories should be signed and with which signing profiles.",
+      "markdownDescription": "Array of signing rules that define which repositories should be signed and with which signing profiles.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "required": [
+    "Rules"
+  ],
+  "readOnlyProperties": [
+    "/properties/RegistryId"
+  ],
+  "primaryIdentifier": [
+    "/properties/RegistryId"
+  ],
+  "additionalProperties": false,
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ecr:PutSigningConfiguration",
+        "ecr:GetSigningConfiguration"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "ecr:GetSigningConfiguration"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ecr:PutSigningConfiguration",
+        "ecr:GetSigningConfiguration"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ecr:DeleteSigningConfiguration",
+        "ecr:GetSigningConfiguration"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ecr:GetSigningConfiguration"
+      ]
+    }
+  },
+  "tagging": {
+    "taggable": false
+  },
+  "attributes": {
+    "RegistryId": {
+      "type": "string",
+      "description": "12-digit AWS account ID of the ECR registry.",
+      "markdownDescription": "12-digit AWS account ID of the ECR registry.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[0-9]{12}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

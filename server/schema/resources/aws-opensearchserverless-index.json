@@ -1,7 +1,7 @@
 {
   "typeName": "AWS::OpenSearchServerless::Index",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-opensearchserverless",
-  "description": "An OpenSearch Serverless index resource",
+  "description": "Resource Type definition for AWS::OpenSearchServerless::Index",
   "tagging": {
     "taggable": false
   },
@@ -31,9 +31,60 @@
             }
           },
           "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "Analysis": {
+          "type": "object",
+          "description": "Custom analysis configuration including analyzers, tokenizers, and filters",
+          "additionalProperties": false,
+          "properties": {
+            "Analyzer": {
+              "type": "object",
+              "description": "Custom analyzer definitions",
+              "patternProperties": {
+                "^[A-Za-z0-9_.-]{1,64}$": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "Type": {
+                      "type": "string",
+                      "description": "The analyzer type (e.g. custom, standard, simple)",
+                      "markdownDescription": "The analyzer type (e.g. custom, standard, simple)\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+                    },
+                    "Tokenizer": {
+                      "type": "string",
+                      "description": "The tokenizer to use",
+                      "markdownDescription": "The tokenizer to use\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+                    },
+                    "Filter": {
+                      "type": "array",
+                      "description": "Token filters to apply",
+                      "items": {
+                        "type": "string",
+                        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+                      },
+                      "markdownDescription": "Token filters to apply\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+                    },
+                    "CharFilter": {
+                      "type": "array",
+                      "description": "Character filters to apply",
+                      "items": {
+                        "type": "string",
+                        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+                      },
+                      "markdownDescription": "Character filters to apply\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+                    }
+                  },
+                  "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+                }
+              },
+              "additionalProperties": false,
+              "markdownDescription": "Custom analyzer definitions\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+            }
+          },
+          "markdownDescription": "Custom analysis configuration including analyzers, tokenizers, and filters\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
         }
       },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
     },
     "PropertyMapping": {
       "type": "object",
@@ -131,9 +182,42 @@
           "description": "The field data type. Must be a valid OpenSearch field type.",
           "enum": [
             "text",
-            "knn_vector"
+            "knn_vector",
+            "keyword",
+            "integer"
           ],
-          "markdownDescription": "The field data type. Must be a valid OpenSearch field type.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: text | knn_vector  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The field data type. Must be a valid OpenSearch field type.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: text | knn_vector | keyword | integer  \nUpdate requires: No interruption\n"
+        },
+        "Analyzer": {
+          "type": "string",
+          "description": "The analyzer to use for this field (for text and keyword fields)",
+          "markdownDescription": "The analyzer to use for this field (for text and keyword fields)\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "SpaceType": {
+          "type": "string",
+          "description": "The distance function used for k-NN search (field-level, outside Method)",
+          "enum": [
+            "l2",
+            "l1",
+            "linf",
+            "cosinesimil",
+            "innerproduct",
+            "hamming"
+          ],
+          "markdownDescription": "The distance function used for k-NN search (field-level, outside Method)\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: l2 | l1 | linf | cosinesimil | innerproduct | hamming  \nUpdate requires: No interruption\n"
+        },
+        "CompressionLevel": {
+          "type": "string",
+          "description": "The compression level for knn_vector fields",
+          "enum": [
+            "16x",
+            "32x",
+            "8x",
+            "4x",
+            "2x",
+            "1x"
+          ],
+          "markdownDescription": "The compression level for knn_vector fields\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: 16x | 32x | 8x | 4x | 2x | 1x  \nUpdate requires: No interruption\n"
         },
         "Value": {
           "type": "string",
@@ -161,7 +245,7 @@
     "Settings": {
       "$ref": "#/definitions/IndexSettings",
       "description": "Index settings",
-      "markdownDescription": "Index settings\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+      "markdownDescription": "Index settings\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
     },
     "Mappings": {
       "type": "object",
@@ -204,7 +288,8 @@
   ],
   "createOnlyProperties": [
     "/properties/IndexName",
-    "/properties/CollectionEndpoint"
+    "/properties/CollectionEndpoint",
+    "/properties/Settings/Analysis"
   ],
   "writeOnlyProperties": [
     "/properties/Settings/Index/RefreshInterval",

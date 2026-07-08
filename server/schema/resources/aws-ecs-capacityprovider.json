@@ -1,7 +1,4 @@
 {
-  "propertyTransform": {
-    "/properties/AutoScalingGroupProvider/AutoScalingGroupArn": "$split(AutoScalingGroupProvider.AutoScalingGroupArn, \"autoScalingGroupName/\")[-1] $OR $split(AutoScalingGroupArn, \"autoScalingGroupName/\")[-1]"
-  },
   "tagging": {
     "permissions": [
       "ecs:TagResource",
@@ -13,6 +10,9 @@
     "tagUpdatable": true,
     "tagProperty": "/properties/Tags",
     "cloudFormationSystemTags": true
+  },
+  "propertyTransform": {
+    "/properties/AutoScalingGroupProvider/AutoScalingGroupArn": "$split(AutoScalingGroupProvider.AutoScalingGroupArn, \"autoScalingGroupName/\")[-1] $OR $split(AutoScalingGroupArn, \"autoScalingGroupName/\")[-1]"
   },
   "handlers": {
     "read": {
@@ -59,6 +59,7 @@
   "description": "Resource Type definition for AWS::ECS::CapacityProvider.",
   "createOnlyProperties": [
     "/properties/AutoScalingGroupProvider/AutoScalingGroupArn",
+    "/properties/ManagedInstancesProvider/InstanceLaunchTemplate/FipsEnabled",
     "/properties/Name",
     "/properties/ClusterName"
   ],
@@ -67,6 +68,26 @@
     "/properties/Name"
   ],
   "definitions": {
+    "CapacityReservationRequest": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ReservationGroupArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ReservationPreference": {
+          "type": "string",
+          "enum": [
+            "RESERVATIONS_ONLY",
+            "RESERVATIONS_FIRST",
+            "RESERVATIONS_EXCLUDED"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: RESERVATIONS_ONLY | RESERVATIONS_FIRST | RESERVATIONS_EXCLUDED  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "AutoScalingGroupProvider": {
       "additionalProperties": false,
       "type": "object",
@@ -115,6 +136,21 @@
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "AutoRepairConfiguration": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ActionsStatus": {
+          "type": "string",
+          "enum": [
+            "ENABLED",
+            "DISABLED"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "MemoryGiBPerVCpuRequest": {
       "additionalProperties": false,
       "type": "object",
@@ -140,7 +176,7 @@
             "type": "string",
             "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
           },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
         },
         "Subnets": {
           "type": "array",
@@ -152,6 +188,7 @@
         }
       },
       "required": [
+        "SecurityGroups",
         "Subnets"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
@@ -321,9 +358,16 @@
               "t4",
               "t4g",
               "vu9p",
-              "v100"
+              "v100",
+              "l40s",
+              "l4",
+              "gaudi-hl-205",
+              "inferentia2",
+              "trainium",
+              "trainium2",
+              "u30"
             ],
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: a10g | a100 | h100 | inferentia | k520 | k80 | m60 | radeon-pro-v520 | t4 | t4g | vu9p | v100  \nUpdate requires: No interruption\n"
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: a10g | a100 | h100 | inferentia | k520 | k80 | m60 | radeon-pro-v520 | t4 | t4g | vu9p | v100 | l40s | l4 | gaudi-hl-205 | inferentia2 | trainium | trainium2 | u30  \nUpdate requires: No interruption\n"
           },
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         },
@@ -488,6 +532,17 @@
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "ManagedInstancesLocalStorageConfiguration": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "UseLocalStorage": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "ManagedInstancesStorageConfiguration": {
       "additionalProperties": false,
       "type": "object",
@@ -542,6 +597,23 @@
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         },
+        "CapacityOptionType": {
+          "type": "string",
+          "enum": [
+            "ON_DEMAND",
+            "SPOT",
+            "RESERVED"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ON_DEMAND | SPOT | RESERVED  \nUpdate requires: No interruption\n"
+        },
+        "FipsEnabled": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "InstanceMetadataTagsPropagation": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
         "StorageConfiguration": {
           "$ref": "#/definitions/ManagedInstancesStorageConfiguration"
         },
@@ -550,6 +622,12 @@
         },
         "InstanceRequirements": {
           "$ref": "#/definitions/InstanceRequirementsRequest"
+        },
+        "CapacityReservations": {
+          "$ref": "#/definitions/CapacityReservationRequest"
+        },
+        "LocalStorageConfiguration": {
+          "$ref": "#/definitions/ManagedInstancesLocalStorageConfiguration"
         },
         "Monitoring": {
           "$ref": "#/definitions/ManagedInstancesMonitoringOptions"
@@ -569,6 +647,9 @@
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         },
+        "AutoRepairConfiguration": {
+          "$ref": "#/definitions/AutoRepairConfiguration"
+        },
         "PropagateTags": {
           "type": "string",
           "enum": [
@@ -576,6 +657,21 @@
             "NONE"
           ],
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CAPACITY_PROVIDER | NONE  \nUpdate requires: No interruption\n"
+        },
+        "InfrastructureOptimization": {
+          "description": "Defines how Amazon ECS Managed Instances optimizes the infrastructure in your capacity provider. Configure it to turn on or off the infrastructure optimization in your capacity provider, and to control the idle EC2 instances optimization delay.",
+          "additionalProperties": false,
+          "type": "object",
+          "properties": {
+            "ScaleInAfter": {
+              "description": "This parameter defines the number of seconds Amazon ECS Managed Instances waits before optimizing EC2 instances that have become idle or underutilized. A longer delay increases the likelihood of placing new tasks on idle instances, reducing startup time. A shorter delay helps reduce infrastructure costs by optimizing idle instances more quickly. Valid values are: Not set (null) - Uses the default optimization behavior, `-1` - Disables automatic infrastructure optimization, `0` to `3600` (inclusive) - Specifies the number of seconds to wait before optimizing instances.",
+              "maximum": 3600,
+              "type": "integer",
+              "minimum": -1,
+              "markdownDescription": "This parameter defines the number of seconds Amazon ECS Managed Instances waits before optimizing EC2 instances that have become idle or underutilized. A longer delay increases the likelihood of placing new tasks on idle instances, reducing startup time. A shorter delay helps reduce infrastructure costs by optimizing idle instances more quickly. Valid values are: Not set (null) - Uses the default optimization behavior, `-1` - Disables automatic infrastructure optimization, `0` to `3600` (inclusive) - Specifies the number of seconds to wait before optimizing instances.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+            }
+          },
+          "markdownDescription": "Defines how Amazon ECS Managed Instances optimizes the infrastructure in your capacity provider. Configure it to turn on or off the infrastructure optimization in your capacity provider, and to control the idle EC2 instances optimization delay.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
         },
         "InstanceLaunchTemplate": {
           "$ref": "#/definitions/InstanceLaunchTemplate"
@@ -585,9 +681,12 @@
         "InfrastructureRoleArn",
         "InstanceLaunchTemplate"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
     }
   },
+  "conditionalCreateOnlyProperties": [
+    "/properties/ManagedInstancesProvider/InstanceLaunchTemplate/CapacityOptionType"
+  ],
   "properties": {
     "AutoScalingGroupProvider": {
       "$ref": "#/definitions/AutoScalingGroupProvider"

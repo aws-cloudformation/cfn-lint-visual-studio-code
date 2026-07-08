@@ -1,39 +1,48 @@
 {
   "typeName": "AWS::SSM::MaintenanceWindowTarget",
-  "description": "Resource Type definition for AWS::SSM::MaintenanceWindowTarget",
+  "description": "Resource type definition for AWS::SSM::MaintenanceWindowTarget",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-ssm/tree/master/aws-ssm-maintenancewindowtask",
   "additionalProperties": false,
   "properties": {
     "OwnerInformation": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      "description": "A user-provided value that will be included in any Amazon CloudWatch Events events that are raised while running tasks for these targets in this maintenance window.",
+      "markdownDescription": "A user-provided value that will be included in any Amazon CloudWatch Events events that are raised while running tasks for these targets in this maintenance window.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
     },
     "Description": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      "description": "A description for the target.",
+      "markdownDescription": "A description for the target.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
     },
     "WindowId": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
+      "description": "The ID of the maintenance window to register the target with.",
+      "markdownDescription": "The ID of the maintenance window to register the target with.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
     },
     "ResourceType": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+      "description": "The type of target that is being registered with the maintenance window.",
+      "markdownDescription": "The type of target that is being registered with the maintenance window.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
     },
     "Targets": {
       "type": "array",
+      "description": "The targets to register with the maintenance window.",
       "uniqueItems": false,
+      "insertionOrder": false,
       "items": {
         "$ref": "#/definitions/Targets"
       },
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
-    },
-    "Id": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "The targets to register with the maintenance window.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
     },
     "Name": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      "description": "The name for the maintenance window target.",
+      "markdownDescription": "The name for the maintenance window target.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "WindowTargetId": {
+      "description": "The ID of the target.",
+      "type": "string",
+      "markdownDescription": "The ID of the target.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   },
   "definitions": {
@@ -43,16 +52,19 @@
       "properties": {
         "Values": {
           "type": "array",
+          "description": "User-defined criteria that maps to Key.",
           "uniqueItems": false,
+          "insertionOrder": false,
           "items": {
             "type": "string",
             "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
           },
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+          "markdownDescription": "User-defined criteria that maps to Key.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
         },
         "Key": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+          "description": "User-defined criteria for sending commands that target managed nodes that meet the criteria.",
+          "markdownDescription": "User-defined criteria for sending commands that target managed nodes that meet the criteria.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
@@ -71,15 +83,59 @@
     "/properties/WindowId"
   ],
   "primaryIdentifier": [
-    "/properties/Id"
+    "/properties/WindowId",
+    "/properties/WindowTargetId"
   ],
   "readOnlyProperties": [
-    "/properties/Id"
+    "/properties/WindowTargetId"
   ],
+  "tagging": {
+    "taggable": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ssm:DescribeMaintenanceWindowTargets",
+        "ssm:RegisterTargetWithMaintenanceWindow"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "ssm:DescribeMaintenanceWindowTargets"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ssm:UpdateMaintenanceWindowTarget"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ssm:DescribeMaintenanceWindowTargets",
+        "ssm:DeregisterTargetFromMaintenanceWindow"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ssm:DescribeMaintenanceWindowTargets"
+      ],
+      "handlerSchema": {
+        "properties": {
+          "WindowId": {
+            "$ref": "resource-schema.json#/properties/WindowId"
+          }
+        },
+        "required": [
+          "WindowId"
+        ]
+      }
+    }
+  },
   "attributes": {
-    "Id": {
+    "WindowTargetId": {
+      "description": "The ID of the target.",
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "The ID of the target.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

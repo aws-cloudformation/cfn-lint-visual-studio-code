@@ -1,0 +1,1655 @@
+{
+  "typeName": "AWS::BedrockAgentCore::Harness",
+  "description": "Resource Type definition for AWS::BedrockAgentCore::Harness - a managed agentic loop service that provides a turnkey solution for running stateful, tool-equipped AI agents.",
+  "definitions": {
+    "HarnessStatus": {
+      "type": "string",
+      "enum": [
+        "CREATING",
+        "CREATE_FAILED",
+        "UPDATING",
+        "UPDATE_FAILED",
+        "READY",
+        "DELETING",
+        "DELETE_FAILED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | CREATE_FAILED | UPDATING | UPDATE_FAILED | READY | DELETING | DELETE_FAILED  \nUpdate requires: No interruption\n"
+    },
+    "HarnessEnvironmentArtifact": {
+      "type": "object",
+      "properties": {
+        "ContainerConfiguration": {
+          "$ref": "#/definitions/ContainerConfiguration"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ContainerConfiguration": {
+      "type": "object",
+      "properties": {
+        "ContainerUri": {
+          "type": "string",
+          "description": "The ECR URI of the container.",
+          "minLength": 1,
+          "maxLength": 1024,
+          "markdownDescription": "The ECR URI of the container.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nPattern: ^(([0-9]{12})\\.dkr\\.ecr\\.([a-z0-9-]+)\\.amazonaws\\.com(\\.cn)?|public\\.ecr\\.aws)/((?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*)(?::([^:@]{1,300}))?(?:@(.+))?$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ContainerUri"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessEnvironmentProvider": {
+      "type": "object",
+      "properties": {
+        "AgentCoreRuntimeEnvironment": {
+          "$ref": "#/definitions/HarnessAgentCoreRuntimeEnvironment"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "HarnessAgentCoreRuntimeEnvironment": {
+      "type": "object",
+      "properties": {
+        "AgentRuntimeArn": {
+          "type": "string",
+          "description": "The ARN of the underlying AgentCore Runtime.",
+          "minLength": 20,
+          "maxLength": 1011,
+          "markdownDescription": "The ARN of the underlying AgentCore Runtime.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 1011  \nUpdate requires: No interruption\n"
+        },
+        "AgentRuntimeName": {
+          "type": "string",
+          "description": "The name of the underlying AgentCore Runtime.",
+          "markdownDescription": "The name of the underlying AgentCore Runtime.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "AgentRuntimeId": {
+          "type": "string",
+          "description": "The ID of the underlying AgentCore Runtime.",
+          "markdownDescription": "The ID of the underlying AgentCore Runtime.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "LifecycleConfiguration": {
+          "$ref": "#/definitions/LifecycleConfiguration"
+        },
+        "NetworkConfiguration": {
+          "$ref": "#/definitions/NetworkConfiguration"
+        },
+        "FilesystemConfigurations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilesystemConfiguration"
+          },
+          "minItems": 0,
+          "maxItems": 5,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LifecycleConfiguration": {
+      "type": "object",
+      "properties": {
+        "IdleRuntimeSessionTimeout": {
+          "type": "integer",
+          "minimum": 60,
+          "maximum": 28800,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "MaxLifetime": {
+          "type": "integer",
+          "minimum": 60,
+          "maximum": 28800,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "NetworkConfiguration": {
+      "type": "object",
+      "properties": {
+        "NetworkMode": {
+          "type": "string",
+          "enum": [
+            "PUBLIC",
+            "VPC"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: PUBLIC | VPC  \nUpdate requires: No interruption\n"
+        },
+        "NetworkModeConfig": {
+          "$ref": "#/definitions/VpcConfig"
+        }
+      },
+      "required": [
+        "NetworkMode"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "VpcConfig": {
+      "type": "object",
+      "properties": {
+        "SecurityGroups": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^sg-[0-9a-zA-Z]{8,17}$  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 1,
+          "maxItems": 16,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "Subnets": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^subnet-[0-9a-zA-Z]{8,17}$  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 1,
+          "maxItems": 16,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "SecurityGroups",
+        "Subnets"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "FilesystemConfiguration": {
+      "type": "object",
+      "properties": {
+        "SessionStorage": {
+          "$ref": "#/definitions/SessionStorageConfiguration"
+        },
+        "S3FilesAccessPoint": {
+          "$ref": "#/definitions/S3FilesAccessPointConfiguration"
+        },
+        "EfsAccessPoint": {
+          "$ref": "#/definitions/EfsAccessPointConfiguration"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SessionStorageConfiguration": {
+      "type": "object",
+      "properties": {
+        "MountPath": {
+          "type": "string",
+          "minLength": 6,
+          "maxLength": 200,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 6  \nMaximum Length: 200  \nPattern: ^/mnt/[a-zA-Z0-9._-]+/?$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "MountPath"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "S3FilesAccessPointConfiguration": {
+      "type": "object",
+      "description": "Configuration for an Amazon S3 Files access point to mount into the AgentCore Runtime.",
+      "properties": {
+        "AccessPointArn": {
+          "type": "string",
+          "maxLength": 256,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: ^arn:aws[-a-z]*:s3files:[0-9a-z-:]+:file-system/fs-[0-9a-f]{17,40}/access-point/fsap-[0-9a-f]{17,40}$  \nUpdate requires: No interruption\n"
+        },
+        "MountPath": {
+          "type": "string",
+          "minLength": 6,
+          "maxLength": 200,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 6  \nMaximum Length: 200  \nPattern: ^/mnt/[a-zA-Z0-9._-]+/?$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "AccessPointArn",
+        "MountPath"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for an Amazon S3 Files access point to mount into the AgentCore Runtime.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EfsAccessPointConfiguration": {
+      "type": "object",
+      "description": "Configuration for an Amazon EFS access point to mount into the AgentCore Runtime.",
+      "properties": {
+        "AccessPointArn": {
+          "type": "string",
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 128  \nPattern: ^arn:aws[-a-z]*:elasticfilesystem:[0-9a-z-:]+:access-point/fsap-[0-9a-f]{8,40}$  \nUpdate requires: No interruption\n"
+        },
+        "MountPath": {
+          "type": "string",
+          "minLength": 6,
+          "maxLength": 200,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 6  \nMaximum Length: 200  \nPattern: ^/mnt/[a-zA-Z0-9._-]+/?$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "AccessPointArn",
+        "MountPath"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for an Amazon EFS access point to mount into the AgentCore Runtime.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessModelConfiguration": {
+      "type": "object",
+      "properties": {
+        "BedrockModelConfig": {
+          "$ref": "#/definitions/HarnessBedrockModelConfig"
+        },
+        "OpenAiModelConfig": {
+          "$ref": "#/definitions/HarnessOpenAiModelConfig"
+        },
+        "GeminiModelConfig": {
+          "$ref": "#/definitions/HarnessGeminiModelConfig"
+        },
+        "LiteLlmModelConfig": {
+          "$ref": "#/definitions/HarnessLiteLlmModelConfig"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "BedrockModelConfig"
+          ]
+        },
+        {
+          "required": [
+            "OpenAiModelConfig"
+          ]
+        },
+        {
+          "required": [
+            "GeminiModelConfig"
+          ]
+        },
+        {
+          "required": [
+            "LiteLlmModelConfig"
+          ]
+        }
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessBedrockModelConfig": {
+      "type": "object",
+      "properties": {
+        "ModelId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "MaxTokens": {
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Temperature": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 2,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "TopP": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "ApiFormat": {
+          "type": "string",
+          "enum": [
+            "converse_stream",
+            "responses",
+            "chat_completions"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: converse_stream | responses | chat_completions  \nUpdate requires: No interruption\n"
+        },
+        "AdditionalParams": {
+          "type": "object",
+          "description": "Provider-specific parameters passed through to the model provider unchanged.",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[\\s\\S]{1,256}$": {}
+          },
+          "markdownDescription": "Provider-specific parameters passed through to the model provider unchanged.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ModelId"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessOpenAiModelConfig": {
+      "type": "object",
+      "properties": {
+        "ModelId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ApiKeyArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:aws:bedrock-agentcore:[a-z0-9-]+:[0-9]{12}:token-vault/[a-zA-Z0-9-.]+/apikeycredentialprovider/[a-zA-Z0-9-.]+$  \nUpdate requires: No interruption\n"
+        },
+        "MaxTokens": {
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Temperature": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 2,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "TopP": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "ApiFormat": {
+          "type": "string",
+          "enum": [
+            "chat_completions",
+            "responses"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: chat_completions | responses  \nUpdate requires: No interruption\n"
+        },
+        "AdditionalParams": {
+          "type": "object",
+          "description": "Provider-specific parameters passed through to the model provider unchanged.",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[\\s\\S]{1,256}$": {}
+          },
+          "markdownDescription": "Provider-specific parameters passed through to the model provider unchanged.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ModelId",
+        "ApiKeyArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessLiteLlmModelConfig": {
+      "type": "object",
+      "properties": {
+        "ModelId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ApiKeyArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws:bedrock-agentcore:[a-z0-9-]+:[0-9]{12}:token-vault/[a-zA-Z0-9-.]+/apikeycredentialprovider/[a-zA-Z0-9-.]+$  \nUpdate requires: No interruption\n"
+        },
+        "ApiBase": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16383,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 16383  \nUpdate requires: No interruption\n"
+        },
+        "MaxTokens": {
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Temperature": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 2,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "TopP": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "AdditionalParams": {
+          "type": "object",
+          "description": "Provider-specific parameters passed through to LiteLLM unchanged.",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[\\s\\S]{1,256}$": {}
+          },
+          "markdownDescription": "Provider-specific parameters passed through to LiteLLM unchanged.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ModelId"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessGeminiModelConfig": {
+      "type": "object",
+      "properties": {
+        "ModelId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ApiKeyArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:aws:bedrock-agentcore:[a-z0-9-]+:[0-9]{12}:token-vault/[a-zA-Z0-9-.]+/apikeycredentialprovider/[a-zA-Z0-9-.]+$  \nUpdate requires: No interruption\n"
+        },
+        "MaxTokens": {
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Temperature": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 2,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "TopP": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "TopK": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 500,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ModelId",
+        "ApiKeyArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AuthorizerConfiguration": {
+      "type": "object",
+      "properties": {
+        "CustomJWTAuthorizer": {
+          "$ref": "#/definitions/CustomJWTAuthorizerConfiguration"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CustomJWTAuthorizerConfiguration": {
+      "type": "object",
+      "properties": {
+        "DiscoveryUrl": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^.+/\\.well-known/openid-configuration$  \nUpdate requires: No interruption\n"
+        },
+        "AllowedAudience": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "AllowedClients": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "AllowedScopes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[\\x21\\x23-\\x5B\\x5D-\\x7E]+$  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "CustomClaims": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CustomClaimValidationType"
+          },
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "PrivateEndpoint": {
+          "$ref": "#/definitions/PrivateEndpoint"
+        },
+        "PrivateEndpointOverrides": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PrivateEndpointOverride"
+          },
+          "maxItems": 5,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "DiscoveryUrl"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PrivateEndpoint": {
+      "type": "object",
+      "description": "Private endpoint configuration for connecting to the OpenID Connect discovery endpoint over a private network.",
+      "properties": {
+        "SelfManagedLatticeResource": {
+          "$ref": "#/definitions/SelfManagedLatticeResource"
+        },
+        "ManagedVpcResource": {
+          "$ref": "#/definitions/ManagedVpcResource"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Private endpoint configuration for connecting to the OpenID Connect discovery endpoint over a private network.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SelfManagedLatticeResource": {
+      "type": "object",
+      "description": "Configuration for connecting to a private resource using a self-managed VPC Lattice resource configuration.",
+      "properties": {
+        "ResourceConfigurationIdentifier": {
+          "type": "string",
+          "minLength": 20,
+          "maxLength": 2048,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^((rcfg-[0-9a-z]{17})|(arn:[a-z0-9\\-]+:vpc-lattice:[a-zA-Z0-9\\-]+:\\d{12}:resourceconfiguration/rcfg-[0-9a-z]{17}))$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ResourceConfigurationIdentifier"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for connecting to a private resource using a self-managed VPC Lattice resource configuration.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ManagedVpcResource": {
+      "type": "object",
+      "description": "Configuration for a service-managed VPC endpoint.",
+      "properties": {
+        "VpcIdentifier": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^vpc-(([0-9a-z]{8})|([0-9a-z]{17}))$  \nUpdate requires: No interruption\n"
+        },
+        "SubnetIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^subnet-[0-9a-zA-Z]{8,17}$  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "EndpointIpAddressType": {
+          "type": "string",
+          "enum": [
+            "IPV4",
+            "IPV6"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: IPV4 | IPV6  \nUpdate requires: No interruption\n"
+        },
+        "SecurityGroupIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^sg-(([0-9a-z]{8})|([0-9a-z]{17}))$  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 0,
+          "maxItems": 5,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "Tags": {
+          "type": "object",
+          "maxProperties": 50,
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[a-zA-Z0-9\\s_.:/=+\\-@]{1,128}$": {
+              "type": "string",
+              "maxLength": 256,
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nPattern: ^[a-zA-Z0-9\\s_.:/=+\\-@]*$  \nUpdate requires: No interruption\n"
+            }
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "RoutingDomain": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 255,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "VpcIdentifier",
+        "SubnetIds",
+        "EndpointIpAddressType"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for a service-managed VPC endpoint.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PrivateEndpointOverride": {
+      "type": "object",
+      "description": "Maps a domain to a private endpoint for resolving that domain over a private network.",
+      "properties": {
+        "Domain": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 253,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 253  \nUpdate requires: No interruption\n"
+        },
+        "PrivateEndpoint": {
+          "$ref": "#/definitions/PrivateEndpoint"
+        }
+      },
+      "required": [
+        "Domain",
+        "PrivateEndpoint"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Maps a domain to a private endpoint for resolving that domain over a private network.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CustomClaimValidationType": {
+      "type": "object",
+      "properties": {
+        "InboundTokenClaimName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[A-Za-z0-9_.-:]+$  \nUpdate requires: No interruption\n"
+        },
+        "InboundTokenClaimValueType": {
+          "type": "string",
+          "enum": [
+            "STRING",
+            "STRING_ARRAY"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: STRING | STRING_ARRAY  \nUpdate requires: No interruption\n"
+        },
+        "AuthorizingClaimMatchValue": {
+          "$ref": "#/definitions/AuthorizingClaimMatchValueType"
+        }
+      },
+      "required": [
+        "InboundTokenClaimName",
+        "InboundTokenClaimValueType",
+        "AuthorizingClaimMatchValue"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AuthorizingClaimMatchValueType": {
+      "type": "object",
+      "properties": {
+        "ClaimMatchValue": {
+          "$ref": "#/definitions/ClaimMatchValueType"
+        },
+        "ClaimMatchOperator": {
+          "type": "string",
+          "enum": [
+            "EQUALS",
+            "CONTAINS",
+            "CONTAINS_ANY"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: EQUALS | CONTAINS | CONTAINS_ANY  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ClaimMatchValue",
+        "ClaimMatchOperator"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ClaimMatchValueType": {
+      "type": "object",
+      "properties": {
+        "MatchValueString": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[A-Za-z0-9_.-]+$  \nUpdate requires: No interruption\n"
+        },
+        "MatchValueStringList": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[A-Za-z0-9_.-]+$  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "MatchValueString"
+          ]
+        },
+        {
+          "required": [
+            "MatchValueStringList"
+          ]
+        }
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessSystemContentBlock": {
+      "type": "object",
+      "properties": {
+        "Text": {
+          "type": "string",
+          "description": "The text content of the system prompt block.",
+          "minLength": 1,
+          "markdownDescription": "The text content of the system prompt block.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Text"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessTool": {
+      "type": "object",
+      "properties": {
+        "Type": {
+          "type": "string",
+          "enum": [
+            "remote_mcp",
+            "agentcore_browser",
+            "agentcore_gateway",
+            "inline_function",
+            "agentcore_code_interpreter"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: remote_mcp | agentcore_browser | agentcore_gateway | inline_function | agentcore_code_interpreter  \nUpdate requires: No interruption\n"
+        },
+        "Name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[a-zA-Z0-9_-]+$  \nUpdate requires: No interruption\n"
+        },
+        "Config": {
+          "$ref": "#/definitions/HarnessToolConfiguration"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessToolConfiguration": {
+      "type": "object",
+      "properties": {
+        "RemoteMcp": {
+          "$ref": "#/definitions/HarnessRemoteMcpConfig"
+        },
+        "AgentCoreBrowser": {
+          "$ref": "#/definitions/HarnessAgentCoreBrowserConfig"
+        },
+        "AgentCoreGateway": {
+          "$ref": "#/definitions/HarnessAgentCoreGatewayConfig"
+        },
+        "InlineFunction": {
+          "$ref": "#/definitions/HarnessInlineFunctionConfig"
+        },
+        "AgentCoreCodeInterpreter": {
+          "$ref": "#/definitions/HarnessAgentCoreCodeInterpreterConfig"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "RemoteMcp"
+          ]
+        },
+        {
+          "required": [
+            "AgentCoreBrowser"
+          ]
+        },
+        {
+          "required": [
+            "AgentCoreGateway"
+          ]
+        },
+        {
+          "required": [
+            "InlineFunction"
+          ]
+        },
+        {
+          "required": [
+            "AgentCoreCodeInterpreter"
+          ]
+        }
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessRemoteMcpConfig": {
+      "type": "object",
+      "properties": {
+        "Url": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16383,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 16383  \nUpdate requires: No interruption\n"
+        },
+        "Headers": {
+          "type": "object",
+          "patternProperties": {
+            "^[\\s\\S]*$": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 16383,
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 16383  \nUpdate requires: No interruption\n"
+            }
+          },
+          "additionalProperties": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Url"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessAgentCoreBrowserConfig": {
+      "type": "object",
+      "properties": {
+        "BrowserArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws(-[^:]+)?:bedrock-agentcore:[a-z0-9-]+:(aws|[0-9]{12}):browser(-custom)?/(aws\\.browser\\.v1|[a-zA-Z][a-zA-Z0-9_]{0,47}-[a-zA-Z0-9]{10})$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessAgentCoreGatewayConfig": {
+      "type": "object",
+      "properties": {
+        "GatewayArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:aws(|-cn|-us-gov):bedrock-agentcore:[a-z0-9-]{1,20}:[0-9]{12}:gateway/([0-9a-z][-]?){1,48}-[a-z0-9]{10}$  \nUpdate requires: No interruption\n"
+        },
+        "OutboundAuth": {
+          "$ref": "#/definitions/HarnessGatewayOutboundAuth"
+        }
+      },
+      "required": [
+        "GatewayArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessGatewayOutboundAuth": {
+      "type": "object",
+      "properties": {
+        "AwsIam": {
+          "type": "object",
+          "additionalProperties": false,
+          "markdownDescription": "\n\n---\n\nRequired: Conditional  \nUpdate requires: No interruption\n"
+        },
+        "None": {
+          "type": "object",
+          "additionalProperties": false,
+          "markdownDescription": "\n\n---\n\nRequired: Conditional  \nUpdate requires: No interruption\n"
+        },
+        "Oauth": {
+          "$ref": "#/definitions/OAuthCredentialProvider"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "AwsIam"
+          ]
+        },
+        {
+          "required": [
+            "None"
+          ]
+        },
+        {
+          "required": [
+            "Oauth"
+          ]
+        }
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "OAuthCredentialProvider": {
+      "type": "object",
+      "properties": {
+        "ProviderArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:([^:]*):([^:]*):([^:]*):([0-9]{12})?:(.+)$  \nUpdate requires: No interruption\n"
+        },
+        "Scopes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nUpdate requires: No interruption\n"
+          },
+          "maxItems": 100,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "CustomParameters": {
+          "type": "object",
+          "patternProperties": {
+            "^[\\s\\S]*$": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048,
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: No interruption\n"
+            }
+          },
+          "additionalProperties": false,
+          "minProperties": 1,
+          "maxProperties": 10,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "GrantType": {
+          "type": "string",
+          "enum": [
+            "CLIENT_CREDENTIALS",
+            "AUTHORIZATION_CODE"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CLIENT_CREDENTIALS | AUTHORIZATION_CODE  \nUpdate requires: No interruption\n"
+        },
+        "DefaultReturnUrl": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^\\w+:(\\/?\\/?)[^\\s]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ProviderArn",
+        "Scopes"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessInlineFunctionConfig": {
+      "type": "object",
+      "properties": {
+        "Description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 4096  \nUpdate requires: No interruption\n"
+        },
+        "InputSchema": {
+          "type": "object",
+          "description": "JSON Schema describing the tool's input parameters.",
+          "markdownDescription": "JSON Schema describing the tool's input parameters.\n\n---\n\nRequired: Yes  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Description",
+        "InputSchema"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessAgentCoreCodeInterpreterConfig": {
+      "type": "object",
+      "properties": {
+        "CodeInterpreterArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws(-[^:]+)?:bedrock-agentcore:[a-z0-9-]+:(aws|[0-9]{12}):code-interpreter(-custom)?/(aws\\.codeinterpreter\\.v1|[a-zA-Z][a-zA-Z0-9_]{0,47}-[a-zA-Z0-9]{10})$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessSkill": {
+      "type": "object",
+      "properties": {
+        "Path": {
+          "type": "string",
+          "description": "The filesystem path to the skill definition.",
+          "minLength": 1,
+          "markdownDescription": "The filesystem path to the skill definition.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nUpdate requires: No interruption\n"
+        },
+        "S3": {
+          "$ref": "#/definitions/HarnessSkillS3Source"
+        },
+        "Git": {
+          "$ref": "#/definitions/HarnessSkillGitSource"
+        },
+        "AwsSkills": {
+          "$ref": "#/definitions/HarnessSkillAwsSkillsSource"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessSkillAwsSkillsSource": {
+      "type": "object",
+      "description": "AWS Skills baked into the Harness's underlying Runtime.",
+      "properties": {
+        "Paths": {
+          "type": "array",
+          "description": "Optionally filter allowed skills with glob syntax, e.g., ['core-skills/*'].",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 4096  \nPattern: ^([^*?\\[\\]]|\\*)+$  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "Optionally filter allowed skills with glob syntax, e.g., ['core-skills/*'].\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "AWS Skills baked into the Harness's underlying Runtime.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessSkillS3Source": {
+      "type": "object",
+      "description": "An S3 source containing the skill.",
+      "properties": {
+        "Uri": {
+          "type": "string",
+          "description": "The S3 URI pointing to the skill directory (e.g., s3://bucket/skills/my-skill/).",
+          "minLength": 5,
+          "markdownDescription": "The S3 URI pointing to the skill directory (e.g., s3://bucket/skills/my-skill/).\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 5  \nPattern: ^s3://  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Uri"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "An S3 source containing the skill.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessSkillGitSource": {
+      "type": "object",
+      "description": "A git repository containing the skill, cloned over HTTPS.",
+      "properties": {
+        "Url": {
+          "type": "string",
+          "description": "The HTTPS URL of the git repository.",
+          "minLength": 8,
+          "markdownDescription": "The HTTPS URL of the git repository.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 8  \nPattern: ^https://  \nUpdate requires: No interruption\n"
+        },
+        "Path": {
+          "type": "string",
+          "description": "Subdirectory within the repository containing the skill.",
+          "markdownDescription": "Subdirectory within the repository containing the skill.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Auth": {
+          "$ref": "#/definitions/HarnessSkillGitAuth"
+        }
+      },
+      "required": [
+        "Url"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A git repository containing the skill, cloned over HTTPS.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessSkillGitAuth": {
+      "type": "object",
+      "description": "Authentication configuration for accessing a private git repository.",
+      "properties": {
+        "CredentialArn": {
+          "type": "string",
+          "description": "The ARN of the credential in AgentCore Identity containing the password or personal access token.",
+          "markdownDescription": "The ARN of the credential in AgentCore Identity containing the password or personal access token.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:aws:bedrock-agentcore:[a-z0-9-]+:[0-9]{12}:token-vault/[a-zA-Z0-9-.]+/apikeycredentialprovider/[a-zA-Z0-9-.]+$  \nUpdate requires: No interruption\n"
+        },
+        "Username": {
+          "type": "string",
+          "description": "Username for authentication. Defaults to 'oauth2' if not specified.",
+          "markdownDescription": "Username for authentication. Defaults to 'oauth2' if not specified.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "CredentialArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Authentication configuration for accessing a private git repository.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessMemoryConfiguration": {
+      "type": "object",
+      "properties": {
+        "AgentCoreMemoryConfiguration": {
+          "$ref": "#/definitions/HarnessAgentCoreMemoryConfiguration"
+        },
+        "ManagedMemoryConfiguration": {
+          "$ref": "#/definitions/HarnessManagedMemoryConfiguration"
+        },
+        "Disabled": {
+          "$ref": "#/definitions/HarnessDisabledMemoryConfiguration"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: Replacement\nRead only property: Yes"
+    },
+    "HarnessManagedMemoryConfiguration": {
+      "type": "object",
+      "description": "Configuration for managed memory. The harness creates and manages a memory resource in the customer's account.",
+      "properties": {
+        "Arn": {
+          "type": "string",
+          "description": "The ARN of the managed memory resource. Read-only, populated by the service.",
+          "markdownDescription": "The ARN of the managed memory resource. Read-only, populated by the service.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws:bedrock-agentcore:[a-z0-9-]+:[0-9]{12}:memory/[a-zA-Z][a-zA-Z0-9-_]{0,99}-[a-zA-Z0-9]{10}$  \nUpdate requires: No interruption\n"
+        },
+        "Strategies": {
+          "type": "array",
+          "description": "Strategy types to enable. Defaults to [SEMANTIC, SUMMARIZATION].",
+          "items": {
+            "type": "string",
+            "enum": [
+              "SEMANTIC",
+              "SUMMARIZATION",
+              "USER_PREFERENCE",
+              "EPISODIC"
+            ],
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SEMANTIC | SUMMARIZATION | USER_PREFERENCE | EPISODIC  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 1,
+          "maxItems": 4,
+          "uniqueItems": true,
+          "markdownDescription": "Strategy types to enable. Defaults to [SEMANTIC, SUMMARIZATION].\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "EventExpiryDuration": {
+          "type": "integer",
+          "description": "Event retention in days. Defaults to 30.",
+          "minimum": 3,
+          "maximum": 365,
+          "markdownDescription": "Event retention in days. Defaults to 30.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "EncryptionKeyArn": {
+          "type": "string",
+          "description": "Customer-managed KMS key ARN. Defaults to AWS-owned key. Not updatable after creation.",
+          "markdownDescription": "Customer-managed KMS key ARN. Defaults to AWS-owned key. Not updatable after creation.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for managed memory. The harness creates and manages a memory resource in the customer's account.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessDisabledMemoryConfiguration": {
+      "type": "object",
+      "description": "Explicitly opt out of memory.",
+      "additionalProperties": false,
+      "markdownDescription": "Explicitly opt out of memory.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessAgentCoreMemoryConfiguration": {
+      "type": "object",
+      "properties": {
+        "Arn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:aws:bedrock-agentcore:[a-z0-9-]+:[0-9]{12}:memory/[a-zA-Z][a-zA-Z0-9-_]{0,99}-[a-zA-Z0-9]{10}$  \nUpdate requires: No interruption\n"
+        },
+        "ActorId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "MessagesCount": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "RetrievalConfig": {
+          "type": "object",
+          "patternProperties": {
+            "^[\\s\\S]*$": {
+              "$ref": "#/definitions/HarnessAgentCoreMemoryRetrievalConfig"
+            }
+          },
+          "additionalProperties": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Arn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessAgentCoreMemoryRetrievalConfig": {
+      "type": "object",
+      "properties": {
+        "TopK": {
+          "description": "Maximum number of memory records to retrieve. Typed as both integer and string because CloudFormation marshals scalars nested in dynamic-key (patternProperties) maps as strings, while direct API/CDK callers send a JSON integer; both forms must validate.",
+          "type": [
+            "integer",
+            "string"
+          ],
+          "markdownDescription": "Maximum number of memory records to retrieve. Typed as both integer and string because CloudFormation marshals scalars nested in dynamic-key (patternProperties) maps as strings, while direct API/CDK callers send a JSON integer; both forms must validate.\n\n---\n\nRequired: No  \nType: ['integer', 'string']  \nUpdate requires: No interruption\n"
+        },
+        "RelevanceScore": {
+          "description": "Minimum relevance score for retrieved memories. Typed as both number and string because CloudFormation marshals scalars nested in dynamic-key (patternProperties) maps as strings, while direct API/CDK callers send a JSON number; both forms must validate.",
+          "type": [
+            "number",
+            "string"
+          ],
+          "markdownDescription": "Minimum relevance score for retrieved memories. Typed as both number and string because CloudFormation marshals scalars nested in dynamic-key (patternProperties) maps as strings, while direct API/CDK callers send a JSON number; both forms must validate.\n\n---\n\nRequired: No  \nType: ['number', 'string']  \nUpdate requires: No interruption\n"
+        },
+        "StrategyId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessTruncationConfiguration": {
+      "type": "object",
+      "properties": {
+        "Strategy": {
+          "type": "string",
+          "enum": [
+            "sliding_window",
+            "summarization",
+            "none"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: sliding_window | summarization | none  \nUpdate requires: No interruption\n"
+        },
+        "Config": {
+          "$ref": "#/definitions/HarnessTruncationStrategyConfiguration"
+        }
+      },
+      "required": [
+        "Strategy"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessTruncationStrategyConfiguration": {
+      "type": "object",
+      "properties": {
+        "SlidingWindow": {
+          "$ref": "#/definitions/HarnessSlidingWindowConfiguration"
+        },
+        "Summarization": {
+          "$ref": "#/definitions/HarnessSummarizationConfiguration"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessSlidingWindowConfiguration": {
+      "type": "object",
+      "properties": {
+        "MessagesCount": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HarnessSummarizationConfiguration": {
+      "type": "object",
+      "properties": {
+        "SummaryRatio": {
+          "type": "number",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "PreserveRecentMessages": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "SummarizationSystemPrompt": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9\\s_.:/=+\\-@]*$  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: ^[a-zA-Z0-9\\s_.:/=+\\-@]*$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "Arn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the harness.",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the harness.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:([^:]+)?:bedrock-agentcore:[a-z0-9-]+:[0-9]{12}:harness/[a-zA-Z][a-zA-Z0-9_]{0,39}-[a-zA-Z0-9]{10}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "HarnessId": {
+      "type": "string",
+      "description": "The unique identifier of the harness.",
+      "markdownDescription": "The unique identifier of the harness.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z][a-zA-Z0-9_]{0,39}-[a-zA-Z0-9]{10}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "HarnessName": {
+      "type": "string",
+      "description": "The name of the harness.",
+      "markdownDescription": "The name of the harness.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z][a-zA-Z0-9_]{0,39}$  \nUpdate requires: Replacement\n"
+    },
+    "Status": {
+      "$ref": "#/definitions/HarnessStatus",
+      "description": "The current status of the harness.",
+      "markdownDescription": "The current status of the harness.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Version": {
+      "type": "string",
+      "description": "The version of the harness. Incremented on every successful update.",
+      "minLength": 1,
+      "maxLength": 5,
+      "markdownDescription": "The version of the harness. Incremented on every successful update.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 5  \nPattern: ^([1-9][0-9]{0,4})$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ExecutionRoleArn": {
+      "type": "string",
+      "description": "The ARN of the IAM role that the harness assumes when running.",
+      "minLength": 1,
+      "maxLength": 2048,
+      "markdownDescription": "The ARN of the IAM role that the harness assumes when running.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws(-[^:]+)?:iam::[0-9]{12}:role/.+$  \nUpdate requires: No interruption\n"
+    },
+    "Environment": {
+      "$ref": "#/definitions/HarnessEnvironmentProvider",
+      "description": "The compute environment configuration for the harness, including underlying runtime information.",
+      "markdownDescription": "The compute environment configuration for the harness, including underlying runtime information.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "EnvironmentArtifact": {
+      "$ref": "#/definitions/HarnessEnvironmentArtifact",
+      "description": "The environment artifact for the harness, such as a custom container image.",
+      "markdownDescription": "The environment artifact for the harness, such as a custom container image.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "EnvironmentVariables": {
+      "type": "object",
+      "description": "Environment variables to set in the harness runtime environment.",
+      "patternProperties": {
+        "^[\\s\\S]*$": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 5000,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 5000  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "maxProperties": 50,
+      "markdownDescription": "Environment variables to set in the harness runtime environment.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AuthorizerConfiguration": {
+      "$ref": "#/definitions/AuthorizerConfiguration",
+      "description": "The inbound authorization configuration for authenticating incoming requests.",
+      "markdownDescription": "The inbound authorization configuration for authenticating incoming requests.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "Model": {
+      "$ref": "#/definitions/HarnessModelConfiguration",
+      "description": "The model configuration for the harness.",
+      "markdownDescription": "The model configuration for the harness.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "SystemPrompt": {
+      "type": "array",
+      "description": "The system prompt that defines the agent's behavior.",
+      "items": {
+        "$ref": "#/definitions/HarnessSystemContentBlock"
+      },
+      "markdownDescription": "The system prompt that defines the agent's behavior.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "Tools": {
+      "type": "array",
+      "description": "The tools available to the agent.",
+      "items": {
+        "$ref": "#/definitions/HarnessTool"
+      },
+      "markdownDescription": "The tools available to the agent.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "Skills": {
+      "type": "array",
+      "description": "The skills available to the agent.",
+      "items": {
+        "$ref": "#/definitions/HarnessSkill"
+      },
+      "markdownDescription": "The skills available to the agent.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "AllowedTools": {
+      "type": "array",
+      "description": "The tools that the agent is allowed to use.",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 64,
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^(\\*|@?[^/]+(/[^/]+)?)$  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "The tools that the agent is allowed to use.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "Memory": {
+      "$ref": "#/definitions/HarnessMemoryConfiguration",
+      "description": "The AgentCore Memory configuration for persisting conversation context.",
+      "markdownDescription": "The AgentCore Memory configuration for persisting conversation context.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\nRead only property: Yes"
+    },
+    "Truncation": {
+      "$ref": "#/definitions/HarnessTruncationConfiguration",
+      "description": "The truncation configuration for managing conversation context.",
+      "markdownDescription": "The truncation configuration for managing conversation context.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "MaxIterations": {
+      "type": "integer",
+      "description": "The maximum number of iterations the agent loop can execute per invocation.",
+      "markdownDescription": "The maximum number of iterations the agent loop can execute per invocation.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    },
+    "MaxTokens": {
+      "type": "integer",
+      "description": "The maximum number of tokens the agent can generate per iteration.",
+      "markdownDescription": "The maximum number of tokens the agent can generate per iteration.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    },
+    "TimeoutSeconds": {
+      "type": "integer",
+      "description": "The maximum duration in seconds for the agent loop execution per invocation.",
+      "markdownDescription": "The maximum duration in seconds for the agent loop execution per invocation.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    },
+    "CreatedAt": {
+      "type": "string",
+      "description": "The timestamp when the harness was created.",
+      "format": "date-time",
+      "markdownDescription": "The timestamp when the harness was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "UpdatedAt": {
+      "type": "string",
+      "description": "The timestamp when the harness was last updated.",
+      "format": "date-time",
+      "markdownDescription": "The timestamp when the harness was last updated.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Tags": {
+      "type": "array",
+      "description": "Tags to apply to the harness resource.",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "maxItems": 50,
+      "insertionOrder": false,
+      "markdownDescription": "Tags to apply to the harness resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "HarnessName",
+    "ExecutionRoleArn",
+    "Model"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/HarnessId",
+    "/properties/Status",
+    "/properties/Version",
+    "/properties/CreatedAt",
+    "/properties/UpdatedAt",
+    "/properties/Memory/ManagedMemoryConfiguration/Arn",
+    "/properties/Environment/AgentCoreRuntimeEnvironment/AgentRuntimeArn",
+    "/properties/Environment/AgentCoreRuntimeEnvironment/AgentRuntimeName",
+    "/properties/Environment/AgentCoreRuntimeEnvironment/AgentRuntimeId"
+  ],
+  "createOnlyProperties": [
+    "/properties/HarnessName",
+    "/properties/Memory/ManagedMemoryConfiguration/EncryptionKeyArn"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/HarnessId"
+    ]
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "tagProperty": "/properties/Tags",
+    "cloudFormationSystemTags": true,
+    "permissions": [
+      "bedrock-agentcore:TagResource",
+      "bedrock-agentcore:UntagResource",
+      "bedrock-agentcore:ListTagsForResource"
+    ]
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "bedrock-agentcore:CreateAgentRuntime",
+        "bedrock-agentcore:CreateAgentRuntimeEndpoint",
+        "bedrock-agentcore:CreateHarness",
+        "bedrock-agentcore:CreateMemory",
+        "bedrock-agentcore:GetMemory",
+        "bedrock-agentcore:DeleteMemory",
+        "bedrock-agentcore:CreateWorkloadIdentity",
+        "bedrock-agentcore:DeleteAgentRuntime",
+        "bedrock-agentcore:DeleteAgentRuntimeEndpoint",
+        "bedrock-agentcore:DeleteWorkloadIdentity",
+        "bedrock-agentcore:GetAgentRuntime",
+        "bedrock-agentcore:GetAgentRuntimeEndpoint",
+        "bedrock-agentcore:GetHarness",
+        "bedrock-agentcore:TagResource",
+        "bedrock-agentcore:UpdateAgentRuntime",
+        "bedrock-agentcore:UpdateAgentRuntimeEndpoint",
+        "iam:CreateServiceLinkedRole",
+        "iam:PassRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "bedrock-agentcore:GetHarness",
+        "bedrock-agentcore:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "bedrock-agentcore:CreateAgentRuntime",
+        "bedrock-agentcore:CreateAgentRuntimeEndpoint",
+        "bedrock-agentcore:CreateMemory",
+        "bedrock-agentcore:GetMemory",
+        "bedrock-agentcore:UpdateMemory",
+        "bedrock-agentcore:DeleteMemory",
+        "bedrock-agentcore:CreateWorkloadIdentity",
+        "bedrock-agentcore:DeleteAgentRuntime",
+        "bedrock-agentcore:DeleteAgentRuntimeEndpoint",
+        "bedrock-agentcore:DeleteWorkloadIdentity",
+        "bedrock-agentcore:GetAgentRuntime",
+        "bedrock-agentcore:GetAgentRuntimeEndpoint",
+        "bedrock-agentcore:GetHarness",
+        "bedrock-agentcore:ListTagsForResource",
+        "bedrock-agentcore:TagResource",
+        "bedrock-agentcore:UntagResource",
+        "bedrock-agentcore:UpdateAgentRuntime",
+        "bedrock-agentcore:UpdateAgentRuntimeEndpoint",
+        "bedrock-agentcore:UpdateHarness",
+        "iam:CreateServiceLinkedRole",
+        "iam:PassRole"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "bedrock-agentcore:CreateAgentRuntime",
+        "bedrock-agentcore:CreateAgentRuntimeEndpoint",
+        "bedrock-agentcore:CreateWorkloadIdentity",
+        "bedrock-agentcore:DeleteAgentRuntime",
+        "bedrock-agentcore:DeleteAgentRuntimeEndpoint",
+        "bedrock-agentcore:DeleteHarness",
+        "bedrock-agentcore:DeleteMemory",
+        "bedrock-agentcore:GetMemory",
+        "bedrock-agentcore:DeleteWorkloadIdentity",
+        "bedrock-agentcore:GetAgentRuntime",
+        "bedrock-agentcore:GetAgentRuntimeEndpoint",
+        "bedrock-agentcore:GetHarness",
+        "bedrock-agentcore:UpdateAgentRuntime",
+        "bedrock-agentcore:UpdateAgentRuntimeEndpoint"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "bedrock-agentcore:ListHarnesses"
+      ]
+    }
+  },
+  "attributes": {
+    "Arn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the harness.",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the harness.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:([^:]+)?:bedrock-agentcore:[a-z0-9-]+:[0-9]{12}:harness/[a-zA-Z][a-zA-Z0-9_]{0,39}-[a-zA-Z0-9]{10}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "HarnessId": {
+      "type": "string",
+      "description": "The unique identifier of the harness.",
+      "markdownDescription": "The unique identifier of the harness.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z][a-zA-Z0-9_]{0,39}-[a-zA-Z0-9]{10}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Status": {
+      "$ref": "#/definitions/HarnessStatus",
+      "description": "The current status of the harness.",
+      "markdownDescription": "The current status of the harness.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Version": {
+      "type": "string",
+      "description": "The version of the harness. Incremented on every successful update.",
+      "minLength": 1,
+      "maxLength": 5,
+      "markdownDescription": "The version of the harness. Incremented on every successful update.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 5  \nPattern: ^([1-9][0-9]{0,4})$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreatedAt": {
+      "type": "string",
+      "description": "The timestamp when the harness was created.",
+      "format": "date-time",
+      "markdownDescription": "The timestamp when the harness was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "UpdatedAt": {
+      "type": "string",
+      "description": "The timestamp when the harness was last updated.",
+      "format": "date-time",
+      "markdownDescription": "The timestamp when the harness was last updated.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

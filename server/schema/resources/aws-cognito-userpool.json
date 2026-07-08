@@ -6,7 +6,7 @@
     "taggable": true,
     "tagOnCreate": true,
     "tagUpdatable": true,
-    "cloudFormationSystemTags": false,
+    "cloudFormationSystemTags": true,
     "tagProperty": "/properties/UserPoolTags",
     "permissions": [
       "cognito-idp:ListTagsForResource",
@@ -231,6 +231,21 @@
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "InboundFederation": {
+      "type": "object",
+      "properties": {
+        "LambdaVersion": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "LambdaArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "LambdaConfig": {
       "type": "object",
       "properties": {
@@ -286,6 +301,9 @@
         },
         "PreTokenGenerationConfig": {
           "$ref": "#/definitions/PreTokenGenerationConfig"
+        },
+        "InboundFederation": {
+          "$ref": "#/definitions/InboundFederation"
         }
       },
       "additionalProperties": false,
@@ -457,6 +475,46 @@
       },
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EncryptionKeyType": {
+      "type": "string",
+      "enum": [
+        "AWS_OWNED_KEY",
+        "CUSTOMER_MANAGED_KEY"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AWS_OWNED_KEY | CUSTOMER_MANAGED_KEY  \nUpdate requires: No interruption\n"
+    },
+    "EncryptionKeyArnType": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: arn:[\\w+=/,.@-]+:[\\w+=/,.@-]+:([\\w+=/,.@-]*)?:[0-9]+:[\\w+=/,.@-]+(:[\\w+=/,.@-]+)?(:[\\w+=/,.@-]+)?  \nUpdate requires: No interruption\n"
+    },
+    "KeyConfiguration": {
+      "type": "object",
+      "properties": {
+        "KeyType": {
+          "$ref": "#/definitions/EncryptionKeyType"
+        },
+        "KmsKeyArn": {
+          "$ref": "#/definitions/EncryptionKeyArnType"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "IssuerConfiguration": {
+      "type": "object",
+      "properties": {
+        "Type": {
+          "type": "string",
+          "enum": [
+            "ORIGINAL",
+            "UPDATED"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ORIGINAL | UPDATED  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -563,6 +621,9 @@
       "maxLength": 140,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 6  \nMaximum Length: 140  \nUpdate requires: No interruption\n"
     },
+    "KeyConfiguration": {
+      "$ref": "#/definitions/KeyConfiguration"
+    },
     "WebAuthnRelyingPartyID": {
       "type": "string",
       "minLength": 1,
@@ -574,6 +635,14 @@
       "minLength": 1,
       "maxLength": 9,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 9  \nUpdate requires: No interruption\n"
+    },
+    "WebAuthnFactorConfiguration": {
+      "type": "string",
+      "enum": [
+        "SINGLE_FACTOR",
+        "MULTI_FACTOR_WITH_USER_VERIFICATION"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SINGLE_FACTOR | MULTI_FACTOR_WITH_USER_VERIFICATION  \nUpdate requires: No interruption\n"
     },
     "Schema": {
       "type": "array",
@@ -629,6 +698,9 @@
         "PLUS"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: LITE | ESSENTIALS | PLUS  \nUpdate requires: No interruption\n"
+    },
+    "IssuerConfiguration": {
+      "$ref": "#/definitions/IssuerConfiguration"
     }
   },
   "additionalProperties": false,
@@ -655,6 +727,13 @@
         "cognito-idp:SetUserPoolMfaConfig",
         "cognito-idp:DescribeUserPool",
         "kms:CreateGrant",
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:GenerateDataKey",
+        "kms:GenerateDataKeyWithoutPlaintext",
+        "kms:ReEncryptFrom",
+        "kms:ReEncryptTo",
         "iam:CreateServiceLinkedRole",
         "cognito-idp:TagResource"
       ],
@@ -663,7 +742,9 @@
     "read": {
       "permissions": [
         "cognito-idp:DescribeUserPool",
-        "cognito-idp:GetUserPoolMfaConfig"
+        "cognito-idp:GetUserPoolMfaConfig",
+        "kms:Decrypt",
+        "kms:DescribeKey"
       ]
     },
     "update": {
@@ -676,7 +757,15 @@
         "cognito-idp:AddCustomAttributes",
         "cognito-idp:DescribeUserPool",
         "cognito-idp:GetUserPoolMfaConfig",
-        "iam:PassRole"
+        "iam:PassRole",
+        "kms:CreateGrant",
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:GenerateDataKey",
+        "kms:GenerateDataKeyWithoutPlaintext",
+        "kms:ReEncryptFrom",
+        "kms:ReEncryptTo"
       ],
       "timeoutInMinutes": 2
     },

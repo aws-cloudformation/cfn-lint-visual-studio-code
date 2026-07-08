@@ -2,8 +2,96 @@
   "typeName": "AWS::Route53Resolver::FirewallRuleGroup",
   "description": "Resource schema for AWS::Route53Resolver::FirewallRuleGroup.",
   "definitions": {
+    "PartnerThreatProtectionConfig": {
+      "description": "Configuration for a partner threat protection rule type.",
+      "type": "object",
+      "properties": {
+        "Partner": {
+          "description": "The partner identifier value.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The partner identifier value.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Partner"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for a partner threat protection rule type.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "FirewallAdvancedContentCategoryConfig": {
+      "description": "Configuration for an advanced content category rule type.",
+      "type": "object",
+      "properties": {
+        "Category": {
+          "description": "The content category value.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The content category value.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Category"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for an advanced content category rule type.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "FirewallAdvancedThreatCategoryConfig": {
+      "description": "Configuration for an advanced threat category rule type.",
+      "type": "object",
+      "properties": {
+        "Category": {
+          "description": "The threat category value.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The threat category value.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Category"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for an advanced threat category rule type.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "FirewallRuleType": {
+      "description": "Firewall rule type union. Exactly one member must be set. Mutually exclusive with FirewallDomainListId and DnsThreatProtection/ConfidenceThreshold.",
+      "type": "object",
+      "properties": {
+        "PartnerThreatProtection": {
+          "$ref": "#/definitions/PartnerThreatProtectionConfig"
+        },
+        "FirewallAdvancedContentCategory": {
+          "$ref": "#/definitions/FirewallAdvancedContentCategoryConfig"
+        },
+        "FirewallAdvancedThreatCategory": {
+          "$ref": "#/definitions/FirewallAdvancedThreatCategoryConfig"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "PartnerThreatProtection"
+          ]
+        },
+        {
+          "required": [
+            "FirewallAdvancedContentCategory"
+          ]
+        },
+        {
+          "required": [
+            "FirewallAdvancedThreatCategory"
+          ]
+        }
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Firewall rule type union. Exactly one member must be set. Mutually exclusive with FirewallDomainListId and DnsThreatProtection/ConfidenceThreshold.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "FirewallRule": {
-      "description": "Firewall Rule associating the Rule Group to a Domain List",
+      "description": "Firewall Rule associating the Rule Group to a Domain List or advanced rule type",
       "type": "object",
       "properties": {
         "FirewallDomainListId": {
@@ -75,23 +163,24 @@
           "markdownDescription": "Qtype\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 16  \nUpdate requires: No interruption\n"
         },
         "ConfidenceThreshold": {
-          "description": "FirewallDomainRedirectionAction",
+          "description": "ConfidenceThreshold",
           "type": "string",
           "enum": [
             "LOW",
             "MEDIUM",
             "HIGH"
           ],
-          "markdownDescription": "FirewallDomainRedirectionAction\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: LOW | MEDIUM | HIGH  \nUpdate requires: No interruption\n"
+          "markdownDescription": "ConfidenceThreshold\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: LOW | MEDIUM | HIGH  \nUpdate requires: No interruption\n"
         },
         "DnsThreatProtection": {
-          "description": "FirewallDomainRedirectionAction",
+          "description": "DnsThreatProtection",
           "type": "string",
           "enum": [
             "DGA",
-            "DNS_TUNNELING"
+            "DNS_TUNNELING",
+            "DICTIONARY_DGA"
           ],
-          "markdownDescription": "FirewallDomainRedirectionAction\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DGA | DNS_TUNNELING  \nUpdate requires: No interruption\n"
+          "markdownDescription": "DnsThreatProtection\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DGA | DNS_TUNNELING | DICTIONARY_DGA  \nUpdate requires: No interruption\n"
         },
         "FirewallDomainRedirectionAction": {
           "description": "FirewallDomainRedirectionAction",
@@ -101,6 +190,21 @@
             "TRUST_REDIRECTION_DOMAIN"
           ],
           "markdownDescription": "FirewallDomainRedirectionAction\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: INSPECT_REDIRECTION_DOMAIN | TRUST_REDIRECTION_DOMAIN  \nUpdate requires: No interruption\n"
+        },
+        "FirewallRuleType": {
+          "description": "Advanced firewall rule type. Mutually exclusive with FirewallDomainListId and DnsThreatProtection/ConfidenceThreshold.",
+          "$ref": "#/definitions/FirewallRuleType",
+          "markdownDescription": "Advanced firewall rule type. Mutually exclusive with FirewallDomainListId and DnsThreatProtection/ConfidenceThreshold.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "Status": {
+          "description": "The status of the firewall rule.",
+          "type": "string",
+          "enum": [
+            "COMPLETE",
+            "CREATING",
+            "CREATION_FAILED"
+          ],
+          "markdownDescription": "The status of the firewall rule.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: COMPLETE | CREATING | CREATION_FAILED  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
@@ -108,7 +212,7 @@
         "Action"
       ],
       "additionalProperties": false,
-      "markdownDescription": "Firewall Rule associating the Rule Group to a Domain List\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Firewall Rule associating the Rule Group to a Domain List or advanced rule type\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Tag": {
       "description": "A key-value pair to associate with a resource.",
@@ -243,7 +347,7 @@
     "taggable": true,
     "tagOnCreate": true,
     "tagUpdatable": true,
-    "cloudFormationSystemTags": false,
+    "cloudFormationSystemTags": true,
     "tagProperty": "/properties/Tags",
     "permissions": [
       "route53resolver:TagResource",
@@ -264,7 +368,8 @@
     "/properties/CreatorRequestId",
     "/properties/CreationTime",
     "/properties/ModificationTime",
-    "/properties/FirewallRules/*/FirewallThreatProtectionId"
+    "/properties/FirewallRules/*/FirewallThreatProtectionId",
+    "/properties/FirewallRules/*/Status"
   ],
   "primaryIdentifier": [
     "/properties/Id"

@@ -27,15 +27,76 @@
           "properties": {
             "SecretArn": {
               "type": "string",
-              "pattern": "^arn:(aws|aws-cn|aws-us-gov):secretsmanager:[a-z0-9-]+:\\d{12}:secret:[a-zA-Z0-9/_+=,.@-]+$"
+              "pattern": "^arn:(aws|aws-cn|aws-us-gov|aws-eusc):secretsmanager:[a-z0-9-]+:\\d{12}:secret:[a-zA-Z0-9/_+=,.@-]+$"
             }
           },
           "required": [
             "SecretArn"
           ],
           "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "TlsAuthConfiguration",
+          "properties": {
+            "TlsAuthConfiguration": {
+              "$ref": "#/definitions/TlsAuthConfiguration"
+            }
+          },
+          "required": [
+            "TlsAuthConfiguration"
+          ],
+          "additionalProperties": false
         }
       ]
+    },
+    "TlsAuthConfiguration": {
+      "type": "object",
+      "properties": {
+        "TrustStore": {
+          "$ref": "#/definitions/TrustStore"
+        }
+      },
+      "required": [
+        "TrustStore"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "TrustStore": {
+      "type": "object",
+      "properties": {
+        "CAContent": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500000,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 500000  \nPattern: ^[\\P{C}\\s]*$  \nUpdate requires: No interruption\n"
+        },
+        "CrlContent": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500000,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 500000  \nPattern: ^[\\P{C}\\s]*$  \nUpdate requires: No interruption\n"
+        },
+        "KmsKeyArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws|aws-cn|aws-us-gov|aws-eusc):kms:[a-z0-9-]+:\\d{12}:(key|alias)/[a-zA-Z0-9/_-]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "CAContent"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "TlsPolicy": {
+      "type": "string",
+      "enum": [
+        "REQUIRED",
+        "OPTIONAL",
+        "FIPS"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: REQUIRED | OPTIONAL | FIPS  \nUpdate requires: No interruption\n"
     },
     "IngressPointStatus": {
       "type": "string",
@@ -61,9 +122,10 @@
       "type": "string",
       "enum": [
         "OPEN",
-        "AUTH"
+        "AUTH",
+        "MTLS"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: OPEN | AUTH  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: OPEN | AUTH | MTLS  \nUpdate requires: No interruption\n"
     },
     "IpType": {
       "type": "string",
@@ -214,6 +276,9 @@
       "maxItems": 200,
       "minItems": 0,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "TlsPolicy": {
+      "$ref": "#/definitions/TlsPolicy"
     },
     "Type": {
       "$ref": "#/definitions/IngressPointType"

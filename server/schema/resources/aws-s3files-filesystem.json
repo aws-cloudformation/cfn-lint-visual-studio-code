@@ -1,0 +1,337 @@
+{
+  "typeName": "AWS::S3Files::FileSystem",
+  "description": "Resource Type definition for AWS::S3Files::FileSystem",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "primaryIdentifier": [
+    "/properties/FileSystemArn"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/FileSystemId"
+    ]
+  ],
+  "readOnlyProperties": [
+    "/properties/CreationTime",
+    "/properties/FileSystemArn",
+    "/properties/FileSystemId",
+    "/properties/CreationTime",
+    "/properties/Status",
+    "/properties/StatusMessage",
+    "/properties/OwnerId",
+    "/properties/SynchronizationConfiguration/LatestVersionNumber"
+  ],
+  "createOnlyProperties": [
+    "/properties/Bucket",
+    "/properties/Prefix",
+    "/properties/ClientToken",
+    "/properties/KmsKeyId",
+    "/properties/RoleArn",
+    "/properties/AcceptBucketWarning"
+  ],
+  "writeOnlyProperties": [
+    "/properties/AcceptBucketWarning"
+  ],
+  "propertyTransform": {
+    "/properties/KmsKeyId": "\"arn:aws[-a-z]*:kms:[a-z0-9-]+:[0-9]{12}:key/[a-zA-Z0-9-]+\""
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "s3files:TagResource",
+      "s3files:ListTagsForResource",
+      "s3files:UntagResource"
+    ]
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "s3files:CreateFileSystem",
+        "s3files:GetFileSystem",
+        "s3files:PutSynchronizationConfiguration",
+        "s3files:GetSynchronizationConfiguration",
+        "s3files:TagResource",
+        "kms:DescribeKey",
+        "kms:GenerateDataKeyWithoutPlaintext",
+        "kms:CreateGrant",
+        "iam:PassRole",
+        "s3:PutBucketNotification",
+        "s3:GetBucketNotification",
+        "events:PutTargets",
+        "events:PutRule",
+        "events:ListTargetsByRule",
+        "events:ListRules",
+        "events:DescribeRule"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "s3files:GetFileSystem",
+        "s3files:GetSynchronizationConfiguration",
+        "s3files:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "s3files:GetFileSystem",
+        "s3files:GetSynchronizationConfiguration",
+        "s3files:PutSynchronizationConfiguration",
+        "s3files:TagResource",
+        "s3files:UntagResource",
+        "s3files:ListTagsForResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "s3files:DeleteFileSystem",
+        "s3files:GetFileSystem",
+        "events:DescribeRule",
+        "events:DeleteRule",
+        "events:ListTargetsByRule",
+        "events:PutRule",
+        "events:RemoveTargets"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "Bucket": {
+            "$ref": "resource-schema.json#/properties/Bucket"
+          }
+        }
+      },
+      "permissions": [
+        "s3files:ListFileSystems",
+        "s3files:ListTagsForResource"
+      ]
+    }
+  },
+  "definitions": {
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]+)$  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "maxLength": 256,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: ^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ImportDataRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Prefix": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 1024,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 1024  \nPattern: ^(|.*/)$  \nUpdate requires: No interruption\n"
+        },
+        "Trigger": {
+          "type": "string",
+          "enum": [
+            "ON_DIRECTORY_FIRST_ACCESS",
+            "ON_FILE_ACCESS"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: ON_DIRECTORY_FIRST_ACCESS | ON_FILE_ACCESS  \nUpdate requires: No interruption\n"
+        },
+        "SizeLessThan": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 52673613135872,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Prefix",
+        "Trigger",
+        "SizeLessThan"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ExpirationDataRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "DaysAfterLastAccess": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 365,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "DaysAfterLastAccess"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SynchronizationConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "LatestVersionNumber": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "ImportDataRules": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10,
+          "items": {
+            "$ref": "#/definitions/ImportDataRule"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "ExpirationDataRules": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "$ref": "#/definitions/ExpirationDataRule"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ImportDataRules",
+        "ExpirationDataRules"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  },
+  "properties": {
+    "CreationTime": {
+      "type": "string",
+      "format": "date-time",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "FileSystemId": {
+      "type": "string",
+      "maxLength": 128,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 128  \nPattern: ^(arn:aws[-a-z]*:s3files:[0-9a-z-:]+:file-system/fs-[0-9a-f]{17,40}|fs-[0-9a-f]{17,40})$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "FileSystemArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(arn:aws[-a-z]*:s3files:[0-9a-z-:]+:file-system/fs-[0-9a-f]{17,40})$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Tags": {
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "maxItems": 50,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "KmsKeyId": {
+      "type": "string",
+      "maxLength": 2048,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nPattern: ^([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|mrk-[0-9a-f]{32}|alias/[a-zA-Z0-9/_-]+|(arn:aws[-a-z]*:kms:[a-z0-9-]+:\\d{12}:((key/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})|(key/mrk-[0-9a-f]{32})|(alias/[a-zA-Z0-9/_-]+))))$  \nUpdate requires: Replacement\n"
+    },
+    "Bucket": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^(arn:aws[a-zA-Z0-9-]*:s3:::.+)$  \nUpdate requires: Replacement\n"
+    },
+    "Prefix": {
+      "type": "string",
+      "maxLength": 1024,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nPattern: ^(|.*/)$  \nUpdate requires: Replacement\n"
+    },
+    "ClientToken": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^(.+)$  \nUpdate requires: Replacement\n"
+    },
+    "RoleArn": {
+      "type": "string",
+      "maxLength": 2048,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nPattern: ^arn:(aws[a-zA-Z-]*)?:iam::\\d{12}:role/?[a-zA-Z_0-9+=,.@\\-_/]+$  \nUpdate requires: Replacement\n"
+    },
+    "Status": {
+      "type": "string",
+      "enum": [
+        "creating",
+        "available",
+        "updating",
+        "deleting",
+        "deleted",
+        "error"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: creating | available | updating | deleting | deleted | error  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "StatusMessage": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "OwnerId": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SynchronizationConfiguration": {
+      "$ref": "#/definitions/SynchronizationConfiguration"
+    },
+    "AcceptBucketWarning": {
+      "type": "boolean",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: Replacement\n"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "Bucket",
+    "RoleArn"
+  ],
+  "attributes": {
+    "CreationTime": {
+      "type": "string",
+      "format": "date-time",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "FileSystemId": {
+      "type": "string",
+      "maxLength": 128,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 128  \nPattern: ^(arn:aws[-a-z]*:s3files:[0-9a-z-:]+:file-system/fs-[0-9a-f]{17,40}|fs-[0-9a-f]{17,40})$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "FileSystemArn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(arn:aws[-a-z]*:s3files:[0-9a-z-:]+:file-system/fs-[0-9a-f]{17,40})$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Status": {
+      "type": "string",
+      "enum": [
+        "creating",
+        "available",
+        "updating",
+        "deleting",
+        "deleted",
+        "error"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: creating | available | updating | deleting | deleted | error  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "StatusMessage": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "OwnerId": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

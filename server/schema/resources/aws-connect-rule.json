@@ -31,6 +31,18 @@
       "additionalProperties": false,
       "markdownDescription": "Object for case field values.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "SlaTargetFieldValue": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "StringValue": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "Field": {
       "description": "",
       "type": "object",
@@ -79,7 +91,7 @@
         "UserTags": {
           "description": "The tags used to organize, track, or control access for this resource. For example, { \"tags\": {\"key1\":\"value1\", \"key2\":\"value2\"} }. CON users with the specified tags will be notified.",
           "patternProperties": {
-            "^(?=.{1,128}$).+$": {
+            "^.{1,128}$": {
               "type": "string",
               "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
             }
@@ -159,7 +171,7 @@
         "References": {
           "description": "Information about the reference when the ``referenceType`` is ``URL``. Otherwise, null. ``URL`` is the only accepted type. (Supports variable injection in the ``Value`` field.)",
           "patternProperties": {
-            "^(?=.{1,4096}$).+$": {
+            "^.+$": {
               "$ref": "#/definitions/Reference"
             }
           },
@@ -249,6 +261,11 @@
           "$ref": "#/definitions/NotificationRecipientType",
           "description": "Notification recipient.",
           "markdownDescription": "Notification recipient.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "Exclusion": {
+          "$ref": "#/definitions/NotificationRecipientType",
+          "description": "",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
         }
       },
       "required": [
@@ -337,6 +354,7 @@
           "description": "The name of the event source.",
           "type": "string",
           "enum": [
+            "OnEmailAnalysisAvailable",
             "OnContactEvaluationSubmit",
             "OnPostCallAnalysisAvailable",
             "OnRealTimeCallAnalysisAvailable",
@@ -347,9 +365,13 @@
             "OnSalesforceCaseCreate",
             "OnMetricDataUpdate",
             "OnCaseCreate",
-            "OnCaseUpdate"
+            "OnCaseUpdate",
+            "OnSlaBreach",
+            "OnSchedulePublish",
+            "OnScheduleUpdate",
+            "OnScheduleTimeOffRequestActivity"
           ],
-          "markdownDescription": "The name of the event source.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: OnContactEvaluationSubmit | OnPostCallAnalysisAvailable | OnRealTimeCallAnalysisAvailable | OnRealTimeChatAnalysisAvailable | OnPostChatAnalysisAvailable | OnZendeskTicketCreate | OnZendeskTicketStatusUpdate | OnSalesforceCaseCreate | OnMetricDataUpdate | OnCaseCreate | OnCaseUpdate  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The name of the event source.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: OnEmailAnalysisAvailable | OnContactEvaluationSubmit | OnPostCallAnalysisAvailable | OnRealTimeCallAnalysisAvailable | OnRealTimeChatAnalysisAvailable | OnPostChatAnalysisAvailable | OnZendeskTicketCreate | OnZendeskTicketStatusUpdate | OnSalesforceCaseCreate | OnMetricDataUpdate | OnCaseCreate | OnCaseUpdate | OnSlaBreach | OnSchedulePublish | OnScheduleUpdate | OnScheduleTimeOffRequestActivity  \nUpdate requires: No interruption\n"
         },
         "IntegrationAssociationArn": {
           "description": "The Amazon Resource Name (ARN) of the integration association. ``IntegrationAssociationArn`` is required if ``TriggerEventSource`` is one of the following values: ``OnZendeskTicketCreate`` | ``OnZendeskTicketStatusUpdate`` | ``OnSalesforceCaseCreate``",
@@ -478,6 +500,11 @@
           "$ref": "#/definitions/SubmitAutoEvaluationActions",
           "description": "",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "AssignSlaActions": {
+          "$ref": "#/definitions/AssignSlaActions",
+          "description": "",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
         }
       },
       "additionalProperties": false,
@@ -493,7 +520,7 @@
           "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -",
           "minLength": 1,
           "maxLength": 128,
-          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^(?!aws:)[a-zA-Z+-=._:/]+$  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z+-=._:/]+$  \nUpdate requires: No interruption\n"
         },
         "Value": {
           "type": "string",
@@ -507,6 +534,89 @@
         "Value"
       ],
       "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AssignSlaAction": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "SlaAssignmentType": {
+          "description": "The type of SLA assignment.",
+          "type": "string",
+          "enum": [
+            "CASES"
+          ],
+          "markdownDescription": "The type of SLA assignment.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: CASES  \nUpdate requires: No interruption\n"
+        },
+        "CaseSlaConfiguration": {
+          "description": "The SLA configuration for cases.",
+          "type": "object",
+          "properties": {
+            "Type": {
+              "description": "The type of SLA.",
+              "type": "string",
+              "enum": [
+                "CaseField"
+              ],
+              "markdownDescription": "The type of SLA.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: CaseField  \nUpdate requires: No interruption\n"
+            },
+            "Name": {
+              "description": "The name of the SLA.",
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500,
+              "markdownDescription": "The name of the SLA.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 500  \nUpdate requires: No interruption\n"
+            },
+            "FieldId": {
+              "description": "The field Id for the SLA.",
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500,
+              "markdownDescription": "The field Id for the SLA.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 500  \nUpdate requires: No interruption\n"
+            },
+            "TargetFieldValues": {
+              "description": "The target field values for the SLA.",
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/SlaTargetFieldValue"
+              },
+              "maxItems": 1,
+              "markdownDescription": "The target field values for the SLA.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+            },
+            "TargetSlaMinutes": {
+              "description": "The target SLA time in minutes.",
+              "type": "number",
+              "minimum": 1,
+              "maximum": 1051200,
+              "markdownDescription": "The target SLA time in minutes.\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption\n"
+            }
+          },
+          "required": [
+            "Type",
+            "Name",
+            "TargetSlaMinutes"
+          ],
+          "additionalProperties": false,
+          "markdownDescription": "The SLA configuration for cases.\n\n---\n\nRequired: Yes  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "SlaAssignmentType",
+        "CaseSlaConfiguration"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AssignSlaActions": {
+      "description": "This action will assign an SLA when a rule is triggered.",
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/AssignSlaAction"
+      },
+      "minItems": 1,
+      "maxItems": 1,
+      "markdownDescription": "This action will assign an SLA when a rule is triggered.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -586,7 +696,9 @@
         "connect:CreateRule",
         "cases:GetTemplate",
         "cases:ListFields",
-        "cases:ListFieldOptions"
+        "cases:ListFieldOptions",
+        "connect:TagResource",
+        "connect:DeleteRule"
       ]
     },
     "read": {
@@ -608,6 +720,21 @@
         "cases:ListFieldOptions",
         "connect:TagResource",
         "connect:UntagResource"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "InstanceArn": {
+            "$ref": "resource-schema.json#/properties/InstanceArn"
+          }
+        },
+        "required": [
+          "InstanceArn"
+        ]
+      },
+      "permissions": [
+        "connect:ListRules"
       ]
     }
   },
