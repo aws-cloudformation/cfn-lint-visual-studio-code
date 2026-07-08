@@ -41,10 +41,31 @@ suite("tokenizeCommand", () => {
       ]);
     });
 
-    test("a backslash escapes a space outside quotes", () => {
-      assert.deepStrictEqual(tokenizeCommand("/opt/my\\ tools/cfn-lint"), [
-        "/opt/my tools/cfn-lint",
-      ]);
+    test("backslashes are literal so Windows paths are preserved", () => {
+      assert.deepStrictEqual(
+        tokenizeCommand("C:\\Python311\\Scripts\\cfn-lint.exe"),
+        ["C:\\Python311\\Scripts\\cfn-lint.exe"]
+      );
+    });
+
+    test("a quoted Windows path with spaces stays one token", () => {
+      assert.deepStrictEqual(
+        tokenizeCommand('"C:\\Program Files\\Python\\cfn-lint.exe"'),
+        ["C:\\Program Files\\Python\\cfn-lint.exe"]
+      );
+    });
+
+    test("a Windows path with an embedded argument splits on whitespace only", () => {
+      assert.deepStrictEqual(
+        tokenizeCommand(
+          "C:\\Python311\\Scripts\\cfn-lint.exe --registry-schemas C:\\schemas"
+        ),
+        [
+          "C:\\Python311\\Scripts\\cfn-lint.exe",
+          "--registry-schemas",
+          "C:\\schemas",
+        ]
+      );
     });
 
     test("empty or whitespace-only input yields no tokens", () => {
