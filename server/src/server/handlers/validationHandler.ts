@@ -179,7 +179,10 @@ export class ValidationHandler extends YamlValidationHandler {
           );
         }
 
-        args.push("--", `"${fileToLint}"`);
+        // Pass the file name as its own argv entry (no shell, no quoting) so a
+        // crafted file name cannot be interpreted as a command. `--` still
+        // guards against a name that begins with a dash being read as a flag.
+        args.push("--", fileToLint);
 
         this.cfnConnection.console.log(
           `Running... ${this.cfnSettings.cfnLintPath} ${args}`
