@@ -144,6 +144,29 @@
         "DbServerId"
       ],
       "markdownDescription": "A DbNode is a virtual machine that hosts Oracle database instances and provides access to shared storage servers within a VM Cluster\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "IamRole": {
+      "description": "An AWS Identity and Access Management (IAM) service role associated with the VM cluster.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "AwsIntegration": {
+          "description": "The AWS integration configuration settings for the AWS Identity and Access Management (IAM) service role.",
+          "type": "string",
+          "markdownDescription": "The AWS integration configuration settings for the AWS Identity and Access Management (IAM) service role.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "IamRoleArn": {
+          "description": "The Amazon Resource Name (ARN) of the AWS Identity and Access Management (IAM) service role.",
+          "type": "string",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the AWS Identity and Access Management (IAM) service role.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Status": {
+          "description": "The current status of the AWS Identity and Access Management (IAM) service role.",
+          "type": "string",
+          "markdownDescription": "The current status of the AWS Identity and Access Management (IAM) service role.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "An AWS Identity and Access Management (IAM) service role associated with the VM cluster.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -377,6 +400,16 @@
         "$ref": "#/definitions/DbNode"
       },
       "markdownDescription": "The DB nodes that are implicitly created and managed as part of this VM Cluster.\n\n---\n\nRequired: No  \nType: Array  \nMinimum Length: 1  \nUpdate requires: Some interruptions\n"
+    },
+    "IamRoles": {
+      "type": "array",
+      "description": "The AWS Identity and Access Management (IAM) service roles associated with the VM cluster.",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/IamRole"
+      },
+      "markdownDescription": "The AWS Identity and Access Management (IAM) service roles associated with the VM cluster.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "additionalProperties": false,
@@ -434,7 +467,8 @@
     "/properties/DbNodes/*/BackupVnic2Id",
     "/properties/DbNodes/*/VnicId",
     "/properties/DbNodes/*/Vnic2Id",
-    "/properties/DbNodes/*/HostIpId"
+    "/properties/DbNodes/*/HostIpId",
+    "/properties/IamRoles/*/Status"
   ],
   "writeOnlyProperties": [
     "/properties/ScanListenerPortTcp"
@@ -449,6 +483,8 @@
   "handlers": {
     "create": {
       "permissions": [
+        "iam:CreateServiceLinkedRole",
+        "iam:PassRole",
         "odb:CreateCloudVmCluster",
         "odb:TagResource",
         "odb:GetCloudVmCluster",
@@ -458,7 +494,8 @@
         "ec2:DescribeAvailabilityZones",
         "odb:ListDbNodes",
         "odb:GetDbNode",
-        "odb:CreateDbNode"
+        "odb:CreateDbNode",
+        "odb:AssociateIamRoleToResource"
       ],
       "timeoutInMinutes": 2160
     },
@@ -473,6 +510,7 @@
     },
     "update": {
       "permissions": [
+        "iam:PassRole",
         "odb:TagResource",
         "odb:UntagResource",
         "odb:GetCloudVmCluster",
@@ -480,7 +518,9 @@
         "odb:ListTagsForResource",
         "odb:ListDbNodes",
         "odb:GetDbNode",
-        "sts:GetCallerIdentity"
+        "sts:GetCallerIdentity",
+        "odb:AssociateIamRoleToResource",
+        "odb:DisassociateIamRoleFromResource"
       ]
     },
     "delete": {

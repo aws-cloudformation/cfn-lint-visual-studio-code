@@ -1,0 +1,432 @@
+{
+  "typeName": "AWS::Glue::Catalog",
+  "description": "Creates a catalog in the Glue Data Catalog.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-glue",
+  "definitions": {
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The key name of the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag.",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The value for the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "FederatedCatalog": {
+      "type": "object",
+      "description": "A FederatedCatalog structure that references an entity outside the Glue Data Catalog.",
+      "properties": {
+        "Identifier": {
+          "type": "string",
+          "description": "A unique identifier for the federated catalog.",
+          "markdownDescription": "A unique identifier for the federated catalog.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ConnectionName": {
+          "type": "string",
+          "description": "The name of the connection to an external data source.",
+          "markdownDescription": "The name of the connection to an external data source.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "A FederatedCatalog structure that references an entity outside the Glue Data Catalog.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "TargetRedshiftCatalog": {
+      "type": "object",
+      "description": "A structure that describes a target catalog for resource linking.",
+      "properties": {
+        "CatalogArn": {
+          "type": "string",
+          "description": "The Amazon Resource Name (ARN) of the catalog resource.",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the catalog resource.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "CatalogArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A structure that describes a target catalog for resource linking.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DataLakePrincipal": {
+      "type": "object",
+      "description": "The Lake Formation principal.",
+      "properties": {
+        "DataLakePrincipalIdentifier": {
+          "type": "string",
+          "description": "An identifier for the Lake Formation principal.",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "An identifier for the Lake Formation principal.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The Lake Formation principal.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PrincipalPermissions": {
+      "type": "object",
+      "description": "Permissions granted to a principal.",
+      "properties": {
+        "Principal": {
+          "$ref": "#/definitions/DataLakePrincipal"
+        },
+        "Permissions": {
+          "type": "array",
+          "description": "The permissions that are granted to the principal.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "ALL",
+              "SELECT",
+              "ALTER",
+              "DROP",
+              "DELETE",
+              "INSERT",
+              "CREATE_DATABASE",
+              "CREATE_TABLE",
+              "DATA_LOCATION_ACCESS"
+            ],
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ALL | SELECT | ALTER | DROP | DELETE | INSERT | CREATE_DATABASE | CREATE_TABLE | DATA_LOCATION_ACCESS  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "The permissions that are granted to the principal.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Permissions granted to a principal.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CatalogProperties": {
+      "type": "object",
+      "description": "A structure that specifies data lake access properties and other custom properties.",
+      "properties": {
+        "DataLakeAccessProperties": {
+          "$ref": "#/definitions/DataLakeAccessProperties"
+        },
+        "CustomProperties": {
+          "type": "object",
+          "description": "Additional key-value properties for the catalog.",
+          "patternProperties": {
+            "^.+$": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            }
+          },
+          "additionalProperties": false,
+          "markdownDescription": "Additional key-value properties for the catalog.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "A structure that specifies data lake access properties and other custom properties.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "DataLakeAccessProperties": {
+      "type": "object",
+      "description": "Data lake access properties for the catalog.",
+      "properties": {
+        "DataLakeAccess": {
+          "type": "boolean",
+          "description": "Turns on or off data lake access for Apache Spark applications that access Amazon Redshift databases in the Data Catalog from any non-Redshift engine.",
+          "markdownDescription": "Turns on or off data lake access for Apache Spark applications that access Amazon Redshift databases in the Data Catalog from any non-Redshift engine.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "DataTransferRole": {
+          "type": "string",
+          "description": "A role that will be assumed by Glue for transferring data into/out of the staging bucket during a query.",
+          "markdownDescription": "A role that will be assumed by Glue for transferring data into/out of the staging bucket during a query.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "KmsKey": {
+          "type": "string",
+          "description": "An encryption key that will be used for the staging bucket that will be created along with the catalog.",
+          "markdownDescription": "An encryption key that will be used for the staging bucket that will be created along with the catalog.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "CatalogType": {
+          "type": "string",
+          "description": "Specifies a federated catalog type for the native catalog resource.",
+          "markdownDescription": "Specifies a federated catalog type for the native catalog resource.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ManagedWorkgroupName": {
+          "type": "string",
+          "description": "The name of the managed workgroup associated with the catalog.",
+          "markdownDescription": "The name of the managed workgroup associated with the catalog.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ManagedWorkgroupStatus": {
+          "type": "string",
+          "description": "The status of the managed workgroup.",
+          "markdownDescription": "The status of the managed workgroup.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "RedshiftDatabaseName": {
+          "type": "string",
+          "description": "The name of the Redshift database.",
+          "markdownDescription": "The name of the Redshift database.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "AllowFullTableExternalDataAccess": {
+          "type": "string",
+          "description": "Allows third-party engines to access data in Amazon S3 locations that are registered with Lake Formation.",
+          "enum": [
+            "True",
+            "False"
+          ],
+          "markdownDescription": "Allows third-party engines to access data in Amazon S3 locations that are registered with Lake Formation.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: True | False  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Data lake access properties for the catalog.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "CatalogId": {
+      "type": "string",
+      "description": "The ID of the catalog.",
+      "markdownDescription": "The ID of the catalog.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ResourceArn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the catalog.",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the catalog.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreateTime": {
+      "type": "integer",
+      "description": "The time at which the catalog was created.",
+      "markdownDescription": "The time at which the catalog was created.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "UpdateTime": {
+      "type": "integer",
+      "description": "The time at which the catalog was last updated.",
+      "markdownDescription": "The time at which the catalog was last updated.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Name": {
+      "type": "string",
+      "description": "The name of the catalog to create.",
+      "minLength": 1,
+      "maxLength": 255,
+      "markdownDescription": "The name of the catalog to create.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: Replacement\n"
+    },
+    "Description": {
+      "type": "string",
+      "description": "A description of the catalog.",
+      "maxLength": 2048,
+      "markdownDescription": "A description of the catalog.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nUpdate requires: No interruption\n"
+    },
+    "Parameters": {
+      "type": "object",
+      "description": "A map of key-value pairs that define parameters and properties of the catalog.",
+      "patternProperties": {
+        "^.+$": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "A map of key-value pairs that define parameters and properties of the catalog.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "FederatedCatalog": {
+      "$ref": "#/definitions/FederatedCatalog"
+    },
+    "TargetRedshiftCatalog": {
+      "$ref": "#/definitions/TargetRedshiftCatalog"
+    },
+    "CatalogProperties": {
+      "$ref": "#/definitions/CatalogProperties"
+    },
+    "CreateTableDefaultPermissions": {
+      "type": "array",
+      "description": "An array of PrincipalPermissions objects for default table permissions.",
+      "items": {
+        "$ref": "#/definitions/PrincipalPermissions"
+      },
+      "markdownDescription": "An array of PrincipalPermissions objects for default table permissions.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "CreateDatabaseDefaultPermissions": {
+      "type": "array",
+      "description": "An array of PrincipalPermissions objects for default database permissions.",
+      "items": {
+        "$ref": "#/definitions/PrincipalPermissions"
+      },
+      "markdownDescription": "An array of PrincipalPermissions objects for default database permissions.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "AllowFullTableExternalDataAccess": {
+      "type": "string",
+      "description": "Allows third-party engines to access data in Amazon S3 locations that are registered with Lake Formation.",
+      "enum": [
+        "True",
+        "False"
+      ],
+      "markdownDescription": "Allows third-party engines to access data in Amazon S3 locations that are registered with Lake Formation.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: True | False  \nUpdate requires: No interruption\n"
+    },
+    "OverwriteChildResourcePermissionsWithDefault": {
+      "type": "string",
+      "description": "Specifies whether to overwrite child resource permissions with the default permissions.",
+      "enum": [
+        "Accept",
+        "Deny"
+      ],
+      "markdownDescription": "Specifies whether to overwrite child resource permissions with the default permissions.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Accept | Deny  \nUpdate requires: No interruption\n"
+    },
+    "Tags": {
+      "type": "array",
+      "description": "An array of key-value pairs to apply to this resource.",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "An array of key-value pairs to apply to this resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "Name"
+  ],
+  "createOnlyProperties": [
+    "/properties/Name"
+  ],
+  "readOnlyProperties": [
+    "/properties/CatalogId",
+    "/properties/ResourceArn",
+    "/properties/CreateTime",
+    "/properties/UpdateTime",
+    "/properties/CatalogProperties/DataLakeAccessProperties/ManagedWorkgroupName",
+    "/properties/CatalogProperties/DataLakeAccessProperties/ManagedWorkgroupStatus",
+    "/properties/CatalogProperties/DataLakeAccessProperties/RedshiftDatabaseName",
+    "/properties/CatalogProperties/CustomProperties",
+    "/properties/CreateDatabaseDefaultPermissions/*/Principal",
+    "/properties/CreateDatabaseDefaultPermissions/*/Principal/DataLakePrincipalIdentifier",
+    "/properties/CreateDatabaseDefaultPermissions/*/Permissions",
+    "/properties/CreateTableDefaultPermissions/*/Principal",
+    "/properties/CreateTableDefaultPermissions/*/Principal/DataLakePrincipalIdentifier",
+    "/properties/CreateTableDefaultPermissions/*/Permissions"
+  ],
+  "primaryIdentifier": [
+    "/properties/ResourceArn"
+  ],
+  "writeOnlyProperties": [
+    "/properties/CatalogProperties/DataLakeAccessProperties/AllowFullTableExternalDataAccess",
+    "/properties/OverwriteChildResourcePermissionsWithDefault"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "glue:TagResource",
+      "glue:UntagResource",
+      "glue:GetTags"
+    ]
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "glue:CreateCatalog",
+        "glue:GetCatalog",
+        "glue:UpdateCatalog",
+        "glue:TagResource",
+        "glue:GetTags",
+        "iam:PassRole",
+        "iam:CreateServiceLinkedRole",
+        "kms:Decrypt",
+        "kms:Encrypt",
+        "kms:GenerateDataKey",
+        "redshift-serverless:CreateNamespace",
+        "redshift-serverless:GetNamespace",
+        "redshift-serverless:CreateWorkgroup",
+        "redshift-serverless:GetWorkgroup",
+        "redshift-serverless:TagResource",
+        "lakeformation:GetDataLakeSettings",
+        "lakeformation:PutDataLakeSettings",
+        "lakeformation:RegisterResource",
+        "lakeformation:GrantPermissions",
+        "s3:CreateBucket",
+        "s3:DeleteBucket",
+        "s3:PutBucketTagging",
+        "s3:PutBucketPolicy",
+        "s3:PutEncryptionConfiguration",
+        "s3:PutLifecycleConfiguration",
+        "s3:PutBucketVersioning",
+        "s3:GetBucketLocation"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "glue:GetCatalog",
+        "glue:GetTags",
+        "kms:Decrypt"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "glue:UpdateCatalog",
+        "glue:GetCatalog",
+        "glue:TagResource",
+        "glue:UntagResource",
+        "glue:GetTags",
+        "iam:PassRole",
+        "kms:Decrypt",
+        "kms:Encrypt",
+        "kms:GenerateDataKey",
+        "redshift-serverless:UpdateNamespace",
+        "redshift-serverless:GetNamespace",
+        "redshift-serverless:UpdateWorkgroup",
+        "redshift-serverless:GetWorkgroup",
+        "redshift-serverless:TagResource",
+        "redshift-serverless:UntagResource",
+        "lakeformation:GetDataLakeSettings",
+        "lakeformation:PutDataLakeSettings"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "glue:DeleteCatalog",
+        "glue:GetCatalog",
+        "kms:Decrypt",
+        "redshift-serverless:DeleteNamespace",
+        "redshift-serverless:GetNamespace",
+        "redshift-serverless:DeleteWorkgroup",
+        "redshift-serverless:GetWorkgroup",
+        "lakeformation:DeregisterResource",
+        "lakeformation:RevokePermissions",
+        "s3:DeleteBucket"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "glue:GetCatalogs",
+        "kms:Decrypt"
+      ]
+    }
+  },
+  "attributes": {
+    "CatalogId": {
+      "type": "string",
+      "description": "The ID of the catalog.",
+      "markdownDescription": "The ID of the catalog.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ResourceArn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the catalog.",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the catalog.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreateTime": {
+      "type": "integer",
+      "description": "The time at which the catalog was created.",
+      "markdownDescription": "The time at which the catalog was created.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "UpdateTime": {
+      "type": "integer",
+      "description": "The time at which the catalog was last updated.",
+      "markdownDescription": "The time at which the catalog was last updated.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

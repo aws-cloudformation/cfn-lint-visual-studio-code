@@ -1,6 +1,6 @@
 {
   "typeName": "AWS::DataSync::LocationHDFS",
-  "description": "Resource schema for AWS::DataSync::LocationHDFS.",
+  "description": "Resource Type definition for AWS::DataSync::LocationHDFS.",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-datasync.git",
   "definitions": {
     "NameNode": {
@@ -85,6 +85,67 @@
         }
       },
       "markdownDescription": "Configuration information for RPC Protection and Data Transfer Protection. These parameters can be set to AUTHENTICATION, INTEGRITY, or PRIVACY. The default value is PRIVACY.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CmkSecretConfig": {
+      "additionalProperties": false,
+      "description": "Specifies configuration information for a DataSync-managed secret, such as an authentication token or set of credentials that DataSync uses to access a specific transfer location, and a customer-managed AWS KMS key.",
+      "type": "object",
+      "properties": {
+        "SecretArn": {
+          "description": "Specifies the ARN for an AWS Secrets Manager secret, managed by DataSync.",
+          "type": "string",
+          "maxLength": 2048,
+          "markdownDescription": "Specifies the ARN for an AWS Secrets Manager secret, managed by DataSync.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nPattern: ^(arn:(aws|aws-cn|aws-us-gov|aws-eusc|aws-iso|aws-iso-b):secretsmanager:[a-z-0-9]+:[0-9]{12}:secret:.*|)$  \nUpdate requires: No interruption\n"
+        },
+        "KmsKeyArn": {
+          "description": "Specifies the ARN for the customer-managed AWS KMS key used to encrypt the secret specified for SecretArn. DataSync provides this key to AWS Secrets Manager.",
+          "type": "string",
+          "maxLength": 2048,
+          "markdownDescription": "Specifies the ARN for the customer-managed AWS KMS key used to encrypt the secret specified for SecretArn. DataSync provides this key to AWS Secrets Manager.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nPattern: ^(arn:(aws|aws-cn|aws-us-gov|aws-eusc|aws-iso|aws-iso-b):kms:[a-z-0-9]+:[0-9]{12}:key/.*|)$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Specifies configuration information for a DataSync-managed secret, such as an authentication token or set of credentials that DataSync uses to access a specific transfer location, and a customer-managed AWS KMS key.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CustomSecretConfig": {
+      "additionalProperties": false,
+      "description": "Specifies configuration information for a customer-managed secret, such as an authentication token or set of credentials that DataSync uses to access a specific transfer location, and an IAM role that DataSync can assume and access the customer-managed secret.",
+      "type": "object",
+      "properties": {
+        "SecretArn": {
+          "description": "Specifies the ARN for a customer created AWS Secrets Manager secret.",
+          "type": "string",
+          "maxLength": 2048,
+          "markdownDescription": "Specifies the ARN for a customer created AWS Secrets Manager secret.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nPattern: ^(arn:(aws|aws-cn|aws-us-gov|aws-eusc|aws-iso|aws-iso-b):secretsmanager:[a-z-0-9]+:[0-9]{12}:secret:.*|)$  \nUpdate requires: No interruption\n"
+        },
+        "SecretAccessRoleArn": {
+          "description": "Specifies the ARN for the AWS Identity and Access Management role that DataSync uses to access the secret specified for SecretArn.",
+          "type": "string",
+          "maxLength": 2048,
+          "markdownDescription": "Specifies the ARN for the AWS Identity and Access Management role that DataSync uses to access the secret specified for SecretArn.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nPattern: ^(arn:(aws|aws-cn|aws-us-gov|aws-eusc|aws-iso|aws-iso-b):iam::[0-9]{12}:role/.*|)$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "SecretArn",
+        "SecretAccessRoleArn"
+      ],
+      "markdownDescription": "Specifies configuration information for a customer-managed secret, such as an authentication token or set of credentials that DataSync uses to access a specific transfer location, and an IAM role that DataSync can assume and access the customer-managed secret.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ManagedSecretConfig": {
+      "additionalProperties": false,
+      "description": "Specifies configuration information for a DataSync-managed secret, such as an authentication token or set of credentials that DataSync uses to access a specific transfer location. DataSync uses the default AWS-managed KMS key to encrypt this secret in AWS Secrets Manager.",
+      "type": "object",
+      "properties": {
+        "SecretArn": {
+          "description": "Specifies the ARN for an AWS Secrets Manager secret.",
+          "type": "string",
+          "maxLength": 2048,
+          "markdownDescription": "Specifies the ARN for an AWS Secrets Manager secret.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nPattern: ^(arn:(aws|aws-cn|aws-us-gov|aws-eusc|aws-iso|aws-iso-b):secretsmanager:[a-z-0-9]+:[0-9]{12}:secret:.*|)$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "SecretArn"
+      ],
+      "markdownDescription": "Specifies configuration information for a DataSync-managed secret, such as an authentication token or set of credentials that DataSync uses to access a specific transfer location. DataSync uses the default AWS-managed KMS key to encrypt this secret in AWS Secrets Manager.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -177,10 +238,10 @@
       "items": {
         "type": "string",
         "maxLength": 128,
-        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 128  \nPattern: ^arn:(aws|aws-cn|aws-us-gov|aws-iso|aws-iso-b):datasync:[a-z\\-0-9]+:[0-9]{12}:agent/agent-[0-9a-z]{17}$  \nUpdate requires: No interruption\n"
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 128  \nPattern: ^arn:(aws|aws-cn|aws-us-gov|aws-eusc|aws-iso|aws-iso-b):datasync:[a-z\\-0-9]+:[0-9]{12}:agent/agent-[0-9a-z]{17}$  \nUpdate requires: No interruption\n"
       },
       "minItems": 1,
-      "maxItems": 4,
+      "maxItems": 8,
       "insertionOrder": false,
       "markdownDescription": "ARN(s) of the agent(s) to use for an HDFS location.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
     },
@@ -194,13 +255,22 @@
       "description": "The Amazon Resource Name (ARN) of the HDFS location.",
       "type": "string",
       "maxLength": 128,
-      "markdownDescription": "The Amazon Resource Name (ARN) of the HDFS location.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 128  \nPattern: ^arn:(aws|aws-cn|aws-us-gov|aws-iso|aws-iso-b):datasync:[a-z\\-0-9]+:[0-9]{12}:location/loc-[0-9a-z]{17}$  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "The Amazon Resource Name (ARN) of the HDFS location.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 128  \nPattern: ^arn:(aws|aws-cn|aws-us-gov|aws-eusc|aws-iso|aws-iso-b):datasync:[a-z\\-0-9]+:[0-9]{12}:location/loc-[0-9a-z]{17}$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "LocationUri": {
       "description": "The URL of the HDFS location that was described.",
       "type": "string",
       "maxLength": 4356,
       "markdownDescription": "The URL of the HDFS location that was described.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 4356  \nPattern: ^(efs|nfs|s3|smb|fsxw|hdfs)://[a-zA-Z0-9.:/\\-]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CmkSecretConfig": {
+      "$ref": "#/definitions/CmkSecretConfig"
+    },
+    "CustomSecretConfig": {
+      "$ref": "#/definitions/CustomSecretConfig"
+    },
+    "ManagedSecretConfig": {
+      "$ref": "#/definitions/ManagedSecretConfig"
     }
   },
   "tagging": {
@@ -223,7 +293,9 @@
   ],
   "readOnlyProperties": [
     "/properties/LocationArn",
-    "/properties/LocationUri"
+    "/properties/LocationUri",
+    "/properties/ManagedSecretConfig",
+    "/properties/CmkSecretConfig/SecretArn"
   ],
   "primaryIdentifier": [
     "/properties/LocationArn"
@@ -239,7 +311,15 @@
         "datasync:CreateLocationHdfs",
         "datasync:DescribeLocationHdfs",
         "datasync:TagResource",
-        "datasync:ListTagsForResource"
+        "datasync:ListTagsForResource",
+        "secretsmanager:CreateSecret",
+        "secretsmanager:PutSecretValue",
+        "secretsmanager:DeleteSecret",
+        "iam:CreateServiceLinkedRole",
+        "iam:PassRole",
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:GenerateDataKey"
       ]
     },
     "read": {
@@ -254,12 +334,22 @@
         "datasync:DescribeLocationHdfs",
         "datasync:ListTagsForResource",
         "datasync:TagResource",
-        "datasync:UntagResource"
+        "datasync:UntagResource",
+        "secretsmanager:UpdateSecret",
+        "secretsmanager:DeleteSecret",
+        "secretsmanager:PutSecretValue",
+        "secretsmanager:CreateSecret",
+        "iam:CreateServiceLinkedRole",
+        "iam:PassRole",
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:GenerateDataKey"
       ]
     },
     "delete": {
       "permissions": [
-        "datasync:DeleteLocation"
+        "datasync:DeleteLocation",
+        "secretsmanager:DeleteSecret"
       ]
     },
     "list": {
@@ -273,13 +363,16 @@
       "description": "The Amazon Resource Name (ARN) of the HDFS location.",
       "type": "string",
       "maxLength": 128,
-      "markdownDescription": "The Amazon Resource Name (ARN) of the HDFS location.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 128  \nPattern: ^arn:(aws|aws-cn|aws-us-gov|aws-iso|aws-iso-b):datasync:[a-z\\-0-9]+:[0-9]{12}:location/loc-[0-9a-z]{17}$  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "The Amazon Resource Name (ARN) of the HDFS location.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 128  \nPattern: ^arn:(aws|aws-cn|aws-us-gov|aws-eusc|aws-iso|aws-iso-b):datasync:[a-z\\-0-9]+:[0-9]{12}:location/loc-[0-9a-z]{17}$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "LocationUri": {
       "description": "The URL of the HDFS location that was described.",
       "type": "string",
       "maxLength": 4356,
       "markdownDescription": "The URL of the HDFS location that was described.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 4356  \nPattern: ^(efs|nfs|s3|smb|fsxw|hdfs)://[a-zA-Z0-9.:/\\-]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ManagedSecretConfig": {
+      "$ref": "#/definitions/ManagedSecretConfig"
     }
   }
 }

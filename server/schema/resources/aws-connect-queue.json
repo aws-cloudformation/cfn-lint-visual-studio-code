@@ -91,6 +91,22 @@
       "description": "The Amazon Resource Name (ARN) for the quick connect.",
       "type": "string",
       "markdownDescription": "The Amazon Resource Name (ARN) for the quick connect.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:instance/[-a-zA-Z0-9]*/transfer-destination/[-a-zA-Z0-9]*$  \nUpdate requires: No interruption\n"
+    },
+    "EmailAddress": {
+      "description": "An email address configuration for the queue",
+      "type": "object",
+      "properties": {
+        "EmailAddressArn": {
+          "description": "The Amazon Resource Name (ARN) of the email address",
+          "type": "string",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the email address\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:instance/[-a-f0-9]{8}-[-a-f0-9]{4}-[-a-f0-9]{4}-[-a-f0-9]{4}-[-a-f0-9]{12}/email-address/[-a-f0-9]{8}-[-a-f0-9]{4}-[-a-f0-9]{4}-[-a-f0-9]{4}-[-a-f0-9]{12}$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "EmailAddressArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "An email address configuration for the queue\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -177,25 +193,40 @@
         "AGENT"
       ],
       "markdownDescription": "The type of queue.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: STANDARD | AGENT  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "AdditionalEmailAddresses": {
+      "description": "The email addresses that agents can use when replying to or initiating email contacts",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/EmailAddress"
+      },
+      "minItems": 0,
+      "maxItems": 50,
+      "insertionOrder": false,
+      "markdownDescription": "The email addresses that agents can use when replying to or initiating email contacts\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "handlers": {
     "create": {
       "permissions": [
         "connect:CreateQueue",
-        "connect:TagResource"
+        "connect:TagResource",
+        "connect:AssociateQueueEmailAddresses"
       ]
     },
     "read": {
       "permissions": [
         "connect:DescribeQueue",
-        "connect:ListQueueQuickConnects"
+        "connect:ListQueueQuickConnects",
+        "connect:ListQueueEmailAddresses"
       ]
     },
     "delete": {
       "permissions": [
         "connect:DeleteQueue",
-        "connect:UntagResource"
+        "connect:UntagResource",
+        "connect:ListQueueEmailAddresses",
+        "connect:DisassociateQueueEmailAddresses"
       ]
     },
     "update": {
@@ -208,6 +239,8 @@
         "connect:UpdateQueueStatus",
         "connect:AssociateQueueQuickConnects",
         "connect:DisassociateQueueQuickConnects",
+        "connect:AssociateQueueEmailAddresses",
+        "connect:DisassociateQueueEmailAddresses",
         "connect:TagResource",
         "connect:UntagResource"
       ]

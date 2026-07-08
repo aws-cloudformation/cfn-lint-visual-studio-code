@@ -23,11 +23,11 @@
     },
     "Name": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: Replacement\n"
     },
     "ImageName": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: No interruption\n"
     },
     "DisplayName": {
       "type": "string",
@@ -39,7 +39,7 @@
     },
     "InstanceType": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: No interruption\n"
     },
     "Tags": {
       "type": "array",
@@ -55,7 +55,7 @@
     },
     "ImageArn": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: No interruption\n"
     },
     "AccessEndpoints": {
       "type": "array",
@@ -64,6 +64,25 @@
         "$ref": "#/definitions/AccessEndpoint"
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "SoftwaresToInstall": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "SoftwaresToUninstall": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "RootVolumeConfig": {
+      "$ref": "#/definitions/VolumeConfig"
     }
   },
   "definitions": {
@@ -144,6 +163,17 @@
         "VpceId"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "VolumeConfig": {
+      "type": "object",
+      "properties": {
+        "VolumeSizeInGb": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "required": [
@@ -156,12 +186,37 @@
   "readOnlyProperties": [
     "/properties/StreamingUrl"
   ],
+  "createOnlyProperties": [
+    "/properties/Name"
+  ],
+  "writeOnlyProperties": [
+    "/properties/SoftwaresToInstall",
+    "/properties/SoftwaresToUninstall",
+    "/properties/ImageName"
+  ],
+  "oneOf": [
+    {
+      "required": [
+        "ImageName"
+      ]
+    },
+    {
+      "required": [
+        "ImageArn"
+      ]
+    }
+  ],
   "tagging": {
     "taggable": false,
     "tagOnCreate": true,
     "tagUpdatable": false,
     "cloudFormationSystemTags": true,
-    "tagProperty": "/properties/Tags"
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "appstream:ListTagsForResource",
+      "appstream:TagResource",
+      "appstream:UntagResource"
+    ]
   },
   "handlers": {
     "create": {
@@ -173,20 +228,18 @@
         "appstream:DescribeImageBuilders",
         "appstream:StartImageBuilder",
         "appstream:StopImageBuilder",
+        "appstream:TagResource",
         "iam:CreateServiceLinkedRole",
         "iam:DeleteServiceLinkedRole",
-        "iam:GetServiceLinkedRoleDeletionStatus"
+        "iam:GetServiceLinkedRoleDeletionStatus",
+        "iam:PassRole"
       ]
     },
     "read": {
       "permissions": [
-        "appstream:CreateImageBuilder",
         "appstream:CreateImageBuilderStreamingURL",
-        "appstream:CreateStreamingURL",
-        "appstream:DeleteImageBuilder",
         "appstream:DescribeImageBuilders",
-        "appstream:StartImageBuilder",
-        "appstream:StopImageBuilder",
+        "appstream:ListTagsForResource",
         "iam:CreateServiceLinkedRole",
         "iam:DeleteServiceLinkedRole",
         "iam:GetServiceLinkedRoleDeletionStatus"
@@ -194,11 +247,9 @@
     },
     "delete": {
       "permissions": [
-        "appstream:CreateImageBuilder",
-        "appstream:CreateImageBuilderStreamingURL",
-        "appstream:CreateStreamingURL",
         "appstream:DeleteImageBuilder",
         "appstream:DescribeImageBuilders",
+        "appstream:ListTagsForResource",
         "appstream:StartImageBuilder",
         "appstream:StopImageBuilder",
         "iam:CreateServiceLinkedRole",
@@ -208,13 +259,8 @@
     },
     "list": {
       "permissions": [
-        "appstream:CreateImageBuilder",
-        "appstream:CreateImageBuilderStreamingURL",
-        "appstream:CreateStreamingURL",
-        "appstream:DeleteImageBuilder",
         "appstream:DescribeImageBuilders",
-        "appstream:StartImageBuilder",
-        "appstream:StopImageBuilder",
+        "appstream:ListTagsForResource",
         "iam:CreateServiceLinkedRole",
         "iam:DeleteServiceLinkedRole",
         "iam:GetServiceLinkedRoleDeletionStatus"

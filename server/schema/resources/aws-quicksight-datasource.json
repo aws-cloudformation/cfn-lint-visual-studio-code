@@ -119,6 +119,17 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "S3TablesParameters": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "TableBucketArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(arn:aws[-a-z0-9]*:[a-z0-9]+:[-a-z0-9]*:[0-9]{12}:bucket/[a-zA-Z0-9-_]{3,63})$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "AuroraPostgreSqlParameters": {
       "description": "<p>Parameters for Amazon Aurora PostgreSQL-Compatible Edition.</p>",
       "additionalProperties": false,
@@ -173,9 +184,41 @@
         },
         "CredentialPair": {
           "$ref": "#/definitions/CredentialPair"
+        },
+        "KeyPairCredentials": {
+          "$ref": "#/definitions/KeyPairCredentials"
         }
       },
       "markdownDescription": "<p>Data source credentials. This is a variant type structure. For this structure to be\n            valid, only one of the attributes can be non-null.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "KeyPairCredentials": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "KeyPairUsername": {
+          "minLength": 1,
+          "type": "string",
+          "maxLength": 64,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nUpdate requires: No interruption\n"
+        },
+        "PrivateKey": {
+          "minLength": 1600,
+          "type": "string",
+          "maxLength": 8000,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1600  \nMaximum Length: 8000  \nPattern: ^-{5}BEGIN (ENCRYPTED )?PRIVATE KEY-{5}\\u000D?\\u000A([A-Za-z0-9/+]{64}\\u000D?\\u000A)*[A-Za-z0-9/+]{1,64}={0,2}\\u000D?\\u000A-{5}END (ENCRYPTED )?PRIVATE KEY-{5}(\\u000D?\\u000A)?$  \nUpdate requires: No interruption\n"
+        },
+        "PrivateKeyPassphrase": {
+          "minLength": 0,
+          "type": "string",
+          "maxLength": 256,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "KeyPairUsername",
+        "PrivateKey"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "ManifestFileLocation": {
       "description": "<p>Amazon S3 manifest file location.</p>",
@@ -379,7 +422,9 @@
         "DB2_AS400",
         "EXASOL",
         "FILE",
+        "FULLY_MANAGED_KNOWLEDGE_BASE",
         "GITHUB",
+        "INTERNATIONAL_DATA_CORPORATION",
         "JIRA",
         "MARIADB",
         "MYSQL",
@@ -414,9 +459,11 @@
         "CONFLUENCE",
         "SHAREPOINT",
         "ONE_DRIVE",
-        "WEB_CRAWLER"
+        "WEB_CRAWLER",
+        "BOX",
+        "GOOGLESHEETS"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ADOBE_ANALYTICS | AMAZON_ELASTICSEARCH | AMAZON_OPENSEARCH | ATHENA | AURORA | AURORA_POSTGRESQL | AWS_IOT_ANALYTICS | DATABRICKS | DENODO | DREMIO | DYNAMODB | SAPHANA | DB2_AS400 | EXASOL | FILE | GITHUB | JIRA | MARIADB | MYSQL | ORACLE | POSTGRESQL | PRESTO | QBUSINESS | REDSHIFT | S3 | S3_TABLES | S3_KNOWLEDGE_BASE | SALESFORCE | SERVICENOW | SNOWFLAKE | SPARK | SPICE | SQLSERVER | TERADATA | TIMESTREAM | TWITTER | BIGQUERY | GOOGLE_ANALYTICS | TRINO | STARBURST | MONGO | MONGO_ATLAS | DOCUMENTDB | APPFLOW | IMPALA | GLUE | GOOGLE_DRIVE | CONFLUENCE | SHAREPOINT | ONE_DRIVE | WEB_CRAWLER  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ADOBE_ANALYTICS | AMAZON_ELASTICSEARCH | AMAZON_OPENSEARCH | ATHENA | AURORA | AURORA_POSTGRESQL | AWS_IOT_ANALYTICS | DATABRICKS | DENODO | DREMIO | DYNAMODB | SAPHANA | DB2_AS400 | EXASOL | FILE | FULLY_MANAGED_KNOWLEDGE_BASE | GITHUB | INTERNATIONAL_DATA_CORPORATION | JIRA | MARIADB | MYSQL | ORACLE | POSTGRESQL | PRESTO | QBUSINESS | REDSHIFT | S3 | S3_TABLES | S3_KNOWLEDGE_BASE | SALESFORCE | SERVICENOW | SNOWFLAKE | SPARK | SPICE | SQLSERVER | TERADATA | TIMESTREAM | TWITTER | BIGQUERY | GOOGLE_ANALYTICS | TRINO | STARBURST | MONGO | MONGO_ATLAS | DOCUMENTDB | APPFLOW | IMPALA | GLUE | GOOGLE_DRIVE | CONFLUENCE | SHAREPOINT | ONE_DRIVE | WEB_CRAWLER | BOX | GOOGLESHEETS  \nUpdate requires: No interruption\n"
     },
     "OAuthParameters": {
       "additionalProperties": false,
@@ -604,7 +651,7 @@
       "properties": {
         "Actions": {
           "minItems": 1,
-          "maxItems": 20,
+          "maxItems": 30,
           "description": "<p>The IAM action to grant or revoke permissions on.</p>",
           "type": "array",
           "items": {
@@ -636,9 +683,10 @@
       "enum": [
         "PASSWORD",
         "TOKEN",
-        "X509"
+        "X509",
+        "KEYPAIR"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PASSWORD | TOKEN | X509  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PASSWORD | TOKEN | X509 | KEYPAIR  \nUpdate requires: No interruption\n"
     },
     "DataSourceErrorInfo": {
       "description": "<p>Error information for the data source creation or update.</p>",
@@ -910,6 +958,9 @@
       "additionalProperties": false,
       "type": "object",
       "properties": {
+        "S3TablesParameters": {
+          "$ref": "#/definitions/S3TablesParameters"
+        },
         "AuroraPostgreSqlParameters": {
           "$ref": "#/definitions/AuroraPostgreSqlParameters"
         },

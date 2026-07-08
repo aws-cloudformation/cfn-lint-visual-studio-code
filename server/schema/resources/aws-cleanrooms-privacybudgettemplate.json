@@ -24,6 +24,40 @@
         "Key"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "BudgetParameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Type": {
+          "type": "string",
+          "enum": [
+            "CALENDAR_DAY",
+            "CALENDAR_MONTH",
+            "CALENDAR_WEEK",
+            "LIFETIME"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: CALENDAR_DAY | CALENDAR_MONTH | CALENDAR_WEEK | LIFETIME  \nUpdate requires: No interruption\n"
+        },
+        "Budget": {
+          "type": "integer",
+          "minimum": 0,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "AutoRefresh": {
+          "type": "string",
+          "enum": [
+            "ENABLED",
+            "DISABLED"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Type",
+        "Budget"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -69,9 +103,10 @@
     "PrivacyBudgetType": {
       "type": "string",
       "enum": [
-        "DIFFERENTIAL_PRIVACY"
+        "DIFFERENTIAL_PRIVACY",
+        "ACCESS_BUDGET"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: DIFFERENTIAL_PRIVACY  \nUpdate requires: Replacement\n"
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: DIFFERENTIAL_PRIVACY | ACCESS_BUDGET  \nUpdate requires: Replacement\n"
     },
     "Parameters": {
       "type": "object",
@@ -81,19 +116,30 @@
           "type": "integer",
           "minimum": 1,
           "maximum": 20,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
         },
         "UsersNoisePerQuery": {
           "type": "integer",
           "minimum": 10,
           "maximum": 100,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "BudgetParameters": {
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/BudgetParameter"
+          },
+          "minItems": 1,
+          "maxItems": 2,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "ResourceArn": {
+          "type": "string",
+          "maxLength": 200,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 200  \nUpdate requires: No interruption\n"
         }
       },
-      "required": [
-        "Epsilon",
-        "UsersNoisePerQuery"
-      ],
       "markdownDescription": "\n\n---\n\nRequired: Yes  \nUpdate requires: No interruption\n"
     },
     "MembershipArn": {
@@ -124,7 +170,8 @@
   "createOnlyProperties": [
     "/properties/MembershipIdentifier",
     "/properties/PrivacyBudgetType",
-    "/properties/AutoRefresh"
+    "/properties/AutoRefresh",
+    "/properties/Parameters/ResourceArn"
   ],
   "primaryIdentifier": [
     "/properties/PrivacyBudgetTemplateIdentifier",

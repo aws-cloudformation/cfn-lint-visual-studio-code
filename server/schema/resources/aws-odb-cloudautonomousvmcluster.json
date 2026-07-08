@@ -113,6 +113,29 @@
         "Key"
       ],
       "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "IamRole": {
+      "description": "An AWS Identity and Access Management (IAM) service role associated with the Autonomous VM cluster.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "AwsIntegration": {
+          "description": "The AWS integration configuration settings for the AWS Identity and Access Management (IAM) service role.",
+          "type": "string",
+          "markdownDescription": "The AWS integration configuration settings for the AWS Identity and Access Management (IAM) service role.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "IamRoleArn": {
+          "description": "The Amazon Resource Name (ARN) of the AWS Identity and Access Management (IAM) service role.",
+          "type": "string",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the AWS Identity and Access Management (IAM) service role.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Status": {
+          "description": "The current status of the AWS Identity and Access Management (IAM) service role.",
+          "type": "string",
+          "markdownDescription": "The current status of the AWS Identity and Access Management (IAM) service role.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "An AWS Identity and Access Management (IAM) service role associated with the Autonomous VM cluster.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -361,6 +384,16 @@
       "type": "integer",
       "description": "The total number of Autonomous Container Databases that can be created with the allocated local storage.",
       "markdownDescription": "The total number of Autonomous Container Databases that can be created with the allocated local storage.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: Replacement\n"
+    },
+    "IamRoles": {
+      "type": "array",
+      "description": "The AWS Identity and Access Management (IAM) service roles associated with the Autonomous VM cluster.",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/IamRole"
+      },
+      "markdownDescription": "The AWS Identity and Access Management (IAM) service roles associated with the Autonomous VM cluster.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "additionalProperties": false,
@@ -409,7 +442,8 @@
     "/properties/ProvisionedCpus",
     "/properties/ReclaimableCpus",
     "/properties/ReservedCpus",
-    "/properties/Shape"
+    "/properties/Shape",
+    "/properties/IamRoles/*/Status"
   ],
   "primaryIdentifier": [
     "/properties/CloudAutonomousVmClusterArn"
@@ -423,11 +457,13 @@
       "permissions": [
         "ec2:DescribeAvailabilityZones",
         "iam:CreateServiceLinkedRole",
+        "iam:PassRole",
         "odb:CreateCloudAutonomousVmCluster",
         "odb:GetCloudAutonomousVmCluster",
         "odb:ListCloudAutonomousVmClusters",
         "odb:ListTagsForResource",
         "odb:TagResource",
+        "odb:AssociateIamRoleToResource",
         "sts:GetCallerIdentity"
       ],
       "timeoutInMinutes": 2160
@@ -441,11 +477,14 @@
     },
     "update": {
       "permissions": [
+        "iam:PassRole",
         "odb:TagResource",
         "odb:UntagResource",
         "odb:GetCloudAutonomousVmCluster",
         "odb:ListCloudAutonomousVmClusters",
         "odb:ListTagsForResource",
+        "odb:AssociateIamRoleToResource",
+        "odb:DisassociateIamRoleFromResource",
         "sts:GetCallerIdentity"
       ]
     },

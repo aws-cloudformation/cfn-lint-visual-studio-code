@@ -1,0 +1,209 @@
+{
+  "typeName": "AWS::Omics::Configuration",
+  "description": "Resource schema for AWS::Omics::Configuration",
+  "definitions": {
+    "TagMap": {
+      "type": "object",
+      "description": "A map of resource tags",
+      "patternProperties": {
+        ".+": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 0,
+          "description": "Resource tag value",
+          "markdownDescription": "Resource tag value\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "A map of resource tags\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RunConfigurations": {
+      "type": "object",
+      "properties": {
+        "VpcConfig": {
+          "$ref": "#/definitions/VpcConfig"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "VpcConfig": {
+      "type": "object",
+      "properties": {
+        "SecurityGroupIds": {
+          "type": "array",
+          "maxItems": 5,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^sg-[0-9a-f]+$  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "SubnetIds": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^subnet-[0-9a-f]+$  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "Name": {
+      "description": "User-friendly name for the configuration.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "markdownDescription": "User-friendly name for the configuration.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[A-Za-z0-9][A-Za-z0-9\\-\\._]*$  \nUpdate requires: Replacement\n"
+    },
+    "Description": {
+      "description": "Optional description for the configuration.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "markdownDescription": "Optional description for the configuration.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^[\\p{L}||\\p{M}||\\p{Z}||\\p{S}||\\p{N}||\\p{P}]+$  \nUpdate requires: No interruption\n"
+    },
+    "RunConfigurations": {
+      "description": "Required run-specific configurations.",
+      "$ref": "#/definitions/RunConfigurations",
+      "markdownDescription": "Required run-specific configurations.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: Replacement\n"
+    },
+    "Tags": {
+      "description": "Tags for the configuration.",
+      "$ref": "#/definitions/TagMap",
+      "markdownDescription": "Tags for the configuration.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "Arn": {
+      "description": "Unique resource identifier for the configuration.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 190,
+      "markdownDescription": "Unique resource identifier for the configuration.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 190  \nPattern: ^arn:.+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Uuid": {
+      "description": "Unique identifier for the configuration.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "markdownDescription": "Unique identifier for the configuration.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[\\p{L}||\\p{M}||\\p{Z}||\\p{S}||\\p{N}||\\p{P}]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Status": {
+      "description": "Current configuration status.",
+      "type": "string",
+      "enum": [
+        "CREATING",
+        "ACTIVE",
+        "UPDATING",
+        "DELETING",
+        "DELETED",
+        "FAILED"
+      ],
+      "markdownDescription": "Current configuration status.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | ACTIVE | UPDATING | DELETING | DELETED | FAILED  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreationTime": {
+      "description": "Configuration creation timestamp.",
+      "type": "string",
+      "format": "date-time",
+      "markdownDescription": "Configuration creation timestamp.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "Name",
+    "RunConfigurations"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/Uuid",
+    "/properties/Status",
+    "/properties/CreationTime"
+  ],
+  "createOnlyProperties": [
+    "/properties/Name",
+    "/properties/RunConfigurations"
+  ],
+  "primaryIdentifier": [
+    "/properties/Name"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "omics:TagResource",
+      "omics:ListTagsForResource"
+    ]
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "omics:CreateConfiguration",
+        "omics:GetConfiguration",
+        "omics:TagResource",
+        "iam:CreateServiceLinkedRole",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeVpcs"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "omics:GetConfiguration",
+        "omics:ListTagsForResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "omics:DeleteConfiguration",
+        "omics:GetConfiguration"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "omics:ListConfigurations"
+      ]
+    }
+  },
+  "attributes": {
+    "Arn": {
+      "description": "Unique resource identifier for the configuration.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 190,
+      "markdownDescription": "Unique resource identifier for the configuration.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 190  \nPattern: ^arn:.+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Uuid": {
+      "description": "Unique identifier for the configuration.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "markdownDescription": "Unique identifier for the configuration.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[\\p{L}||\\p{M}||\\p{Z}||\\p{S}||\\p{N}||\\p{P}]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Status": {
+      "description": "Current configuration status.",
+      "type": "string",
+      "enum": [
+        "CREATING",
+        "ACTIVE",
+        "UPDATING",
+        "DELETING",
+        "DELETED",
+        "FAILED"
+      ],
+      "markdownDescription": "Current configuration status.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | ACTIVE | UPDATING | DELETING | DELETED | FAILED  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreationTime": {
+      "description": "Configuration creation timestamp.",
+      "type": "string",
+      "format": "date-time",
+      "markdownDescription": "Configuration creation timestamp.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

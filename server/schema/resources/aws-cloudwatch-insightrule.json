@@ -1,19 +1,18 @@
 {
   "typeName": "AWS::CloudWatch::InsightRule",
-  "description": "Resource Type definition for AWS::CloudWatch::InsightRule",
-  "additionalProperties": false,
+  "description": "Resource Type definition for AWS::CloudWatch::InsightRule. Creates a Contributor Insights rule that analyzes log data to identify top contributors and usage patterns.",
   "properties": {
+    "RuleName": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
+    },
     "RuleState": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-    },
-    "Id": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "Arn": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+      "enum": [
+        "ENABLED",
+        "DISABLED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption\n"
     },
     "RuleBody": {
       "type": "string",
@@ -21,43 +20,114 @@
     },
     "ApplyOnTransformedLogs": {
       "type": "boolean",
+      "default": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
     },
-    "RuleName": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
-    },
     "Tags": {
-      "$ref": "#/definitions/Tags"
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "Arn": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   },
   "definitions": {
-    "Tags": {
+    "Tag": {
       "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
+  "additionalProperties": false,
   "required": [
+    "RuleName",
     "RuleState",
-    "RuleBody",
-    "RuleName"
+    "RuleBody"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn"
   ],
   "createOnlyProperties": [
     "/properties/RuleName"
   ],
   "primaryIdentifier": [
-    "/properties/Id"
-  ],
-  "readOnlyProperties": [
-    "/properties/Id",
     "/properties/Arn"
   ],
-  "attributes": {
-    "Id": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+  "additionalIdentifiers": [
+    [
+      "/properties/RuleName"
+    ]
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "cloudwatch:PutInsightRule",
+        "cloudwatch:DescribeInsightRules",
+        "cloudwatch:TagResource"
+      ],
+      "timeoutInMinutes": 20
     },
+    "read": {
+      "permissions": [
+        "cloudwatch:DescribeInsightRules",
+        "cloudwatch:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "cloudwatch:PutInsightRule",
+        "cloudwatch:DescribeInsightRules",
+        "cloudwatch:TagResource",
+        "cloudwatch:UntagResource"
+      ],
+      "timeoutInMinutes": 20
+    },
+    "delete": {
+      "permissions": [
+        "cloudwatch:DeleteInsightRules",
+        "cloudwatch:DescribeInsightRules"
+      ],
+      "timeoutInMinutes": 20
+    },
+    "list": {
+      "permissions": [
+        "cloudwatch:DescribeInsightRules"
+      ]
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "cloudwatch:TagResource",
+      "cloudwatch:UntagResource",
+      "cloudwatch:ListTagsForResource"
+    ]
+  },
+  "attributes": {
     "Arn": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"

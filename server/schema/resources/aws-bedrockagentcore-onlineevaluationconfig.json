@@ -1,0 +1,541 @@
+{
+  "typeName": "AWS::BedrockAgentCore::OnlineEvaluationConfig",
+  "description": "Resource Type definition for AWS::BedrockAgentCore::OnlineEvaluationConfig - Creates an online evaluation configuration for continuous monitoring of agent performance.",
+  "definitions": {
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^(?!aws:)[a-zA-Z+-=._:/]+$  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "OnlineEvaluationConfigStatus": {
+      "type": "string",
+      "enum": [
+        "ACTIVE",
+        "CREATING",
+        "CREATE_FAILED",
+        "UPDATING",
+        "UPDATE_FAILED",
+        "DELETING"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ACTIVE | CREATING | CREATE_FAILED | UPDATING | UPDATE_FAILED | DELETING  \nUpdate requires: No interruption\n"
+    },
+    "ExecutionStatus": {
+      "type": "string",
+      "enum": [
+        "ENABLED",
+        "DISABLED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption\n"
+    },
+    "DataSourceConfig": {
+      "type": "object",
+      "description": "The configuration that specifies where to read agent traces for online evaluation.",
+      "properties": {
+        "CloudWatchLogs": {
+          "$ref": "#/definitions/CloudWatchLogsInputConfig"
+        }
+      },
+      "required": [
+        "CloudWatchLogs"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The configuration that specifies where to read agent traces for online evaluation.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CloudWatchLogsInputConfig": {
+      "type": "object",
+      "description": "The configuration for reading agent traces from CloudWatch logs.",
+      "properties": {
+        "LogGroupNames": {
+          "type": "array",
+          "description": "The list of CloudWatch log group names to monitor for agent traces.",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^[.\\-_/#A-Za-z0-9]+$  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 1,
+          "maxItems": 5,
+          "insertionOrder": false,
+          "markdownDescription": "The list of CloudWatch log group names to monitor for agent traces.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "ServiceNames": {
+          "type": "array",
+          "description": "The list of service names to filter traces within the specified log groups.",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^[a-zA-Z0-9._-]+$  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 1,
+          "maxItems": 1,
+          "insertionOrder": false,
+          "markdownDescription": "The list of service names to filter traces within the specified log groups.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "LogGroupNames",
+        "ServiceNames"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The configuration for reading agent traces from CloudWatch logs.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EvaluatorReference": {
+      "type": "object",
+      "description": "The reference to an evaluator used in online evaluation configurations.",
+      "properties": {
+        "EvaluatorId": {
+          "type": "string",
+          "description": "The unique identifier of the evaluator.",
+          "markdownDescription": "The unique identifier of the evaluator.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^(Builtin\\.[a-zA-Z0-9_-]+|[a-zA-Z][a-zA-Z0-9-_]{0,99}-[a-zA-Z0-9]{10})$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "EvaluatorId"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The reference to an evaluator used in online evaluation configurations.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Rule": {
+      "type": "object",
+      "description": "The evaluation rule that defines sampling configuration, filtering criteria, and session detection settings.",
+      "properties": {
+        "SamplingConfig": {
+          "$ref": "#/definitions/SamplingConfig"
+        },
+        "Filters": {
+          "type": "array",
+          "description": "The list of filters that determine which agent traces should be included in the evaluation.",
+          "items": {
+            "$ref": "#/definitions/Filter"
+          },
+          "minItems": 0,
+          "maxItems": 5,
+          "insertionOrder": false,
+          "markdownDescription": "The list of filters that determine which agent traces should be included in the evaluation.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "SessionConfig": {
+          "$ref": "#/definitions/SessionConfig"
+        }
+      },
+      "required": [
+        "SamplingConfig"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The evaluation rule that defines sampling configuration, filtering criteria, and session detection settings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SamplingConfig": {
+      "type": "object",
+      "description": "The configuration that controls what percentage of agent traces are sampled for evaluation.",
+      "properties": {
+        "SamplingPercentage": {
+          "type": "number",
+          "description": "The percentage of agent traces to sample for evaluation.",
+          "minimum": 0.01,
+          "maximum": 100,
+          "markdownDescription": "The percentage of agent traces to sample for evaluation.\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "SamplingPercentage"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The configuration that controls what percentage of agent traces are sampled for evaluation.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Filter": {
+      "type": "object",
+      "description": "The filter that applies conditions to agent traces during online evaluation.",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key or field name to filter on within the agent trace data.",
+          "minLength": 1,
+          "maxLength": 256,
+          "markdownDescription": "The key or field name to filter on within the agent trace data.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^[a-zA-Z0-9._-]+$  \nUpdate requires: No interruption\n"
+        },
+        "Operator": {
+          "type": "string",
+          "description": "The comparison operator to use for filtering.",
+          "enum": [
+            "Equals",
+            "NotEquals",
+            "GreaterThan",
+            "LessThan",
+            "GreaterThanOrEqual",
+            "LessThanOrEqual",
+            "Contains",
+            "NotContains"
+          ],
+          "markdownDescription": "The comparison operator to use for filtering.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: Equals | NotEquals | GreaterThan | LessThan | GreaterThanOrEqual | LessThanOrEqual | Contains | NotContains  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "$ref": "#/definitions/FilterValue"
+        }
+      },
+      "required": [
+        "Key",
+        "Operator",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The filter that applies conditions to agent traces during online evaluation.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "FilterValue": {
+      "type": "object",
+      "description": "The value used in filter comparisons.",
+      "properties": {
+        "StringValue": {
+          "type": "string",
+          "description": "The string value for text-based filtering.",
+          "minLength": 1,
+          "maxLength": 1024,
+          "markdownDescription": "The string value for text-based filtering.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+        },
+        "DoubleValue": {
+          "type": "number",
+          "description": "The numeric value for numerical filtering.",
+          "markdownDescription": "The numeric value for numerical filtering.\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "BooleanValue": {
+          "type": "boolean",
+          "description": "The boolean value for true/false filtering conditions.",
+          "markdownDescription": "The boolean value for true/false filtering conditions.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The value used in filter comparisons.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SessionConfig": {
+      "type": "object",
+      "description": "The configuration that defines how agent sessions are detected.",
+      "properties": {
+        "SessionTimeoutMinutes": {
+          "type": "integer",
+          "description": "The number of minutes of inactivity after which an agent session is considered complete.",
+          "minimum": 1,
+          "maximum": 1440,
+          "markdownDescription": "The number of minutes of inactivity after which an agent session is considered complete.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "SessionTimeoutMinutes"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The configuration that defines how agent sessions are detected.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "OutputConfig": {
+      "type": "object",
+      "description": "The configuration that specifies where evaluation results should be written.",
+      "properties": {
+        "CloudWatchConfig": {
+          "$ref": "#/definitions/CloudWatchOutputConfig"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The configuration that specifies where evaluation results should be written.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CloudWatchOutputConfig": {
+      "type": "object",
+      "description": "The CloudWatch configuration for writing evaluation results.",
+      "properties": {
+        "LogGroupName": {
+          "type": "string",
+          "description": "The CloudWatch log group name for evaluation results.",
+          "markdownDescription": "The CloudWatch log group name for evaluation results.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The CloudWatch configuration for writing evaluation results.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Insight": {
+      "type": "object",
+      "description": "An insight configuration for failure analysis.",
+      "properties": {
+        "InsightId": {
+          "type": "string",
+          "description": "The unique identifier of the insight.",
+          "minLength": 1,
+          "maxLength": 256,
+          "markdownDescription": "The unique identifier of the insight.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^[a-zA-Z][a-zA-Z0-9._]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "InsightId"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "An insight configuration for failure analysis.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ClusteringFrequency": {
+      "type": "string",
+      "description": "The frequency at which clustering reports are generated.",
+      "enum": [
+        "DAILY",
+        "WEEKLY",
+        "MONTHLY"
+      ],
+      "markdownDescription": "The frequency at which clustering reports are generated.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DAILY | WEEKLY | MONTHLY  \nUpdate requires: No interruption\n"
+    },
+    "ClusteringConfig": {
+      "type": "object",
+      "description": "The configuration for clustering analysis of evaluation results.",
+      "properties": {
+        "Frequencies": {
+          "type": "array",
+          "description": "The list of frequencies at which clustering reports are generated.",
+          "items": {
+            "$ref": "#/definitions/ClusteringFrequency"
+          },
+          "minItems": 0,
+          "maxItems": 3,
+          "insertionOrder": false,
+          "markdownDescription": "The list of frequencies at which clustering reports are generated.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Frequencies"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The configuration for clustering analysis of evaluation results.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "OnlineEvaluationConfigId": {
+      "type": "string",
+      "description": "The unique identifier of the online evaluation configuration.",
+      "markdownDescription": "The unique identifier of the online evaluation configuration.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z][a-zA-Z0-9-_]{0,99}-[a-zA-Z0-9]{10}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "OnlineEvaluationConfigArn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the online evaluation configuration.",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the online evaluation configuration.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws|aws-cn|aws-us-gov):bedrock-agentcore:[a-z0-9-]+:[0-9]{12}:online-evaluation-config/[a-zA-Z][a-zA-Z0-9-_]{0,99}-[a-zA-Z0-9]{10}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "OnlineEvaluationConfigName": {
+      "type": "string",
+      "description": "The name of the online evaluation configuration. Must be unique within your account.",
+      "markdownDescription": "The name of the online evaluation configuration. Must be unique within your account.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z][a-zA-Z0-9_]{0,47}$  \nUpdate requires: Replacement\n"
+    },
+    "Description": {
+      "type": "string",
+      "description": "The description of the online evaluation configuration.",
+      "minLength": 1,
+      "maxLength": 200,
+      "markdownDescription": "The description of the online evaluation configuration.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 200  \nUpdate requires: No interruption\n"
+    },
+    "DataSourceConfig": {
+      "$ref": "#/definitions/DataSourceConfig",
+      "description": "The data source configuration that specifies CloudWatch log groups and service names to monitor.",
+      "markdownDescription": "The data source configuration that specifies CloudWatch log groups and service names to monitor.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "EvaluationExecutionRoleArn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the IAM role that grants permissions for evaluation.",
+      "minLength": 1,
+      "maxLength": 2048,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the IAM role that grants permissions for evaluation.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws(-[^:]+)?:iam::([0-9]{12})?:role/.+$  \nUpdate requires: No interruption\n"
+    },
+    "Evaluators": {
+      "type": "array",
+      "description": "The list of evaluators to apply during online evaluation.",
+      "items": {
+        "$ref": "#/definitions/EvaluatorReference"
+      },
+      "minItems": 0,
+      "maxItems": 10,
+      "insertionOrder": false,
+      "markdownDescription": "The list of evaluators to apply during online evaluation.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "Rule": {
+      "$ref": "#/definitions/Rule",
+      "description": "The evaluation rule that defines sampling configuration, filters, and session detection settings.",
+      "markdownDescription": "The evaluation rule that defines sampling configuration, filters, and session detection settings.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "Status": {
+      "$ref": "#/definitions/OnlineEvaluationConfigStatus",
+      "description": "The status of the online evaluation configuration.",
+      "markdownDescription": "The status of the online evaluation configuration.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ExecutionStatus": {
+      "$ref": "#/definitions/ExecutionStatus",
+      "description": "The execution status indicating whether the online evaluation is currently running.",
+      "markdownDescription": "The execution status indicating whether the online evaluation is currently running.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "OutputConfig": {
+      "$ref": "#/definitions/OutputConfig",
+      "description": "The configuration that specifies where evaluation results should be written.",
+      "markdownDescription": "The configuration that specifies where evaluation results should be written.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreatedAt": {
+      "type": "string",
+      "description": "The timestamp when the online evaluation configuration was created.",
+      "format": "date-time",
+      "markdownDescription": "The timestamp when the online evaluation configuration was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "UpdatedAt": {
+      "type": "string",
+      "description": "The timestamp when the online evaluation configuration was last updated.",
+      "format": "date-time",
+      "markdownDescription": "The timestamp when the online evaluation configuration was last updated.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Tags": {
+      "type": "array",
+      "description": "A list of tags to assign to the online evaluation configuration.",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "A list of tags to assign to the online evaluation configuration.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "Insights": {
+      "type": "array",
+      "description": "The list of insights to enable for failure analysis.",
+      "items": {
+        "$ref": "#/definitions/Insight"
+      },
+      "minItems": 0,
+      "maxItems": 10,
+      "insertionOrder": false,
+      "markdownDescription": "The list of insights to enable for failure analysis.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "ClusteringConfig": {
+      "$ref": "#/definitions/ClusteringConfig",
+      "description": "The configuration for clustering analysis of evaluation results.",
+      "markdownDescription": "The configuration for clustering analysis of evaluation results.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "OnlineEvaluationConfigName",
+    "DataSourceConfig",
+    "EvaluationExecutionRoleArn",
+    "Rule"
+  ],
+  "readOnlyProperties": [
+    "/properties/OnlineEvaluationConfigId",
+    "/properties/OnlineEvaluationConfigArn",
+    "/properties/Status",
+    "/properties/OutputConfig",
+    "/properties/CreatedAt",
+    "/properties/UpdatedAt"
+  ],
+  "createOnlyProperties": [
+    "/properties/OnlineEvaluationConfigName"
+  ],
+  "primaryIdentifier": [
+    "/properties/OnlineEvaluationConfigArn"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/OnlineEvaluationConfigId"
+    ]
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "bedrock-agentcore:TagResource",
+      "bedrock-agentcore:UntagResource",
+      "bedrock-agentcore:ListTagsForResource"
+    ]
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "bedrock-agentcore:CreateOnlineEvaluationConfig",
+        "bedrock-agentcore:GetOnlineEvaluationConfig",
+        "bedrock-agentcore:TagResource",
+        "iam:PassRole",
+        "lambda:GetFunction",
+        "lambda:InvokeFunction",
+        "logs:DescribeLogGroups",
+        "logs:DescribeIndexPolicies",
+        "logs:PutIndexPolicy"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "bedrock-agentcore:GetOnlineEvaluationConfig",
+        "bedrock-agentcore:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "bedrock-agentcore:UpdateOnlineEvaluationConfig",
+        "bedrock-agentcore:GetOnlineEvaluationConfig",
+        "bedrock-agentcore:TagResource",
+        "bedrock-agentcore:UntagResource",
+        "iam:PassRole",
+        "lambda:GetFunction",
+        "lambda:InvokeFunction",
+        "logs:DescribeLogGroups",
+        "logs:DescribeIndexPolicies",
+        "logs:PutIndexPolicy"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "bedrock-agentcore:DeleteOnlineEvaluationConfig",
+        "bedrock-agentcore:GetOnlineEvaluationConfig"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "bedrock-agentcore:ListOnlineEvaluationConfigs"
+      ]
+    }
+  },
+  "attributes": {
+    "OnlineEvaluationConfigId": {
+      "type": "string",
+      "description": "The unique identifier of the online evaluation configuration.",
+      "markdownDescription": "The unique identifier of the online evaluation configuration.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z][a-zA-Z0-9-_]{0,99}-[a-zA-Z0-9]{10}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "OnlineEvaluationConfigArn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the online evaluation configuration.",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the online evaluation configuration.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws|aws-cn|aws-us-gov):bedrock-agentcore:[a-z0-9-]+:[0-9]{12}:online-evaluation-config/[a-zA-Z][a-zA-Z0-9-_]{0,99}-[a-zA-Z0-9]{10}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Status": {
+      "$ref": "#/definitions/OnlineEvaluationConfigStatus",
+      "description": "The status of the online evaluation configuration.",
+      "markdownDescription": "The status of the online evaluation configuration.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "OutputConfig": {
+      "$ref": "#/definitions/OutputConfig",
+      "description": "The configuration that specifies where evaluation results should be written.",
+      "markdownDescription": "The configuration that specifies where evaluation results should be written.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreatedAt": {
+      "type": "string",
+      "description": "The timestamp when the online evaluation configuration was created.",
+      "format": "date-time",
+      "markdownDescription": "The timestamp when the online evaluation configuration was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "UpdatedAt": {
+      "type": "string",
+      "description": "The timestamp when the online evaluation configuration was last updated.",
+      "format": "date-time",
+      "markdownDescription": "The timestamp when the online evaluation configuration was last updated.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

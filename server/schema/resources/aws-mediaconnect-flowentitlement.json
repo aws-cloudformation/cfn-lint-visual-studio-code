@@ -3,6 +3,25 @@
   "description": "Resource schema for AWS::MediaConnect::FlowEntitlement",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-mediaconnect.git",
   "definitions": {
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "Encryption": {
       "type": "object",
       "description": "Information about the encryption of the flow.",
@@ -50,12 +69,12 @@
         "RoleArn": {
           "type": "string",
           "description": "The ARN of the role that you created during setup (when you set up AWS Elemental MediaConnect as a trusted entity).",
-          "markdownDescription": "The ARN of the role that you created during setup (when you set up AWS Elemental MediaConnect as a trusted entity).\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The ARN of the role that you created during setup (when you set up AWS Elemental MediaConnect as a trusted entity).\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:(aws[a-zA-Z-]*):iam::[0-9]{12}:role/[a-zA-Z0-9_+=,.@-]+$  \nUpdate requires: No interruption\n"
         },
         "SecretArn": {
           "type": "string",
           "description": " The ARN of the secret that you created in AWS Secrets Manager to store the encryption key. This parameter is required for static key encryption and is not valid for SPEKE encryption.",
-          "markdownDescription": " The ARN of the secret that you created in AWS Secrets Manager to store the encryption key. This parameter is required for static key encryption and is not valid for SPEKE encryption.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          "markdownDescription": " The ARN of the secret that you created in AWS Secrets Manager to store the encryption key. This parameter is required for static key encryption and is not valid for SPEKE encryption.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws[a-zA-Z-]*):secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:[a-zA-Z0-9/_+=.@-]+$  \nUpdate requires: No interruption\n"
         },
         "Url": {
           "type": "string",
@@ -75,12 +94,12 @@
     "FlowArn": {
       "type": "string",
       "description": "The ARN of the flow.",
-      "markdownDescription": "The ARN of the flow.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The ARN of the flow.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
     },
     "EntitlementArn": {
       "type": "string",
       "description": "The ARN of the entitlement.",
-      "markdownDescription": "The ARN of the entitlement.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "The ARN of the entitlement.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws[a-zA-Z-]*):mediaconnect:[a-z0-9-]+:[0-9]{12}:entitlement:[a-zA-Z0-9-]+:[a-zA-Z0-9_-]+$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "DataTransferSubscriberFeePercent": {
       "type": "integer",
@@ -120,6 +139,16 @@
         "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
       },
       "markdownDescription": "The AWS account IDs that you want to share your content with. The receiving accounts (subscribers) will be allowed to create their own flow using your content as the source.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "Tags": {
+      "type": "array",
+      "description": "Key-value pairs that can be used to tag and organize this flow entitlement.",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "Key-value pairs that can be used to tag and organize this flow entitlement.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "additionalProperties": false,
@@ -130,6 +159,7 @@
     "Description"
   ],
   "createOnlyProperties": [
+    "/properties/FlowArn",
     "/properties/DataTransferSubscriberFeePercent",
     "/properties/Name"
   ],
@@ -139,27 +169,56 @@
   "primaryIdentifier": [
     "/properties/EntitlementArn"
   ],
+  "deprecatedProperties": [
+    "/properties/Encryption/ResourceId",
+    "/properties/Encryption/ConstantInitializationVector",
+    "/properties/Encryption/DeviceId",
+    "/properties/Encryption/Region",
+    "/properties/Encryption/Url"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "mediaconnect:TagResource",
+      "mediaconnect:UntagResource",
+      "mediaconnect:ListTagsForResource"
+    ]
+  },
   "handlers": {
     "create": {
       "permissions": [
         "iam:PassRole",
-        "mediaconnect:GrantFlowEntitlements"
+        "mediaconnect:GrantFlowEntitlements",
+        "mediaconnect:DescribeFlow",
+        "mediaconnect:TagResource",
+        "mediaconnect:ListTagsForResource"
       ]
     },
     "read": {
       "permissions": [
-        "mediaconnect:DescribeFlow"
+        "mediaconnect:DescribeFlow",
+        "mediaconnect:ListFlows",
+        "mediaconnect:ListTagsForResource"
       ]
     },
     "update": {
       "permissions": [
+        "iam:PassRole",
         "mediaconnect:DescribeFlow",
-        "mediaconnect:UpdateFlowEntitlement"
+        "mediaconnect:UpdateFlowEntitlement",
+        "mediaconnect:TagResource",
+        "mediaconnect:UntagResource",
+        "mediaconnect:ListTagsForResource"
       ]
     },
     "delete": {
       "permissions": [
         "mediaconnect:DescribeFlow",
+        "mediaconnect:ListFlows",
         "mediaconnect:RevokeFlowEntitlement"
       ]
     },
@@ -167,14 +226,24 @@
       "permissions": [
         "mediaconnect:DescribeFlow",
         "mediaconnect:ListFlows"
-      ]
+      ],
+      "handlerSchema": {
+        "properties": {
+          "FlowArn": {
+            "$ref": "resource-schema.json#/properties/FlowArn"
+          }
+        },
+        "required": [
+          "FlowArn"
+        ]
+      }
     }
   },
   "attributes": {
     "EntitlementArn": {
       "type": "string",
       "description": "The ARN of the entitlement.",
-      "markdownDescription": "The ARN of the entitlement.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "The ARN of the entitlement.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws[a-zA-Z-]*):mediaconnect:[a-z0-9-]+:[0-9]{12}:entitlement:[a-zA-Z0-9-]+:[a-zA-Z0-9_-]+$  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

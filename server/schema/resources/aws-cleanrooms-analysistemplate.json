@@ -9,8 +9,8 @@
         "DefaultValue": {
           "type": "string",
           "minLength": 0,
-          "maxLength": 250,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 250  \nUpdate requires: No interruption\n"
+          "maxLength": 1000,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1000  \nUpdate requires: No interruption\n"
         },
         "Name": {
           "type": "string",
@@ -270,6 +270,99 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SyntheticDataParameters": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "MlSyntheticDataParameters",
+          "properties": {
+            "MlSyntheticDataParameters": {
+              "$ref": "#/definitions/MLSyntheticDataParameters"
+            }
+          },
+          "required": [
+            "MlSyntheticDataParameters"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "MLSyntheticDataParameters": {
+      "type": "object",
+      "properties": {
+        "Epsilon": {
+          "type": "number",
+          "minimum": 0.0001,
+          "maximum": 10,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "MaxMembershipInferenceAttackScore": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "ColumnClassification": {
+          "$ref": "#/definitions/ColumnClassificationDetails"
+        }
+      },
+      "required": [
+        "Epsilon",
+        "MaxMembershipInferenceAttackScore",
+        "ColumnClassification"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ColumnClassificationDetails": {
+      "type": "object",
+      "properties": {
+        "ColumnMapping": {
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/SyntheticDataColumnProperties"
+          },
+          "minItems": 5,
+          "maxItems": 1000,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ColumnMapping"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SyntheticDataColumnProperties": {
+      "type": "object",
+      "properties": {
+        "ColumnName": {
+          "type": "string",
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 128  \nPattern: ^[a-z0-9_](([a-z0-9_]+-)*([a-z0-9_]+))?$  \nUpdate requires: No interruption\n"
+        },
+        "ColumnType": {
+          "type": "string",
+          "enum": [
+            "CATEGORICAL",
+            "NUMERICAL"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: CATEGORICAL | NUMERICAL  \nUpdate requires: No interruption\n"
+        },
+        "IsPredictiveValue": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ColumnName",
+        "ColumnType",
+        "IsPredictiveValue"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -306,7 +399,7 @@
       },
       "type": "array",
       "minItems": 0,
-      "maxItems": 10,
+      "maxItems": 50,
       "markdownDescription": "The member who can query can provide this placeholder for a literal data value in an analysis template\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement\n"
     },
     "AnalysisTemplateIdentifier": {
@@ -355,6 +448,9 @@
     },
     "ErrorMessageConfiguration": {
       "$ref": "#/definitions/ErrorMessageConfiguration"
+    },
+    "SyntheticDataParameters": {
+      "$ref": "#/definitions/SyntheticDataParameters"
     }
   },
   "required": [
@@ -377,7 +473,8 @@
     "/properties/Format",
     "/properties/AnalysisParameters",
     "/properties/Schema",
-    "/properties/ErrorMessageConfiguration"
+    "/properties/ErrorMessageConfiguration",
+    "/properties/SyntheticDataParameters"
   ],
   "primaryIdentifier": [
     "/properties/AnalysisTemplateIdentifier",

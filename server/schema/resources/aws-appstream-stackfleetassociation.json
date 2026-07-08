@@ -1,35 +1,85 @@
 {
   "typeName": "AWS::AppStream::StackFleetAssociation",
   "description": "Resource Type definition for AWS::AppStream::StackFleetAssociation",
-  "additionalProperties": false,
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-appstream/tree/master/aws-appstream-stackfleetassociation.git",
   "properties": {
-    "Id": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
     "FleetName": {
+      "description": "The name of the fleet. To associate a fleet with a stack, you must specify a dependency on the fleet resource.",
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The name of the fleet. To associate a fleet with a stack, you must specify a dependency on the fleet resource.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
     },
     "StackName": {
+      "description": "The name of the stack. To associate a fleet with a stack, you must specify a dependency on the stack resource.",
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The name of the stack. To associate a fleet with a stack, you must specify a dependency on the stack resource.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
     }
   },
+  "additionalProperties": false,
   "required": [
     "FleetName",
     "StackName"
   ],
+  "createOnlyProperties": [
+    "/properties/FleetName",
+    "/properties/StackName"
+  ],
   "primaryIdentifier": [
-    "/properties/Id"
+    "/properties/FleetName",
+    "/properties/StackName"
   ],
-  "readOnlyProperties": [
-    "/properties/Id"
-  ],
-  "attributes": {
-    "Id": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+  "tagging": {
+    "taggable": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "appstream:AssociateFleet",
+        "appstream:ListAssociatedStacks"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "appstream:ListAssociatedStacks"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "appstream:DisassociateFleet",
+        "appstream:ListAssociatedStacks"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "FleetName": {
+            "type": "string",
+            "description": "Fleet name to filter associations",
+            "markdownDescription": "Fleet name to filter associations\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "StackName": {
+            "type": "string",
+            "description": "Stack name to filter associations",
+            "markdownDescription": "Stack name to filter associations\n\n---\n\nRequired: Conditional  \nType: String  \nUpdate requires: No interruption\n"
+          }
+        },
+        "anyOf": [
+          {
+            "required": [
+              "FleetName"
+            ]
+          },
+          {
+            "required": [
+              "StackName"
+            ]
+          }
+        ]
+      },
+      "permissions": [
+        "appstream:ListAssociatedStacks",
+        "appstream:ListAssociatedFleets"
+      ]
     }
-  }
+  },
+  "attributes": {}
 }

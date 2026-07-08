@@ -2,11 +2,32 @@
   "typeName": "AWS::MediaConnect::FlowVpcInterface",
   "description": "Resource schema for AWS::MediaConnect::FlowVpcInterface",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-mediaconnect.git",
+  "definitions": {
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
   "properties": {
     "FlowArn": {
       "type": "string",
       "description": "The Amazon Resource Name (ARN), a unique identifier for any AWS resource, of the flow.",
-      "markdownDescription": "The Amazon Resource Name (ARN), a unique identifier for any AWS resource, of the flow.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
+      "markdownDescription": "The Amazon Resource Name (ARN), a unique identifier for any AWS resource, of the flow.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:(aws[a-zA-Z-]*):mediaconnect:[a-z0-9-]+:[0-9]{12}:flow:[a-zA-Z0-9-]+:[a-zA-Z0-9_-]+$  \nUpdate requires: Replacement\n"
     },
     "Name": {
       "type": "string",
@@ -16,7 +37,7 @@
     "RoleArn": {
       "type": "string",
       "description": "Role Arn MediaConnect can assume to create ENIs in customer's account.",
-      "markdownDescription": "Role Arn MediaConnect can assume to create ENIs in customer's account.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Role Arn MediaConnect can assume to create ENIs in customer's account.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:(aws[a-zA-Z-]*):iam::[0-9]{12}:role/[a-zA-Z0-9_+=,.@-]+$  \nUpdate requires: No interruption\n"
     },
     "SecurityGroupIds": {
       "type": "array",
@@ -40,6 +61,16 @@
         "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
       },
       "markdownDescription": "IDs of the network interfaces created in customer's account by MediaConnect.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Tags": {
+      "type": "array",
+      "description": "Key-value pairs that can be used to tag and organize this VPC network interface.",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "Key-value pairs that can be used to tag and organize this VPC network interface.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "additionalProperties": false,
@@ -66,19 +97,26 @@
       "permissions": [
         "iam:PassRole",
         "mediaconnect:DescribeFlow",
-        "mediaconnect:AddFlowVpcInterfaces"
+        "mediaconnect:AddFlowVpcInterfaces",
+        "mediaconnect:TagResource",
+        "mediaconnect:ListTagsForResource"
       ]
     },
     "read": {
       "permissions": [
-        "mediaconnect:DescribeFlow"
+        "mediaconnect:DescribeFlow",
+        "mediaconnect:ListTagsForResource"
       ]
     },
     "update": {
       "permissions": [
+        "iam:PassRole",
         "mediaconnect:DescribeFlow",
         "mediaconnect:AddFlowVpcInterfaces",
-        "mediaconnect:RemoveFlowVpcInterface"
+        "mediaconnect:RemoveFlowVpcInterface",
+        "mediaconnect:TagResource",
+        "mediaconnect:UntagResource",
+        "mediaconnect:ListTagsForResource"
       ]
     },
     "delete": {
@@ -90,8 +128,30 @@
     "list": {
       "permissions": [
         "mediaconnect:DescribeFlow"
-      ]
+      ],
+      "handlerSchema": {
+        "properties": {
+          "FlowArn": {
+            "$ref": "resource-schema.json#/properties/FlowArn"
+          }
+        },
+        "required": [
+          "FlowArn"
+        ]
+      }
     }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "mediaconnect:TagResource",
+      "mediaconnect:UntagResource",
+      "mediaconnect:ListTagsForResource"
+    ]
   },
   "attributes": {
     "NetworkInterfaceIds": {

@@ -1,0 +1,1386 @@
+{
+  "typeName": "AWS::DevOpsAgent::Service",
+  "description": "The AWS::DevOpsAgent::Service resource registers external services (like Dynatrace, MCP servers, GitLab) for integration with DevOpsAgent.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "definitions": {
+    "ServiceId": {
+      "description": "The unique identifier of the service",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "markdownDescription": "The unique identifier of the service\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+    },
+    "ServiceType": {
+      "description": "The type of service being registered",
+      "type": "string",
+      "enum": [
+        "dynatrace",
+        "mcpserver",
+        "mcpserversplunk",
+        "mcpservernewrelic",
+        "gitlab",
+        "servicenow",
+        "pagerduty",
+        "azureidentity",
+        "mcpserversigv4",
+        "mcpservergrafana"
+      ],
+      "markdownDescription": "The type of service being registered\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: dynatrace | mcpserver | mcpserversplunk | mcpservernewrelic | gitlab | servicenow | pagerduty | azureidentity | mcpserversigv4 | mcpservergrafana  \nUpdate requires: No interruption\n"
+    },
+    "ServiceDetails": {
+      "description": "Service-specific configuration details - only MCPServerSigV4 supports in-place updates, all other service types require replacement when modified",
+      "type": "object",
+      "oneOf": [
+        {
+          "properties": {
+            "Dynatrace": {
+              "$ref": "#/definitions/DynatraceServiceDetails"
+            }
+          },
+          "required": [
+            "Dynatrace"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "MCPServer": {
+              "$ref": "#/definitions/MCPServerDetails"
+            }
+          },
+          "required": [
+            "MCPServer"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "MCPServerSplunk": {
+              "$ref": "#/definitions/MCPServerSplunkDetails"
+            }
+          },
+          "required": [
+            "MCPServerSplunk"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "MCPServerNewRelic": {
+              "$ref": "#/definitions/NewRelicServiceDetails"
+            }
+          },
+          "required": [
+            "MCPServerNewRelic"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "GitLab": {
+              "$ref": "#/definitions/GitLabDetails"
+            }
+          },
+          "required": [
+            "GitLab"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "ServiceNow": {
+              "$ref": "#/definitions/ServiceNowServiceDetails"
+            }
+          },
+          "required": [
+            "ServiceNow"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "PagerDuty": {
+              "$ref": "#/definitions/PagerDutyDetails"
+            }
+          },
+          "required": [
+            "PagerDuty"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "AzureIdentity": {
+              "$ref": "#/definitions/AzureIdentityServiceDetails"
+            }
+          },
+          "required": [
+            "AzureIdentity"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "MCPServerSigV4": {
+              "$ref": "#/definitions/MCPServerSigV4Details"
+            }
+          },
+          "required": [
+            "MCPServerSigV4"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "MCPServerGrafana": {
+              "$ref": "#/definitions/MCPServerGrafanaDetails"
+            }
+          },
+          "required": [
+            "MCPServerGrafana"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "Service-specific configuration details - only MCPServerSigV4 supports in-place updates, all other service types require replacement when modified\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
+    },
+    "DynatraceServiceDetails": {
+      "description": "Dynatrace service configuration",
+      "type": "object",
+      "properties": {
+        "AccountUrn": {
+          "description": "Dynatrace resource account URN",
+          "type": "string",
+          "markdownDescription": "Dynatrace resource account URN\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "AuthorizationConfig": {
+          "$ref": "#/definitions/DynatraceAuthorizationConfig"
+        }
+      },
+      "required": [
+        "AccountUrn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Dynatrace service configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DynatraceAuthorizationConfig": {
+      "description": "Dynatrace OAuth authorization configuration",
+      "type": "object",
+      "properties": {
+        "OAuthClientCredentials": {
+          "$ref": "#/definitions/OAuthClientDetails"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Dynatrace OAuth authorization configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ServiceNowServiceDetails": {
+      "description": "ServiceNow service configuration",
+      "type": "object",
+      "properties": {
+        "InstanceUrl": {
+          "description": "ServiceNow instance URL",
+          "type": "string",
+          "markdownDescription": "ServiceNow instance URL\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^https://[a-zA-Z0-9-]+\\.service-now\\.com/?$  \nUpdate requires: No interruption\n"
+        },
+        "AuthorizationConfig": {
+          "$ref": "#/definitions/ServiceNowAuthorizationConfig"
+        }
+      },
+      "required": [
+        "InstanceUrl"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "ServiceNow service configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ServiceNowAuthorizationConfig": {
+      "description": "ServiceNow OAuth authorization configuration",
+      "type": "object",
+      "properties": {
+        "OAuthClientCredentials": {
+          "$ref": "#/definitions/OAuthClientDetails"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "ServiceNow OAuth authorization configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PagerDutyDetails": {
+      "description": "PagerDuty service configuration",
+      "type": "object",
+      "properties": {
+        "Scopes": {
+          "description": "PagerDuty scopes",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "PagerDuty scopes\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "AuthorizationConfig": {
+          "$ref": "#/definitions/PagerDutyAuthorizationConfig"
+        }
+      },
+      "required": [
+        "Scopes",
+        "AuthorizationConfig"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "PagerDuty service configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PagerDutyAuthorizationConfig": {
+      "description": "PagerDuty OAuth authorization configuration",
+      "type": "object",
+      "properties": {
+        "OAuthClientCredentials": {
+          "$ref": "#/definitions/OAuthClientDetails"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "PagerDuty OAuth authorization configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "MCPServerSigV4Details": {
+      "description": "SigV4-authenticated MCP server configuration",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "MCP server name",
+          "type": "string",
+          "markdownDescription": "MCP server name\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z0-9_-]+$  \nUpdate requires: No interruption\n"
+        },
+        "Endpoint": {
+          "description": "MCP server endpoint URL",
+          "type": "string",
+          "markdownDescription": "MCP server endpoint URL\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^https://[a-zA-Z0-9.-]+(?::[0-9]+)?(?:/.*)?$  \nUpdate requires: No interruption\n"
+        },
+        "Description": {
+          "description": "Optional description for the MCP server",
+          "type": "string",
+          "maxLength": 500,
+          "markdownDescription": "Optional description for the MCP server\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 500  \nUpdate requires: No interruption\n"
+        },
+        "AuthorizationConfig": {
+          "$ref": "#/definitions/MCPServerSigV4AuthorizationConfig"
+        }
+      },
+      "required": [
+        "Name",
+        "Endpoint",
+        "AuthorizationConfig"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "SigV4-authenticated MCP server configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "MCPServerSigV4AuthorizationConfig": {
+      "description": "SigV4 authorization configuration for MCP server",
+      "type": "object",
+      "properties": {
+        "Region": {
+          "description": "AWS region for SigV4 signing. Use '*' for SigV4a multi-region signing.",
+          "type": "string",
+          "markdownDescription": "AWS region for SigV4 signing. Use '*' for SigV4a multi-region signing.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^(\\*|[a-z]{2,4}(-[a-z]+)+-\\d+)$  \nUpdate requires: No interruption\n"
+        },
+        "Service": {
+          "description": "AWS service name for SigV4 signing",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "markdownDescription": "AWS service name for SigV4 signing\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nUpdate requires: No interruption\n"
+        },
+        "RoleArn": {
+          "description": "IAM role ARN to assume for SigV4 signing",
+          "type": "string",
+          "markdownDescription": "IAM role ARN to assume for SigV4 signing\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:aws:iam::\\d{12}:role/[a-zA-Z0-9+=,.@_/-]+$  \nUpdate requires: No interruption\n"
+        },
+        "CustomHeaders": {
+          "description": "Custom headers for the SigV4 MCP server",
+          "type": "object",
+          "maxProperties": 10,
+          "patternProperties": {
+            "^[a-zA-Z0-9-_]+$": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            }
+          },
+          "additionalProperties": false,
+          "markdownDescription": "Custom headers for the SigV4 MCP server\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Region",
+        "Service",
+        "RoleArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "SigV4 authorization configuration for MCP server\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "MCPServerDetails": {
+      "description": "MCP server configuration",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "MCP server name",
+          "type": "string",
+          "markdownDescription": "MCP server name\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z0-9_-]+$  \nUpdate requires: No interruption\n"
+        },
+        "Endpoint": {
+          "description": "MCP server endpoint URL",
+          "type": "string",
+          "markdownDescription": "MCP server endpoint URL\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^https://[a-zA-Z0-9.-]+(?::[0-9]+)?(?:/.*)?$  \nUpdate requires: No interruption\n"
+        },
+        "Description": {
+          "description": "Optional description for the MCP server",
+          "type": "string",
+          "maxLength": 500,
+          "markdownDescription": "Optional description for the MCP server\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 500  \nUpdate requires: No interruption\n"
+        },
+        "AuthorizationConfig": {
+          "$ref": "#/definitions/MCPServerAuthorizationConfig"
+        }
+      },
+      "required": [
+        "Name",
+        "Endpoint",
+        "AuthorizationConfig"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "MCP server configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "MCPServerAuthorizationConfig": {
+      "description": "MCP server authorization configuration",
+      "type": "object",
+      "oneOf": [
+        {
+          "properties": {
+            "OAuthClientCredentials": {
+              "$ref": "#/definitions/MCPServerOAuthClientCredentialsConfig"
+            }
+          },
+          "required": [
+            "OAuthClientCredentials"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "ApiKey": {
+              "$ref": "#/definitions/ApiKeyDetails"
+            }
+          },
+          "required": [
+            "ApiKey"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "MCP server authorization configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "MCPServerSplunkAuthorizationConfig": {
+      "description": "MCP server splunk authorization configuration",
+      "type": "object",
+      "oneOf": [
+        {
+          "properties": {
+            "BearerToken": {
+              "$ref": "#/definitions/BearerTokenDetails"
+            }
+          },
+          "required": [
+            "BearerToken"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "MCP server splunk authorization configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "MCPServerOAuthClientCredentialsConfig": {
+      "description": "MCP server OAuth client credentials configuration",
+      "type": "object",
+      "properties": {
+        "ClientName": {
+          "description": "User friendly OAuth client name",
+          "type": "string",
+          "markdownDescription": "User friendly OAuth client name\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ClientId": {
+          "description": "OAuth client ID",
+          "type": "string",
+          "markdownDescription": "OAuth client ID\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ClientSecret": {
+          "description": "OAuth client secret",
+          "type": "string",
+          "markdownDescription": "OAuth client secret\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ExchangeUrl": {
+          "description": "OAuth token exchange URL",
+          "type": "string",
+          "markdownDescription": "OAuth token exchange URL\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^https://[a-zA-Z0-9.-]+(?::[0-9]+)?(?:/.*)?$  \nUpdate requires: No interruption\n"
+        },
+        "Scopes": {
+          "description": "OAuth scopes",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "OAuth scopes\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "ExchangeParameters": {
+          "description": "OAuth token exchange parameters",
+          "type": "object",
+          "markdownDescription": "OAuth token exchange parameters\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ClientId",
+        "ClientSecret",
+        "ExchangeUrl"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "MCP server OAuth client credentials configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "GitLabDetails": {
+      "description": "GitLab service configuration",
+      "type": "object",
+      "properties": {
+        "TargetUrl": {
+          "description": "GitLab instance URL",
+          "type": "string",
+          "markdownDescription": "GitLab instance URL\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^https://[a-zA-Z0-9]([a-zA-Z0-9.-]*[a-zA-Z0-9])?(?::[0-9]{1,5})?/?$  \nUpdate requires: No interruption\n"
+        },
+        "TokenType": {
+          "description": "Type of GitLab access token",
+          "type": "string",
+          "enum": [
+            "personal",
+            "group"
+          ],
+          "markdownDescription": "Type of GitLab access token\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: personal | group  \nUpdate requires: No interruption\n"
+        },
+        "TokenValue": {
+          "description": "GitLab access token value",
+          "type": "string",
+          "markdownDescription": "GitLab access token value\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^glpat-[a-zA-Z0-9._-]+$  \nUpdate requires: No interruption\n"
+        },
+        "GroupId": {
+          "description": "Optional GitLab group ID for group-level access tokens",
+          "type": "string",
+          "markdownDescription": "Optional GitLab group ID for group-level access tokens\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "TargetUrl",
+        "TokenType",
+        "TokenValue"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "GitLab service configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "OAuthClientDetails": {
+      "description": "OAuth client credentials",
+      "type": "object",
+      "properties": {
+        "ClientName": {
+          "description": "User friendly OAuth client name",
+          "type": "string",
+          "markdownDescription": "User friendly OAuth client name\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ClientId": {
+          "description": "OAuth client ID",
+          "type": "string",
+          "markdownDescription": "OAuth client ID\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ClientSecret": {
+          "description": "OAuth client secret",
+          "type": "string",
+          "markdownDescription": "OAuth client secret\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ExchangeParameters": {
+          "description": "OAuth token exchange parameters",
+          "type": "object",
+          "markdownDescription": "OAuth token exchange parameters\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ClientId",
+        "ClientSecret"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "OAuth client credentials\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ApiKeyDetails": {
+      "description": "API key authentication details",
+      "type": "object",
+      "properties": {
+        "ApiKeyName": {
+          "description": "User friendly API key name",
+          "type": "string",
+          "markdownDescription": "User friendly API key name\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z0-9_\\s-]+$  \nUpdate requires: No interruption\n"
+        },
+        "ApiKeyValue": {
+          "description": "API key value",
+          "type": "string",
+          "markdownDescription": "API key value\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[!-~]([ \\t]*[!-~])*$  \nUpdate requires: No interruption\n"
+        },
+        "ApiKeyHeader": {
+          "description": "HTTP header name to send the API key",
+          "type": "string",
+          "markdownDescription": "HTTP header name to send the API key\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z0-9-]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ApiKeyName",
+        "ApiKeyValue",
+        "ApiKeyHeader"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "API key authentication details\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "BearerTokenDetails": {
+      "description": "Bearer token authentication details",
+      "type": "object",
+      "properties": {
+        "TokenName": {
+          "description": "User friendly bearer token name",
+          "type": "string",
+          "markdownDescription": "User friendly bearer token name\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z0-9_\\s-]+$  \nUpdate requires: No interruption\n"
+        },
+        "TokenValue": {
+          "description": "Bearer token value",
+          "type": "string",
+          "markdownDescription": "Bearer token value\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[\\S]+$  \nUpdate requires: No interruption\n"
+        },
+        "AuthorizationHeader": {
+          "description": "HTTP header name to send the bearer token",
+          "type": "string",
+          "default": "Authorization",
+          "markdownDescription": "HTTP header name to send the bearer token\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9-]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "TokenName",
+        "TokenValue"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Bearer token authentication details\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "MCPServerSplunkDetails": {
+      "description": "Splunk MCP server configuration",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "MCP server name",
+          "type": "string",
+          "markdownDescription": "MCP server name\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z0-9_-]+$  \nUpdate requires: No interruption\n"
+        },
+        "Endpoint": {
+          "description": "MCP server endpoint URL",
+          "type": "string",
+          "markdownDescription": "MCP server endpoint URL\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^https://[a-zA-Z0-9.-]+(?::[0-9]+)?(?:/.*)?$  \nUpdate requires: No interruption\n"
+        },
+        "Description": {
+          "description": "Optional description for the MCP server",
+          "type": "string",
+          "maxLength": 500,
+          "markdownDescription": "Optional description for the MCP server\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 500  \nUpdate requires: No interruption\n"
+        },
+        "AuthorizationConfig": {
+          "$ref": "#/definitions/MCPServerSplunkAuthorizationConfig"
+        }
+      },
+      "required": [
+        "Name",
+        "Endpoint",
+        "AuthorizationConfig"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Splunk MCP server configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "MCPServerGrafanaDetails": {
+      "description": "Grafana MCP server configuration",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "MCP server name",
+          "type": "string",
+          "markdownDescription": "MCP server name\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z0-9_-]+$  \nUpdate requires: No interruption\n"
+        },
+        "Endpoint": {
+          "description": "MCP server endpoint URL",
+          "type": "string",
+          "markdownDescription": "MCP server endpoint URL\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^https://[a-zA-Z0-9.-]+(?::[0-9]+)?(?:/.*)?$  \nUpdate requires: No interruption\n"
+        },
+        "Description": {
+          "description": "Optional description for the MCP server",
+          "type": "string",
+          "maxLength": 500,
+          "markdownDescription": "Optional description for the MCP server\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 500  \nUpdate requires: No interruption\n"
+        },
+        "AuthorizationConfig": {
+          "$ref": "#/definitions/MCPServerGrafanaAuthorizationConfig"
+        }
+      },
+      "required": [
+        "Name",
+        "Endpoint",
+        "AuthorizationConfig"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Grafana MCP server configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "MCPServerGrafanaAuthorizationConfig": {
+      "description": "Grafana MCP server authorization configuration",
+      "type": "object",
+      "oneOf": [
+        {
+          "properties": {
+            "BearerToken": {
+              "$ref": "#/definitions/BearerTokenDetails"
+            }
+          },
+          "required": [
+            "BearerToken"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "Grafana MCP server authorization configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "NewRelicServiceDetails": {
+      "description": "New Relic service configuration",
+      "type": "object",
+      "properties": {
+        "AuthorizationConfig": {
+          "$ref": "#/definitions/NewRelicAuthorizationConfig"
+        }
+      },
+      "required": [
+        "AuthorizationConfig"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "New Relic service configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "NewRelicAuthorizationConfig": {
+      "description": "New Relic authorization configuration",
+      "type": "object",
+      "properties": {
+        "ApiKey": {
+          "$ref": "#/definitions/NewRelicApiKeyConfig"
+        }
+      },
+      "required": [
+        "ApiKey"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "New Relic authorization configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "NewRelicApiKeyConfig": {
+      "description": "New Relic API key configuration",
+      "type": "object",
+      "properties": {
+        "ApiKey": {
+          "description": "New Relic User API Key",
+          "type": "string",
+          "markdownDescription": "New Relic User API Key\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^NRAK-[A-Z0-9]+$  \nUpdate requires: No interruption\n"
+        },
+        "AccountId": {
+          "description": "New Relic Account ID",
+          "type": "string",
+          "markdownDescription": "New Relic Account ID\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[0-9]+$  \nUpdate requires: No interruption\n"
+        },
+        "Region": {
+          "description": "New Relic region",
+          "type": "string",
+          "enum": [
+            "US",
+            "EU"
+          ],
+          "markdownDescription": "New Relic region\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: US | EU  \nUpdate requires: No interruption\n"
+        },
+        "ApplicationIds": {
+          "description": "List of monitored APM application IDs",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[0-9]+$  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "List of monitored APM application IDs\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "EntityGuids": {
+          "description": "List of globally unique IDs for New Relic resources",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9_.-]+$  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "List of globally unique IDs for New Relic resources\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "AlertPolicyIds": {
+          "description": "List of alert policy IDs",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[0-9]+$  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "List of alert policy IDs\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ApiKey",
+        "AccountId",
+        "Region"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "New Relic API key configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AzureIdentityServiceDetails": {
+      "description": "Azure Identity service configuration for federated identity",
+      "type": "object",
+      "properties": {
+        "TenantId": {
+          "description": "Azure AD tenant ID",
+          "type": "string",
+          "markdownDescription": "Azure AD tenant ID\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$  \nUpdate requires: No interruption\n"
+        },
+        "ClientId": {
+          "description": "Azure AD application client ID",
+          "type": "string",
+          "markdownDescription": "Azure AD application client ID\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$  \nUpdate requires: No interruption\n"
+        },
+        "WebIdentityRoleArn": {
+          "description": "ARN of the IAM role for web identity token exchange",
+          "type": "string",
+          "markdownDescription": "ARN of the IAM role for web identity token exchange\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:aws[a-zA-Z-]*:iam::[0-9]{12}:role/.+$  \nUpdate requires: No interruption\n"
+        },
+        "WebIdentityTokenAudiences": {
+          "description": "List of audiences for the web identity token",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "List of audiences for the web identity token\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "TenantId",
+        "ClientId",
+        "WebIdentityRoleArn",
+        "WebIdentityTokenAudiences"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Azure Identity service configuration for federated identity\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AdditionalServiceDetails": {
+      "description": "Additional details specific to the service type returned after registration",
+      "type": "object",
+      "oneOf": [
+        {
+          "properties": {
+            "MCPServer": {
+              "$ref": "#/definitions/RegisteredMCPServerDetails"
+            }
+          },
+          "required": [
+            "MCPServer"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "GitLab": {
+              "$ref": "#/definitions/RegisteredGitLabServiceDetails"
+            }
+          },
+          "required": [
+            "GitLab"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "MCPServerSplunk": {
+              "$ref": "#/definitions/RegisteredMCPServerDetails"
+            }
+          },
+          "required": [
+            "MCPServerSplunk"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "MCPServerNewRelic": {
+              "$ref": "#/definitions/RegisteredNewRelicDetails"
+            }
+          },
+          "required": [
+            "MCPServerNewRelic"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "Dynatrace": {
+              "$ref": "#/definitions/RegisteredDynatraceDetails"
+            }
+          },
+          "required": [
+            "Dynatrace"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "ServiceNow": {
+              "$ref": "#/definitions/RegisteredServiceNowDetails"
+            }
+          },
+          "required": [
+            "ServiceNow"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "PagerDuty": {
+              "$ref": "#/definitions/RegisteredPagerDutyDetails"
+            }
+          },
+          "required": [
+            "PagerDuty"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "AzureIdentity": {
+              "$ref": "#/definitions/RegisteredAzureIdentityDetails"
+            }
+          },
+          "required": [
+            "AzureIdentity"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "MCPServerSigV4": {
+              "$ref": "#/definitions/RegisteredMCPServerSigV4Details"
+            }
+          },
+          "required": [
+            "MCPServerSigV4"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "MCPServerGrafana": {
+              "$ref": "#/definitions/RegisteredMCPServerGrafanaDetails"
+            }
+          },
+          "required": [
+            "MCPServerGrafana"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "Additional details specific to the service type returned after registration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RegisteredMCPServerDetails": {
+      "description": "MCP server details returned after registration",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "MCP server name",
+          "type": "string",
+          "markdownDescription": "MCP server name\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Endpoint": {
+          "description": "MCP server endpoint URL",
+          "type": "string",
+          "markdownDescription": "MCP server endpoint URL\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "AuthorizationMethod": {
+          "description": "MCP server authorization method",
+          "type": "string",
+          "enum": [
+            "oauth-client-credentials",
+            "api-key",
+            "bearer-token"
+          ],
+          "markdownDescription": "MCP server authorization method\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: oauth-client-credentials | api-key | bearer-token  \nUpdate requires: No interruption\n"
+        },
+        "Description": {
+          "description": "Optional description for the MCP server",
+          "type": "string",
+          "markdownDescription": "Optional description for the MCP server\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ApiKeyHeader": {
+          "description": "API key header name if using API key authentication",
+          "type": "string",
+          "markdownDescription": "API key header name if using API key authentication\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Name",
+        "Endpoint",
+        "AuthorizationMethod"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "MCP server details returned after registration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RegisteredMCPServerGrafanaDetails": {
+      "description": "Grafana MCP server details returned after registration",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "MCP server name",
+          "type": "string",
+          "markdownDescription": "MCP server name\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Endpoint": {
+          "description": "MCP server endpoint URL",
+          "type": "string",
+          "markdownDescription": "MCP server endpoint URL\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "AuthorizationMethod": {
+          "description": "MCP server authorization method",
+          "type": "string",
+          "enum": [
+            "bearer-token"
+          ],
+          "markdownDescription": "MCP server authorization method\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: bearer-token  \nUpdate requires: No interruption\n"
+        },
+        "Description": {
+          "description": "Optional description for the MCP server",
+          "type": "string",
+          "markdownDescription": "Optional description for the MCP server\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Endpoint",
+        "AuthorizationMethod"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Grafana MCP server details returned after registration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RegisteredNewRelicDetails": {
+      "description": "New Relic service details returned after registration",
+      "type": "object",
+      "properties": {
+        "AccountId": {
+          "description": "New Relic account ID",
+          "type": "string",
+          "markdownDescription": "New Relic account ID\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Region": {
+          "description": "New Relic region",
+          "type": "string",
+          "enum": [
+            "US",
+            "EU"
+          ],
+          "markdownDescription": "New Relic region\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: US | EU  \nUpdate requires: No interruption\n"
+        },
+        "Description": {
+          "description": "Optional user description",
+          "type": "string",
+          "markdownDescription": "Optional user description\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "AccountId",
+        "Region"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "New Relic service details returned after registration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RegisteredGitLabServiceDetails": {
+      "description": "GitLab service details returned after registration",
+      "type": "object",
+      "properties": {
+        "TargetUrl": {
+          "description": "GitLab instance URL",
+          "type": "string",
+          "markdownDescription": "GitLab instance URL\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "TokenType": {
+          "description": "Type of GitLab access token",
+          "type": "string",
+          "enum": [
+            "personal",
+            "group"
+          ],
+          "markdownDescription": "Type of GitLab access token\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: personal | group  \nUpdate requires: No interruption\n"
+        },
+        "GroupId": {
+          "description": "Optional GitLab group ID for group-level access tokens",
+          "type": "string",
+          "markdownDescription": "Optional GitLab group ID for group-level access tokens\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "TargetUrl",
+        "TokenType"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "GitLab service details returned after registration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RegisteredDynatraceDetails": {
+      "description": "Dynatrace service details returned after registration",
+      "type": "object",
+      "properties": {
+        "AccountUrn": {
+          "description": "Dynatrace resource account URN",
+          "type": "string",
+          "markdownDescription": "Dynatrace resource account URN\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "AccountUrn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Dynatrace service details returned after registration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RegisteredServiceNowDetails": {
+      "description": "ServiceNow service details returned after registration",
+      "type": "object",
+      "properties": {
+        "InstanceUrl": {
+          "description": "ServiceNow instance URL",
+          "type": "string",
+          "markdownDescription": "ServiceNow instance URL\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "InstanceUrl"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "ServiceNow service details returned after registration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RegisteredPagerDutyDetails": {
+      "description": "PagerDuty service details returned after registration",
+      "type": "object",
+      "properties": {
+        "Scopes": {
+          "description": "The scopes assigned to the service",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "The scopes assigned to the service\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Scopes"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "PagerDuty service details returned after registration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RegisteredAzureIdentityDetails": {
+      "description": "Azure Identity service details returned after registration",
+      "type": "object",
+      "properties": {
+        "TenantId": {
+          "description": "Azure AD tenant ID",
+          "type": "string",
+          "markdownDescription": "Azure AD tenant ID\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$  \nUpdate requires: No interruption\n"
+        },
+        "ClientId": {
+          "description": "Azure AD application client ID",
+          "type": "string",
+          "markdownDescription": "Azure AD application client ID\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$  \nUpdate requires: No interruption\n"
+        },
+        "WebIdentityRoleArn": {
+          "description": "ARN of the IAM role for web identity token exchange",
+          "type": "string",
+          "markdownDescription": "ARN of the IAM role for web identity token exchange\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:aws[a-zA-Z-]*:iam::[0-9]{12}:role/.+$  \nUpdate requires: No interruption\n"
+        },
+        "WebIdentityTokenAudiences": {
+          "description": "List of audiences for the web identity token",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "List of audiences for the web identity token\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "TenantId",
+        "ClientId",
+        "WebIdentityRoleArn",
+        "WebIdentityTokenAudiences"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Azure Identity service details returned after registration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RegisteredMCPServerSigV4Details": {
+      "description": "SigV4-authenticated MCP server details returned after registration",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "The MCP server name",
+          "type": "string",
+          "markdownDescription": "The MCP server name\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Endpoint": {
+          "description": "The MCP server endpoint URL",
+          "type": "string",
+          "markdownDescription": "The MCP server endpoint URL\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Description": {
+          "description": "Optional description for the MCP server",
+          "type": "string",
+          "markdownDescription": "Optional description for the MCP server\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Region": {
+          "description": "AWS region for SigV4 signing",
+          "type": "string",
+          "markdownDescription": "AWS region for SigV4 signing\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Service": {
+          "description": "AWS service name for SigV4 signing",
+          "type": "string",
+          "markdownDescription": "AWS service name for SigV4 signing\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "RoleArn": {
+          "description": "IAM role ARN for SigV4 signing",
+          "type": "string",
+          "markdownDescription": "IAM role ARN for SigV4 signing\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "CustomHeaders": {
+          "description": "Custom headers for the SigV4 MCP server",
+          "type": "object",
+          "patternProperties": {
+            "^[a-zA-Z0-9-_]+$": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            }
+          },
+          "additionalProperties": false,
+          "markdownDescription": "Custom headers for the SigV4 MCP server\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Name",
+        "Endpoint",
+        "Region",
+        "Service",
+        "RoleArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "SigV4-authenticated MCP server details returned after registration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The key name of the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag.",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The value for the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "ServiceId": {
+      "description": "The unique identifier of the service",
+      "$ref": "#/definitions/ServiceId",
+      "markdownDescription": "The unique identifier of the service\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ServiceType": {
+      "description": "The type of service being registered",
+      "$ref": "#/definitions/ServiceType",
+      "markdownDescription": "The type of service being registered\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: Replacement\n"
+    },
+    "ServiceDetails": {
+      "description": "Service-specific configuration details for create operation",
+      "$ref": "#/definitions/ServiceDetails",
+      "markdownDescription": "Service-specific configuration details for create operation\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
+    },
+    "AccessibleResources": {
+      "description": "List of accessible resources for this service",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "patternProperties": {
+          ".*": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          }
+        },
+        "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "List of accessible resources for this service\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "AdditionalServiceDetails": {
+      "description": "Additional details specific to the service type",
+      "$ref": "#/definitions/AdditionalServiceDetails",
+      "markdownDescription": "Additional details specific to the service type\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "KmsKeyArn": {
+      "description": "The ARN of the KMS key to use for encryption.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048,
+      "markdownDescription": "The ARN of the KMS key to use for encryption.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: Replacement\n"
+    },
+    "Arn": {
+      "description": "The Amazon Resource Name (ARN) of the Service.",
+      "type": "string",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the Service.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Tags": {
+      "description": "An array of key-value pairs to apply to this resource.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "An array of key-value pairs to apply to this resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "additionalProperties": false,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "aidevops:TagResource",
+      "aidevops:UntagResource",
+      "aidevops:ListTagsForResource"
+    ]
+  },
+  "required": [
+    "ServiceType"
+  ],
+  "readOnlyProperties": [
+    "/properties/ServiceId",
+    "/properties/AccessibleResources",
+    "/properties/AdditionalServiceDetails",
+    "/properties/Arn"
+  ],
+  "writeOnlyProperties": [
+    "/properties/ServiceDetails"
+  ],
+  "createOnlyProperties": [
+    "/properties/ServiceType",
+    "/properties/ServiceDetails/Dynatrace",
+    "/properties/ServiceDetails/MCPServer",
+    "/properties/ServiceDetails/MCPServerSplunk",
+    "/properties/ServiceDetails/MCPServerNewRelic",
+    "/properties/ServiceDetails/GitLab",
+    "/properties/ServiceDetails/ServiceNow",
+    "/properties/ServiceDetails/PagerDuty",
+    "/properties/ServiceDetails/AzureIdentity",
+    "/properties/ServiceDetails/MCPServerGrafana",
+    "/properties/KmsKeyArn"
+  ],
+  "primaryIdentifier": [
+    "/properties/ServiceId"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "aidevops:RegisterService",
+        "aidevops:GetService",
+        "aidevops:TagResource",
+        "aidevops:ListTagsForResource",
+        "iam:CreateServiceLinkedRole",
+        "iam:PassRole",
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:GenerateDataKey",
+        "kms:GenerateDataKeyPair",
+        "kms:GenerateDataKeyPairWithoutPlaintext",
+        "kms:GenerateDataKeyWithoutPlaintext",
+        "kms:ReEncryptFrom",
+        "kms:ReEncryptTo"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "aidevops:GetService",
+        "aidevops:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "aidevops:UpdateService",
+        "aidevops:GetService",
+        "aidevops:TagResource",
+        "aidevops:UntagResource",
+        "aidevops:ListTagsForResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "aidevops:DeregisterService",
+        "aidevops:GetService"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "aidevops:ListServices"
+      ]
+    }
+  },
+  "attributes": {
+    "ServiceId": {
+      "description": "The unique identifier of the service",
+      "$ref": "#/definitions/ServiceId",
+      "markdownDescription": "The unique identifier of the service\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "AccessibleResources": {
+      "description": "List of accessible resources for this service",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "patternProperties": {
+          ".*": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          }
+        },
+        "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "List of accessible resources for this service\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "AdditionalServiceDetails": {
+      "description": "Additional details specific to the service type",
+      "$ref": "#/definitions/AdditionalServiceDetails",
+      "markdownDescription": "Additional details specific to the service type\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Arn": {
+      "description": "The Amazon Resource Name (ARN) of the Service.",
+      "type": "string",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the Service.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

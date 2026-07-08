@@ -30,6 +30,16 @@
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws|aws-us-gov|aws-cn):kms:.*:[0-9]+:.*$  \nUpdate requires: No interruption\n"
     },
+    "CustomerProfilesDomainArn": {
+      "description": "The Amazon Resource Name (ARN) of the Customer Profiles domain",
+      "type": "string",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the Customer Profiles domain\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws|aws-us-gov|aws-cn):profile:[a-z]{2}-[a-z]{1,10}-[0-9]:[0-9]{12}:(domains/[a-zA-Z_0-9-]{1,255})$  \nUpdate requires: No interruption\n"
+    },
+    "CustomerProfilesObjectTypeArn": {
+      "description": "The Amazon Resource Name (ARN) of the Customer Profiles object type",
+      "type": "string",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the Customer Profiles object type\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws|aws-us-gov|aws-cn):profile:[a-z]{2}-[a-z]{1,10}-[0-9]:[0-9]{12}:(domains/[a-zA-Z_0-9-]{1,255}/object-types/[a-zA-Z_0-9-]{1,255})$  \nUpdate requires: No interruption\n"
+    },
     "MatchingWorkflowArn": {
       "description": "The default MatchingWorkflow arn",
       "type": "string",
@@ -76,7 +86,7 @@
         "OutputS3Path": {
           "description": "The S3 path to which Entity Resolution will write the output table",
           "type": "string",
-          "markdownDescription": "The S3 path to which Entity Resolution will write the output table\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^s3://([^/]+)/?(.*?([^/]+)/?)$  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The S3 path to which Entity Resolution will write the output table\n\n---\n\nRequired: No  \nType: String  \nPattern: ^s3://([^/]+)/?(.*?([^/]+)/?)$  \nUpdate requires: No interruption\n"
         },
         "Output": {
           "type": "array",
@@ -94,11 +104,13 @@
         "ApplyNormalization": {
           "type": "boolean",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "CustomerProfilesIntegrationConfig": {
+          "$ref": "#/definitions/CustomerProfilesIntegrationConfig"
         }
       },
       "required": [
-        "Output",
-        "OutputS3Path"
+        "Output"
       ],
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
@@ -172,7 +184,7 @@
           "type": "array",
           "insertionOrder": false,
           "minItems": 1,
-          "maxItems": 15,
+          "maxItems": 25,
           "items": {
             "$ref": "#/definitions/Rule"
           },
@@ -209,11 +221,14 @@
           "type": "array",
           "insertionOrder": false,
           "minItems": 1,
-          "maxItems": 15,
+          "maxItems": 25,
           "items": {
             "$ref": "#/definitions/RuleCondition"
           },
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "MatchingConfig": {
+          "$ref": "#/definitions/MatchingConfig"
         }
       },
       "required": [
@@ -235,6 +250,19 @@
       },
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "MatchingConfig": {
+      "type": "object",
+      "description": "Configuration for matching behavior within rule condition properties",
+      "properties": {
+        "EnableTransitiveMatching": {
+          "type": "boolean",
+          "description": "Enables transitive matching to process records across all rule levels and connect unmatched records to existing match groups",
+          "markdownDescription": "Enables transitive matching to process records across all rule levels and connect unmatched records to existing match groups\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for matching behavior within rule condition properties\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Rule": {
       "type": "object",
@@ -307,6 +335,24 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CustomerProfilesIntegrationConfig": {
+      "type": "object",
+      "description": "The Customer Profiles integration configuration for the output source",
+      "properties": {
+        "DomainArn": {
+          "$ref": "#/definitions/CustomerProfilesDomainArn"
+        },
+        "ObjectTypeArn": {
+          "$ref": "#/definitions/CustomerProfilesObjectTypeArn"
+        }
+      },
+      "required": [
+        "DomainArn",
+        "ObjectTypeArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The Customer Profiles integration configuration for the output source\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Tag": {
       "description": "A key-value pair to associate with a resource",
@@ -432,7 +478,8 @@
         "events:PutRule",
         "events:DeleteRule",
         "events:PutTargets",
-        "events:ListTargetsByRule"
+        "events:ListTargetsByRule",
+        "profile:PutIntegration"
       ]
     },
     "read": {
@@ -450,7 +497,8 @@
         "events:DeleteRule",
         "events:PutTargets",
         "events:RemoveTargets",
-        "events:ListTargetsByRule"
+        "events:ListTargetsByRule",
+        "profile:DeleteIntegration"
       ]
     },
     "list": {

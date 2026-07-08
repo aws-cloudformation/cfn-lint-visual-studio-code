@@ -11,12 +11,38 @@
     "tagProperty": "/properties/Tags",
     "cloudFormationSystemTags": true
   },
+  "typeName": "AWS::Lambda::Function",
+  "readOnlyProperties": [
+    "/properties/SnapStartResponse",
+    "/properties/SnapStartResponse/ApplyOn",
+    "/properties/SnapStartResponse/OptimizationStatus",
+    "/properties/Arn"
+  ],
+  "description": "The ``AWS::Lambda::Function`` resource creates a Lambda function. To create a function, you need a [deployment package](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html) and an [execution role](https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html). The deployment package is a .zip file archive or container image that contains your function code. The execution role grants the function permission to use AWS services, such as Amazon CloudWatch Logs for log streaming and AWS X-Ray for request tracing.\n You set the package type to ``Image`` if the deployment package is a [container image](https://docs.aws.amazon.com/lambda/latest/dg/lambda-images.html). For these functions, include the URI of the container image in the ECR registry in the [ImageUri property of the Code property](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html#cfn-lambda-function-code-imageuri). You do not need to specify the handler and runtime properties. \n You set the package type to ``Zip`` if the deployment package is a [.zip file archive](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html#gettingstarted-package-zip). For these functions, specify the S3 location of your .zip file in the ``Code`` property. Alternatively, for Node.js and Python functions, you can define your function inline in the [ZipFile property of the Code property](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html#cfn-lambda-function-code-zipfile). In both cases, you must also specify the handler and runtime properties.\n You can use [code signing](https://docs.aws.amazon.com/lambda/latest/dg/configuration-codesigning.html) if your deployment package is a .zip file archive. To enable code signing for this function, specify the ARN of a code-signing configuration. When a user attempts to deploy a code package with ``UpdateFunctionCode``, Lambda checks that the code package has a valid signature from a trusted publisher. The code-signing configuration includes a set of signing profiles, which define the trusted publishers for this function.\n When you update a ``AWS::Lambda::Function`` resource, CFNshort calls the [UpdateFunctionConfiguration](https://docs.aws.amazon.com/lambda/latest/api/API_UpdateFunctionConfiguration.html) and [UpdateFunctionCode](https://docs.aws.amazon.com/lambda/latest/api/API_UpdateFunctionCode.html)LAM APIs under the hood. Because these calls happen sequentially, and invocations can happen between these calls, your function may encounter errors in the time between the calls. For example, if you remove an environment variable, and the code that references that environment variable in the same CFNshort update, you may see invocation errors related to a missing environment variable. To work around this, you can invoke your function against a version or alias by default, rather than the ``$LATEST`` version.\n Note that you configure [provisioned concurrency](https://docs.aws.amazon.com/lambda/latest/dg/provisioned-concurrency.html) on a ``AWS::Lambda::Version`` or a ``AWS::Lambda::Alias``.\n For a complete introduction to Lambda functions, see [What is Lambda?](https://docs.aws.amazon.com/lambda/latest/dg/lambda-welcome.html) in the *Lambda developer guide.*",
+  "createOnlyProperties": [
+    "/properties/FunctionName",
+    "/properties/PackageType",
+    "/properties/TenancyConfig"
+  ],
+  "primaryIdentifier": [
+    "/properties/FunctionName"
+  ],
+  "conditionalCreateOnlyProperties": [
+    "/properties/DurableConfig"
+  ],
+  "required": [
+    "Code",
+    "Role"
+  ],
   "handlers": {
     "read": {
       "permissions": [
         "lambda:GetFunction",
+        "kms:Decrypt",
         "lambda:GetFunctionCodeSigningConfig",
-        "lambda:GetFunctionRecursionConfig"
+        "lambda:GetFunctionRecursionConfig",
+        "lambda:GetRuntimeManagementConfig",
+        "lambda:GetFunctionScalingConfig"
       ]
     },
     "create": {
@@ -31,8 +57,10 @@
         "ec2:DescribeSubnets",
         "ec2:DescribeVpcs",
         "elasticfilesystem:DescribeMountTargets",
+        "s3files:ListMountTargets",
         "kms:CreateGrant",
         "kms:Decrypt",
+        "kms:DescribeKey",
         "kms:Encrypt",
         "kms:GenerateDataKey",
         "lambda:GetCodeSigningConfig",
@@ -42,7 +70,9 @@
         "lambda:PutRuntimeManagementConfig",
         "lambda:TagResource",
         "lambda:PutFunctionRecursionConfig",
-        "lambda:GetFunctionRecursionConfig"
+        "lambda:GetFunctionRecursionConfig",
+        "lambda:PutFunctionScalingConfig",
+        "lambda:PassCapacityProvider"
       ]
     },
     "update": {
@@ -61,8 +91,10 @@
         "ec2:DescribeSubnets",
         "ec2:DescribeVpcs",
         "elasticfilesystem:DescribeMountTargets",
+        "s3files:ListMountTargets",
         "kms:CreateGrant",
         "kms:Decrypt",
+        "kms:DescribeKey",
         "kms:GenerateDataKey",
         "lambda:GetRuntimeManagementConfig",
         "lambda:PutRuntimeManagementConfig",
@@ -71,7 +103,10 @@
         "lambda:GetCodeSigningConfig",
         "lambda:GetFunctionCodeSigningConfig",
         "lambda:PutFunctionRecursionConfig",
-        "lambda:GetFunctionRecursionConfig"
+        "lambda:GetFunctionRecursionConfig",
+        "lambda:PutFunctionScalingConfig",
+        "lambda:PublishVersion",
+        "lambda:PassCapacityProvider"
       ]
     },
     "list": {
@@ -87,14 +122,6 @@
       ]
     }
   },
-  "typeName": "AWS::Lambda::Function",
-  "readOnlyProperties": [
-    "/properties/SnapStartResponse",
-    "/properties/SnapStartResponse/ApplyOn",
-    "/properties/SnapStartResponse/OptimizationStatus",
-    "/properties/Arn"
-  ],
-  "description": "The ``AWS::Lambda::Function`` resource creates a Lambda function. To create a function, you need a [deployment package](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html) and an [execution role](https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html). The deployment package is a .zip file archive or container image that contains your function code. The execution role grants the function permission to use AWS services, such as Amazon CloudWatch Logs for log streaming and AWS X-Ray for request tracing.\n You set the package type to ``Image`` if the deployment package is a [container image](https://docs.aws.amazon.com/lambda/latest/dg/lambda-images.html). For these functions, include the URI of the container image in the ECR registry in the [ImageUri property of the Code property](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html#cfn-lambda-function-code-imageuri). You do not need to specify the handler and runtime properties. \n You set the package type to ``Zip`` if the deployment package is a [.zip file archive](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html#gettingstarted-package-zip). For these functions, specify the S3 location of your .zip file in the ``Code`` property. Alternatively, for Node.js and Python functions, you can define your function inline in the [ZipFile property of the Code property](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html#cfn-lambda-function-code-zipfile). In both cases, you must also specify the handler and runtime properties.\n You can use [code signing](https://docs.aws.amazon.com/lambda/latest/dg/configuration-codesigning.html) if your deployment package is a .zip file archive. To enable code signing for this function, specify the ARN of a code-signing configuration. When a user attempts to deploy a code package with ``UpdateFunctionCode``, Lambda checks that the code package has a valid signature from a trusted publisher. The code-signing configuration includes a set of signing profiles, which define the trusted publishers for this function.\n When you update a ``AWS::Lambda::Function`` resource, CFNshort calls the [UpdateFunctionConfiguration](https://docs.aws.amazon.com/lambda/latest/api/API_UpdateFunctionConfiguration.html) and [UpdateFunctionCode](https://docs.aws.amazon.com/lambda/latest/api/API_UpdateFunctionCode.html)LAM APIs under the hood. Because these calls happen sequentially, and invocations can happen between these calls, your function may encounter errors in the time between the calls. For example, if you remove an environment variable, and the code that references that environment variable in the same CFNshort update, you may see invocation errors related to a missing environment variable. To work around this, you can invoke your function against a version or alias by default, rather than the ``$LATEST`` version.\n Note that you configure [provisioned concurrency](https://docs.aws.amazon.com/lambda/latest/dg/provisioned-concurrency.html) on a ``AWS::Lambda::Version`` or a ``AWS::Lambda::Alias``.\n For a complete introduction to Lambda functions, see [What is Lambda?](https://docs.aws.amazon.com/lambda/latest/dg/lambda-welcome.html) in the *Lambda developer guide.*",
   "writeOnlyProperties": [
     "/properties/SnapStart",
     "/properties/SnapStart/ApplyOn",
@@ -103,16 +130,11 @@
     "/properties/Code/S3Key",
     "/properties/Code/S3ObjectVersion",
     "/properties/Code/ZipFile",
-    "/properties/Code/SourceKMSKeyArn"
-  ],
-  "createOnlyProperties": [
-    "/properties/FunctionName",
-    "/properties/PackageType"
+    "/properties/Code/SourceKMSKeyArn",
+    "/properties/Code/S3ObjectStorageMode",
+    "/properties/PublishToLatestPublished"
   ],
   "additionalProperties": false,
-  "primaryIdentifier": [
-    "/properties/FunctionName"
-  ],
   "definitions": {
     "ImageConfig": {
       "description": "Configuration values that override the container image Dockerfile settings. For more information, see [Container image settings](https://docs.aws.amazon.com/lambda/latest/dg/images-create.html#images-parms).",
@@ -148,6 +170,60 @@
         }
       },
       "markdownDescription": "Configuration values that override the container image Dockerfile settings. For more information, see [Container image settings](https://docs.aws.amazon.com/lambda/latest/dg/images-create.html#images-parms).\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "FunctionScalingConfig": {
+      "description": "Configuration that defines the scaling behavior for a Lambda Managed Instances function, including the minimum and maximum number of execution environments that can be provisioned.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "MinExecutionEnvironments": {
+          "description": "The minimum number of execution environments to maintain for the function.",
+          "maximum": 15000,
+          "type": "integer",
+          "minimum": 0,
+          "markdownDescription": "The minimum number of execution environments to maintain for the function.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "MaxExecutionEnvironments": {
+          "description": "The maximum number of execution environments that can be provisioned for the function.",
+          "maximum": 15000,
+          "type": "integer",
+          "minimum": 0,
+          "markdownDescription": "The maximum number of execution environments that can be provisioned for the function.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Configuration that defines the scaling behavior for a Lambda Managed Instances function, including the minimum and maximum number of execution environments that can be provisioned.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LambdaManagedInstancesCapacityProviderConfig": {
+      "description": "Configuration for Lambda-managed instances used by the capacity provider.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ExecutionEnvironmentMemoryGiBPerVCpu": {
+          "description": "The amount of memory in GiB allocated per vCPU for execution environments.",
+          "maximum": 8,
+          "type": "number",
+          "minimum": 2,
+          "markdownDescription": "The amount of memory in GiB allocated per vCPU for execution environments.\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "CapacityProviderArn": {
+          "minLength": 1,
+          "description": "The Amazon Resource Name (ARN) of the capacity provider.",
+          "type": "string",
+          "maxLength": 140,
+          "markdownDescription": "The Amazon Resource Name (ARN) of the capacity provider.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 140  \nPattern: ^arn:aws[a-zA-Z-]*:lambda:(eusc-)?[a-z]{2}((-gov)|(-iso([a-z]?)))?-[a-z]+-\\d{1}:\\d{12}:capacity-provider:[a-zA-Z0-9-_]+$  \nUpdate requires: No interruption\n"
+        },
+        "PerExecutionEnvironmentMaxConcurrency": {
+          "description": "The maximum number of concurrent executions that can run on each execution environment.",
+          "maximum": 1600,
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "The maximum number of concurrent executions that can run on each execution environment.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "CapacityProviderArn"
+      ],
+      "markdownDescription": "Configuration for Lambda-managed instances used by the capacity provider.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "TracingConfig": {
       "description": "The function's [](https://docs.aws.amazon.com/lambda/latest/dg/services-xray.html) tracing configuration. To sample and record incoming requests, set ``Mode`` to ``Active``.",
@@ -214,6 +290,22 @@
       },
       "markdownDescription": "The [dead-letter queue](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async-retain-records.html#invocation-dlq) for failed asynchronous invocations.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "CapacityProviderConfig": {
+      "description": "Configuration for the capacity provider that manages compute resources for Lambda functions.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "LambdaManagedInstancesCapacityProviderConfig": {
+          "description": "Configuration for Lambda-managed instances used by the capacity provider.",
+          "$ref": "#/definitions/LambdaManagedInstancesCapacityProviderConfig",
+          "markdownDescription": "Configuration for Lambda-managed instances used by the capacity provider.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "LambdaManagedInstancesCapacityProviderConfig"
+      ],
+      "markdownDescription": "Configuration for the capacity provider that manages compute resources for Lambda functions.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "RuntimeManagementConfig": {
       "description": "Sets the runtime management configuration for a function's version. For more information, see [Runtime updates](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-update.html).",
       "additionalProperties": false,
@@ -239,6 +331,37 @@
         "UpdateRuntimeOn"
       ],
       "markdownDescription": "Sets the runtime management configuration for a function's version. For more information, see [Runtime updates](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-update.html).\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DurableConfig": {
+      "description": "Configuration settings for [durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html), including execution timeout and retention period for execution history.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "KMSKeyArn": {
+          "description": "",
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(arn:(aws[a-zA-Z-]*)?:[a-z0-9-.]+:.*)|()$  \nUpdate requires: No interruption\n"
+        },
+        "ExecutionTimeout": {
+          "description": "The maximum time (in seconds) that a durable execution can run before timing out. This timeout applies to the entire durable execution, not individual function invocations.",
+          "maximum": 31622400,
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "The maximum time (in seconds) that a durable execution can run before timing out. This timeout applies to the entire durable execution, not individual function invocations.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "RetentionPeriodInDays": {
+          "default": 14,
+          "description": "The number of days to retain execution history after a durable execution completes. After this period, execution history is no longer available through the GetDurableExecutionHistory API.",
+          "maximum": 90,
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "The number of days to retain execution history after a durable execution completes. After this period, execution history is no longer available through the GetDurableExecutionHistory API.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ExecutionTimeout"
+      ],
+      "markdownDescription": "Configuration settings for [durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html), including execution timeout and retention period for execution history.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "SnapStart": {
       "description": "The function's [SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html) setting.",
@@ -287,7 +410,7 @@
       "markdownDescription": "The function's [SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html) setting.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Code": {
-      "description": "The [deployment package](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html) for a Lambda function. To deploy a function defined as a container image, you specify the location of a container image in the Amazon ECR registry. For a .zip file deployment package, you can specify the location of an object in Amazon S3. For Node.js and Python functions, you can specify the function code inline in the template.\n  When you specify source code inline for a Node.js function, the ``index`` file that CFN creates uses the extension ``.js``. This means that LAM treats the file as a CommonJS module. ES modules aren't supported for inline functions.\n  Changes to a deployment package in Amazon S3 or a container image in ECR are not detected automatically during stack updates. To update the function code, change the object key or version in the template.",
+      "description": "The [deployment package](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html) for a Lambda function. To deploy a function defined as a container image, you specify the location of a container image in the Amazon ECR registry. For a .zip file deployment package, you can specify the location of an object in Amazon S3. For Node.js and Python functions, you can specify the function code inline in the template.\n  When you specify source code inline for a Node.js function, the ``index`` file that CFN creates uses the extension ``.js``. This means that Node.js treats the file as a CommonJS module.\n  Changes to a deployment package in Amazon S3 or a container image in ECR are not detected automatically during stack updates. To update the function code, change the object key or version in the template.",
       "additionalProperties": false,
       "type": "object",
       "properties": {
@@ -311,9 +434,9 @@
           "markdownDescription": "An Amazon S3 bucket in the same AWS-Region as your function. The bucket can be in a different AWS-account.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 63  \nPattern: ^[0-9A-Za-z\\.\\-_]*(?<!\\.)$  \nUpdate requires: No interruption\n"
         },
         "ZipFile": {
-          "description": "(Node.js and Python) The source code of your Lambda function. If you include your function source inline with this parameter, CFN places it in a file named ``index`` and zips it to create a [deployment package](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html). This zip file cannot exceed 4MB. For the ``Handler`` property, the first part of the handler identifier must be ``index``. For example, ``index.handler``.\n  When you specify source code inline for a Node.js function, the ``index`` file that CFN creates uses the extension ``.js``. This means that LAM treats the file as a CommonJS module. ES modules aren't supported for inline functions.\n   For JSON, you must escape quotes and special characters such as newline (``\\n``) with a backslash.\n If you specify a function that interacts with an AWS CloudFormation custom resource, you don't have to write your own functions to send responses to the custom resource that invoked the function. AWS CloudFormation provides a response module ([cfn-response](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-lambda-function-code-cfnresponsemodule.html)) that simplifies sending responses. See [Using Lambda with CloudFormation](https://docs.aws.amazon.com/lambda/latest/dg/services-cloudformation.html) for details.",
+          "description": "(Node.js and Python) The source code of your Lambda function. If you include your function source inline with this parameter, CFN places it in a file named ``index`` and zips it to create a [deployment package](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html). This zip file cannot exceed 4MB. For the ``Handler`` property, the first part of the handler identifier must be ``index``. For example, ``index.handler``.\n  When you specify source code inline for a Node.js function, the ``index`` file that CFN creates uses the extension ``.js``. This means that Node.js treats the file as a CommonJS module.\n When using Node.js 24 or later, Node.js can automatically detect if a ``.js`` file should be treated as CommonJS or as an ES module. To enable auto-detection, add the ``--experimental-detect-module`` flag to the ``NODE_OPTIONS`` environment variable. For more information, see [Experimental Node.js features](https://docs.aws.amazon.com//lambda/latest/dg/lambda-nodejs.html#nodejs-experimental-features).\n   For JSON, you must escape quotes and special characters such as newline (``\\n``) with a backslash.\n If you specify a function that interacts with an AWS CloudFormation custom resource, you don't have to write your own functions to send responses to the custom resource that invoked the function. AWS CloudFormation provides a response module ([cfn-response](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-lambda-function-code-cfnresponsemodule.html)) that simplifies sending responses. See [Using Lambda with CloudFormation](https://docs.aws.amazon.com/lambda/latest/dg/services-cloudformation.html) for details.",
           "type": "string",
-          "markdownDescription": "(Node.js and Python) The source code of your Lambda function. If you include your function source inline with this parameter, CFN places it in a file named ``index`` and zips it to create a [deployment package](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html). This zip file cannot exceed 4MB. For the ``Handler`` property, the first part of the handler identifier must be ``index``. For example, ``index.handler``.\n  When you specify source code inline for a Node.js function, the ``index`` file that CFN creates uses the extension ``.js``. This means that LAM treats the file as a CommonJS module. ES modules aren't supported for inline functions.\n   For JSON, you must escape quotes and special characters such as newline (``\\n``) with a backslash.\n If you specify a function that interacts with an AWS CloudFormation custom resource, you don't have to write your own functions to send responses to the custom resource that invoked the function. AWS CloudFormation provides a response module ([cfn-response](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-lambda-function-code-cfnresponsemodule.html)) that simplifies sending responses. See [Using Lambda with CloudFormation](https://docs.aws.amazon.com/lambda/latest/dg/services-cloudformation.html) for details.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          "markdownDescription": "(Node.js and Python) The source code of your Lambda function. If you include your function source inline with this parameter, CFN places it in a file named ``index`` and zips it to create a [deployment package](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html). This zip file cannot exceed 4MB. For the ``Handler`` property, the first part of the handler identifier must be ``index``. For example, ``index.handler``.\n  When you specify source code inline for a Node.js function, the ``index`` file that CFN creates uses the extension ``.js``. This means that Node.js treats the file as a CommonJS module.\n When using Node.js 24 or later, Node.js can automatically detect if a ``.js`` file should be treated as CommonJS or as an ES module. To enable auto-detection, add the ``--experimental-detect-module`` flag to the ``NODE_OPTIONS`` environment variable. For more information, see [Experimental Node.js features](https://docs.aws.amazon.com//lambda/latest/dg/lambda-nodejs.html#nodejs-experimental-features).\n   For JSON, you must escape quotes and special characters such as newline (``\\n``) with a backslash.\n If you specify a function that interacts with an AWS CloudFormation custom resource, you don't have to write your own functions to send responses to the custom resource that invoked the function. AWS CloudFormation provides a response module ([cfn-response](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-lambda-function-code-cfnresponsemodule.html)) that simplifies sending responses. See [Using Lambda with CloudFormation](https://docs.aws.amazon.com/lambda/latest/dg/services-cloudformation.html) for details.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
         "S3Key": {
           "minLength": 1,
@@ -322,13 +445,22 @@
           "maxLength": 1024,
           "markdownDescription": "The Amazon S3 key of the deployment package.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
         },
+        "S3ObjectStorageMode": {
+          "description": "",
+          "type": "string",
+          "enum": [
+            "COPY",
+            "REFERENCE"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: COPY | REFERENCE  \nUpdate requires: No interruption\n"
+        },
         "ImageUri": {
           "description": "URI of a [container image](https://docs.aws.amazon.com/lambda/latest/dg/lambda-images.html) in the Amazon ECR registry.",
           "type": "string",
           "markdownDescription": "URI of a [container image](https://docs.aws.amazon.com/lambda/latest/dg/lambda-images.html) in the Amazon ECR registry.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         }
       },
-      "markdownDescription": "The [deployment package](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html) for a Lambda function. To deploy a function defined as a container image, you specify the location of a container image in the Amazon ECR registry. For a .zip file deployment package, you can specify the location of an object in Amazon S3. For Node.js and Python functions, you can specify the function code inline in the template.\n  When you specify source code inline for a Node.js function, the ``index`` file that CFN creates uses the extension ``.js``. This means that LAM treats the file as a CommonJS module. ES modules aren't supported for inline functions.\n  Changes to a deployment package in Amazon S3 or a container image in ECR are not detected automatically during stack updates. To update the function code, change the object key or version in the template.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The [deployment package](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html) for a Lambda function. To deploy a function defined as a container image, you specify the location of a container image in the Amazon ECR registry. For a .zip file deployment package, you can specify the location of an object in Amazon S3. For Node.js and Python functions, you can specify the function code inline in the template.\n  When you specify source code inline for a Node.js function, the ``index`` file that CFN creates uses the extension ``.js``. This means that Node.js treats the file as a CommonJS module.\n  Changes to a deployment package in Amazon S3 or a container image in ECR are not detected automatically during stack updates. To update the function code, change the object key or version in the template.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "LoggingConfig": {
       "description": "The function's Amazon CloudWatch Logs configuration settings.",
@@ -407,15 +539,15 @@
       "markdownDescription": "A function's environment variable settings. You can use environment variables to adjust your function's behavior without updating code. An environment variable is a pair of strings that are stored in a function's version-specific configuration.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "FileSystemConfig": {
-      "description": "Details about the connection between a Lambda function and an [Amazon EFS file system](https://docs.aws.amazon.com/lambda/latest/dg/configuration-filesystem.html).",
+      "description": "Details about the connection between a Lambda function and an [Amazon EFS file system](https://docs.aws.amazon.com/lambda/latest/dg/configuration-filesystem.html) or an [Amazon S3 Files file system](https://docs.aws.amazon.com/lambda/latest/dg/configuration-filesystem.html).",
       "additionalProperties": false,
       "type": "object",
       "properties": {
         "Arn": {
-          "description": "The Amazon Resource Name (ARN) of the Amazon EFS access point that provides access to the file system.",
+          "description": "The Amazon Resource Name (ARN) of the Amazon EFS or Amazon S3 Files access point that provides access to the file system.",
           "type": "string",
           "maxLength": 200,
-          "markdownDescription": "The Amazon Resource Name (ARN) of the Amazon EFS access point that provides access to the file system.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 200  \nPattern: ^arn:aws[a-zA-Z-]*:elasticfilesystem:(eusc-)?[a-z]{2}((-gov)|(-iso([a-z]?)))?-[a-z]+-\\d{1}:\\d{12}:access-point/fsap-[a-f0-9]{17}$  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The Amazon Resource Name (ARN) of the Amazon EFS or Amazon S3 Files access point that provides access to the file system.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 200  \nPattern: ^arn:aws[a-zA-Z-]*:elasticfilesystem:(eusc-)?[a-z]{2}((-gov)|(-iso([a-z]?)))?-[a-z]+-\\d{1}:\\d{12}:access-point/fsap-[a-f0-9]{17}$|^arn:aws[-a-z]*:s3files:[0-9a-z-:]+:file-system/fs-[0-9a-f]{17,40}/access-point/fsap-[0-9a-f]{17,40}$  \nUpdate requires: No interruption\n"
         },
         "LocalMountPath": {
           "description": "The path where the function can access the file system, starting with ``/mnt/``.",
@@ -428,7 +560,7 @@
         "Arn",
         "LocalMountPath"
       ],
-      "markdownDescription": "Details about the connection between a Lambda function and an [Amazon EFS file system](https://docs.aws.amazon.com/lambda/latest/dg/configuration-filesystem.html).\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Details about the connection between a Lambda function and an [Amazon EFS file system](https://docs.aws.amazon.com/lambda/latest/dg/configuration-filesystem.html) or an [Amazon S3 Files file system](https://docs.aws.amazon.com/lambda/latest/dg/configuration-filesystem.html).\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Tag": {
       "description": "A [tag](https://docs.aws.amazon.com/lambda/latest/dg/tagging.html) to apply to the function.",
@@ -472,13 +604,33 @@
         "Size"
       ],
       "markdownDescription": "The size of the function's ``/tmp`` directory in MB. The default value is 512, but it can be any whole number between 512 and 10,240 MB.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "TenancyConfig": {
+      "description": "Specifies the tenant isolation mode configuration for a Lambda function. This allows you to configure specific tenant isolation strategies for your function invocations. Tenant isolation configuration cannot be modified after function creation.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "TenantIsolationMode": {
+          "description": "Tenant isolation mode allows for invocation to be sent to a corresponding execution environment dedicated to a specific tenant ID.",
+          "type": "string",
+          "enum": [
+            "PER_TENANT"
+          ],
+          "markdownDescription": "Tenant isolation mode allows for invocation to be sent to a corresponding execution environment dedicated to a specific tenant ID.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: PER_TENANT  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "TenantIsolationMode"
+      ],
+      "markdownDescription": "Specifies the tenant isolation mode configuration for a Lambda function. This allows you to configure specific tenant isolation strategies for your function invocations. Tenant isolation configuration cannot be modified after function creation.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
-  "required": [
-    "Code",
-    "Role"
-  ],
   "properties": {
+    "FunctionScalingConfig": {
+      "description": "Configuration that defines the scaling behavior for a Lambda Managed Instances function, including the minimum and maximum number of execution environments that can be provisioned.",
+      "$ref": "#/definitions/FunctionScalingConfig",
+      "markdownDescription": "Configuration that defines the scaling behavior for a Lambda Managed Instances function, including the minimum and maximum number of execution environments that can be provisioned.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
     "Description": {
       "description": "A description of the function.",
       "type": "string",
@@ -500,6 +652,11 @@
       "$ref": "#/definitions/RuntimeManagementConfig",
       "markdownDescription": "Sets the runtime management configuration for a function's version. For more information, see [Runtime updates](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-update.html).\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
     },
+    "DurableConfig": {
+      "description": "Configuration settings for [durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html), including execution timeout and retention period for execution history.",
+      "$ref": "#/definitions/DurableConfig",
+      "markdownDescription": "Configuration settings for [durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html), including execution timeout and retention period for execution history.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Some interruptions\n"
+    },
     "ReservedConcurrentExecutions": {
       "description": "The number of simultaneous executions to reserve for the function.",
       "type": "integer",
@@ -513,12 +670,12 @@
     },
     "FileSystemConfigs": {
       "maxItems": 1,
-      "description": "Connection settings for an Amazon EFS file system. To connect a function to a file system, a mount target must be available in every Availability Zone that your function connects to. If your template contains an [AWS::EFS::MountTarget](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-efs-mounttarget.html) resource, you must also specify a ``DependsOn`` attribute to ensure that the mount target is created or updated before the function.\n For more information about using the ``DependsOn`` attribute, see [DependsOn Attribute](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-attribute-dependson.html).",
+      "description": "Connection settings for an Amazon EFS or Amazon S3 Files file system. To connect a function to a file system, a mount target must be available in every Availability Zone that your function connects to. If your template contains an [AWS::EFS::MountTarget](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-efs-mounttarget.html) or [AWS::S3Files::MountTarget](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3files-mounttarget.html) resource, you must also specify a ``DependsOn`` attribute to ensure that the mount target is created or updated before the function.\n For more information about using the ``DependsOn`` attribute, see [DependsOn Attribute](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-attribute-dependson.html).",
       "type": "array",
       "items": {
         "$ref": "#/definitions/FileSystemConfig"
       },
-      "markdownDescription": "Connection settings for an Amazon EFS file system. To connect a function to a file system, a mount target must be available in every Availability Zone that your function connects to. If your template contains an [AWS::EFS::MountTarget](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-efs-mounttarget.html) resource, you must also specify a ``DependsOn`` attribute to ensure that the mount target is created or updated before the function.\n For more information about using the ``DependsOn`` attribute, see [DependsOn Attribute](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-attribute-dependson.html).\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Connection settings for an Amazon EFS or Amazon S3 Files file system. To connect a function to a file system, a mount target must be available in every Availability Zone that your function connects to. If your template contains an [AWS::EFS::MountTarget](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-efs-mounttarget.html) or [AWS::S3Files::MountTarget](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3files-mounttarget.html) resource, you must also specify a ``DependsOn`` attribute to ensure that the mount target is created or updated before the function.\n For more information about using the ``DependsOn`` attribute, see [DependsOn Attribute](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-attribute-dependson.html).\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     },
     "FunctionName": {
       "minLength": 1,
@@ -535,6 +692,11 @@
       "description": "The ARN of the KMSlong (KMS) customer managed key that's used to encrypt the following resources:\n  +  The function's [environment variables](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-encryption).\n  +  The function's [Lambda SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart-security.html) snapshots.\n  +  When used with ``SourceKMSKeyArn``, the unzipped version of the .zip deployment package that's used for function invocations. For more information, see [Specifying a customer managed key for Lambda](https://docs.aws.amazon.com/lambda/latest/dg/encrypt-zip-package.html#enable-zip-custom-encryption).\n  +  The optimized version of the container image that's used for function invocations. Note that this is not the same key that's used to protect your container image in the Amazon Elastic Container Registry (Amazon ECR). For more information, see [Function lifecycle](https://docs.aws.amazon.com/lambda/latest/dg/images-create.html#images-lifecycle).\n  \n If you don't provide a customer managed key, Lambda uses an [owned key](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#aws-owned-cmk) or an [](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#aws-managed-cmk).",
       "type": "string",
       "markdownDescription": "The ARN of the KMSlong (KMS) customer managed key that's used to encrypt the following resources:\n  +  The function's [environment variables](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-encryption).\n  +  The function's [Lambda SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart-security.html) snapshots.\n  +  When used with ``SourceKMSKeyArn``, the unzipped version of the .zip deployment package that's used for function invocations. For more information, see [Specifying a customer managed key for Lambda](https://docs.aws.amazon.com/lambda/latest/dg/encrypt-zip-package.html#enable-zip-custom-encryption).\n  +  The optimized version of the container image that's used for function invocations. Note that this is not the same key that's used to protect your container image in the Amazon Elastic Container Registry (Amazon ECR). For more information, see [Function lifecycle](https://docs.aws.amazon.com/lambda/latest/dg/images-create.html#images-lifecycle).\n  \n If you don't provide a customer managed key, Lambda uses an [owned key](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#aws-owned-cmk) or an [](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#aws-managed-cmk).\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(arn:(aws[a-zA-Z-]*)?:[a-z0-9-.]+:.*)|()$  \nUpdate requires: No interruption\n"
+    },
+    "PublishToLatestPublished": {
+      "description": "",
+      "type": "boolean",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
     },
     "PackageType": {
       "description": "The type of deployment package. Set to ``Image`` for container image and set ``Zip`` for .zip file archive.",
@@ -559,6 +721,11 @@
         "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
       },
       "markdownDescription": "A list of [function layers](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html) to add to the function's execution environment. Specify each layer by its ARN, including the version.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "TenancyConfig": {
+      "description": "The function's tenant isolation configuration settings. Determines whether the Lambda function runs on a shared or dedicated infrastructure per unique tenant.",
+      "$ref": "#/definitions/TenancyConfig",
+      "markdownDescription": "The function's tenant isolation configuration settings. Determines whether the Lambda function runs on a shared or dedicated infrastructure per unique tenant.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
     },
     "Tags": {
       "uniqueItems": true,
@@ -590,6 +757,11 @@
       "type": "integer",
       "minimum": 1,
       "markdownDescription": "The amount of time (in seconds) that Lambda allows a function to run before stopping it. The default is 3 seconds. The maximum allowed value is 900 seconds. For more information, see [Lambda execution environment](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html).\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    },
+    "CapacityProviderConfig": {
+      "description": "Configuration for the capacity provider that manages compute resources for Lambda functions.",
+      "$ref": "#/definitions/CapacityProviderConfig",
+      "markdownDescription": "Configuration for the capacity provider that manages compute resources for Lambda functions.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
     },
     "Handler": {
       "description": "The name of the method within your code that Lambda calls to run your function. Handler is required if the deployment package is a .zip file archive. The format includes the file name. It can also include namespaces and other qualifiers, depending on the runtime. For more information, see [Lambda programming model](https://docs.aws.amazon.com/lambda/latest/dg/foundation-progmodel.html).",

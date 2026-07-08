@@ -176,6 +176,9 @@
         },
         "WebConfiguration": {
           "$ref": "#/definitions/WebDataSourceConfiguration"
+        },
+        "ManagedKnowledgeBaseConnectorConfiguration": {
+          "$ref": "#/definitions/ManagedKnowledgeBaseConnectorConfiguration"
         }
       },
       "required": [
@@ -190,9 +193,12 @@
       "enum": [
         "AVAILABLE",
         "DELETING",
-        "DELETE_UNSUCCESSFUL"
+        "DELETE_UNSUCCESSFUL",
+        "CREATING",
+        "UPDATING",
+        "FAILED"
       ],
-      "markdownDescription": "The status of a data source.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AVAILABLE | DELETING | DELETE_UNSUCCESSFUL  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The status of a data source.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AVAILABLE | DELETING | DELETE_UNSUCCESSFUL | CREATING | UPDATING | FAILED  \nUpdate requires: No interruption\n"
     },
     "DataSourceType": {
       "type": "string",
@@ -204,9 +210,10 @@
         "SHAREPOINT",
         "WEB",
         "CUSTOM",
-        "REDSHIFT_METADATA"
+        "REDSHIFT_METADATA",
+        "MANAGED_KNOWLEDGE_BASE_CONNECTOR"
       ],
-      "markdownDescription": "The type of the data source location.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: S3 | CONFLUENCE | SALESFORCE | SHAREPOINT | WEB | CUSTOM | REDSHIFT_METADATA  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The type of the data source location.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: S3 | CONFLUENCE | SALESFORCE | SHAREPOINT | WEB | CUSTOM | REDSHIFT_METADATA | MANAGED_KNOWLEDGE_BASE_CONNECTOR  \nUpdate requires: No interruption\n"
     },
     "DataDeletionPolicy": {
       "type": "string",
@@ -365,9 +372,119 @@
       "description": "The parsing strategy for the data source.",
       "enum": [
         "BEDROCK_FOUNDATION_MODEL",
-        "BEDROCK_DATA_AUTOMATION"
+        "BEDROCK_DATA_AUTOMATION",
+        "SMART_PARSING"
       ],
-      "markdownDescription": "The parsing strategy for the data source.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: BEDROCK_FOUNDATION_MODEL | BEDROCK_DATA_AUTOMATION  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The parsing strategy for the data source.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: BEDROCK_FOUNDATION_MODEL | BEDROCK_DATA_AUTOMATION | SMART_PARSING  \nUpdate requires: No interruption\n"
+    },
+    "EnabledOrDisabledState": {
+      "type": "string",
+      "description": "Indicates whether a feature is enabled or disabled.",
+      "enum": [
+        "ENABLED",
+        "DISABLED"
+      ],
+      "markdownDescription": "Indicates whether a feature is enabled or disabled.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption\n"
+    },
+    "ManagedKnowledgeBaseConnectorConfiguration": {
+      "type": "object",
+      "description": "Configuration for managed knowledge base connector data sources.",
+      "properties": {
+        "DeletionProtectionConfiguration": {
+          "$ref": "#/definitions/DeletionProtectionConfiguration"
+        },
+        "MediaExtractionConfiguration": {
+          "$ref": "#/definitions/MediaExtractionConfiguration"
+        },
+        "ConnectorParameters": {
+          "type": "object",
+          "description": "Connector-specific parameters.",
+          "markdownDescription": "Connector-specific parameters.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for managed knowledge base connector data sources.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DeletionProtectionConfiguration": {
+      "type": "object",
+      "description": "Configuration for deletion protection.",
+      "properties": {
+        "DeletionProtectionStatus": {
+          "$ref": "#/definitions/EnabledOrDisabledState"
+        },
+        "DeletionProtectionThreshold": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 15,
+          "description": "Threshold for deletion protection.",
+          "markdownDescription": "Threshold for deletion protection.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "DeletionProtectionStatus"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for deletion protection.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "MediaExtractionConfiguration": {
+      "type": "object",
+      "description": "Configuration for media extraction settings.",
+      "properties": {
+        "ImageExtractionConfiguration": {
+          "$ref": "#/definitions/ImageExtractionConfiguration"
+        },
+        "AudioExtractionConfiguration": {
+          "$ref": "#/definitions/AudioExtractionConfiguration"
+        },
+        "VideoExtractionConfiguration": {
+          "$ref": "#/definitions/VideoExtractionConfiguration"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for media extraction settings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ImageExtractionConfiguration": {
+      "type": "object",
+      "description": "Configuration for image extraction.",
+      "properties": {
+        "ImageExtractionStatus": {
+          "$ref": "#/definitions/EnabledOrDisabledState"
+        }
+      },
+      "required": [
+        "ImageExtractionStatus"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for image extraction.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AudioExtractionConfiguration": {
+      "type": "object",
+      "description": "Configuration for audio extraction.",
+      "properties": {
+        "AudioExtractionStatus": {
+          "$ref": "#/definitions/EnabledOrDisabledState"
+        }
+      },
+      "required": [
+        "AudioExtractionStatus"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for audio extraction.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "VideoExtractionConfiguration": {
+      "type": "object",
+      "description": "Configuration for video extraction.",
+      "properties": {
+        "VideoExtractionStatus": {
+          "$ref": "#/definitions/EnabledOrDisabledState"
+        }
+      },
+      "required": [
+        "VideoExtractionStatus"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for video extraction.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "S3DataSourceConfiguration": {
       "type": "object",
@@ -1088,7 +1205,8 @@
         "bedrock:CreateDataSource",
         "bedrock:GetDataSource",
         "bedrock:GetKnowledgeBase",
-        "kms:GenerateDataKey"
+        "kms:GenerateDataKey",
+        "kms:Decrypt"
       ]
     },
     "read": {
@@ -1100,7 +1218,8 @@
       "permissions": [
         "bedrock:GetDataSource",
         "bedrock:UpdateDataSource",
-        "kms:GenerateDataKey"
+        "kms:GenerateDataKey",
+        "kms:Decrypt"
       ]
     },
     "delete": {

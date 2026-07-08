@@ -1,0 +1,475 @@
+{
+  "typeName": "AWS::BedrockAgentCore::Evaluator",
+  "description": "Resource Type definition for AWS::BedrockAgentCore::Evaluator - Creates a custom evaluator for agent quality assessment using LLM-as-a-Judge configurations.",
+  "definitions": {
+    "EvaluatorStatus": {
+      "type": "string",
+      "enum": [
+        "ACTIVE",
+        "CREATING",
+        "CREATE_FAILED",
+        "UPDATING",
+        "UPDATE_FAILED",
+        "DELETING"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ACTIVE | CREATING | CREATE_FAILED | UPDATING | UPDATE_FAILED | DELETING  \nUpdate requires: No interruption\n"
+    },
+    "EvaluatorLevel": {
+      "type": "string",
+      "enum": [
+        "TOOL_CALL",
+        "TRACE",
+        "SESSION"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: TOOL_CALL | TRACE | SESSION  \nUpdate requires: No interruption\n"
+    },
+    "EvaluatorConfig": {
+      "type": "object",
+      "description": "The configuration that defines how an evaluator assesses agent performance.",
+      "properties": {
+        "LlmAsAJudge": {
+          "$ref": "#/definitions/LlmAsAJudgeEvaluatorConfig"
+        },
+        "CodeBased": {
+          "$ref": "#/definitions/CodeBasedEvaluatorConfig"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "LlmAsAJudge"
+          ]
+        },
+        {
+          "required": [
+            "CodeBased"
+          ]
+        }
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The configuration that defines how an evaluator assesses agent performance.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CodeBasedEvaluatorConfig": {
+      "type": "object",
+      "description": "The configuration for code-based evaluation using a Lambda function.",
+      "properties": {
+        "LambdaConfig": {
+          "$ref": "#/definitions/LambdaEvaluatorConfig"
+        }
+      },
+      "required": [
+        "LambdaConfig"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The configuration for code-based evaluation using a Lambda function.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LambdaEvaluatorConfig": {
+      "type": "object",
+      "description": "The Lambda function configuration for code-based evaluation.",
+      "properties": {
+        "LambdaArn": {
+          "type": "string",
+          "description": "The ARN of the Lambda function used for evaluation.",
+          "markdownDescription": "The ARN of the Lambda function used for evaluation.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:(aws[a-zA-Z-]*)?:lambda:([a-z]{2}(-gov)?-[a-z]+-\\d{1}):(\\d{12}):function:([a-zA-Z0-9-_.]+)(:(\\$LATEST|[a-zA-Z0-9-_]+))?$  \nUpdate requires: No interruption\n"
+        },
+        "LambdaTimeoutInSeconds": {
+          "type": "integer",
+          "description": "The timeout in seconds for the Lambda function invocation.",
+          "minimum": 1,
+          "maximum": 300,
+          "markdownDescription": "The timeout in seconds for the Lambda function invocation.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "LambdaArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The Lambda function configuration for code-based evaluation.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LlmAsAJudgeEvaluatorConfig": {
+      "type": "object",
+      "description": "The configuration for LLM-as-a-Judge evaluation.",
+      "properties": {
+        "Instructions": {
+          "type": "string",
+          "description": "The evaluation instructions that guide the language model in assessing agent performance.",
+          "markdownDescription": "The evaluation instructions that guide the language model in assessing agent performance.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "RatingScale": {
+          "$ref": "#/definitions/RatingScale"
+        },
+        "ModelConfig": {
+          "$ref": "#/definitions/EvaluatorModelConfig"
+        }
+      },
+      "required": [
+        "Instructions",
+        "RatingScale",
+        "ModelConfig"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The configuration for LLM-as-a-Judge evaluation.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RatingScale": {
+      "type": "object",
+      "description": "The rating scale that defines how evaluators should score agent performance.",
+      "properties": {
+        "Numerical": {
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/NumericalScaleDefinition"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "Categorical": {
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/CategoricalScaleDefinition"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "Numerical"
+          ]
+        },
+        {
+          "required": [
+            "Categorical"
+          ]
+        }
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The rating scale that defines how evaluators should score agent performance.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "NumericalScaleDefinition": {
+      "type": "object",
+      "description": "A numerical rating scale option.",
+      "properties": {
+        "Value": {
+          "type": "number",
+          "description": "The numerical value for this rating scale option.",
+          "minimum": 0,
+          "markdownDescription": "The numerical value for this rating scale option.\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "Label": {
+          "type": "string",
+          "description": "The label that describes this numerical rating option.",
+          "minLength": 1,
+          "maxLength": 100,
+          "markdownDescription": "The label that describes this numerical rating option.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nUpdate requires: No interruption\n"
+        },
+        "Definition": {
+          "type": "string",
+          "description": "The description that explains what this numerical rating represents.",
+          "markdownDescription": "The description that explains what this numerical rating represents.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Value",
+        "Label",
+        "Definition"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A numerical rating scale option.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CategoricalScaleDefinition": {
+      "type": "object",
+      "description": "A categorical rating scale option.",
+      "properties": {
+        "Label": {
+          "type": "string",
+          "description": "The label of this categorical rating option.",
+          "minLength": 1,
+          "maxLength": 100,
+          "markdownDescription": "The label of this categorical rating option.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nUpdate requires: No interruption\n"
+        },
+        "Definition": {
+          "type": "string",
+          "description": "The description that explains what this categorical rating represents.",
+          "markdownDescription": "The description that explains what this categorical rating represents.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Label",
+        "Definition"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A categorical rating scale option.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EvaluatorModelConfig": {
+      "type": "object",
+      "description": "The model configuration that specifies which foundation model to use for evaluation.",
+      "properties": {
+        "BedrockEvaluatorModelConfig": {
+          "$ref": "#/definitions/BedrockEvaluatorModelConfig"
+        }
+      },
+      "required": [
+        "BedrockEvaluatorModelConfig"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The model configuration that specifies which foundation model to use for evaluation.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "BedrockEvaluatorModelConfig": {
+      "type": "object",
+      "description": "The configuration for using Amazon Bedrock models in evaluator assessments.",
+      "properties": {
+        "ModelId": {
+          "type": "string",
+          "description": "The identifier of the Amazon Bedrock model to use for evaluation.",
+          "markdownDescription": "The identifier of the Amazon Bedrock model to use for evaluation.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "InferenceConfig": {
+          "$ref": "#/definitions/InferenceConfiguration"
+        },
+        "AdditionalModelRequestFields": {
+          "type": "object",
+          "description": "Additional model-specific request fields.",
+          "markdownDescription": "Additional model-specific request fields.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ModelId"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The configuration for using Amazon Bedrock models in evaluator assessments.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "InferenceConfiguration": {
+      "type": "object",
+      "description": "The inference configuration parameters that control model behavior during evaluation.",
+      "properties": {
+        "MaxTokens": {
+          "type": "integer",
+          "description": "The maximum number of tokens to generate in the model response.",
+          "minimum": 1,
+          "markdownDescription": "The maximum number of tokens to generate in the model response.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Temperature": {
+          "type": "number",
+          "description": "The temperature value that controls randomness in the model's responses.",
+          "minimum": 0,
+          "maximum": 1,
+          "markdownDescription": "The temperature value that controls randomness in the model's responses.\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "TopP": {
+          "type": "number",
+          "description": "The top-p sampling parameter that controls the diversity of the model's responses.",
+          "minimum": 0,
+          "maximum": 1,
+          "markdownDescription": "The top-p sampling parameter that controls the diversity of the model's responses.\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The inference configuration parameters that control model behavior during evaluation.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "EvaluatorId": {
+      "type": "string",
+      "description": "The unique identifier of the evaluator.",
+      "markdownDescription": "The unique identifier of the evaluator.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(Builtin.[a-zA-Z0-9_-]+|[a-zA-Z][a-zA-Z0-9-_]{0,99}-[a-zA-Z0-9]{10})$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "EvaluatorArn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the evaluator.",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the evaluator.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws|aws-cn|aws-us-gov):bedrock-agentcore:[a-z0-9-]+:[0-9]{12}:evaluator/[a-zA-Z][a-zA-Z0-9-_]{0,99}-[a-zA-Z0-9]{10}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "EvaluatorName": {
+      "type": "string",
+      "description": "The name of the evaluator. Must be unique within your account.",
+      "markdownDescription": "The name of the evaluator. Must be unique within your account.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z][a-zA-Z0-9_]{0,47}$  \nUpdate requires: Replacement\n"
+    },
+    "Description": {
+      "type": "string",
+      "description": "The description of the evaluator.",
+      "minLength": 1,
+      "maxLength": 200,
+      "markdownDescription": "The description of the evaluator.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 200  \nUpdate requires: No interruption\n"
+    },
+    "EvaluatorConfig": {
+      "$ref": "#/definitions/EvaluatorConfig",
+      "description": "The configuration for the evaluator.",
+      "markdownDescription": "The configuration for the evaluator.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "Level": {
+      "$ref": "#/definitions/EvaluatorLevel",
+      "description": "The evaluation level that determines the scope of evaluation.",
+      "markdownDescription": "The evaluation level that determines the scope of evaluation.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "Status": {
+      "$ref": "#/definitions/EvaluatorStatus",
+      "description": "The current status of the evaluator.",
+      "markdownDescription": "The current status of the evaluator.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreatedAt": {
+      "type": "string",
+      "description": "The timestamp when the evaluator was created.",
+      "format": "date-time",
+      "markdownDescription": "The timestamp when the evaluator was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "UpdatedAt": {
+      "type": "string",
+      "description": "The timestamp when the evaluator was last updated.",
+      "format": "date-time",
+      "markdownDescription": "The timestamp when the evaluator was last updated.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "KmsKeyArn": {
+      "type": "string",
+      "description": "The ARN of the KMS key used to encrypt evaluator data.",
+      "minLength": 1,
+      "maxLength": 2048,
+      "markdownDescription": "The ARN of the KMS key used to encrypt evaluator data.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws(|-cn|-us-gov):kms:[a-zA-Z0-9-]+:[0-9]{12}:key/[a-zA-Z0-9-]{36}$  \nUpdate requires: No interruption\n"
+    },
+    "Tags": {
+      "type": "array",
+      "description": "A list of tags to assign to the evaluator.",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "maxItems": 50,
+      "insertionOrder": false,
+      "markdownDescription": "A list of tags to assign to the evaluator.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "EvaluatorName",
+    "EvaluatorConfig",
+    "Level"
+  ],
+  "readOnlyProperties": [
+    "/properties/EvaluatorId",
+    "/properties/EvaluatorArn",
+    "/properties/Status",
+    "/properties/CreatedAt",
+    "/properties/UpdatedAt"
+  ],
+  "createOnlyProperties": [
+    "/properties/EvaluatorName"
+  ],
+  "primaryIdentifier": [
+    "/properties/EvaluatorArn"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/EvaluatorId"
+    ]
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "tagProperty": "/properties/Tags",
+    "cloudFormationSystemTags": false,
+    "permissions": [
+      "bedrock-agentcore:TagResource",
+      "bedrock-agentcore:UntagResource",
+      "bedrock-agentcore:ListTagsForResource"
+    ]
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "bedrock-agentcore:CreateEvaluator",
+        "bedrock-agentcore:GetEvaluator",
+        "bedrock-agentcore:TagResource",
+        "bedrock:InvokeModel",
+        "lambda:GetFunction",
+        "lambda:InvokeFunction",
+        "kms:DescribeKey",
+        "kms:GenerateDataKey",
+        "kms:Decrypt"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "bedrock-agentcore:GetEvaluator",
+        "bedrock-agentcore:ListTagsForResource",
+        "kms:Decrypt"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "bedrock-agentcore:UpdateEvaluator",
+        "bedrock-agentcore:GetEvaluator",
+        "bedrock-agentcore:TagResource",
+        "bedrock-agentcore:UntagResource",
+        "bedrock-agentcore:ListTagsForResource",
+        "bedrock:InvokeModel",
+        "lambda:GetFunction",
+        "lambda:InvokeFunction",
+        "kms:DescribeKey",
+        "kms:GenerateDataKey",
+        "kms:Decrypt"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "bedrock-agentcore:DeleteEvaluator",
+        "bedrock-agentcore:GetEvaluator"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "bedrock-agentcore:ListEvaluators"
+      ]
+    }
+  },
+  "attributes": {
+    "EvaluatorId": {
+      "type": "string",
+      "description": "The unique identifier of the evaluator.",
+      "markdownDescription": "The unique identifier of the evaluator.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(Builtin.[a-zA-Z0-9_-]+|[a-zA-Z][a-zA-Z0-9-_]{0,99}-[a-zA-Z0-9]{10})$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "EvaluatorArn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the evaluator.",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the evaluator.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws|aws-cn|aws-us-gov):bedrock-agentcore:[a-z0-9-]+:[0-9]{12}:evaluator/[a-zA-Z][a-zA-Z0-9-_]{0,99}-[a-zA-Z0-9]{10}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Status": {
+      "$ref": "#/definitions/EvaluatorStatus",
+      "description": "The current status of the evaluator.",
+      "markdownDescription": "The current status of the evaluator.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreatedAt": {
+      "type": "string",
+      "description": "The timestamp when the evaluator was created.",
+      "format": "date-time",
+      "markdownDescription": "The timestamp when the evaluator was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "UpdatedAt": {
+      "type": "string",
+      "description": "The timestamp when the evaluator was last updated.",
+      "format": "date-time",
+      "markdownDescription": "The timestamp when the evaluator was last updated.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

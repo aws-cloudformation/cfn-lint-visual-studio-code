@@ -3,6 +3,32 @@
   "description": "Resource Type definition for AWS::Connect::IntegrationAssociation",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-connect",
   "definitions": {
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "description": "The key name of the tag.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The key name of the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^(?!aws:)[a-zA-Z+-=._:/]+$  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "description": "The value for the tag.",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The value for the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "IntegrationArn": {
       "description": "ARN of Integration being associated with the instance",
       "type": "string",
@@ -16,9 +42,17 @@
       "enum": [
         "LEX_BOT",
         "LAMBDA_FUNCTION",
-        "APPLICATION"
+        "APPLICATION",
+        "CASES_DOMAIN",
+        "WISDOM_ASSISTANT",
+        "WISDOM_KNOWLEDGE_BASE",
+        "WISDOM_QUICK_RESPONSES",
+        "FILE_SCANNER",
+        "MESSAGE_PROCESSOR",
+        "Q_MESSAGE_TEMPLATES",
+        "SES_IDENTITY"
       ],
-      "markdownDescription": "Specifies the integration type to be associated with the instance\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: LEX_BOT | LAMBDA_FUNCTION | APPLICATION  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Specifies the integration type to be associated with the instance\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: LEX_BOT | LAMBDA_FUNCTION | APPLICATION | CASES_DOMAIN | WISDOM_ASSISTANT | WISDOM_KNOWLEDGE_BASE | WISDOM_QUICK_RESPONSES | FILE_SCANNER | MESSAGE_PROCESSOR | Q_MESSAGE_TEMPLATES | SES_IDENTITY  \nUpdate requires: No interruption\n"
     },
     "InstanceId": {
       "description": "Amazon Connect instance identifier",
@@ -30,7 +64,7 @@
     "IntegrationAssociationId": {
       "description": "Identifier of the association with Connect Instance",
       "type": "string",
-      "markdownDescription": "Identifier of the association with Connect Instance\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z]{1}(?:-?[a-zA-Z0-9])*$  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Identifier of the association with Connect Instance\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -45,13 +79,29 @@
     },
     "IntegrationType": {
       "$ref": "#/definitions/IntegrationType"
+    },
+    "Tags": {
+      "description": "The tags used to organize, track, or control access for this resource.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "minItems": 0,
+      "maxItems": 200,
+      "markdownDescription": "The tags used to organize, track, or control access for this resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "tagging": {
-    "taggable": false,
-    "tagOnCreate": false,
-    "tagUpdatable": false,
-    "cloudFormationSystemTags": false
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "connect:TagResource",
+      "connect:UntagResource",
+      "connect:ListTagsForResource"
+    ]
   },
   "additionalProperties": false,
   "required": [
@@ -82,13 +132,17 @@
         "cases:GetDomain",
         "wisdom:GetAssistant",
         "wisdom:GetKnowledgeBase",
+        "wisdom:GetQuickResponse",
+        "wisdom:GetMessageTemplate",
         "wisdom:TagResource",
         "voiceid:DescribeDomain",
         "events:PutTargets",
+        "ses:GetIdentityVerificationAttributes",
         "events:PutRule",
         "connect:AssociateBot",
         "connect:AssociateLambdaFunction",
         "connect:CreateIntegrationAssociation",
+        "connect:TagResource",
         "connect:ListBots",
         "connect:ListLambdaFunctions",
         "connect:ListIntegrationAssociations",
@@ -111,11 +165,17 @@
       "permissions": [
         "connect:ListBots",
         "connect:ListLambdaFunctions",
-        "connect:ListIntegrationAssociations"
+        "connect:ListIntegrationAssociations",
+        "connect:ListTagsForResource"
       ]
     },
     "update": {
-      "permissions": []
+      "permissions": [
+        "connect:TagResource",
+        "connect:UntagResource",
+        "connect:ListTagsForResource",
+        "connect:ListIntegrationAssociations"
+      ]
     },
     "delete": {
       "permissions": [
@@ -144,7 +204,8 @@
       "permissions": [
         "connect:ListBots",
         "connect:ListLambdaFunctions",
-        "connect:ListIntegrationAssociations"
+        "connect:ListIntegrationAssociations",
+        "connect:ListTagsForResource"
       ],
       "handlerSchema": {
         "properties": {

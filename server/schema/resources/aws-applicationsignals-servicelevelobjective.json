@@ -204,6 +204,15 @@
         },
         "DependencyConfig": {
           "$ref": "#/definitions/DependencyConfig"
+        },
+        "MetricSource": {
+          "$ref": "#/definitions/MetricSource"
+        },
+        "MetricName": {
+          "$ref": "#/definitions/MetricName"
+        },
+        "CompositeSliConfig": {
+          "$ref": "#/definitions/CompositeSliConfig"
         }
       },
       "markdownDescription": "A structure that contains information about the metric that the SLO monitors.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
@@ -242,6 +251,15 @@
         },
         "DependencyConfig": {
           "$ref": "#/definitions/DependencyConfig"
+        },
+        "MetricSource": {
+          "$ref": "#/definitions/MetricSource"
+        },
+        "MetricName": {
+          "$ref": "#/definitions/MetricName"
+        },
+        "CompositeSliConfig": {
+          "$ref": "#/definitions/CompositeSliConfig"
         }
       },
       "markdownDescription": "This structure contains the information about the metric that is used for a request-based SLO.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
@@ -653,6 +671,117 @@
       },
       "additionalProperties": false,
       "markdownDescription": "If this SLO is related to a metric collected by Application Signals, you must use this field to specify which dependency the SLO metric is related to.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "MetricSource": {
+      "description": "Configuration for identifying the source of metrics for non-Application Signals services",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "MetricSourceKeyAttributes": {
+          "$ref": "#/definitions/MetricSourceKeyAttributes"
+        },
+        "MetricSourceAttributes": {
+          "$ref": "#/definitions/MetricSourceAttributes"
+        }
+      },
+      "required": [
+        "MetricSourceKeyAttributes"
+      ],
+      "markdownDescription": "Configuration for identifying the source of metrics for non-Application Signals services\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "MetricSourceKeyAttributes": {
+      "description": "Required attributes that identify the metric source",
+      "patternProperties": {
+        "^.+$": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Required attributes that identify the metric source\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "MetricSourceAttributes": {
+      "description": "Optional additional attributes for the metric source",
+      "patternProperties": {
+        "^.+$": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Optional additional attributes for the metric source\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "MetricName": {
+      "description": "The name of the metric for non-Application Signals services",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "markdownDescription": "The name of the metric for non-Application Signals services\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+    },
+    "CompositeSliConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "SelectionConfig": {
+          "$ref": "#/definitions/SelectionConfig"
+        },
+        "CompositeSliComponents": {
+          "$ref": "#/definitions/CompositeSliComponents"
+        }
+      },
+      "required": [
+        "SelectionConfig"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SelectionConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Type": {
+          "$ref": "#/definitions/SelectionType"
+        },
+        "Pattern": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^.+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SelectionType": {
+      "type": "string",
+      "enum": [
+        "EXPLICIT",
+        "PREFIX",
+        "REGEX"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: EXPLICIT | PREFIX | REGEX  \nUpdate requires: No interruption\n"
+    },
+    "CompositeSliComponents": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/CompositeSliComponent"
+      },
+      "minItems": 2,
+      "maxItems": 20,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "CompositeSliComponent": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "OperationName": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "OperationName"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "handlers": {
@@ -666,7 +795,9 @@
         "iam:GetRole",
         "iam:CreateServiceLinkedRole",
         "application-signals:ListServiceLevelObjectiveExclusionWindows",
-        "application-signals:BatchUpdateExclusionWindows"
+        "application-signals:BatchUpdateExclusionWindows",
+        "rum:GetAppMonitor",
+        "rum:BatchGetRumMetricDefinitions"
       ]
     },
     "read": {
@@ -685,7 +816,9 @@
         "application-signals:GetServiceLevelObjective",
         "application-signals:ListTagsForResource",
         "application-signals:ListServiceLevelObjectiveExclusionWindows",
-        "application-signals:BatchUpdateExclusionWindows"
+        "application-signals:BatchUpdateExclusionWindows",
+        "rum:GetAppMonitor",
+        "rum:BatchGetRumMetricDefinitions"
       ]
     },
     "delete": {

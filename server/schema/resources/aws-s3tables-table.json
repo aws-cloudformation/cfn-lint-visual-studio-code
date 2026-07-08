@@ -1,15 +1,23 @@
 {
   "tagging": {
-    "taggable": false,
-    "tagOnCreate": false,
-    "tagUpdatable": false,
+    "permissions": [
+      "s3tables:TagResource",
+      "s3tables:UntagResource",
+      "s3tables:ListTagsForResource"
+    ],
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "tagProperty": "/properties/Tags",
     "cloudFormationSystemTags": false
   },
   "handlers": {
     "read": {
       "permissions": [
         "s3tables:GetTable",
-        "s3tables:GetTableMaintenanceConfiguration"
+        "s3tables:GetTableMaintenanceConfiguration",
+        "s3tables:GetTableStorageClass",
+        "s3tables:ListTagsForResource"
       ]
     },
     "create": {
@@ -17,14 +25,23 @@
         "s3tables:CreateTable",
         "s3tables:PutTableData",
         "s3tables:GetTable",
-        "s3tables:PutTableMaintenanceConfiguration"
+        "s3tables:PutTableMaintenanceConfiguration",
+        "s3tables:GetTableMaintenanceConfiguration",
+        "s3tables:PutTableStorageClass",
+        "s3tables:GetTableStorageClass",
+        "s3tables:TagResource",
+        "s3tables:ListTagsForResource"
       ]
     },
     "update": {
       "permissions": [
         "s3tables:GetTable",
         "s3tables:RenameTable",
-        "s3tables:PutTableMaintenanceConfiguration"
+        "s3tables:PutTableMaintenanceConfiguration",
+        "s3tables:GetTableMaintenanceConfiguration",
+        "s3tables:TagResource",
+        "s3tables:UntagResource",
+        "s3tables:ListTagsForResource"
       ]
     },
     "list": {
@@ -76,20 +93,130 @@
     "/properties/TableBucketARN",
     "/properties/OpenTableFormat",
     "/properties/IcebergMetadata",
-    "/properties/WithoutMetadata"
+    "/properties/WithoutMetadata",
+    "/properties/StorageClassConfiguration"
   ],
   "additionalProperties": false,
   "primaryIdentifier": [
     "/properties/TableARN"
   ],
   "definitions": {
-    "WithoutMetadata": {
-      "description": "Indicates that you don't want to specify a schema for the table. This property is mutually exclusive to 'IcebergMetadata', and its only possible value is 'Yes'.",
-      "type": "string",
-      "enum": [
-        "Yes"
+    "StorageClassConfiguration": {
+      "description": "Specifies storage class settings for the table",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "StorageClass": {
+          "description": "The storage class for the table",
+          "type": "string",
+          "enum": [
+            "STANDARD",
+            "INTELLIGENT_TIERING"
+          ],
+          "markdownDescription": "The storage class for the table\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: STANDARD | INTELLIGENT_TIERING  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Specifies storage class settings for the table\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "IcebergSortFieldList": {
+      "description": "List of sort fields for an Iceberg table",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/IcebergSortField"
+      },
+      "markdownDescription": "List of sort fields for an Iceberg table\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "IcebergSortOrder": {
+      "description": "Sort order specification for an Iceberg table",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Fields": {
+          "description": "List of sort fields",
+          "$ref": "#/definitions/IcebergSortFieldList",
+          "markdownDescription": "List of sort fields\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "OrderId": {
+          "description": "The sort order ID (defaults to 1 if not specified, 0 is reserved for unsorted)",
+          "type": "integer",
+          "markdownDescription": "The sort order ID (defaults to 1 if not specified, 0 is reserved for unsorted)\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Fields"
       ],
-      "markdownDescription": "Indicates that you don't want to specify a schema for the table. This property is mutually exclusive to 'IcebergMetadata', and its only possible value is 'Yes'.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Yes  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Sort order specification for an Iceberg table\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "IcebergPartitionFieldList": {
+      "description": "List of partition fields for an Iceberg table",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/IcebergPartitionField"
+      },
+      "markdownDescription": "List of partition fields for an Iceberg table\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "IcebergSchemaV2": {
+      "description": "Contains details about the schema version 2 (V2) for an Iceberg table that supports Apache Iceberg Nested Types (struct, list, map). Primitive types are also supported.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "SchemaV2FieldList": {
+          "description": "The schema fields for the table",
+          "$ref": "#/definitions/SchemaV2FieldList",
+          "markdownDescription": "The schema fields for the table\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "SchemaV2FieldType": {
+          "description": "The type of the top-level schema, which is always 'struct'",
+          "type": "string",
+          "enum": [
+            "struct"
+          ],
+          "markdownDescription": "The type of the top-level schema, which is always 'struct'\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: struct  \nUpdate requires: No interruption\n"
+        },
+        "SchemaId": {
+          "description": "An optional unique identifier for the schema",
+          "type": "integer",
+          "markdownDescription": "An optional unique identifier for the schema\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "IdentifierFieldIds": {
+          "description": "A list of field IDs that are used as the identifier fields for the table. Identifier fields uniquely identify a row in the table.",
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "A list of field IDs that are used as the identifier fields for the table. Identifier fields uniquely identify a row in the table.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "SchemaV2FieldList",
+        "SchemaV2FieldType"
+      ],
+      "markdownDescription": "Contains details about the schema version 2 (V2) for an Iceberg table that supports Apache Iceberg Nested Types (struct, list, map). Primitive types are also supported.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "IcebergPartitionSpec": {
+      "description": "Partition specification for an Iceberg table",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Fields": {
+          "description": "List of partition fields",
+          "$ref": "#/definitions/IcebergPartitionFieldList",
+          "markdownDescription": "List of partition fields\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "SpecId": {
+          "description": "The partition spec ID (defaults to 0 if not specified)",
+          "type": "integer",
+          "markdownDescription": "The partition spec ID (defaults to 0 if not specified)\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Fields"
+      ],
+      "markdownDescription": "Partition specification for an Iceberg table\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Compaction": {
       "description": "Settings governing the Compaction maintenance action. Contains details about the compaction settings for an Iceberg table.",
@@ -114,6 +241,111 @@
       },
       "markdownDescription": "Settings governing the Compaction maintenance action. Contains details about the compaction settings for an Iceberg table.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "TableBucketARN": {
+      "examples": [
+        "arn:aws:s3tables:us-west-2:123456789012:bucket/mytablebucket"
+      ],
+      "description": "The Amazon Resource Name (ARN) of the specified table bucket.",
+      "type": "string",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the specified table bucket.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "WarehouseLocation": {
+      "description": "The warehouse location of the table.",
+      "type": "string",
+      "markdownDescription": "The warehouse location of the table.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "SnapshotManagement": {
+      "description": "Contains details about the snapshot management settings for an Iceberg table. A snapshot is expired when it exceeds MinSnapshotsToKeep and MaxSnapshotAgeHours.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Status": {
+          "description": "Indicates whether the SnapshotManagement maintenance action is enabled.",
+          "type": "string",
+          "enum": [
+            "enabled",
+            "disabled"
+          ],
+          "markdownDescription": "Indicates whether the SnapshotManagement maintenance action is enabled.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: enabled | disabled  \nUpdate requires: No interruption\n"
+        },
+        "MinSnapshotsToKeep": {
+          "description": "The minimum number of snapshots to keep.",
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "The minimum number of snapshots to keep.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "MaxSnapshotAgeHours": {
+          "description": "The maximum age of a snapshot before it can be expired.",
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "The maximum age of a snapshot before it can be expired.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Contains details about the snapshot management settings for an Iceberg table. A snapshot is expired when it exceeds MinSnapshotsToKeep and MaxSnapshotAgeHours.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "WithoutMetadata": {
+      "description": "Indicates that you don't want to specify a schema for the table. This property is mutually exclusive to 'IcebergMetadata', and its only possible value is 'Yes'.",
+      "type": "string",
+      "enum": [
+        "Yes"
+      ],
+      "markdownDescription": "Indicates that you don't want to specify a schema for the table. This property is mutually exclusive to 'IcebergMetadata', and its only possible value is 'Yes'.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Yes  \nUpdate requires: No interruption\n"
+    },
+    "SchemaV2Field": {
+      "description": "Contains details about a schema field for an Iceberg table that supports nested types (struct, list, map)",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Type": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ],
+          "description": "The field type. For primitive types, use a string (e.g., 'int', 'string', 'long'). For nested types, use an object (e.g., {'type': 'struct', 'fields': [...]} for struct, {'type': 'list', 'element-id': N, 'element': 'type'} for list, {'type': 'map', 'key-id': N, 'key': 'type', 'value-id': N, 'value': 'type'} for map).",
+          "markdownDescription": "The field type. For primitive types, use a string (e.g., 'int', 'string', 'long'). For nested types, use an object (e.g., {'type': 'struct', 'fields': [...]} for struct, {'type': 'list', 'element-id': N, 'element': 'type'} for list, {'type': 'map', 'key-id': N, 'key': 'type', 'value-id': N, 'value': 'type'} for map).\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "Required": {
+          "description": "A Boolean value that specifies whether values are required for each row in this field",
+          "type": "boolean",
+          "markdownDescription": "A Boolean value that specifies whether values are required for each row in this field\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "Doc": {
+          "description": "Optional documentation for the field",
+          "type": "string",
+          "markdownDescription": "Optional documentation for the field\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Id": {
+          "description": "The unique identifier for the field",
+          "type": "integer",
+          "markdownDescription": "The unique identifier for the field\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Name": {
+          "description": "The name of the field",
+          "type": "string",
+          "markdownDescription": "The name of the field\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Id",
+        "Name",
+        "Type",
+        "Required"
+      ],
+      "markdownDescription": "Contains details about a schema field for an Iceberg table that supports nested types (struct, list, map)\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SchemaV2FieldList": {
+      "description": "List of schema fields that support nested types",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/SchemaV2Field"
+      },
+      "markdownDescription": "List of schema fields that support nested types\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
     "Namespace": {
       "description": "The namespace that the table belongs to.",
       "type": "string",
@@ -134,6 +366,11 @@
           "type": "boolean",
           "markdownDescription": "A Boolean value that specifies whether values are required for each row in this field\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
         },
+        "Id": {
+          "description": "The unique identifier for the field",
+          "type": "integer",
+          "markdownDescription": "The unique identifier for the field\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
         "Name": {
           "description": "The name of the field",
           "type": "string",
@@ -150,14 +387,6 @@
       "description": "The name for the table.",
       "type": "string",
       "markdownDescription": "The name for the table.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-    },
-    "TableBucketARN": {
-      "examples": [
-        "arn:aws:s3tables:us-west-2:123456789012:bucket/mytablebucket"
-      ],
-      "description": "The Amazon Resource Name (ARN) of the specified table bucket.",
-      "type": "string",
-      "markdownDescription": "The Amazon Resource Name (ARN) of the specified table bucket.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
     },
     "IcebergSchema": {
       "description": "Contains details about the schema for an Iceberg table",
@@ -203,53 +432,143 @@
       ],
       "markdownDescription": "Format of the table.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ICEBERG  \nUpdate requires: No interruption\n"
     },
+    "IcebergSortField": {
+      "description": "A sort field specification for an Iceberg table",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "SourceId": {
+          "description": "The source column ID to sort on",
+          "type": "integer",
+          "markdownDescription": "The source column ID to sort on\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "NullOrder": {
+          "description": "Null value ordering (nulls-first or nulls-last)",
+          "type": "string",
+          "enum": [
+            "nulls-first",
+            "nulls-last"
+          ],
+          "markdownDescription": "Null value ordering (nulls-first or nulls-last)\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: nulls-first | nulls-last  \nUpdate requires: No interruption\n"
+        },
+        "Transform": {
+          "description": "The sort transform function",
+          "type": "string",
+          "markdownDescription": "The sort transform function\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Direction": {
+          "description": "Sort direction (asc or desc)",
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "markdownDescription": "Sort direction (asc or desc)\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: asc | desc  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "SourceId",
+        "Transform",
+        "Direction",
+        "NullOrder"
+      ],
+      "markdownDescription": "A sort field specification for an Iceberg table\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "IcebergMetadata": {
-      "description": "Contains details about the metadata for an Iceberg table.",
+      "description": "Contains details about the metadata for an Iceberg table. Specify either IcebergSchema (for simple flat schemas with primitive types only) or IcebergSchemaV2 (for schemas with nested types like struct, list, map), but not both.",
       "additionalProperties": false,
       "type": "object",
       "properties": {
         "IcebergSchema": {
-          "$ref": "#/definitions/IcebergSchema"
+          "description": "Schema definition for flat tables with primitive types only. Mutually exclusive with IcebergSchemaV2.",
+          "$ref": "#/definitions/IcebergSchema",
+          "markdownDescription": "Schema definition for flat tables with primitive types only. Mutually exclusive with IcebergSchemaV2.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "IcebergSortOrder": {
+          "$ref": "#/definitions/IcebergSortOrder"
+        },
+        "IcebergSchemaV2": {
+          "description": "Schema definition that supports Apache Iceberg nested types (struct, list, map) and primitive types. Mutually exclusive with IcebergSchema.",
+          "$ref": "#/definitions/IcebergSchemaV2",
+          "markdownDescription": "Schema definition that supports Apache Iceberg nested types (struct, list, map) and primitive types. Mutually exclusive with IcebergSchema.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "IcebergPartitionSpec": {
+          "$ref": "#/definitions/IcebergPartitionSpec"
+        },
+        "TableProperties": {
+          "$ref": "#/definitions/TableProperties"
         }
       },
-      "required": [
-        "IcebergSchema"
-      ],
-      "markdownDescription": "Contains details about the metadata for an Iceberg table.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Contains details about the metadata for an Iceberg table. Specify either IcebergSchema (for simple flat schemas with primitive types only) or IcebergSchemaV2 (for schemas with nested types like struct, list, map), but not both.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "WarehouseLocation": {
-      "description": "The warehouse location of the table.",
-      "type": "string",
-      "markdownDescription": "The warehouse location of the table.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-    },
-    "SnapshotManagement": {
-      "description": "Contains details about the snapshot management settings for an Iceberg table. A snapshot is expired when it exceeds MinSnapshotsToKeep and MaxSnapshotAgeHours.",
+    "IcebergPartitionField": {
+      "description": "A partition field specification for an Iceberg table",
       "additionalProperties": false,
       "type": "object",
       "properties": {
-        "Status": {
-          "description": "Indicates whether the SnapshotManagement maintenance action is enabled.",
+        "SourceId": {
+          "description": "The source column ID to partition on",
+          "type": "integer",
+          "markdownDescription": "The source column ID to partition on\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "FieldId": {
+          "description": "The partition field ID (auto-assigned starting from 1000 if not specified)",
+          "type": "integer",
+          "markdownDescription": "The partition field ID (auto-assigned starting from 1000 if not specified)\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Transform": {
+          "description": "The partition transform function (identity, bucket[N], truncate[N], year, month, day, hour)",
           "type": "string",
-          "enum": [
-            "enabled",
-            "disabled"
-          ],
-          "markdownDescription": "Indicates whether the SnapshotManagement maintenance action is enabled.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: enabled | disabled  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The partition transform function (identity, bucket[N], truncate[N], year, month, day, hour)\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         },
-        "MinSnapshotsToKeep": {
-          "description": "The minimum number of snapshots to keep.",
-          "type": "integer",
-          "minimum": 1,
-          "markdownDescription": "The minimum number of snapshots to keep.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
-        },
-        "MaxSnapshotAgeHours": {
-          "description": "The maximum age of a snapshot before it can be expired.",
-          "type": "integer",
-          "minimum": 1,
-          "markdownDescription": "The maximum age of a snapshot before it can be expired.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        "Name": {
+          "description": "The name of the partition field",
+          "type": "string",
+          "markdownDescription": "The name of the partition field\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         }
       },
-      "markdownDescription": "Contains details about the snapshot management settings for an Iceberg table. A snapshot is expired when it exceeds MinSnapshotsToKeep and MaxSnapshotAgeHours.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "required": [
+        "SourceId",
+        "Transform",
+        "Name"
+      ],
+      "markdownDescription": "A partition field specification for an Iceberg table\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "description": "Tag value must be between 0 to 256 characters in length. Tag value can only contain alphanumeric characters, spaces, _, ., /, =, +, -, and @.",
+          "type": "string",
+          "maxLength": 256,
+          "markdownDescription": "Tag value must be between 0 to 256 characters in length. Tag value can only contain alphanumeric characters, spaces, _, ., /, =, +, -, and @.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        },
+        "Key": {
+          "minLength": 1,
+          "description": "Tag key must be between 1 to 128 characters in length. Tag key cannot start with 'aws:' and can only contain alphanumeric characters, spaces, _, ., /, =, +, -, and @.",
+          "type": "string",
+          "maxLength": 128,
+          "markdownDescription": "Tag key must be between 1 to 128 characters in length. Tag key cannot start with 'aws:' and can only contain alphanumeric characters, spaces, _, ., /, =, +, -, and @.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "TableProperties": {
+      "patternProperties": {
+        "^.+$": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "description": "Iceberg table properties (e.g., format-version, write.parquet.compression-codec)",
+      "additionalProperties": false,
+      "type": "object",
+      "markdownDescription": "Iceberg table properties (e.g., format-version, write.parquet.compression-codec)\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "required": [
@@ -261,6 +580,9 @@
   "properties": {
     "WithoutMetadata": {
       "$ref": "#/definitions/WithoutMetadata"
+    },
+    "StorageClassConfiguration": {
+      "$ref": "#/definitions/StorageClassConfiguration"
     },
     "Compaction": {
       "$ref": "#/definitions/Compaction"
@@ -291,6 +613,16 @@
     },
     "SnapshotManagement": {
       "$ref": "#/definitions/SnapshotManagement"
+    },
+    "Tags": {
+      "uniqueItems": true,
+      "description": "User tags (key-value pairs) to associate with the table.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "User tags (key-value pairs) to associate with the table.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "attributes": {

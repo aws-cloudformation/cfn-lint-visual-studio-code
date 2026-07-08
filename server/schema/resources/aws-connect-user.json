@@ -63,6 +63,16 @@
       "type": "boolean",
       "markdownDescription": "The Persistent Connection setting.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
     },
+    "VoiceEnhancementMode": {
+      "description": "The Voice Enhancement Mode setting.",
+      "type": "string",
+      "enum": [
+        "NONE",
+        "VOICE_ISOLATION",
+        "NOISE_SUPPRESSION"
+      ],
+      "markdownDescription": "The Voice Enhancement Mode setting.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: NONE | VOICE_ISOLATION | NOISE_SUPPRESSION  \nUpdate requires: No interruption\n"
+    },
     "UserIdentityInfo": {
       "description": "Contains information about the identity of a user.",
       "type": "object",
@@ -107,9 +117,6 @@
           "$ref": "#/definitions/PersistentConnection"
         }
       },
-      "required": [
-        "PhoneType"
-      ],
       "markdownDescription": "Contains information about the phone configuration settings for a user.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Tag": {
@@ -179,6 +186,132 @@
       "minimum": 1.0,
       "maximum": 5.0,
       "markdownDescription": "The level of the proficiency. The valid values are 1, 2, 3, 4 and 5.\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+    },
+    "AutoAcceptConfig": {
+      "description": "Auto-accept configuration per channel.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Channel": {
+          "$ref": "#/definitions/Channel"
+        },
+        "AutoAccept": {
+          "$ref": "#/definitions/AutoAccept"
+        },
+        "AgentFirstCallbackAutoAccept": {
+          "$ref": "#/definitions/AgentFirstCallbackAutoAccept"
+        }
+      },
+      "required": [
+        "Channel",
+        "AutoAccept"
+      ],
+      "markdownDescription": "Auto-accept configuration per channel.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Channel": {
+      "description": "The channels that agents can handle in the Contact Control Panel (CCP).",
+      "type": "string",
+      "enum": [
+        "VOICE",
+        "CHAT",
+        "TASK",
+        "EMAIL"
+      ],
+      "markdownDescription": "The channels that agents can handle in the Contact Control Panel (CCP).\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: VOICE | CHAT | TASK | EMAIL  \nUpdate requires: No interruption\n"
+    },
+    "AgentFirstCallbackAutoAccept": {
+      "description": "The agent first callback auto accept setting.",
+      "type": "boolean",
+      "markdownDescription": "The agent first callback auto accept setting.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+    },
+    "AfterContactWorkConfigPerChannel": {
+      "description": "After Contact Work configuration per channel.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Channel": {
+          "$ref": "#/definitions/Channel"
+        },
+        "AfterContactWorkConfig": {
+          "$ref": "#/definitions/AfterContactWorkConfig"
+        },
+        "AgentFirstCallbackAfterContactWorkConfig": {
+          "$ref": "#/definitions/AfterContactWorkConfig"
+        }
+      },
+      "required": [
+        "Channel",
+        "AfterContactWorkConfig"
+      ],
+      "markdownDescription": "After Contact Work configuration per channel.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AfterContactWorkConfig": {
+      "description": "After Contact Work configuration.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "AfterContactWorkTimeLimit": {
+          "$ref": "#/definitions/AfterContactWorkTimeLimit"
+        }
+      },
+      "markdownDescription": "After Contact Work configuration.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PhoneNumberConfig": {
+      "description": "Phone Number configuration per channel.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Channel": {
+          "$ref": "#/definitions/Channel"
+        },
+        "PhoneType": {
+          "$ref": "#/definitions/PhoneType"
+        },
+        "PhoneNumber": {
+          "$ref": "#/definitions/DeskPhoneNumber"
+        }
+      },
+      "required": [
+        "Channel",
+        "PhoneType"
+      ],
+      "markdownDescription": "Phone Number configuration per channel.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PersistentConnectionConfig": {
+      "description": "Persistent Connection configuration per channel.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Channel": {
+          "$ref": "#/definitions/Channel"
+        },
+        "PersistentConnection": {
+          "$ref": "#/definitions/PersistentConnection"
+        }
+      },
+      "required": [
+        "Channel",
+        "PersistentConnection"
+      ],
+      "markdownDescription": "Persistent Connection configuration per channel.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "VoiceEnhancementConfig": {
+      "description": "Voice Enhancement configuration per channel.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Channel": {
+          "$ref": "#/definitions/Channel"
+        },
+        "VoiceEnhancementMode": {
+          "$ref": "#/definitions/VoiceEnhancementMode"
+        }
+      },
+      "required": [
+        "Channel",
+        "VoiceEnhancementMode"
+      ],
+      "markdownDescription": "Voice Enhancement configuration per channel.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -222,7 +355,7 @@
     "PhoneConfig": {
       "description": "The phone settings for the user.",
       "$ref": "#/definitions/UserPhoneConfig",
-      "markdownDescription": "The phone settings for the user.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+      "markdownDescription": "The phone settings for the user.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
     },
     "SecurityProfileArns": {
       "type": "array",
@@ -260,11 +393,55 @@
         "$ref": "#/definitions/UserProficiency"
       },
       "markdownDescription": "One or more predefined attributes assigned to a user, with a level that indicates how skilled they are.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "AutoAcceptConfigs": {
+      "description": "Auto-accept configurations of a user.",
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/AutoAcceptConfig"
+      },
+      "markdownDescription": "Auto-accept configurations of a user.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "AfterContactWorkConfigs": {
+      "description": "After Contact Work configurations of a user.",
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/AfterContactWorkConfigPerChannel"
+      },
+      "markdownDescription": "After Contact Work configurations of a user.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "PhoneNumberConfigs": {
+      "description": "Phone Number configurations of a user.",
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/PhoneNumberConfig"
+      },
+      "markdownDescription": "Phone Number configurations of a user.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "PersistentConnectionConfigs": {
+      "description": "Persistent Connection configurations of a user.",
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/PersistentConnectionConfig"
+      },
+      "markdownDescription": "Persistent Connection configurations of a user.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "VoiceEnhancementConfigs": {
+      "description": "Voice Enhancement configurations of a user.",
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/VoiceEnhancementConfig"
+      },
+      "markdownDescription": "Voice Enhancement configurations of a user.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "required": [
     "InstanceArn",
-    "PhoneConfig",
     "RoutingProfileArn",
     "SecurityProfileArns",
     "Username"
@@ -300,7 +477,8 @@
         "connect:UntagResource",
         "connect:AssociateUserProficiencies",
         "connect:DisassociateUserProficiencies",
-        "connect:UpdateUserProficiencies"
+        "connect:UpdateUserProficiencies",
+        "connect:UpdateUserConfig"
       ]
     },
     "list": {

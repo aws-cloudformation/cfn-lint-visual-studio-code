@@ -35,6 +35,29 @@
         "SubjectPart"
       ],
       "markdownDescription": "The content of the email, composed of a subject line, an HTML part, and a text-only part\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
+    },
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -44,6 +67,17 @@
     },
     "Template": {
       "$ref": "#/definitions/Template"
+    },
+    "Tags": {
+      "description": "The tags (keys and values) associated with the email template.",
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "minItems": 0,
+      "maxItems": 50,
+      "markdownDescription": "The tags (keys and values) associated with the email template.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "additionalProperties": false,
@@ -57,7 +91,16 @@
     "/properties/Template/TemplateName"
   ],
   "tagging": {
-    "taggable": false
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "ses:TagResource",
+      "ses:UntagResource",
+      "ses:ListTagsForResource"
+    ]
   },
   "handlers": {
     "create": {
@@ -65,13 +108,15 @@
         "ses:CreateEmailTemplate",
         "ses:GetEmailTemplate",
         "ses:CreateTemplate",
-        "ses:GetTemplate"
+        "ses:GetTemplate",
+        "ses:TagResource"
       ]
     },
     "read": {
       "permissions": [
         "ses:GetEmailTemplate",
-        "ses:GetTemplate"
+        "ses:GetTemplate",
+        "ses:ListTagsForResource"
       ]
     },
     "delete": {
@@ -85,7 +130,9 @@
         "ses:GetEmailTemplate",
         "ses:UpdateEmailTemplate",
         "ses:GetTemplate",
-        "ses:UpdateTemplate"
+        "ses:UpdateTemplate",
+        "ses:TagResource",
+        "ses:UntagResource"
       ]
     },
     "list": {

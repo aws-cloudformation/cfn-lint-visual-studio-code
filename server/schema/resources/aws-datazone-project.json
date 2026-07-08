@@ -3,6 +3,48 @@
   "description": "Amazon DataZone projects are business use case\u2013based groupings of people, assets (data), and tools used to simplify access to the AWS analytics.",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-datazone",
   "definitions": {
+    "Member": {
+      "type": "object",
+      "description": "The member of the project.",
+      "properties": {
+        "UserIdentifier": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "GroupIdentifier": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The member of the project.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "UserDesignation": {
+      "type": "string",
+      "enum": [
+        "PROJECT_OWNER",
+        "PROJECT_CONTRIBUTOR"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PROJECT_OWNER | PROJECT_CONTRIBUTOR  \nUpdate requires: No interruption\n"
+    },
+    "ProjectMembershipAssignment": {
+      "type": "object",
+      "description": "The project membership assignment.",
+      "properties": {
+        "Member": {
+          "$ref": "#/definitions/Member"
+        },
+        "Designation": {
+          "$ref": "#/definitions/UserDesignation"
+        }
+      },
+      "required": [
+        "Member",
+        "Designation"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The project membership assignment.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "EnvironmentConfigurationUserParameter": {
       "type": "object",
       "properties": {
@@ -163,6 +205,29 @@
       },
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ResourceTag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[\\w \\.:/=+@-]+$  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 0,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: ^[\\w \\.:/=+@-]*$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -207,7 +272,7 @@
         "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9_-]{1,36}$  \nUpdate requires: No interruption\n"
       },
       "maxItems": 20,
-      "minItems": 1,
+      "minItems": 0,
       "markdownDescription": "The glossary terms that can be used in this Amazon DataZone project.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     },
     "Id": {
@@ -250,6 +315,32 @@
         "$ref": "#/definitions/EnvironmentConfigurationUserParameter"
       },
       "markdownDescription": "The user parameters of the project.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "ResourceTags": {
+      "description": "The resource tags of the project.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ResourceTag"
+      },
+      "markdownDescription": "The resource tags of the project.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "MembershipAssignments": {
+      "description": "The project membership assignments.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ProjectMembershipAssignment"
+      },
+      "markdownDescription": "The project membership assignments.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement\n"
+    },
+    "ProjectCategory": {
+      "description": "The project category.",
+      "type": "string",
+      "markdownDescription": "The project category.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "ProjectExecutionRole": {
+      "description": "The project execution role ARN.",
+      "type": "string",
+      "markdownDescription": "The project execution role ARN.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[^:]*:iam::\\d{12}:role/[\\w+=,.@/-]+$  \nUpdate requires: Replacement\n"
     }
   },
   "required": [
@@ -268,7 +359,9 @@
     "/properties/DomainIdentifier",
     "/properties/ProjectProfileVersion",
     "/properties/ProjectProfileId",
-    "/properties/UserParameters"
+    "/properties/UserParameters",
+    "/properties/MembershipAssignments",
+    "/properties/ProjectExecutionRole"
   ],
   "primaryIdentifier": [
     "/properties/DomainId",
@@ -276,7 +369,10 @@
   ],
   "createOnlyProperties": [
     "/properties/ProjectProfileId",
-    "/properties/DomainIdentifier"
+    "/properties/DomainIdentifier",
+    "/properties/MembershipAssignments",
+    "/properties/ProjectCategory",
+    "/properties/ProjectExecutionRole"
   ],
   "additionalIdentifiers": [
     [
@@ -293,7 +389,8 @@
     "create": {
       "permissions": [
         "datazone:CreateProject",
-        "datazone:GetProject"
+        "datazone:GetProject",
+        "iam:PassRole"
       ]
     },
     "read": {
