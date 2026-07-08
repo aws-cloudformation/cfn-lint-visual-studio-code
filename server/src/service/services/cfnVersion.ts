@@ -16,6 +16,7 @@ permissions and limitations under the License.
 
 import { spawn, ChildProcess } from "child_process";
 import { Diagnostic } from "vscode-languageserver";
+import { tokenizeCommand } from "../../utils/commandTokenizer";
 
 export class CfnVersion {
   child: ChildProcess;
@@ -25,8 +26,12 @@ export class CfnVersion {
   end: number;
 
   constructor(cmd: string) {
-    this.child = spawn(cmd, ["--version"], {
-      shell: true,
+    // Split any arguments embedded in the configured path without a shell, then
+    // launch with shell:false so nothing in the path can be interpreted as a
+    // shell command.
+    const [executable, ...embeddedArgs] = tokenizeCommand(cmd);
+    this.child = spawn(executable, [...embeddedArgs, "--version"], {
+      shell: false,
     });
     this.start = 0;
     this.end = Number.MAX_VALUE;
