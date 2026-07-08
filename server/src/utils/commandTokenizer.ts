@@ -26,11 +26,13 @@ permissions and limitations under the License.
  * or substitution, so any metacharacter is carried through verbatim as a
  * literal argv token instead of being interpreted by a shell.
  *
- * Supported quoting mirrors POSIX literal quoting only:
+ * Quoting rules (backslash is deliberately NOT an escape character):
  *   - single quotes: everything between them is literal
  *   - double quotes: everything between them is literal (no variable or
  *     command substitution, since no shell is involved)
- *   - a backslash escapes the next character outside single quotes
+ *   - a backslash is an ordinary character, so Windows paths such as
+ *     `C:\Python\Scripts\cfn-lint.exe` are preserved verbatim. Paths that
+ *     contain spaces must be wrapped in quotes, exactly as before.
  *
  * @param command raw command string (may be empty)
  * @returns argv tokens; the first entry is the executable
@@ -40,24 +42,9 @@ export function tokenizeCommand(command: string): string[] {
   let current = "";
   let hasToken = false;
   let quote: '"' | "'" | null = null;
-  let escaped = false;
 
   for (let i = 0; i < command.length; i++) {
     const ch = command[i];
-
-    if (escaped) {
-      current += ch;
-      escaped = false;
-      hasToken = true;
-      continue;
-    }
-
-    // Backslash escapes the next char except inside single quotes.
-    if (ch === "\\" && quote !== "'") {
-      escaped = true;
-      hasToken = true;
-      continue;
-    }
 
     if (quote) {
       if (ch === quote) {
