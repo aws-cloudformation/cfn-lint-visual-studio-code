@@ -18,6 +18,7 @@ import {
   RequestPreview,
   PreviewClosed,
   ValidateCfnLintVersion,
+  ClearAllDiagnostics,
 } from "../../requestTypes";
 import { SettingsState } from "../../cfnSettings";
 import { ValidationHandler } from "./validationHandler";
@@ -49,6 +50,11 @@ export class NotificationHandler {
     this.connection.onNotification(ValidateCfnLintVersion.type, () =>
       this.validateCfnLintVersion()
     );
+    this.connection.onNotification(ClearAllDiagnostics.type, () => {
+      this.cfnSettings.documents.all().forEach((document) => {
+        this.connection.sendDiagnostics({ uri: document.uri, diagnostics: [] });
+      });
+    });
   }
 
   private requestPreview(uri: string): void {

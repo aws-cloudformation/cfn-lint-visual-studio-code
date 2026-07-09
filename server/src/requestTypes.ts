@@ -39,3 +39,9 @@ export namespace ValidateCfnLintVersion {
     "cfn/validateCfnLintVersion"
   );
 }
+
+export namespace ClearAllDiagnostics {
+  export const type: NotificationType<{}> = new NotificationType(
+    "cfn/clearAllDiagnostics"
+  );
+}
