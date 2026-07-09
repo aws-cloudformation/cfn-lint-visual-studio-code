@@ -23,9 +23,14 @@ jobs:
         id: publishToOpenVSX
         with:
           pat: ${{ secrets.OVSX_PAT }}
+          # Treat an already-published version as success so re-running the
+          # release (e.g. after fixing the Marketplace token) does not fail
+          # here before the Marketplace step gets a chance to run.
+          skipDuplicate: true
       - name: Publish to Visual Studio Marketplace
         uses: HaaLeo/publish-vscode-extension@v2
         with:
           pat: ${{ secrets.VSCE_PAT }}
           registryUrl: https://marketplace.visualstudio.com
           extensionFile: ${{ steps.publishToOpenVSX.outputs.vsixPath }}
+          skipDuplicate: true
