@@ -28,7 +28,7 @@
       "markdownDescription": "The type of service being registered\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: dynatrace | mcpserver | mcpserversplunk | mcpservernewrelic | gitlab | servicenow | pagerduty | azureidentity | mcpserversigv4 | mcpservergrafana  \nUpdate requires: No interruption\n"
     },
     "ServiceDetails": {
-      "description": "Service-specific configuration details - only MCPServerSigV4 supports in-place updates, all other service types require replacement when modified",
+      "description": "Service-specific configuration details - MCPServerSigV4 supports in-place updates; GitLab (TokenValue), MCPServer (ApiKey or BearerToken credential rotation), MCPServerNewRelic (ApiKey rotation), and MCPServerGrafana (BearerToken rotation) support in-place credential rotation; all other service types and fields require replacement when modified",
       "type": "object",
       "oneOf": [
         {
@@ -142,7 +142,7 @@
           "additionalProperties": false
         }
       ],
-      "markdownDescription": "Service-specific configuration details - only MCPServerSigV4 supports in-place updates, all other service types require replacement when modified\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
+      "markdownDescription": "Service-specific configuration details - MCPServerSigV4 supports in-place updates; GitLab (TokenValue), MCPServer (ApiKey or BearerToken credential rotation), MCPServerNewRelic (ApiKey rotation), and MCPServerGrafana (BearerToken rotation) support in-place credential rotation; all other service types and fields require replacement when modified\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
     },
     "DynatraceServiceDetails": {
       "description": "Dynatrace service configuration",
@@ -288,9 +288,14 @@
           "markdownDescription": "AWS service name for SigV4 signing\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nUpdate requires: No interruption\n"
         },
         "RoleArn": {
-          "description": "IAM role ARN to assume for SigV4 signing",
+          "description": "Deprecated - use McpRoleArn instead. IAM role ARN to assume for SigV4 signing",
           "type": "string",
-          "markdownDescription": "IAM role ARN to assume for SigV4 signing\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:aws:iam::\\d{12}:role/[a-zA-Z0-9+=,.@_/-]+$  \nUpdate requires: No interruption\n"
+          "markdownDescription": "Deprecated - use McpRoleArn instead. IAM role ARN to assume for SigV4 signing\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws:iam::\\d{12}:role/[a-zA-Z0-9+=,.@_/-]+$  \nUpdate requires: No interruption\n"
+        },
+        "McpRoleArn": {
+          "description": "IAM role ARN to assume for SigV4 signing. Optional - when omitted, credentials are resolved at runtime via a monitor account association.",
+          "type": "string",
+          "markdownDescription": "IAM role ARN to assume for SigV4 signing. Optional - when omitted, credentials are resolved at runtime via a monitor account association.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws:iam::\\d{12}:role/[a-zA-Z0-9+=,.@_/-]+$  \nUpdate requires: No interruption\n"
         },
         "CustomHeaders": {
           "description": "Custom headers for the SigV4 MCP server",
@@ -308,8 +313,7 @@
       },
       "required": [
         "Region",
-        "Service",
-        "RoleArn"
+        "Service"
       ],
       "additionalProperties": false,
       "markdownDescription": "SigV4 authorization configuration for MCP server\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
@@ -369,6 +373,17 @@
           },
           "required": [
             "ApiKey"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "BearerToken": {
+              "$ref": "#/definitions/BearerTokenDetails"
+            }
+          },
+          "required": [
+            "BearerToken"
           ],
           "additionalProperties": false
         }
@@ -1150,9 +1165,14 @@
           "markdownDescription": "AWS service name for SigV4 signing\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         },
         "RoleArn": {
-          "description": "IAM role ARN for SigV4 signing",
+          "description": "Deprecated - use McpRoleArn instead. IAM role ARN for SigV4 signing",
           "type": "string",
-          "markdownDescription": "IAM role ARN for SigV4 signing\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+          "markdownDescription": "Deprecated - use McpRoleArn instead. IAM role ARN for SigV4 signing\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "McpRoleArn": {
+          "description": "IAM role ARN for SigV4 signing. Absent when no dedicated role is configured.",
+          "type": "string",
+          "markdownDescription": "IAM role ARN for SigV4 signing. Absent when no dedicated role is configured.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
         "CustomHeaders": {
           "description": "Custom headers for the SigV4 MCP server",
@@ -1291,14 +1311,10 @@
   "createOnlyProperties": [
     "/properties/ServiceType",
     "/properties/ServiceDetails/Dynatrace",
-    "/properties/ServiceDetails/MCPServer",
     "/properties/ServiceDetails/MCPServerSplunk",
-    "/properties/ServiceDetails/MCPServerNewRelic",
-    "/properties/ServiceDetails/GitLab",
     "/properties/ServiceDetails/ServiceNow",
     "/properties/ServiceDetails/PagerDuty",
     "/properties/ServiceDetails/AzureIdentity",
-    "/properties/ServiceDetails/MCPServerGrafana",
     "/properties/KmsKeyArn"
   ],
   "primaryIdentifier": [
@@ -1336,7 +1352,17 @@
         "aidevops:GetService",
         "aidevops:TagResource",
         "aidevops:UntagResource",
-        "aidevops:ListTagsForResource"
+        "aidevops:ListTagsForResource",
+        "iam:PassRole",
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:GenerateDataKey",
+        "kms:GenerateDataKeyPair",
+        "kms:GenerateDataKeyPairWithoutPlaintext",
+        "kms:GenerateDataKeyWithoutPlaintext",
+        "kms:ReEncryptFrom",
+        "kms:ReEncryptTo"
       ]
     },
     "delete": {

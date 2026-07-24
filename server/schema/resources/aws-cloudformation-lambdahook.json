@@ -3,6 +3,32 @@
   "description": "This is a CloudFormation resource for the first-party AWS::Hooks::LambdaHook.",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
   "definitions": {
+    "LoggingConfig": {
+      "description": "Contains logging configuration information for an extension.",
+      "type": "object",
+      "properties": {
+        "LogGroupName": {
+          "description": "The Amazon CloudWatch Logs group to which CloudFormation sends error logging information when invoking the extension's handlers.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "markdownDescription": "The Amazon CloudWatch Logs group to which CloudFormation sends error logging information when invoking the extension's handlers.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^[\\.\\-_/#A-Za-z0-9]+$  \nUpdate requires: No interruption\n"
+        },
+        "LogRoleArn": {
+          "description": "The ARN of the role that CloudFormation should assume when sending log entries to CloudWatch Logs.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "markdownDescription": "The ARN of the role that CloudFormation should assume when sending log entries to CloudWatch Logs.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: arn:.+:iam::[0-9]{12}:role/.+  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "LogGroupName",
+        "LogRoleArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Contains logging configuration information for an extension.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "Role": {
       "description": "IAM Role ARN",
       "type": "string",
@@ -291,6 +317,17 @@
       "description": "The execution role ARN assumed by Hooks to invoke Lambda.",
       "$ref": "#/definitions/Role",
       "markdownDescription": "The execution role ARN assumed by Hooks to invoke Lambda.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "AutoUpdate": {
+      "description": "Whether to automatically update the extension in this account and Region when a new minor version is published by the extension publisher.",
+      "type": "boolean",
+      "default": true,
+      "markdownDescription": "Whether to automatically update the extension in this account and Region when a new minor version is published by the extension publisher.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: Replacement\n"
+    },
+    "LoggingConfig": {
+      "description": "Contains logging configuration information for the hook.",
+      "$ref": "#/definitions/LoggingConfig",
+      "markdownDescription": "Contains logging configuration information for the hook.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
     }
   },
   "additionalProperties": false,
@@ -305,8 +342,14 @@
   "readOnlyProperties": [
     "/properties/HookArn"
   ],
+  "writeOnlyProperties": [
+    "/properties/AutoUpdate",
+    "/properties/LoggingConfig"
+  ],
   "createOnlyProperties": [
-    "/properties/Alias"
+    "/properties/Alias",
+    "/properties/AutoUpdate",
+    "/properties/LoggingConfig"
   ],
   "primaryIdentifier": [
     "/properties/HookArn"

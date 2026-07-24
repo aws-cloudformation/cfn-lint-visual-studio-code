@@ -1,0 +1,173 @@
+{
+  "typeName": "AWS::Athena::Session",
+  "description": "An Athena session is a Spark-based interactive environment for running calculations within a workgroup.",
+  "properties": {
+    "Arn": {
+      "type": "string",
+      "description": "The ARN of the session.",
+      "markdownDescription": "The ARN of the session.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SessionId": {
+      "type": "string",
+      "description": "The session ID.",
+      "minLength": 1,
+      "maxLength": 256,
+      "markdownDescription": "The session ID.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "WorkGroup": {
+      "type": "string",
+      "description": "The workgroup to which the session belongs.",
+      "markdownDescription": "The workgroup to which the session belongs.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z0-9._-]{1,128}$  \nUpdate requires: Replacement\n"
+    },
+    "EngineConfiguration": {
+      "description": "Contains engine data processing unit (DPU) configuration settings.",
+      "$ref": "#/definitions/EngineConfiguration",
+      "markdownDescription": "Contains engine data processing unit (DPU) configuration settings.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: Replacement\nRead only property: Yes"
+    },
+    "ExecutionRole": {
+      "type": "string",
+      "description": "The ARN of the execution role used to access user resources for Spark sessions and Identity Center enabled workgroups.",
+      "minLength": 20,
+      "maxLength": 2048,
+      "markdownDescription": "The ARN of the execution role used to access user resources for Spark sessions and Identity Center enabled workgroups.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nUpdate requires: Replacement\n"
+    },
+    "EngineVersion": {
+      "type": "string",
+      "description": "The engine version used by the session.",
+      "minLength": 1,
+      "maxLength": 128,
+      "markdownDescription": "The engine version used by the session.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  },
+  "definitions": {
+    "EngineConfiguration": {
+      "type": "object",
+      "description": "Contains engine data processing unit (DPU) configuration settings.",
+      "properties": {
+        "CoordinatorDpuSize": {
+          "type": "integer",
+          "description": "The number of DPUs to use for the coordinator.",
+          "minimum": 1,
+          "maximum": 1,
+          "markdownDescription": "The number of DPUs to use for the coordinator.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "MaxConcurrentDpus": {
+          "type": "integer",
+          "description": "The maximum number of DPUs that can run concurrently.",
+          "minimum": 2,
+          "maximum": 5000,
+          "markdownDescription": "The maximum number of DPUs that can run concurrently.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "DefaultExecutorDpuSize": {
+          "type": "integer",
+          "description": "The default number of DPUs to use for executors.",
+          "minimum": 1,
+          "maximum": 1,
+          "markdownDescription": "The default number of DPUs to use for executors.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "AdditionalConfigs": {
+          "type": "object",
+          "description": "Contains additional notebook engine parameter mappings.",
+          "patternProperties": {
+            ".*": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            }
+          },
+          "additionalProperties": false,
+          "markdownDescription": "Contains additional notebook engine parameter mappings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "SparkProperties": {
+          "type": "object",
+          "description": "Specifies custom jar files and Spark properties.",
+          "patternProperties": {
+            ".*": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            }
+          },
+          "additionalProperties": false,
+          "markdownDescription": "Specifies custom jar files and Spark properties.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "MaxConcurrentDpus"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Contains engine data processing unit (DPU) configuration settings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  },
+  "required": [
+    "WorkGroup",
+    "EngineConfiguration"
+  ],
+  "additionalProperties": false,
+  "createOnlyProperties": [
+    "/properties/EngineConfiguration",
+    "/properties/ExecutionRole",
+    "/properties/WorkGroup"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/SessionId",
+    "/properties/EngineVersion",
+    "/properties/EngineConfiguration/AdditionalConfigs",
+    "/properties/EngineConfiguration/SparkProperties"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/WorkGroup",
+      "/properties/SessionId"
+    ]
+  ],
+  "tagging": {
+    "taggable": false
+  },
+  "handlers": {
+    "read": {
+      "permissions": [
+        "athena:GetSession"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "WorkGroup": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z0-9._-]{1,128}$  \nUpdate requires: No interruption\n"
+          }
+        },
+        "required": [
+          "WorkGroup"
+        ]
+      },
+      "permissions": [
+        "athena:ListSessions"
+      ]
+    }
+  },
+  "attributes": {
+    "Arn": {
+      "type": "string",
+      "description": "The ARN of the session.",
+      "markdownDescription": "The ARN of the session.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SessionId": {
+      "type": "string",
+      "description": "The session ID.",
+      "minLength": 1,
+      "maxLength": 256,
+      "markdownDescription": "The session ID.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "EngineVersion": {
+      "type": "string",
+      "description": "The engine version used by the session.",
+      "minLength": 1,
+      "maxLength": 128,
+      "markdownDescription": "The engine version used by the session.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}
