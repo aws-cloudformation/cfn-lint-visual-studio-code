@@ -1,0 +1,458 @@
+{
+  "typeName": "AWS::CleanRooms::IntermediateTable",
+  "description": "Represents an intermediate table that stores cached query results within a collaboration",
+  "definitions": {
+    "UUID": {
+      "type": "string",
+      "maxLength": 36,
+      "minLength": 36,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 36  \nMaximum Length: 36  \nPattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$  \nUpdate requires: No interruption\n"
+    },
+    "IntermediateTableStatus": {
+      "type": "string",
+      "enum": [
+        "CREATED",
+        "POPULATE_STARTED",
+        "POPULATE_SUCCESS",
+        "POPULATE_FAILED",
+        "DISALLOWED_BY_DATA_PROVIDER",
+        "BASE_TABLE_REMOVED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATED | POPULATE_STARTED | POPULATE_SUCCESS | POPULATE_FAILED | DISALLOWED_BY_DATA_PROVIDER | BASE_TABLE_REMOVED  \nUpdate requires: No interruption\n"
+    },
+    "PopulationAnalysisConfiguration": {
+      "type": "object",
+      "properties": {
+        "SqlParameters": {
+          "$ref": "#/definitions/PopulationAnalysisSqlParameters"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PopulationAnalysisSqlParameters": {
+      "type": "object",
+      "properties": {
+        "QueryString": {
+          "type": "string",
+          "maxLength": 500000,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 500000  \nUpdate requires: No interruption\n"
+        },
+        "AnalysisTemplateArn": {
+          "type": "string",
+          "maxLength": 256,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "IntermediateTableAnalysisRule": {
+      "type": "object",
+      "properties": {
+        "Type": {
+          "$ref": "#/definitions/IntermediateTableAnalysisRuleType"
+        },
+        "Policy": {
+          "$ref": "#/definitions/IntermediateTableAnalysisRulePolicy"
+        }
+      },
+      "required": [
+        "Type",
+        "Policy"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "IntermediateTableAnalysisRuleType": {
+      "type": "string",
+      "enum": [
+        "CUSTOM"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CUSTOM  \nUpdate requires: No interruption\n"
+    },
+    "IntermediateTableAnalysisRulePolicy": {
+      "type": "object",
+      "title": "V1",
+      "properties": {
+        "V1": {
+          "$ref": "#/definitions/IntermediateTableAnalysisRulePolicyV1"
+        }
+      },
+      "required": [
+        "V1"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "IntermediateTableAnalysisRulePolicyV1": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "Custom",
+          "properties": {
+            "Custom": {
+              "$ref": "#/definitions/IntermediateTableAnalysisRuleCustom"
+            }
+          },
+          "required": [
+            "Custom"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "IntermediateTableAnalysisRuleCustom": {
+      "type": "object",
+      "properties": {
+        "AllowedAnalyses": {
+          "$ref": "#/definitions/AllowedAnalyses"
+        },
+        "AllowedAnalysisProviders": {
+          "$ref": "#/definitions/AllowedAnalysisProviders"
+        },
+        "AdditionalAnalyses": {
+          "$ref": "#/definitions/AdditionalAnalyses"
+        },
+        "AllowedResultReceivers": {
+          "$ref": "#/definitions/AllowedResultReceivers"
+        },
+        "DifferentialPrivacy": {
+          "$ref": "#/definitions/DifferentialPrivacy"
+        },
+        "DisallowedOutputColumns": {
+          "$ref": "#/definitions/DisallowedOutputColumns"
+        }
+      },
+      "required": [
+        "AllowedAnalyses"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AllowedAnalysis": {
+      "type": "string",
+      "minLength": 0,
+      "maxLength": 200,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 200  \nPattern: (ANY_QUERY|ANY_JOB|arn:[\\w]{3}:cleanrooms:[\\w]{2}-[\\w]{4,9}-[\\d]:[\\d]{12}:membership/[\\d\\w-]+/analysistemplate/[\\d\\w-]+)  \nUpdate requires: No interruption\n"
+    },
+    "AllowedAnalyses": {
+      "type": "array",
+      "insertionOrder": false,
+      "minItems": 0,
+      "items": {
+        "$ref": "#/definitions/AllowedAnalysis"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "AllowedAnalysisProvider": {
+      "type": "string",
+      "minLength": 12,
+      "maxLength": 12,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 12  \nMaximum Length: 12  \nPattern: \\d+  \nUpdate requires: No interruption\n"
+    },
+    "AllowedAnalysisProviders": {
+      "type": "array",
+      "insertionOrder": false,
+      "minItems": 0,
+      "items": {
+        "$ref": "#/definitions/AllowedAnalysisProvider"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "AllowedResultReceivers": {
+      "type": "array",
+      "insertionOrder": false,
+      "minItems": 0,
+      "items": {
+        "type": "string",
+        "minLength": 12,
+        "maxLength": 12,
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 12  \nMaximum Length: 12  \nPattern: \\d+  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "AdditionalAnalyses": {
+      "type": "string",
+      "enum": [
+        "ALLOWED",
+        "REQUIRED",
+        "NOT_ALLOWED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ALLOWED | REQUIRED | NOT_ALLOWED  \nUpdate requires: No interruption\n"
+    },
+    "DifferentialPrivacyColumn": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Name"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DifferentialPrivacy": {
+      "type": "object",
+      "properties": {
+        "Columns": {
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/DifferentialPrivacyColumn"
+          },
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Columns"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DisallowedOutputColumns": {
+      "type": "array",
+      "insertionOrder": false,
+      "minItems": 0,
+      "items": {
+        "type": "string",
+        "maxLength": 127,
+        "minLength": 1,
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 127  \nPattern: ^[a-z0-9_](([a-z0-9_ ]+-)*([a-z0-9_ ]+))?$  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "IntermediateTableIdentifier": {
+      "$ref": "#/definitions/UUID"
+    },
+    "Arn": {
+      "type": "string",
+      "maxLength": 256,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "MembershipIdentifier": {
+      "$ref": "#/definitions/UUID"
+    },
+    "MembershipArn": {
+      "type": "string",
+      "maxLength": 100,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 100  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CollaborationIdentifier": {
+      "$ref": "#/definitions/UUID"
+    },
+    "CollaborationArn": {
+      "type": "string",
+      "maxLength": 100,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 100  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Name": {
+      "type": "string",
+      "maxLength": 100,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: ^(?!\\s*$)[\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDBFF-\\uDC00\\uDFFF\\t]*$  \nUpdate requires: Replacement\n"
+    },
+    "Description": {
+      "type": "string",
+      "maxLength": 255,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 255  \nPattern: ^[\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDBFF-\\uDC00\\uDFFF\\t\\r\\n]*$  \nUpdate requires: No interruption\n"
+    },
+    "PopulationAnalysisConfiguration": {
+      "$ref": "#/definitions/PopulationAnalysisConfiguration"
+    },
+    "Status": {
+      "$ref": "#/definitions/IntermediateTableStatus"
+    },
+    "KmsKeyArn": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 4,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 4  \nMaximum Length: 2048  \nUpdate requires: No interruption\n"
+    },
+    "AnalysisRules": {
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/IntermediateTableAnalysisRule"
+      },
+      "maxItems": 1,
+      "minItems": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "Tags": {
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "uniqueItems": true,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "required": [
+    "MembershipIdentifier",
+    "Name",
+    "PopulationAnalysisConfiguration"
+  ],
+  "readOnlyProperties": [
+    "/properties/IntermediateTableIdentifier",
+    "/properties/Arn",
+    "/properties/MembershipArn",
+    "/properties/CollaborationIdentifier",
+    "/properties/CollaborationArn",
+    "/properties/Status"
+  ],
+  "createOnlyProperties": [
+    "/properties/MembershipIdentifier",
+    "/properties/Name",
+    "/properties/PopulationAnalysisConfiguration"
+  ],
+  "primaryIdentifier": [
+    "/properties/IntermediateTableIdentifier",
+    "/properties/MembershipIdentifier"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "cleanrooms:ListTagsForResource",
+      "cleanrooms:UntagResource",
+      "cleanrooms:TagResource"
+    ]
+  },
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-cleanrooms",
+  "handlers": {
+    "create": {
+      "permissions": [
+        "cleanrooms:CreateIntermediateTable",
+        "cleanrooms:GetIntermediateTable",
+        "cleanrooms:ListIntermediateTables",
+        "cleanrooms:PopulateIntermediateTable",
+        "cleanrooms:CreateIntermediateTableAnalysisRule",
+        "cleanrooms:GetIntermediateTableAnalysisRule",
+        "cleanrooms:GetCollaborationAnalysisTemplate",
+        "cleanrooms:ListTagsForResource",
+        "cleanrooms:TagResource",
+        "cleanrooms:GetMembership",
+        "cleanrooms:GetCollaboration",
+        "kms:DescribeKey",
+        "kms:GenerateDataKey",
+        "kms:Decrypt"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "cleanrooms:GetIntermediateTable",
+        "cleanrooms:GetIntermediateTableAnalysisRule",
+        "cleanrooms:ListTagsForResource",
+        "cleanrooms:GetMembership",
+        "cleanrooms:GetCollaboration"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "cleanrooms:UpdateIntermediateTable",
+        "cleanrooms:GetIntermediateTable",
+        "cleanrooms:CreateIntermediateTableAnalysisRule",
+        "cleanrooms:UpdateIntermediateTableAnalysisRule",
+        "cleanrooms:GetIntermediateTableAnalysisRule",
+        "cleanrooms:DeleteIntermediateTableAnalysisRule",
+        "cleanrooms:GetMembership",
+        "cleanrooms:ListTagsForResource",
+        "cleanrooms:TagResource",
+        "cleanrooms:UntagResource",
+        "kms:DescribeKey",
+        "kms:GenerateDataKey",
+        "kms:Decrypt"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "cleanrooms:DeleteIntermediateTable",
+        "cleanrooms:GetIntermediateTable",
+        "cleanrooms:ListIntermediateTables",
+        "cleanrooms:DeleteIntermediateTableAnalysisRule",
+        "cleanrooms:GetIntermediateTableAnalysisRule",
+        "cleanrooms:GetMembership",
+        "cleanrooms:ListTagsForResource",
+        "cleanrooms:UntagResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "cleanrooms:ListIntermediateTables",
+        "cleanrooms:GetMembership",
+        "cleanrooms:GetCollaboration"
+      ],
+      "handlerSchema": {
+        "properties": {
+          "MembershipIdentifier": {
+            "$ref": "resource-schema.json#/properties/MembershipIdentifier"
+          }
+        },
+        "required": [
+          "MembershipIdentifier"
+        ]
+      }
+    }
+  },
+  "additionalProperties": false,
+  "attributes": {
+    "IntermediateTableIdentifier": {
+      "$ref": "#/definitions/UUID"
+    },
+    "Arn": {
+      "type": "string",
+      "maxLength": 256,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "MembershipArn": {
+      "type": "string",
+      "maxLength": 100,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 100  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CollaborationIdentifier": {
+      "$ref": "#/definitions/UUID"
+    },
+    "CollaborationArn": {
+      "type": "string",
+      "maxLength": 100,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 100  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Status": {
+      "$ref": "#/definitions/IntermediateTableStatus"
+    }
+  }
+}

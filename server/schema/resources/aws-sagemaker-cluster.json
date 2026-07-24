@@ -18,7 +18,8 @@
     "/properties/ClusterStatus",
     "/properties/FailureMessage",
     "/properties/InstanceGroups/*/CurrentCount",
-    "/properties/RestrictedInstanceGroups/*/CurrentCount"
+    "/properties/RestrictedInstanceGroups/*/CurrentCount",
+    "/properties/InstanceGroups/*/AutoPatchConfig/PatchSchedule/NextPatchDate"
   ],
   "description": "Resource Type definition for AWS::SageMaker::Cluster",
   "createOnlyProperties": [
@@ -250,6 +251,19 @@
       ],
       "markdownDescription": "Specifies an Amazon Virtual Private Cloud (VPC) that your SageMaker jobs, hosted models, and compute resources have access to. You can control access to and from your resources by configuring a VPC.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "PatchSchedule": {
+      "description": "The schedule configuration for automatic patching.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "NextPatchDate": {
+          "description": "The date and time of the next scheduled patch, set by the system when a patch AMI is detected.",
+          "type": "string",
+          "markdownDescription": "The date and time of the next scheduled patch, set by the system when a patch AMI is detected.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "The schedule configuration for automatic patching.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "ClusterKubernetesTaint": {
       "description": "A Kubernetes taint to apply to cluster nodes.",
       "additionalProperties": false,
@@ -453,6 +467,32 @@
       "description": "The instance type of the instance group of a SageMaker HyperPod cluster.",
       "type": "string",
       "markdownDescription": "The instance type of the instance group of a SageMaker HyperPod cluster.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "AutoPatchConfig": {
+      "description": "The configuration for automatic patching of the instance group. Enables workload-aware, patch-level AMI updates.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "PatchingStrategy": {
+          "description": "The patching strategy that determines when and how instances are patched. WhenIdle patches instances as they become idle. WhenAllIdle patches all instances when they are all idle.",
+          "type": "string",
+          "enum": [
+            "WhenIdle",
+            "WhenAllIdle"
+          ],
+          "markdownDescription": "The patching strategy that determines when and how instances are patched. WhenIdle patches instances as they become idle. WhenAllIdle patches all instances when they are all idle.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: WhenIdle | WhenAllIdle  \nUpdate requires: No interruption\n"
+        },
+        "PatchSchedule": {
+          "$ref": "#/definitions/PatchSchedule"
+        },
+        "DeploymentConfig": {
+          "$ref": "#/definitions/DeploymentConfig"
+        }
+      },
+      "required": [
+        "PatchingStrategy"
+      ],
+      "markdownDescription": "The configuration for automatic patching of the instance group. Enables workload-aware, patch-level AMI updates.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "ClusterOrchestratorSlurmConfig": {
       "description": "Specifies parameter(s) related to Slurm as orchestrator.",
@@ -816,6 +856,9 @@
         },
         "InstanceType": {
           "$ref": "#/definitions/InstanceType"
+        },
+        "AutoPatchConfig": {
+          "$ref": "#/definitions/AutoPatchConfig"
         },
         "ExecutionRole": {
           "$ref": "#/definitions/ExecutionRole"

@@ -53,18 +53,23 @@
           "markdownDescription": "The expression that defines when the scheduled query runs, e.g. rate(1 minute).\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         },
         "StartTimeOffset": {
-          "description": "The number of seconds into the past to start the query window.",
+          "description": "The number of seconds into the past to start the query window. Must be a positive value and cannot exceed 2592000 seconds (30 days).",
           "type": "integer",
-          "markdownDescription": "The number of seconds into the past to start the query window.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+          "minimum": 1,
+          "maximum": 2592000,
+          "markdownDescription": "The number of seconds into the past to start the query window. Must be a positive value and cannot exceed 2592000 seconds (30 days).\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
         },
         "EndTimeOffset": {
-          "description": "The number of seconds into the past to end the query window.",
+          "description": "The number of seconds into the past to end the query window. Must be a non-negative value and cannot exceed 2592000 seconds (30 days).",
           "type": "integer",
-          "markdownDescription": "The number of seconds into the past to end the query window.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+          "minimum": 0,
+          "maximum": 2592000,
+          "markdownDescription": "The number of seconds into the past to end the query window. Must be a non-negative value and cannot exceed 2592000 seconds (30 days).\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "ScheduleExpression"
+        "ScheduleExpression",
+        "StartTimeOffset"
       ],
       "markdownDescription": "The schedule configuration for the scheduled query.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
@@ -81,7 +86,8 @@
         "AggregationExpression": {
           "description": "The aggregation expression for the scheduled query, e.g. count(*) or avg(latency) by host.",
           "type": "string",
-          "markdownDescription": "The aggregation expression for the scheduled query, e.g. count(*) or avg(latency) by host.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+          "maxLength": 2048,
+          "markdownDescription": "The aggregation expression for the scheduled query, e.g. count(*) or avg(latency) by host.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nUpdate requires: No interruption\n"
         },
         "LogGroupIdentifiers": {
           "description": "The log groups to query.",
@@ -91,7 +97,7 @@
             "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
           },
           "insertionOrder": false,
-          "markdownDescription": "The log groups to query.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The log groups to query.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         },
         "ScheduledQueryRoleARN": {
           "description": "The ARN of the IAM role that grants permissions to execute the scheduled query.",
@@ -102,12 +108,22 @@
           "description": "The schedule configuration.",
           "$ref": "#/definitions/ScheduleConfiguration",
           "markdownDescription": "The schedule configuration.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "Tags": {
+          "description": "A list of key-value pairs to associate with the scheduled query that backs the log alarm.",
+          "type": "array",
+          "maxItems": 50,
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/Tag"
+          },
+          "markdownDescription": "A list of key-value pairs to associate with the scheduled query that backs the log alarm.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
         "QueryString",
         "AggregationExpression",
-        "LogGroupIdentifiers",
         "ScheduledQueryRoleARN",
         "ScheduleConfiguration"
       ],
@@ -248,6 +264,8 @@
         "logs:CreateScheduledQuery",
         "logs:UpdateScheduledQuery",
         "logs:DeleteScheduledQuery",
+        "logs:ListTagsForResource",
+        "logs:TagResource",
         "iam:PassRole"
       ]
     },
@@ -261,6 +279,9 @@
         "logs:CreateScheduledQuery",
         "logs:UpdateScheduledQuery",
         "logs:DeleteScheduledQuery",
+        "logs:ListTagsForResource",
+        "logs:TagResource",
+        "logs:UntagResource",
         "iam:PassRole"
       ]
     },
@@ -281,7 +302,8 @@
     "read": {
       "permissions": [
         "cloudwatch:DescribeAlarms",
-        "cloudwatch:ListTagsForResource"
+        "cloudwatch:ListTagsForResource",
+        "logs:ListTagsForResource"
       ]
     }
   },

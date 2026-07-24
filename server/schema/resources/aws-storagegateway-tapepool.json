@@ -1,0 +1,170 @@
+{
+  "typeName": "AWS::StorageGateway::TapePool",
+  "description": "Creates a custom tape pool for archiving virtual tapes with optional retention lock.",
+  "properties": {
+    "PoolARN": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the custom tape pool.",
+      "minLength": 50,
+      "maxLength": 500,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the custom tape pool.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 50  \nMaximum Length: 500  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "PoolId": {
+      "type": "string",
+      "description": "The unique identifier of the custom tape pool, extracted from the ARN.",
+      "markdownDescription": "The unique identifier of the custom tape pool, extracted from the ARN.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "PoolName": {
+      "type": "string",
+      "description": "The name of the custom tape pool.",
+      "minLength": 1,
+      "maxLength": 100,
+      "markdownDescription": "The name of the custom tape pool.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: ^[ -\\.0-\\[\\]-~]*[!-\\.0-\\[\\]-~][ -\\.0-\\[\\]-~]*$  \nUpdate requires: Replacement\n"
+    },
+    "StorageClass": {
+      "type": "string",
+      "description": "The storage class associated with the custom pool (S3 Glacier or S3 Glacier Deep Archive).",
+      "enum": [
+        "DEEP_ARCHIVE",
+        "GLACIER"
+      ],
+      "markdownDescription": "The storage class associated with the custom pool (S3 Glacier or S3 Glacier Deep Archive).\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: DEEP_ARCHIVE | GLACIER  \nUpdate requires: Replacement\n"
+    },
+    "RetentionLockType": {
+      "type": "string",
+      "description": "Tape retention lock type. Governance mode allows authorized removal; compliance mode prevents all removal.",
+      "enum": [
+        "COMPLIANCE",
+        "GOVERNANCE",
+        "NONE"
+      ],
+      "markdownDescription": "Tape retention lock type. Governance mode allows authorized removal; compliance mode prevents all removal.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: COMPLIANCE | GOVERNANCE | NONE  \nUpdate requires: Replacement\n"
+    },
+    "RetentionLockTimeInDays": {
+      "type": "integer",
+      "description": "Tape retention lock time in days (up to 36,500 days / 100 years).",
+      "minimum": 0,
+      "maximum": 36500,
+      "markdownDescription": "Tape retention lock time in days (up to 36,500 days / 100 years).\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: Replacement\n"
+    },
+    "Tags": {
+      "type": "array",
+      "description": "A list of up to 50 tags for the tape pool.",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "maxItems": 50,
+      "insertionOrder": false,
+      "markdownDescription": "A list of up to 50 tags for the tape pool.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "definitions": {
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The tag key.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The tag key.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The tag value.",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The tag value.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "required": [
+    "PoolName",
+    "StorageClass"
+  ],
+  "createOnlyProperties": [
+    "/properties/PoolName",
+    "/properties/StorageClass",
+    "/properties/RetentionLockType",
+    "/properties/RetentionLockTimeInDays"
+  ],
+  "readOnlyProperties": [
+    "/properties/PoolARN",
+    "/properties/PoolId"
+  ],
+  "primaryIdentifier": [
+    "/properties/PoolARN"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/PoolId"
+    ]
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "storagegateway:AddTagsToResource",
+      "storagegateway:RemoveTagsFromResource",
+      "storagegateway:ListTagsForResource"
+    ]
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "storagegateway:CreateTapePool",
+        "storagegateway:AddTagsToResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "storagegateway:ListTapePools",
+        "storagegateway:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "storagegateway:ListTapePools",
+        "storagegateway:AddTagsToResource",
+        "storagegateway:RemoveTagsFromResource",
+        "storagegateway:ListTagsForResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "storagegateway:DeleteTapePool",
+        "storagegateway:ListTapePools"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "storagegateway:ListTapePools"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "attributes": {
+    "PoolARN": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the custom tape pool.",
+      "minLength": 50,
+      "maxLength": 500,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the custom tape pool.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 50  \nMaximum Length: 500  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "PoolId": {
+      "type": "string",
+      "description": "The unique identifier of the custom tape pool, extracted from the ARN.",
+      "markdownDescription": "The unique identifier of the custom tape pool, extracted from the ARN.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

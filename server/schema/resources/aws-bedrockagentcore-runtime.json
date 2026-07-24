@@ -168,6 +168,15 @@
         },
         "CustomClaims": {
           "$ref": "#/definitions/CustomClaimsList"
+        },
+        "AllowedWorkloadConfiguration": {
+          "$ref": "#/definitions/AllowedWorkloadConfiguration"
+        },
+        "PrivateEndpoint": {
+          "$ref": "#/definitions/PrivateEndpoint"
+        },
+        "PrivateEndpointOverrides": {
+          "$ref": "#/definitions/PrivateEndpointOverridesList"
         }
       },
       "required": [
@@ -175,6 +184,66 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "Configuration for custom JWT authorizer\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AllowedWorkloadConfiguration": {
+      "type": "object",
+      "description": "Allow-list of upstream workloads permitted to reach this resource via the workload identity chain. When set, the data plane enforces that the introspected workload chain's caller matches one of the configured hosting environments or workload identities; absent means no chain enforcement.",
+      "properties": {
+        "HostingEnvironments": {
+          "$ref": "#/definitions/HostingEnvironmentsList"
+        },
+        "WorkloadIdentities": {
+          "$ref": "#/definitions/WorkloadIdentitiesList"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Allow-list of upstream workloads permitted to reach this resource via the workload identity chain. When set, the data plane enforces that the introspected workload chain's caller matches one of the configured hosting environments or workload identities; absent means no chain enforcement.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HostingEnvironmentsList": {
+      "type": "array",
+      "description": "List of allow-listed hosting environments",
+      "minItems": 1,
+      "maxItems": 10,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/HostingEnvironment"
+      },
+      "markdownDescription": "List of allow-listed hosting environments\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "HostingEnvironment": {
+      "type": "object",
+      "description": "An upstream workload identified by the ARN of its hosting environment (for example a Gateway or Runtime ARN)",
+      "properties": {
+        "Arn": {
+          "type": "string",
+          "description": "The ARN of the bedrock-agentcore hosting environment",
+          "minLength": 20,
+          "maxLength": 1011,
+          "markdownDescription": "The ARN of the bedrock-agentcore hosting environment\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 20  \nMaximum Length: 1011  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Arn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "An upstream workload identified by the ARN of its hosting environment (for example a Gateway or Runtime ARN)\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "WorkloadIdentitiesList": {
+      "type": "array",
+      "description": "List of allow-listed workload identity names",
+      "minItems": 1,
+      "maxItems": 10,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "type": "string",
+        "description": "Allowed workload identity name",
+        "minLength": 3,
+        "maxLength": 255,
+        "markdownDescription": "Allowed workload identity name\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 255  \nPattern: ^[A-Za-z0-9_.-]+$  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "List of allow-listed workload identity names\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     },
     "DiscoveryUrl": {
       "type": "string",
@@ -669,6 +738,153 @@
       "maxItems": 5,
       "insertionOrder": false,
       "markdownDescription": "List of filesystem configurations\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "PrivateEndpoint": {
+      "type": "object",
+      "description": "Private endpoint configuration. Exactly one of SelfManagedLatticeResource or ManagedVpcResource must be specified.",
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "SelfManagedLatticeResource",
+          "properties": {
+            "SelfManagedLatticeResource": {
+              "$ref": "#/definitions/SelfManagedLatticeResource"
+            }
+          },
+          "required": [
+            "SelfManagedLatticeResource"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "ManagedVpcResource",
+          "properties": {
+            "ManagedVpcResource": {
+              "$ref": "#/definitions/ManagedVpcResource"
+            }
+          },
+          "required": [
+            "ManagedVpcResource"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "Private endpoint configuration. Exactly one of SelfManagedLatticeResource or ManagedVpcResource must be specified.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SelfManagedLatticeResource": {
+      "type": "object",
+      "description": "Self-managed VPC Lattice resource configuration",
+      "properties": {
+        "ResourceConfigurationIdentifier": {
+          "type": "string",
+          "description": "The identifier of the VPC Lattice resource configuration",
+          "markdownDescription": "The identifier of the VPC Lattice resource configuration\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ResourceConfigurationIdentifier"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Self-managed VPC Lattice resource configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ManagedVpcResource": {
+      "type": "object",
+      "description": "Managed VPC resource configuration",
+      "properties": {
+        "VpcIdentifier": {
+          "type": "string",
+          "description": "The VPC identifier",
+          "markdownDescription": "The VPC identifier\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "SubnetIds": {
+          "type": "array",
+          "description": "The subnet IDs",
+          "minItems": 1,
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "The subnet IDs\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "EndpointIpAddressType": {
+          "type": "string",
+          "description": "The IP address type for the endpoint",
+          "enum": [
+            "IPV4",
+            "IPV6"
+          ],
+          "markdownDescription": "The IP address type for the endpoint\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: IPV4 | IPV6  \nUpdate requires: No interruption\n"
+        },
+        "SecurityGroupIds": {
+          "type": "array",
+          "description": "The security group IDs",
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "The security group IDs\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "RoutingDomain": {
+          "type": "string",
+          "description": "An intermediate domain to use as the resource configuration endpoint instead of the actual target domain",
+          "markdownDescription": "An intermediate domain to use as the resource configuration endpoint instead of the actual target domain\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Tags": {
+          "type": "object",
+          "description": "Tags to apply to the managed VPC Lattice resource gateway",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[\\s\\S]+$": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            }
+          },
+          "markdownDescription": "Tags to apply to the managed VPC Lattice resource gateway\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "VpcIdentifier",
+        "SubnetIds",
+        "EndpointIpAddressType"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Managed VPC resource configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PrivateEndpointOverride": {
+      "type": "object",
+      "description": "Override mapping of a domain to a private endpoint",
+      "properties": {
+        "Domain": {
+          "type": "string",
+          "description": "The domain to override",
+          "minLength": 1,
+          "maxLength": 253,
+          "markdownDescription": "The domain to override\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 253  \nUpdate requires: No interruption\n"
+        },
+        "PrivateEndpoint": {
+          "$ref": "#/definitions/PrivateEndpoint"
+        }
+      },
+      "required": [
+        "Domain",
+        "PrivateEndpoint"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Override mapping of a domain to a private endpoint\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PrivateEndpointOverridesList": {
+      "type": "array",
+      "description": "List of private endpoint overrides",
+      "minItems": 0,
+      "maxItems": 5,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/PrivateEndpointOverride"
+      },
+      "markdownDescription": "List of private endpoint overrides\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -808,7 +1024,16 @@
         "iam:PassRole",
         "s3:GetObject",
         "s3:GetObjectVersion",
-        "kms:Decrypt"
+        "kms:Decrypt",
+        "vpc-lattice:GetResourceConfiguration",
+        "vpc-lattice:CreateServiceNetworkResourceAssociation",
+        "vpc-lattice:GetServiceNetworkResourceAssociation",
+        "vpc-lattice:ListServiceNetworkResourceAssociations",
+        "vpc-lattice:AssociateViaAWSService",
+        "ec2:DescribeVpcs",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeSecurityGroups",
+        "ec2:CreateNetworkInterface"
       ]
     },
     "read": {
@@ -831,7 +1056,16 @@
         "iam:PassRole",
         "s3:GetObject",
         "s3:GetObjectVersion",
-        "kms:Decrypt"
+        "kms:Decrypt",
+        "vpc-lattice:GetResourceConfiguration",
+        "vpc-lattice:CreateServiceNetworkResourceAssociation",
+        "vpc-lattice:GetServiceNetworkResourceAssociation",
+        "vpc-lattice:ListServiceNetworkResourceAssociations",
+        "vpc-lattice:AssociateViaAWSService",
+        "ec2:DescribeVpcs",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeSecurityGroups",
+        "ec2:CreateNetworkInterface"
       ]
     },
     "delete": {
@@ -851,7 +1085,7 @@
     }
   },
   "tagging": {
-    "cloudFormationSystemTags": false,
+    "cloudFormationSystemTags": true,
     "tagOnCreate": true,
     "tagProperty": "/properties/Tags",
     "tagUpdatable": true,
