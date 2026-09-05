@@ -2,6 +2,22 @@
   "typeName": "AWS::BedrockAgentCore::Gateway",
   "description": "Definition of AWS::BedrockAgentCore::Gateway Resource Type",
   "definitions": {
+    "AdvertisedScopeMappingType": {
+      "type": "object",
+      "maxProperties": 50,
+      "minProperties": 1,
+      "description": "Maps an originalScope (from allowedScopes) to an advertisedScope\nexposed in WWW-Authenticate / Protected Resource Metadata.",
+      "patternProperties": {
+        "^[\\x21\\x23-\\x5B\\x5D-\\x7E]+$": {
+          "type": "string",
+          "maxLength": 255,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[\\x21\\x23-\\x5B\\x5D-\\x7E]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Maps an originalScope (from allowedScopes) to an advertisedScope\nexposed in WWW-Authenticate / Protected Resource Metadata.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "AuthorizerConfiguration": {
       "oneOf": [
         {
@@ -28,6 +44,96 @@
         "AUTHENTICATE_ONLY"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CUSTOM_JWT | AWS_IAM | NONE | AUTHENTICATE_ONLY  \nUpdate requires: No interruption\n"
+    },
+    "AuthorizingClaimMatchValueType": {
+      "type": "object",
+      "properties": {
+        "ClaimMatchValue": {
+          "$ref": "#/definitions/ClaimMatchValueType"
+        },
+        "ClaimMatchOperator": {
+          "$ref": "#/definitions/ClaimMatchOperatorType"
+        }
+      },
+      "required": [
+        "ClaimMatchOperator",
+        "ClaimMatchValue"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ClaimMatchOperatorType": {
+      "type": "string",
+      "enum": [
+        "EQUALS",
+        "CONTAINS",
+        "CONTAINS_ANY"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: EQUALS | CONTAINS | CONTAINS_ANY  \nUpdate requires: No interruption\n"
+    },
+    "ClaimMatchValueType": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "MatchValueString",
+          "properties": {
+            "MatchValueString": {
+              "type": "string",
+              "maxLength": 255,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9_.:/-]+$"
+            }
+          },
+          "required": [
+            "MatchValueString"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "MatchValueStringList",
+          "properties": {
+            "MatchValueStringList": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 255,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_.:/-]+$"
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "MatchValueStringList"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "CustomClaimValidationType": {
+      "type": "object",
+      "properties": {
+        "InboundTokenClaimName": {
+          "type": "string",
+          "maxLength": 255,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[A-Za-z0-9_.-:]+$  \nUpdate requires: No interruption\n"
+        },
+        "InboundTokenClaimValueType": {
+          "$ref": "#/definitions/InboundTokenClaimValueType"
+        },
+        "AuthorizingClaimMatchValue": {
+          "$ref": "#/definitions/AuthorizingClaimMatchValueType"
+        }
+      },
+      "required": [
+        "AuthorizingClaimMatchValue",
+        "InboundTokenClaimName",
+        "InboundTokenClaimValueType"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "CustomJWTAuthorizerConfiguration": {
       "type": "object",
@@ -57,10 +163,16 @@
         "AllowedScopes": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/AllowedScope"
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[\\x21\\x23-\\x5B\\x5D-\\x7E]+$  \nUpdate requires: No interruption\n"
           },
           "minItems": 1,
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "AdvertisedScopeMapping": {
+          "$ref": "#/definitions/AdvertisedScopeMappingType"
         },
         "CustomClaims": {
           "type": "array",
@@ -69,6 +181,9 @@
           },
           "minItems": 1,
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "PrivateEndpoint": {
+          "$ref": "#/definitions/PrivateEndpoint"
         }
       },
       "required": [
@@ -77,116 +192,13 @@
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "AllowedScope": {
+    "EndpointIpAddressType": {
       "type": "string",
-      "description": "Allowed scope value",
-      "markdownDescription": "Allowed scope value\n\n---\n\nRequired: No  \nType: String  \nPattern: [\\x21\\x23-\\x5B\\x5D-\\x7E]+  \nUpdate requires: No interruption\n"
-    },
-    "CustomClaimValidationType": {
-      "type": "object",
-      "description": "Required custom claim",
-      "properties": {
-        "AuthorizingClaimMatchValue": {
-          "$ref": "#/definitions/AuthorizingClaimMatchValueType"
-        },
-        "InboundTokenClaimName": {
-          "$ref": "#/definitions/InboundTokenClaimName"
-        },
-        "InboundTokenClaimValueType": {
-          "$ref": "#/definitions/InboundTokenClaimValueType"
-        }
-      },
-      "required": [
-        "AuthorizingClaimMatchValue",
-        "InboundTokenClaimName",
-        "InboundTokenClaimValueType"
-      ],
-      "additionalProperties": false,
-      "markdownDescription": "Required custom claim\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "InboundTokenClaimName": {
-      "type": "string",
-      "description": "The name of the custom claim to validate",
-      "markdownDescription": "The name of the custom claim to validate\n\n---\n\nRequired: No  \nType: String  \nPattern: [A-Za-z0-9_.-:]+  \nUpdate requires: No interruption\n"
-    },
-    "InboundTokenClaimValueType": {
-      "type": "string",
-      "description": "Token claim data type",
       "enum": [
-        "STRING",
-        "STRING_ARRAY"
+        "IPV4",
+        "IPV6"
       ],
-      "markdownDescription": "Token claim data type\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: STRING | STRING_ARRAY  \nUpdate requires: No interruption\n"
-    },
-    "AuthorizingClaimMatchValueType": {
-      "type": "object",
-      "description": "The value or values in the custom claim to match and relationship of match",
-      "properties": {
-        "ClaimMatchOperator": {
-          "$ref": "#/definitions/ClaimMatchOperator"
-        },
-        "ClaimMatchValue": {
-          "$ref": "#/definitions/ClaimMatchValueType"
-        }
-      },
-      "required": [
-        "ClaimMatchOperator",
-        "ClaimMatchValue"
-      ],
-      "additionalProperties": false,
-      "markdownDescription": "The value or values in the custom claim to match and relationship of match\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "ClaimMatchOperator": {
-      "type": "string",
-      "description": "The relationship between the claim field value and the value or values being matched",
-      "enum": [
-        "EQUALS",
-        "CONTAINS",
-        "CONTAINS_ANY"
-      ],
-      "markdownDescription": "The relationship between the claim field value and the value or values being matched\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: EQUALS | CONTAINS | CONTAINS_ANY  \nUpdate requires: No interruption\n"
-    },
-    "ClaimMatchValueType": {
-      "type": "object",
-      "description": "The value or values in the custom claim to match for",
-      "oneOf": [
-        {
-          "required": [
-            "MatchValueString"
-          ]
-        },
-        {
-          "required": [
-            "MatchValueStringList"
-          ]
-        }
-      ],
-      "properties": {
-        "MatchValueString": {
-          "$ref": "#/definitions/MatchValueString"
-        },
-        "MatchValueStringList": {
-          "$ref": "#/definitions/MatchValueStringList"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "The value or values in the custom claim to match for\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "MatchValueString": {
-      "type": "string",
-      "description": "The string value to match for",
-      "markdownDescription": "The string value to match for\n\n---\n\nRequired: No  \nType: String  \nPattern: [A-Za-z0-9_.-]+  \nUpdate requires: No interruption\n"
-    },
-    "MatchValueStringList": {
-      "type": "array",
-      "description": "The list of strings to check for a match",
-      "minItems": 1,
-      "maxItems": 255,
-      "insertionOrder": false,
-      "items": {
-        "$ref": "#/definitions/MatchValueString"
-      },
-      "markdownDescription": "The list of strings to check for a match\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: IPV4 | IPV6  \nUpdate requires: No interruption\n"
     },
     "ExceptionLevel": {
       "type": "string",
@@ -214,8 +226,8 @@
           "items": {
             "$ref": "#/definitions/GatewayInterceptionPoint"
           },
-          "minItems": 1,
           "maxItems": 2,
+          "minItems": 1,
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
         },
         "InputConfiguration": {
@@ -223,78 +235,20 @@
         }
       },
       "required": [
-        "Interceptor",
-        "InterceptionPoints"
+        "InterceptionPoints",
+        "Interceptor"
       ],
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "InterceptorConfiguration": {
-      "oneOf": [
-        {
-          "type": "object",
-          "title": "Lambda",
-          "properties": {
-            "Lambda": {
-              "$ref": "#/definitions/LambdaInterceptorConfiguration"
-            }
-          },
-          "required": [
-            "Lambda"
-          ],
-          "additionalProperties": false
-        }
-      ]
-    },
-    "InterceptorInputConfiguration": {
-      "type": "object",
-      "properties": {
-        "PassRequestHeaders": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "PassRequestHeaders"
-      ],
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "LambdaInterceptorConfiguration": {
-      "type": "object",
-      "properties": {
-        "Arn": {
-          "type": "string",
-          "maxLength": 170,
-          "minLength": 1,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 170  \nPattern: ^arn:[a-z0-9-]{1,20}:lambda:([a-z]{2}(-gov)?-[a-z]+-\\d{1}):(\\d{12}):function:([a-zA-Z0-9-_.]+)(:(\\$LATEST|[a-zA-Z0-9-_]+))?$  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Arn"
-      ],
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "GatewayPolicyEngineMode": {
-      "type": "string",
-      "description": "The enforcement mode for the policy engine. LOG_ONLY - The policy engine evaluates each action against your policies and adds traces on whether tool calls would be allowed or denied, but does not enforce the decision. Use this mode to test and validate policies before enabling enforcement. ENFORCE - The policy engine evaluates actions against your policies and enforces decisions by allowing or denying agent operations. Test and validate policies in LOG_ONLY mode before enabling enforcement to avoid unintended denials or adversely affecting production traffic.",
-      "enum": [
-        "LOG_ONLY",
-        "ENFORCE"
-      ],
-      "markdownDescription": "The enforcement mode for the policy engine. LOG_ONLY - The policy engine evaluates each action against your policies and adds traces on whether tool calls would be allowed or denied, but does not enforce the decision. Use this mode to test and validate policies before enabling enforcement. ENFORCE - The policy engine evaluates actions against your policies and enforces decisions by allowing or denying agent operations. Test and validate policies in LOG_ONLY mode before enabling enforcement to avoid unintended denials or adversely affecting production traffic.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: LOG_ONLY | ENFORCE  \nUpdate requires: No interruption\n"
     },
     "GatewayPolicyEngineConfiguration": {
       "type": "object",
-      "description": "The configuration for a policy engine associated with a gateway. A policy engine is a collection of policies that evaluates and authorizes agent tool calls. When associated with a gateway, the policy engine intercepts all agent requests and determines whether to allow or deny each action based on the defined policies.",
       "properties": {
         "Arn": {
           "type": "string",
-          "description": "The ARN of the policy engine. The policy engine contains Cedar policies that define fine-grained authorization rules specifying who can perform what actions on which resources as agents interact through the gateway.",
           "maxLength": 170,
           "minLength": 1,
-          "markdownDescription": "The ARN of the policy engine. The policy engine contains Cedar policies that define fine-grained authorization rules specifying who can perform what actions on which resources as agents interact through the gateway.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 170  \nPattern: ^arn:[a-z0-9-]{1,20}:bedrock-agentcore:[a-z0-9-]+:[0-9]{12}:policy-engine/[a-zA-Z][a-zA-Z0-9-_]{0,99}-[a-zA-Z0-9_]{10}$  \nUpdate requires: No interruption\n"
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 170  \nPattern: ^arn:aws:bedrock-agentcore:[a-z0-9-]+:[0-9]{12}:policy-engine\\/[a-zA-Z][a-zA-Z0-9-_]{0,99}-[a-zA-Z0-9_]{10}$  \nUpdate requires: No interruption\n"
         },
         "Mode": {
           "$ref": "#/definitions/GatewayPolicyEngineMode"
@@ -305,7 +259,15 @@
         "Mode"
       ],
       "additionalProperties": false,
-      "markdownDescription": "The configuration for a policy engine associated with a gateway. A policy engine is a collection of policies that evaluates and authorizes agent tool calls. When associated with a gateway, the policy engine intercepts all agent requests and determines whether to allow or deny each action based on the defined policies.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "GatewayPolicyEngineMode": {
+      "type": "string",
+      "enum": [
+        "LOG_ONLY",
+        "ENFORCE"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: LOG_ONLY | ENFORCE  \nUpdate requires: No interruption\n"
     },
     "GatewayProtocolConfiguration": {
       "oneOf": [
@@ -343,6 +305,107 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | UPDATING | UPDATE_UNSUCCESSFUL | DELETING | READY | FAILED  \nUpdate requires: No interruption\n"
     },
+    "InboundTokenClaimValueType": {
+      "type": "string",
+      "enum": [
+        "STRING",
+        "STRING_ARRAY"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: STRING | STRING_ARRAY  \nUpdate requires: No interruption\n"
+    },
+    "InterceptorConfiguration": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "Lambda",
+          "properties": {
+            "Lambda": {
+              "$ref": "#/definitions/LambdaInterceptorConfiguration"
+            }
+          },
+          "required": [
+            "Lambda"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "InterceptorInputConfiguration": {
+      "type": "object",
+      "properties": {
+        "PassRequestHeaders": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "PayloadFilter": {
+          "$ref": "#/definitions/InterceptorPayloadFilter"
+        }
+      },
+      "required": [
+        "PassRequestHeaders"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "InterceptorPayloadExclusion": {
+      "type": "string",
+      "enum": [
+        "RESPONSE_BODY"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: RESPONSE_BODY  \nUpdate requires: No interruption\n"
+    },
+    "InterceptorPayloadExclusionSelector": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "Field",
+          "properties": {
+            "Field": {
+              "$ref": "#/definitions/InterceptorPayloadExclusion"
+            }
+          },
+          "required": [
+            "Field"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "InterceptorPayloadFilter": {
+      "type": "object",
+      "properties": {
+        "Exclude": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/InterceptorPayloadExclusionSelector"
+          },
+          "maxItems": 1,
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Exclude"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LambdaInterceptorConfiguration": {
+      "type": "object",
+      "properties": {
+        "Arn": {
+          "type": "string",
+          "maxLength": 170,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 170  \nPattern: ^arn:(aws[a-zA-Z-]*)?:lambda:([a-z]{2}(-gov)?-[a-z]+-\\d{1}):(\\d{12}):function:([a-zA-Z0-9-_.]+)(:(\\$LATEST|[a-zA-Z0-9-_]+))?$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Arn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "MCPGatewayConfiguration": {
       "type": "object",
       "properties": {
@@ -374,14 +437,114 @@
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "ManagedVpcResource": {
+      "type": "object",
+      "properties": {
+        "VpcIdentifier": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^vpc-(([0-9a-z]{8})|([0-9a-z]{17}))$  \nUpdate requires: No interruption\n"
+        },
+        "SubnetIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^subnet-[0-9a-zA-Z]{8,17}$  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "EndpointIpAddressType": {
+          "$ref": "#/definitions/EndpointIpAddressType"
+        },
+        "SecurityGroupIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^sg-(([0-9a-z]{8})|([0-9a-z]{17}))$  \nUpdate requires: No interruption\n"
+          },
+          "maxItems": 5,
+          "minItems": 0,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "RoutingDomain": {
+          "type": "string",
+          "maxLength": 255,
+          "minLength": 3,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "EndpointIpAddressType",
+        "SubnetIds",
+        "VpcIdentifier"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PrivateEndpoint": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "SelfManagedLatticeResource",
+          "properties": {
+            "SelfManagedLatticeResource": {
+              "$ref": "#/definitions/SelfManagedLatticeResource"
+            }
+          },
+          "required": [
+            "SelfManagedLatticeResource"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "ManagedVpcResource",
+          "properties": {
+            "ManagedVpcResource": {
+              "$ref": "#/definitions/ManagedVpcResource"
+            }
+          },
+          "required": [
+            "ManagedVpcResource"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "SearchType": {
+      "type": "string",
+      "enum": [
+        "SEMANTIC"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SEMANTIC  \nUpdate requires: No interruption\n"
+    },
+    "SelfManagedLatticeResource": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "ResourceConfigurationIdentifier",
+          "properties": {
+            "ResourceConfigurationIdentifier": {
+              "type": "string",
+              "maxLength": 2048,
+              "minLength": 20,
+              "pattern": "^((rcfg-[0-9a-z]{17})|(arn:[a-z0-9\\-]+:vpc-lattice:[a-zA-Z0-9\\-]+:\\d{12}:resourceconfiguration/rcfg-[0-9a-z]{17}))$"
+            }
+          },
+          "required": [
+            "ResourceConfigurationIdentifier"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
     "SessionConfiguration": {
       "type": "object",
       "properties": {
         "SessionTimeoutInSeconds": {
-          "type": "integer",
-          "minimum": 900,
+          "type": "number",
           "maximum": 28800,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+          "minimum": 900,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
         }
       },
       "additionalProperties": false,
@@ -398,13 +561,6 @@
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "SearchType": {
-      "type": "string",
-      "enum": [
-        "SEMANTIC"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SEMANTIC  \nUpdate requires: No interruption\n"
-    },
     "TagsMap": {
       "type": "object",
       "maxProperties": 50,
@@ -419,6 +575,24 @@
       },
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "WafConfiguration": {
+      "type": "object",
+      "properties": {
+        "FailureMode": {
+          "$ref": "#/definitions/WafFailureMode"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "WafFailureMode": {
+      "type": "string",
+      "enum": [
+        "FAIL_CLOSE",
+        "FAIL_OPEN"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: FAIL_CLOSE | FAIL_OPEN  \nUpdate requires: No interruption\n"
     },
     "WorkloadIdentityDetails": {
       "type": "object",
@@ -458,21 +632,9 @@
     "ExceptionLevel": {
       "$ref": "#/definitions/ExceptionLevel"
     },
-    "InterceptorConfigurations": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/GatewayInterceptorConfiguration"
-      },
-      "minItems": 1,
-      "maxItems": 2,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-    },
-    "PolicyEngineConfiguration": {
-      "$ref": "#/definitions/GatewayPolicyEngineConfiguration"
-    },
     "GatewayArn": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:[a-z0-9-]{1,20}:bedrock-agentcore:[a-z0-9-]{1,20}:[0-9]{12}:gateway/([0-9a-z][-]?){1,100}-[a-z0-9]{10}$  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws(|-cn|-us-gov):bedrock-agentcore:[a-z0-9-]{1,20}:[0-9]{12}:gateway/([0-9a-z][-]?){1,48}-[a-z0-9]{10}$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "GatewayIdentifier": {
       "type": "string",
@@ -484,15 +646,27 @@
       "minLength": 1,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\nRead only property: Yes"
     },
+    "InterceptorConfigurations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/GatewayInterceptorConfiguration"
+      },
+      "maxItems": 2,
+      "minItems": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
     "KmsKeyArn": {
       "type": "string",
       "maxLength": 2048,
       "minLength": 1,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:[a-z0-9-]{1,20}:kms:[a-zA-Z0-9-]*:[0-9]{12}:key/[a-zA-Z0-9-]{36}$  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws(|-cn|-us-gov):kms:[a-zA-Z0-9-]*:[0-9]{12}:key/[a-zA-Z0-9-]{36}$  \nUpdate requires: No interruption\n"
     },
     "Name": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^([0-9a-zA-Z][-]?){1,100}$  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^([0-9a-zA-Z][-]?){1,48}$  \nUpdate requires: No interruption\n"
+    },
+    "PolicyEngineConfiguration": {
+      "$ref": "#/definitions/GatewayPolicyEngineConfiguration"
     },
     "ProtocolConfiguration": {
       "$ref": "#/definitions/GatewayProtocolConfiguration"
@@ -511,7 +685,7 @@
       "type": "string",
       "maxLength": 2048,
       "minLength": 1,
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:[a-z0-9-]{1,20}:iam::([0-9]{12})?:role/.+$  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws(-[^:]+)?:iam::([0-9]{12})?:role/.+$  \nUpdate requires: No interruption\n"
     },
     "Status": {
       "$ref": "#/definitions/GatewayStatus"
@@ -534,6 +708,15 @@
       "format": "date-time",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
+    "WafConfiguration": {
+      "$ref": "#/definitions/WafConfiguration"
+    },
+    "WebAclArn": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:[a-z0-9\\-]+:wafv2:[a-z0-9\\-]+:[0-9]{12}:regional/webacl/.+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
     "WorkloadIdentityDetails": {
       "$ref": "#/definitions/WorkloadIdentityDetails"
     }
@@ -551,6 +734,7 @@
     "/properties/Status",
     "/properties/StatusReasons",
     "/properties/UpdatedAt",
+    "/properties/WebAclArn",
     "/properties/WorkloadIdentityDetails"
   ],
   "primaryIdentifier": [
@@ -573,6 +757,18 @@
         "kms:GenerateDataKey"
       ]
     },
+    "delete": {
+      "permissions": [
+        "bedrock-agentcore:DeleteGateway",
+        "bedrock-agentcore:DeleteWorkloadIdentity",
+        "bedrock-agentcore:GetGateway"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "bedrock-agentcore:ListGateways"
+      ]
+    },
     "read": {
       "permissions": [
         "bedrock-agentcore:GetGateway",
@@ -591,18 +787,6 @@
         "kms:DescribeKey",
         "kms:GenerateDataKey",
         "kms:ListGrants"
-      ]
-    },
-    "delete": {
-      "permissions": [
-        "bedrock-agentcore:DeleteGateway",
-        "bedrock-agentcore:DeleteWorkloadIdentity",
-        "bedrock-agentcore:GetGateway"
-      ]
-    },
-    "list": {
-      "permissions": [
-        "bedrock-agentcore:ListGateways"
       ]
     }
   },
@@ -627,7 +811,7 @@
     },
     "GatewayArn": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:[a-z0-9-]{1,20}:bedrock-agentcore:[a-z0-9-]{1,20}:[0-9]{12}:gateway/([0-9a-z][-]?){1,100}-[a-z0-9]{10}$  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws(|-cn|-us-gov):bedrock-agentcore:[a-z0-9-]{1,20}:[0-9]{12}:gateway/([0-9a-z][-]?){1,48}-[a-z0-9]{10}$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "GatewayIdentifier": {
       "type": "string",
@@ -656,6 +840,12 @@
       "type": "string",
       "format": "date-time",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "WebAclArn": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:[a-z0-9\\-]+:wafv2:[a-z0-9\\-]+:[0-9]{12}:regional/webacl/.+$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "WorkloadIdentityDetails": {
       "$ref": "#/definitions/WorkloadIdentityDetails"

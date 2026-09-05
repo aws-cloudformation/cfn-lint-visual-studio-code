@@ -109,6 +109,11 @@
       ],
       "markdownDescription": "Setting to control if provisioned resources created by Synthetics are deleted alongside the canary. Default is AUTOMATIC.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AUTOMATIC | OFF  \nUpdate requires: No interruption\n"
     },
+    "KmsKeyArn": {
+      "description": "KMS key ARN for encrypting the canary's Lambda function environment variables at rest. If omitted, Lambda uses an AWS-managed key.",
+      "type": "string",
+      "markdownDescription": "KMS key ARN for encrypting the canary's Lambda function environment variables at rest. If omitted, Lambda uses an AWS-managed key.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:[a-z0-9-]+:kms:[a-z0-9-]+:[0-9]{12}:(key/([a-f0-9-]{36}|mrk-[a-f0-9]{32})|alias/[a-zA-Z0-9:/_.-]+)$  \nUpdate requires: No interruption\n"
+    },
     "DryRunAndUpdate": {
       "description": "Setting to control if UpdateCanary will perform a DryRun and validate it is PASSING before performing the Update. Default is FALSE.",
       "type": "boolean",
@@ -133,6 +138,17 @@
         "$ref": "#/definitions/VisualReference"
       },
       "markdownDescription": "List of visual references for the canary\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "Replicas": {
+      "description": "List of replica locations for multi-location canary execution",
+      "type": "array",
+      "insertionOrder": false,
+      "minItems": 1,
+      "maxItems": 50,
+      "items": {
+        "$ref": "#/definitions/Replica"
+      },
+      "markdownDescription": "List of replica locations for multi-location canary execution\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "definitions": {
@@ -206,7 +222,7 @@
           "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: Array  \nUpdate requires: No interruption\n"
         }
       },
-      "oneOf": [
+      "anyOf": [
         {
           "required": [
             "Handler",
@@ -231,6 +247,16 @@
           "required": [
             "BlueprintTypes",
             "Script"
+          ]
+        },
+        {
+          "required": [
+            "Handler"
+          ]
+        },
+        {
+          "required": [
+            "BlueprintTypes"
           ]
         }
       ],
@@ -484,6 +510,78 @@
         "FIREFOX"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CHROME | FIREFOX  \nUpdate requires: No interruption\n"
+    },
+    "Replica": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration and status for a replica location in a multi-location canary",
+      "properties": {
+        "Location": {
+          "type": "string",
+          "description": "AWS region for the replica (e.g., us-east-1)",
+          "markdownDescription": "AWS region for the replica (e.g., us-east-1)\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "VpcConfig": {
+          "$ref": "#/definitions/VPCConfig",
+          "description": "VPC configuration for this replica location",
+          "markdownDescription": "VPC configuration for this replica location\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "Tags": {
+          "type": "array",
+          "uniqueItems": false,
+          "items": {
+            "$ref": "#/definitions/Tag"
+          },
+          "description": "Tags to apply to this replica canary and optionally its Lambda function",
+          "markdownDescription": "Tags to apply to this replica canary and optionally its Lambda function\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "ResourcesToReplicateTags": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/ResourceToTag"
+          },
+          "description": "Resources to replicate tags to for this replica (e.g., lambda-function)",
+          "markdownDescription": "Resources to replicate tags to for this replica (e.g., lambda-function)\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "KmsKeyArn": {
+          "type": "string",
+          "description": "ARN of the KMS key used to encrypt the replica canary's Lambda function environment variables",
+          "markdownDescription": "ARN of the KMS key used to encrypt the replica canary's Lambda function environment variables\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:[a-z0-9-]+:kms:[a-z0-9-]+:[0-9]{12}:(key/([a-f0-9-]{36}|mrk-[a-f0-9]{32})|alias/[a-zA-Z0-9:/_.-]+)$  \nUpdate requires: No interruption\n"
+        },
+        "CanaryState": {
+          "type": "string",
+          "description": "State of the replica canary (CREATING, READY, RUNNING, etc.)",
+          "markdownDescription": "State of the replica canary (CREATING, READY, RUNNING, etc.)\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "LastModified": {
+          "type": "number",
+          "description": "Last modified timestamp of the replica",
+          "markdownDescription": "Last modified timestamp of the replica\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "ReplicationStatus": {
+          "$ref": "#/definitions/ReplicaReplicationStatus",
+          "description": "Replication status for this replica",
+          "markdownDescription": "Replication status for this replica\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Location"
+      ],
+      "markdownDescription": "Configuration and status for a replica location in a multi-location canary\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ReplicaReplicationStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Replication status details",
+      "properties": {
+        "State": {
+          "type": "string",
+          "description": "Replication state: InProgress, InSync, or Inconsistent",
+          "markdownDescription": "Replication state: InProgress, InSync, or Inconsistent\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Replication status details\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "required": [
@@ -509,6 +607,7 @@
     "create": {
       "permissions": [
         "synthetics:CreateCanary",
+        "synthetics:ReplicateCanary",
         "synthetics:StartCanary",
         "synthetics:GetCanary",
         "synthetics:TagResource",
@@ -531,12 +630,19 @@
         "ec2:DescribeVpcs",
         "ec2:DescribeSubnets",
         "ec2:DescribeSecurityGroups",
-        "iam:PassRole"
+        "iam:PassRole",
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:GenerateDataKey",
+        "kms:GenerateDataKeyWithoutPlaintext",
+        "kms:CreateGrant"
       ]
     },
     "update": {
       "permissions": [
         "synthetics:UpdateCanary",
+        "synthetics:ReplicateCanary",
         "synthetics:StartCanary",
         "synthetics:StartCanaryDryRun",
         "synthetics:StopCanary",
@@ -550,6 +656,7 @@
         "s3:PutEncryptionConfiguration",
         "s3:GetBucketLocation",
         "lambda:AddPermission",
+        "lambda:CreateFunction",
         "lambda:PublishVersion",
         "lambda:UpdateFunctionCode",
         "lambda:UpdateFunctionConfiguration",
@@ -563,7 +670,13 @@
         "iam:PassRole",
         "ec2:DescribeVpcs",
         "ec2:DescribeSubnets",
-        "ec2:DescribeSecurityGroups"
+        "ec2:DescribeSecurityGroups",
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:GenerateDataKey",
+        "kms:GenerateDataKeyWithoutPlaintext",
+        "kms:CreateGrant"
       ]
     },
     "read": {
@@ -573,15 +686,20 @@
         "synthetics:ListTagsForResource",
         "iam:ListRoles",
         "s3:ListAllMyBuckets",
-        "s3:GetBucketLocation"
+        "s3:GetBucketLocation",
+        "kms:Decrypt",
+        "kms:DescribeKey"
       ]
     },
     "delete": {
       "permissions": [
         "synthetics:DeleteCanary",
+        "synthetics:UpdateCanary",
+        "synthetics:ReplicateCanary",
         "synthetics:GetCanary",
         "lambda:DeleteFunction",
-        "lambda:DeleteLayerVersion"
+        "lambda:DeleteLayerVersion",
+        "lambda:GetFunctionConfiguration"
       ]
     },
     "list": {
@@ -600,7 +718,11 @@
   "readOnlyProperties": [
     "/properties/Id",
     "/properties/State",
-    "/properties/Code/SourceLocationArn"
+    "/properties/Code/SourceLocationArn",
+    "/properties/Replicas/*/VpcConfig/VpcId",
+    "/properties/Replicas/*/CanaryState",
+    "/properties/Replicas/*/LastModified",
+    "/properties/Replicas/*/ReplicationStatus"
   ],
   "writeOnlyProperties": [
     "/properties/Code/S3Bucket",
@@ -613,7 +735,10 @@
     "/properties/RunConfig/EnvironmentVariables",
     "/properties/VisualReference",
     "/properties/VisualReferences",
-    "/properties/DryRunAndUpdate"
+    "/properties/DryRunAndUpdate",
+    "/properties/Replicas/*/Tags",
+    "/properties/Replicas/*/ResourcesToReplicateTags",
+    "/properties/Replicas/*/KmsKeyArn"
   ],
   "deprecatedProperties": [
     "/properties/DeleteLambdaResourcesOnCanaryDeletion",

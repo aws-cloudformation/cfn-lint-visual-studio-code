@@ -333,14 +333,14 @@
       "markdownDescription": "Sets the runtime management configuration for a function's version. For more information, see [Runtime updates](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-update.html).\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "DurableConfig": {
-      "description": "Configuration settings for [durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html), including execution timeout and retention period for execution history.",
+      "description": "Configuration settings for [durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html), including execution timeout, retention period for execution history, and an optional ARN of the KMSlong (KMS) customer managed key that is used to encrypt your durable execution's payload data, including input, output, and error payloads.",
       "additionalProperties": false,
       "type": "object",
       "properties": {
         "KMSKeyArn": {
-          "description": "",
+          "description": "The ARN of the KMSlong (KMS) customer managed key that is used to encrypt your durable execution's payload data, including input, output, and error payloads.",
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(arn:(aws[a-zA-Z-]*)?:[a-z0-9-.]+:.*)|()$  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The ARN of the KMSlong (KMS) customer managed key that is used to encrypt your durable execution's payload data, including input, output, and error payloads.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(arn:(aws[a-zA-Z-]*)?:[a-z0-9-.]+:.*)|()$  \nUpdate requires: No interruption\n"
         },
         "ExecutionTimeout": {
           "description": "The maximum time (in seconds) that a durable execution can run before timing out. This timeout applies to the entire durable execution, not individual function invocations.",
@@ -361,7 +361,7 @@
       "required": [
         "ExecutionTimeout"
       ],
-      "markdownDescription": "Configuration settings for [durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html), including execution timeout and retention period for execution history.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Configuration settings for [durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html), including execution timeout, retention period for execution history, and an optional ARN of the KMSlong (KMS) customer managed key that is used to encrypt your durable execution's payload data, including input, output, and error payloads.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "SnapStart": {
       "description": "The function's [SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html) setting.",
@@ -446,13 +446,13 @@
           "markdownDescription": "The Amazon S3 key of the deployment package.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
         },
         "S3ObjectStorageMode": {
-          "description": "",
+          "description": "Specifies the storage mode for the deployment package. Use ``COPY`` to store the package in LAMlong-managed storage. Use ``REFERENCE`` to read the package directly from the Amazon S3 bucket. If omitted, the default is ``COPY``.",
           "type": "string",
           "enum": [
             "COPY",
             "REFERENCE"
           ],
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: COPY | REFERENCE  \nUpdate requires: No interruption\n"
+          "markdownDescription": "Specifies the storage mode for the deployment package. Use ``COPY`` to store the package in LAMlong-managed storage. Use ``REFERENCE`` to read the package directly from the Amazon S3 bucket. If omitted, the default is ``COPY``.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: COPY | REFERENCE  \nUpdate requires: No interruption\n"
         },
         "ImageUri": {
           "description": "URI of a [container image](https://docs.aws.amazon.com/lambda/latest/dg/lambda-images.html) in the Amazon ECR registry.",
@@ -461,6 +461,24 @@
         }
       },
       "markdownDescription": "The [deployment package](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html) for a Lambda function. To deploy a function defined as a container image, you specify the location of a container image in the Amazon ECR registry. For a .zip file deployment package, you can specify the location of an object in Amazon S3. For Node.js and Python functions, you can specify the function code inline in the template.\n  When you specify source code inline for a Node.js function, the ``index`` file that CFN creates uses the extension ``.js``. This means that Node.js treats the file as a CommonJS module.\n  Changes to a deployment package in Amazon S3 or a container image in ECR are not detected automatically during stack updates. To update the function code, change the object key or version in the template.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "S3FilesConfig": {
+      "description": "",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "DirectS3Read": {
+          "description": "Specifies if a function reads from the file system for the lowest latency, or through Amazon S3 Files feature \"direct Amazon S3 bucket reads\" for the highest throughput",
+          "type": "string",
+          "enum": [
+            "ENABLED",
+            "DISABLED",
+            "AUTO"
+          ],
+          "markdownDescription": "Specifies if a function reads from the file system for the lowest latency, or through Amazon S3 Files feature \"direct Amazon S3 bucket reads\" for the highest throughput\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED | AUTO  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "LoggingConfig": {
       "description": "The function's Amazon CloudWatch Logs configuration settings.",
@@ -543,6 +561,11 @@
       "additionalProperties": false,
       "type": "object",
       "properties": {
+        "S3FilesConfig": {
+          "description": "",
+          "$ref": "#/definitions/S3FilesConfig",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
         "Arn": {
           "description": "The Amazon Resource Name (ARN) of the Amazon EFS or Amazon S3 Files access point that provides access to the file system.",
           "type": "string",
@@ -594,7 +617,7 @@
       "properties": {
         "Size": {
           "description": "The size of the function's ``/tmp`` directory.",
-          "maximum": 10240,
+          "maximum": 32768,
           "type": "integer",
           "minimum": 512,
           "markdownDescription": "The size of the function's ``/tmp`` directory.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
@@ -653,9 +676,9 @@
       "markdownDescription": "Sets the runtime management configuration for a function's version. For more information, see [Runtime updates](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-update.html).\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
     },
     "DurableConfig": {
-      "description": "Configuration settings for [durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html), including execution timeout and retention period for execution history.",
+      "description": "Configuration settings for [durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html), including execution timeout, retention period for execution history, and an optional ARN of the KMSlong (KMS) customer managed key that is used to encrypt your durable execution's payload data, including input, output, and error payloads.",
       "$ref": "#/definitions/DurableConfig",
-      "markdownDescription": "Configuration settings for [durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html), including execution timeout and retention period for execution history.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Some interruptions\n"
+      "markdownDescription": "Configuration settings for [durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html), including execution timeout, retention period for execution history, and an optional ARN of the KMSlong (KMS) customer managed key that is used to encrypt your durable execution's payload data, including input, output, and error payloads.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Some interruptions\n"
     },
     "ReservedConcurrentExecutions": {
       "description": "The number of simultaneous executions to reserve for the function.",
