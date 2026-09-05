@@ -1,0 +1,208 @@
+{
+  "typeName": "AWS::Bedrock::Session",
+  "description": "Definition of AWS::Bedrock::Session Resource Type",
+  "properties": {
+    "SessionArn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the session.",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the session.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws(-[^:]+)?:bedrock:[a-z0-9-]+:[0-9]{12}:session/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SessionId": {
+      "type": "string",
+      "description": "The unique identifier of the session in UUID format.",
+      "markdownDescription": "The unique identifier of the session in UUID format.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SessionStatus": {
+      "type": "string",
+      "description": "The current status of the session.",
+      "enum": [
+        "ACTIVE",
+        "EXPIRED",
+        "ENDED"
+      ],
+      "markdownDescription": "The current status of the session.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ACTIVE | EXPIRED | ENDED  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreatedAt": {
+      "type": "string",
+      "description": "The timestamp for when the session was created.",
+      "format": "date-time",
+      "markdownDescription": "The timestamp for when the session was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "LastUpdatedAt": {
+      "type": "string",
+      "description": "The timestamp for when the session was last modified.",
+      "format": "date-time",
+      "markdownDescription": "The timestamp for when the session was last modified.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SessionMetadata": {
+      "type": "object",
+      "description": "A map of key-value pairs containing attributes to be persisted across the session.",
+      "maxProperties": 50,
+      "patternProperties": {
+        "^[\\s\\S]{1,100}$": {
+          "type": "string",
+          "maxLength": 5000,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 5000  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "A map of key-value pairs containing attributes to be persisted across the session.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EncryptionKeyArn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the KMS key to use to encrypt the session data.",
+      "minLength": 1,
+      "maxLength": 2048,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the KMS key to use to encrypt the session data.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws(|-cn|-us-gov):kms:[a-zA-Z0-9-]*:[0-9]{12}:key/[a-zA-Z0-9-]{36}$  \nUpdate requires: Replacement\n"
+    },
+    "Tags": {
+      "type": "array",
+      "description": "A list of tags associated with the session.",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "maxItems": 200,
+      "insertionOrder": false,
+      "markdownDescription": "A list of tags associated with the session.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "definitions": {
+    "Tag": {
+      "type": "object",
+      "description": "A tag associated with a resource.",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key of the tag.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The key of the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9\\s._:/=+@-]*$  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value of the tag.",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The value of the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: ^[a-zA-Z0-9\\s._:/=+@-]*$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A tag associated with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "additionalProperties": false,
+  "readOnlyProperties": [
+    "/properties/SessionArn",
+    "/properties/SessionId",
+    "/properties/SessionStatus",
+    "/properties/CreatedAt",
+    "/properties/LastUpdatedAt"
+  ],
+  "createOnlyProperties": [
+    "/properties/EncryptionKeyArn"
+  ],
+  "primaryIdentifier": [
+    "/properties/SessionArn"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/SessionId"
+    ]
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "bedrock:TagResource",
+      "bedrock:UntagResource",
+      "bedrock:ListTagsForResource"
+    ]
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "bedrock:CreateSession",
+        "bedrock:GetSession",
+        "bedrock:TagResource",
+        "kms:GenerateDataKey",
+        "kms:Decrypt"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "bedrock:GetSession",
+        "bedrock:ListTagsForResource",
+        "kms:Decrypt",
+        "kms:DescribeKey"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "bedrock:UpdateSession",
+        "bedrock:GetSession",
+        "bedrock:TagResource",
+        "bedrock:UntagResource",
+        "bedrock:ListTagsForResource",
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:GenerateDataKey",
+        "kms:DescribeKey"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "bedrock:DeleteSession",
+        "bedrock:EndSession",
+        "bedrock:GetSession",
+        "kms:Decrypt",
+        "kms:DescribeKey"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "bedrock:ListSessions"
+      ]
+    }
+  },
+  "attributes": {
+    "SessionArn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the session.",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the session.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws(-[^:]+)?:bedrock:[a-z0-9-]+:[0-9]{12}:session/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SessionId": {
+      "type": "string",
+      "description": "The unique identifier of the session in UUID format.",
+      "markdownDescription": "The unique identifier of the session in UUID format.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SessionStatus": {
+      "type": "string",
+      "description": "The current status of the session.",
+      "enum": [
+        "ACTIVE",
+        "EXPIRED",
+        "ENDED"
+      ],
+      "markdownDescription": "The current status of the session.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ACTIVE | EXPIRED | ENDED  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreatedAt": {
+      "type": "string",
+      "description": "The timestamp for when the session was created.",
+      "format": "date-time",
+      "markdownDescription": "The timestamp for when the session was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "LastUpdatedAt": {
+      "type": "string",
+      "description": "The timestamp for when the session was last modified.",
+      "format": "date-time",
+      "markdownDescription": "The timestamp for when the session was last modified.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

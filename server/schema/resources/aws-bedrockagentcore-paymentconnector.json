@@ -18,9 +18,14 @@
         "READY",
         "CREATE_FAILED",
         "UPDATE_FAILED",
-        "DELETE_FAILED"
+        "DELETE_FAILED",
+        "AWS_MARKETPLACE_SUBSCRIPTION_REQUIRED",
+        "PENDING_AUTHENTICATION",
+        "PROVISIONING",
+        "AUTHENTICATION_EXPIRED",
+        "AUTHENTICATION_FAILED"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | UPDATING | DELETING | READY | CREATE_FAILED | UPDATE_FAILED | DELETE_FAILED  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | UPDATING | DELETING | READY | CREATE_FAILED | UPDATE_FAILED | DELETE_FAILED | AWS_MARKETPLACE_SUBSCRIPTION_REQUIRED | PENDING_AUTHENTICATION | PROVISIONING | AUTHENTICATION_EXPIRED | AUTHENTICATION_FAILED  \nUpdate requires: No interruption\n"
     },
     "PaymentConnectorType": {
       "type": "string",
@@ -29,6 +34,14 @@
         "StripePrivy"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CoinbaseCDP | StripePrivy  \nUpdate requires: No interruption\n"
+    },
+    "PaymentConnectorProvisionMode": {
+      "type": "string",
+      "enum": [
+        "MANUAL",
+        "QUICK_CREATE"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MANUAL | QUICK_CREATE  \nUpdate requires: No interruption\n"
     },
     "CredentialsProviderConfiguration": {
       "type": "object",
@@ -90,16 +103,21 @@
     "ConnectorType": {
       "$ref": "#/definitions/PaymentConnectorType"
     },
+    "ProvisionMode": {
+      "$ref": "#/definitions/PaymentConnectorProvisionMode",
+      "description": "The provision mode for creating the connector. MANUAL requires CredentialProviderConfigurations; QUICK_CREATE orchestrates OAuth consent and credential provisioning.",
+      "markdownDescription": "The provision mode for creating the connector. MANUAL requires CredentialProviderConfigurations; QUICK_CREATE orchestrates OAuth consent and credential provisioning.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
+    },
     "CredentialProviderConfigurations": {
       "type": "array",
-      "description": "The credential provider configurations for the connector",
+      "description": "The credential provider configurations for the connector. Required when ProvisionMode is MANUAL or not specified. Empty for QUICK_CREATE until provisioning completes.",
       "items": {
         "$ref": "#/definitions/CredentialsProviderConfiguration"
       },
-      "minItems": 1,
+      "minItems": 0,
       "maxItems": 1,
       "insertionOrder": false,
-      "markdownDescription": "The credential provider configurations for the connector\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The credential provider configurations for the connector. Required when ProvisionMode is MANUAL or not specified. Empty for QUICK_CREATE until provisioning completes.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     },
     "ConnectorStatus": {
       "$ref": "#/definitions/PaymentConnectorStatus"
@@ -115,25 +133,33 @@
       "format": "date-time",
       "description": "The timestamp when the connector was last updated",
       "markdownDescription": "The timestamp when the connector was last updated\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "AuthorizationUrl": {
+      "type": "string",
+      "description": "The URL the user must open to complete OAuth consent. Only present when ConnectorStatus is PENDING_AUTHENTICATION.",
+      "maxLength": 4096,
+      "markdownDescription": "The URL the user must open to complete OAuth consent. Only present when ConnectorStatus is PENDING_AUTHENTICATION.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 4096  \nPattern: ^https://[^\\p{C}]*$  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   },
   "additionalProperties": false,
   "required": [
     "PaymentManagerId",
     "ConnectorName",
-    "ConnectorType",
-    "CredentialProviderConfigurations"
+    "ConnectorType"
   ],
   "readOnlyProperties": [
     "/properties/PaymentConnectorId",
     "/properties/PaymentConnectorArn",
     "/properties/ConnectorStatus",
     "/properties/ConnectorCreatedAt",
-    "/properties/ConnectorLastUpdatedAt"
+    "/properties/ConnectorLastUpdatedAt",
+    "/properties/AuthorizationUrl"
   ],
   "createOnlyProperties": [
     "/properties/PaymentManagerId",
-    "/properties/ConnectorName"
+    "/properties/ConnectorName",
+    "/properties/ProvisionMode",
+    "/properties/ConnectorType"
   ],
   "primaryIdentifier": [
     "/properties/PaymentConnectorArn"
@@ -188,6 +214,9 @@
       }
     }
   },
+  "writeOnlyProperties": [
+    "/properties/ProvisionMode"
+  ],
   "attributes": {
     "PaymentConnectorId": {
       "type": "string",
@@ -213,6 +242,12 @@
       "format": "date-time",
       "description": "The timestamp when the connector was last updated",
       "markdownDescription": "The timestamp when the connector was last updated\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "AuthorizationUrl": {
+      "type": "string",
+      "description": "The URL the user must open to complete OAuth consent. Only present when ConnectorStatus is PENDING_AUTHENTICATION.",
+      "maxLength": 4096,
+      "markdownDescription": "The URL the user must open to complete OAuth consent. Only present when ConnectorStatus is PENDING_AUTHENTICATION.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 4096  \nPattern: ^https://[^\\p{C}]*$  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

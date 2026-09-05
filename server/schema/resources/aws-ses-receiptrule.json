@@ -1,98 +1,163 @@
 {
   "typeName": "AWS::SES::ReceiptRule",
   "description": "Resource Type definition for AWS::SES::ReceiptRule",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-ses.git",
   "additionalProperties": false,
   "properties": {
-    "After": {
+    "RuleName": {
+      "description": "The name of the rule",
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The name of the rule\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "After": {
+      "description": "The name of an existing rule after which the new rule is placed. If this parameter is null, the new rule is inserted at the beginning of the rule list.",
+      "type": "string",
+      "markdownDescription": "The name of an existing rule after which the new rule is placed. If this parameter is null, the new rule is inserted at the beginning of the rule list.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
     },
     "Rule": {
-      "$ref": "#/definitions/Rule"
-    },
-    "Id": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+      "description": "A data structure that contains the specified rule's name, actions, recipients, domains, enabled status, scan status, and TLS policy.",
+      "$ref": "#/definitions/Rule",
+      "markdownDescription": "A data structure that contains the specified rule's name, actions, recipients, domains, enabled status, scan status, and TLS policy.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: Replacement\n"
     },
     "RuleSetName": {
+      "description": "The name of the rule set where the receipt rule is added.",
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
+      "markdownDescription": "The name of the rule set where the receipt rule is added.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
     }
   },
   "definitions": {
-    "ConnectAction": {
+    "Rule": {
+      "description": "A data structure that contains the specified rule's name, actions, recipients, domains, enabled status, scan status, and TLS policy.",
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "InstanceARN": {
+        "Name": {
+          "description": "The name of the receipt rule. The name must meet the following requirements: Contain only ASCII letters (a-z, A-Z), numbers (0-9), underscores (_), dashes (-), or periods (.). Start and end with a letter or number. Contain 64 characters or fewer.",
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The name of the receipt rule. The name must meet the following requirements: Contain only ASCII letters (a-z, A-Z), numbers (0-9), underscores (_), dashes (-), or periods (.). Start and end with a letter or number. Contain 64 characters or fewer.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
-        "IAMRoleARN": {
+        "Enabled": {
+          "description": "If true, the receipt rule is active. The default value is false.",
+          "type": "boolean",
+          "markdownDescription": "If true, the receipt rule is active. The default value is false.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "TlsPolicy": {
+          "description": "Specifies whether Amazon SES should require that incoming email is delivered over a connection encrypted with Transport Layer Security (TLS). If this parameter is set to Require, Amazon SES bounces emails that are not received over TLS. The default is Optional.",
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+          "markdownDescription": "Specifies whether Amazon SES should require that incoming email is delivered over a connection encrypted with Transport Layer Security (TLS). If this parameter is set to Require, Amazon SES bounces emails that are not received over TLS. The default is Optional.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Recipients": {
+          "description": "The recipient domains and email addresses that the receipt rule applies to. If this field is not specified, this rule matches all recipients on all verified domains.",
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": true,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "The recipient domains and email addresses that the receipt rule applies to. If this field is not specified, this rule matches all recipients on all verified domains.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "Actions": {
+          "description": "An ordered list of actions to perform on messages that match at least one of the recipient email addresses or domains specified in the receipt rule.",
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": true,
+          "items": {
+            "$ref": "#/definitions/Action"
+          },
+          "markdownDescription": "An ordered list of actions to perform on messages that match at least one of the recipient email addresses or domains specified in the receipt rule.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "ScanEnabled": {
+          "description": "If true, then messages that this receipt rule applies to are scanned for spam and viruses. The default value is false.",
+          "type": "boolean",
+          "markdownDescription": "If true, then messages that this receipt rule applies to are scanned for spam and viruses. The default value is false.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
         }
       },
-      "required": [
-        "InstanceARN",
-        "IAMRoleARN"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "A data structure that contains the specified rule's name, actions, recipients, domains, enabled status, scan status, and TLS policy.\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
     },
     "Action": {
+      "description": "An action that Amazon SES can take when it receives an email on behalf of one or more email addresses or domains that you own. An instance of this data type can represent only one action.",
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "ConnectAction": {
-          "$ref": "#/definitions/ConnectAction"
+        "AddHeaderAction": {
+          "$ref": "#/definitions/AddHeaderAction"
         },
         "BounceAction": {
           "$ref": "#/definitions/BounceAction"
         },
+        "ConnectAction": {
+          "$ref": "#/definitions/ConnectAction"
+        },
+        "LambdaAction": {
+          "$ref": "#/definitions/LambdaAction"
+        },
         "S3Action": {
           "$ref": "#/definitions/S3Action"
-        },
-        "StopAction": {
-          "$ref": "#/definitions/StopAction"
         },
         "SNSAction": {
           "$ref": "#/definitions/SNSAction"
         },
+        "StopAction": {
+          "$ref": "#/definitions/StopAction"
+        },
         "WorkmailAction": {
           "$ref": "#/definitions/WorkmailAction"
-        },
-        "AddHeaderAction": {
-          "$ref": "#/definitions/AddHeaderAction"
-        },
-        "LambdaAction": {
-          "$ref": "#/definitions/LambdaAction"
         }
       },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "An action that Amazon SES can take when it receives an email on behalf of one or more email addresses or domains that you own. An instance of this data type can represent only one action.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AddHeaderAction": {
+      "description": "When included in a receipt rule, this action adds a header to the received email.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "HeaderName": {
+          "description": "The name of the header to add to the incoming message. The name must contain at least one character, and can contain up to 50 characters. It consists of alphanumeric (a-z, A-Z, 0-9) characters and dashes.",
+          "type": "string",
+          "markdownDescription": "The name of the header to add to the incoming message. The name must contain at least one character, and can contain up to 50 characters. It consists of alphanumeric (a-z, A-Z, 0-9) characters and dashes.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "HeaderValue": {
+          "description": "The content to include in the header. This value can contain up to 2048 characters. It can't contain newline (\\n) or carriage return (\\r) characters.",
+          "type": "string",
+          "markdownDescription": "The content to include in the header. This value can contain up to 2048 characters. It can't contain newline (\\n) or carriage return (\\r) characters.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "HeaderName",
+        "HeaderValue"
+      ],
+      "markdownDescription": "When included in a receipt rule, this action adds a header to the received email.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "BounceAction": {
+      "description": "When included in a receipt rule, this action rejects the received email by returning a bounce response to the sender and, optionally, publishes a notification to Amazon Simple Notification Service (Amazon SNS).",
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "Sender": {
+          "description": "The email address of the sender of the bounced email. This is the address from which the bounce message is sent.",
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The email address of the sender of the bounced email. This is the address from which the bounce message is sent.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         },
         "SmtpReplyCode": {
+          "description": "The SMTP reply code, as defined by RFC 5321.",
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The SMTP reply code, as defined by RFC 5321.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         },
         "Message": {
+          "description": "Human-readable text to include in the bounce message.",
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+          "markdownDescription": "Human-readable text to include in the bounce message.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         },
         "TopicArn": {
+          "description": "The Amazon Resource Name (ARN) of the Amazon SNS topic to notify when the bounce action is taken. You can find the ARN of a topic by using the ListTopics operation in Amazon SNS.",
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The Amazon Resource Name (ARN) of the Amazon SNS topic to notify when the bounce action is taken. You can find the ARN of a topic by using the ListTopics operation in Amazon SNS.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
         "StatusCode": {
+          "description": "The SMTP enhanced status code, as defined by RFC 3463.",
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The SMTP enhanced status code, as defined by RFC 3463.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
@@ -100,188 +165,223 @@
         "SmtpReplyCode",
         "Message"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "When included in a receipt rule, this action rejects the received email by returning a bounce response to the sender and, optionally, publishes a notification to Amazon Simple Notification Service (Amazon SNS).\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "S3Action": {
+    "ConnectAction": {
+      "description": "When included in a receipt rule, this action parses the received message and starts an email contact in Amazon Connect on your behalf.",
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "ObjectKeyPrefix": {
+        "InstanceARN": {
+          "description": "The Amazon Resource Name (ARN) for the Amazon Connect instance that Amazon SES integrates with for starting email contacts.",
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The Amazon Resource Name (ARN) for the Amazon Connect instance that Amazon SES integrates with for starting email contacts.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         },
-        "BucketName": {
+        "IAMRoleARN": {
+          "description": "The Amazon Resource Name (ARN) of the IAM role to be used by Amazon Simple Email Service while starting email contacts to the Amazon Connect instance. This role should have permission to invoke connect:StartEmailContact for the given Amazon Connect instance.",
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "IamRoleArn": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "KmsKeyArn": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "TopicArn": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The Amazon Resource Name (ARN) of the IAM role to be used by Amazon Simple Email Service while starting email contacts to the Amazon Connect instance. This role should have permission to invoke connect:StartEmailContact for the given Amazon Connect instance.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "BucketName"
+        "InstanceARN",
+        "IAMRoleARN"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "StopAction": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "Scope": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "TopicArn": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Scope"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "Rule": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "ScanEnabled": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-        },
-        "Recipients": {
-          "type": "array",
-          "uniqueItems": false,
-          "items": {
-            "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "Actions": {
-          "type": "array",
-          "uniqueItems": false,
-          "items": {
-            "$ref": "#/definitions/Action"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "Enabled": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-        },
-        "Name": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "TlsPolicy": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "SNSAction": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "TopicArn": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "Encoding": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "WorkmailAction": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "TopicArn": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "OrganizationArn": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "OrganizationArn"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "AddHeaderAction": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "HeaderName": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "HeaderValue": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "HeaderValue",
-        "HeaderName"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "When included in a receipt rule, this action parses the received message and starts an email contact in Amazon Connect on your behalf.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "LambdaAction": {
+      "description": "When included in a receipt rule, this action calls an AWS Lambda function and, optionally, publishes a notification to Amazon Simple Notification Service (Amazon SNS).",
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "InvocationType": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
         "FunctionArn": {
+          "description": "The Amazon Resource Name (ARN) of the AWS Lambda function. An example of an AWS Lambda function ARN is arn:aws:lambda:us-west-2:account-id:function:MyFunction. For more information about AWS Lambda, see the AWS Lambda Developer Guide.",
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The Amazon Resource Name (ARN) of the AWS Lambda function. An example of an AWS Lambda function ARN is arn:aws:lambda:us-west-2:account-id:function:MyFunction. For more information about AWS Lambda, see the AWS Lambda Developer Guide.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "InvocationType": {
+          "description": "The invocation type of the AWS Lambda function. An invocation type of RequestResponse means that the execution of the function immediately results in a response, and a value of Event means that the function is invoked asynchronously. The default value is Event. For information about AWS Lambda invocation types, see the AWS Lambda Developer Guide. There is a 30-second timeout on RequestResponse invocations. You should use Event invocation in most cases. Use RequestResponse only to make a mail flow decision, such as whether to stop the receipt rule or the receipt rule set.",
+          "type": "string",
+          "markdownDescription": "The invocation type of the AWS Lambda function. An invocation type of RequestResponse means that the execution of the function immediately results in a response, and a value of Event means that the function is invoked asynchronously. The default value is Event. For information about AWS Lambda invocation types, see the AWS Lambda Developer Guide. There is a 30-second timeout on RequestResponse invocations. You should use Event invocation in most cases. Use RequestResponse only to make a mail flow decision, such as whether to stop the receipt rule or the receipt rule set.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
         "TopicArn": {
+          "description": "The Amazon Resource Name (ARN) of the Amazon SNS topic to notify when the Lambda action is executed. You can find the ARN of a topic by using the ListTopics operation in Amazon SNS.",
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The Amazon Resource Name (ARN) of the Amazon SNS topic to notify when the Lambda action is executed. You can find the ARN of a topic by using the ListTopics operation in Amazon SNS.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
         "FunctionArn"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "When included in a receipt rule, this action calls an AWS Lambda function and, optionally, publishes a notification to Amazon Simple Notification Service (Amazon SNS).\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "S3Action": {
+      "description": "When included in a receipt rule, this action saves the received message to an Amazon Simple Storage Service (Amazon S3) bucket and, optionally, publishes a notification to Amazon Simple Notification Service (Amazon SNS).",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "BucketName": {
+          "description": "The name of the Amazon S3 bucket for incoming email.",
+          "type": "string",
+          "markdownDescription": "The name of the Amazon S3 bucket for incoming email.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ObjectKeyPrefix": {
+          "description": "The key prefix of the Amazon S3 bucket. The key prefix is similar to a directory name that enables you to store similar data under the same directory in a bucket.",
+          "type": "string",
+          "markdownDescription": "The key prefix of the Amazon S3 bucket. The key prefix is similar to a directory name that enables you to store similar data under the same directory in a bucket.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "IamRoleArn": {
+          "description": "The ARN of the IAM role to be used by Amazon SES while writing to the Amazon S3 bucket.",
+          "type": "string",
+          "markdownDescription": "The ARN of the IAM role to be used by Amazon SES while writing to the Amazon S3 bucket.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "KmsKeyArn": {
+          "description": "The customer managed key that Amazon SES should use to encrypt your emails before saving them to the Amazon S3 bucket. You can use the AWS managed key or a customer managed key that you created in AWS KMS as follows: To use the AWS managed key, provide an ARN in the form of arn:aws:kms:REGION:ACCOUNT-ID-WITHOUT-HYPHENS:alias/aws/ses. For example, if your AWS account ID is 123456789012 and you want to use the AWS managed key in the US West (Oregon) Region, the ARN of the AWS managed key would be arn:aws:kms:us-west-2:123456789012:alias/aws/ses. If you use the AWS managed key, you don't need to perform any extra steps to give Amazon SES permission to use the key. To use a customer managed key that you created in AWS KMS, provide the ARN of the customer managed key and ensure that you add a statement to your key's policy to give Amazon SES permission to use it. For more information about giving permissions, see the Amazon SES Developer Guide. For more information about key policies, see the AWS KMS Developer Guide. If you do not specify an AWS KMS key, Amazon SES does not encrypt your emails. Your mail is encrypted by Amazon SES using the Amazon S3 encryption client before the mail is submitted to Amazon S3 for storage. It is not encrypted using Amazon S3 server-side encryption. This means that you must use the Amazon S3 encryption client to decrypt the email after retrieving it from Amazon S3, as the service has no access to use your AWS KMS keys for decryption. This encryption client is currently available with the AWS SDK for Java and AWS SDK for Ruby only. For more information about client-side encryption using AWS KMS managed keys, see the Amazon S3 Developer Guide.",
+          "type": "string",
+          "markdownDescription": "The customer managed key that Amazon SES should use to encrypt your emails before saving them to the Amazon S3 bucket. You can use the AWS managed key or a customer managed key that you created in AWS KMS as follows: To use the AWS managed key, provide an ARN in the form of arn:aws:kms:REGION:ACCOUNT-ID-WITHOUT-HYPHENS:alias/aws/ses. For example, if your AWS account ID is 123456789012 and you want to use the AWS managed key in the US West (Oregon) Region, the ARN of the AWS managed key would be arn:aws:kms:us-west-2:123456789012:alias/aws/ses. If you use the AWS managed key, you don't need to perform any extra steps to give Amazon SES permission to use the key. To use a customer managed key that you created in AWS KMS, provide the ARN of the customer managed key and ensure that you add a statement to your key's policy to give Amazon SES permission to use it. For more information about giving permissions, see the Amazon SES Developer Guide. For more information about key policies, see the AWS KMS Developer Guide. If you do not specify an AWS KMS key, Amazon SES does not encrypt your emails. Your mail is encrypted by Amazon SES using the Amazon S3 encryption client before the mail is submitted to Amazon S3 for storage. It is not encrypted using Amazon S3 server-side encryption. This means that you must use the Amazon S3 encryption client to decrypt the email after retrieving it from Amazon S3, as the service has no access to use your AWS KMS keys for decryption. This encryption client is currently available with the AWS SDK for Java and AWS SDK for Ruby only. For more information about client-side encryption using AWS KMS managed keys, see the Amazon S3 Developer Guide.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "TopicArn": {
+          "description": "The ARN of the Amazon SNS topic to notify when the message is saved to the Amazon S3 bucket. You can find the ARN of a topic by using the ListTopics operation in Amazon SNS.",
+          "type": "string",
+          "markdownDescription": "The ARN of the Amazon SNS topic to notify when the message is saved to the Amazon S3 bucket. You can find the ARN of a topic by using the ListTopics operation in Amazon SNS.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "BucketName"
+      ],
+      "markdownDescription": "When included in a receipt rule, this action saves the received message to an Amazon Simple Storage Service (Amazon S3) bucket and, optionally, publishes a notification to Amazon Simple Notification Service (Amazon SNS).\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SNSAction": {
+      "description": "The action to publish the email content to an Amazon SNS topic. When executed, this action will send the email as a notification to the specified SNS topic.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "TopicArn": {
+          "description": "The Amazon Resource Name (ARN) of the Amazon SNS Topic to which notification for the email received will be published.",
+          "type": "string",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the Amazon SNS Topic to which notification for the email received will be published.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Encoding": {
+          "description": "The encoding to use for the email within the Amazon SNS notification. The default value is UTF-8. Use BASE64 if you need to preserve all special characters, especially when the original message uses a different encoding format.",
+          "type": "string",
+          "markdownDescription": "The encoding to use for the email within the Amazon SNS notification. The default value is UTF-8. Use BASE64 if you need to preserve all special characters, especially when the original message uses a different encoding format.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "The action to publish the email content to an Amazon SNS topic. When executed, this action will send the email as a notification to the specified SNS topic.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "StopAction": {
+      "description": "When included in a receipt rule, this action terminates the evaluation of the receipt rule set and, optionally, publishes a notification to Amazon Simple Notification Service (Amazon SNS).",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Scope": {
+          "description": "The scope of the StopAction. The only acceptable value is RuleSet.",
+          "type": "string",
+          "markdownDescription": "The scope of the StopAction. The only acceptable value is RuleSet.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "TopicArn": {
+          "description": "The Amazon Resource Name (ARN) of the Amazon SNS topic to notify when the stop action is taken. You can find the ARN of a topic by using the ListTopics Amazon SNS operation.",
+          "type": "string",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the Amazon SNS topic to notify when the stop action is taken. You can find the ARN of a topic by using the ListTopics Amazon SNS operation.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Scope"
+      ],
+      "markdownDescription": "When included in a receipt rule, this action terminates the evaluation of the receipt rule set and, optionally, publishes a notification to Amazon Simple Notification Service (Amazon SNS).\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "WorkmailAction": {
+      "description": "When included in a receipt rule, this action calls Amazon WorkMail and, optionally, publishes a notification to Amazon Simple Notification Service (Amazon SNS). It usually isn't necessary to set this up manually, because Amazon WorkMail adds the rule automatically during its setup procedure.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "OrganizationArn": {
+          "description": "The Amazon Resource Name (ARN) of the Amazon WorkMail organization. Amazon WorkMail ARNs use the following format: arn:aws:workmail:<region>:<awsAccountId>:organization/<workmailOrganizationId>. You can find the ID of your organization by using the ListOrganizations operation in Amazon WorkMail. Amazon WorkMail organization IDs begin with \"m-\", followed by a string of alphanumeric characters.",
+          "type": "string",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the Amazon WorkMail organization. Amazon WorkMail ARNs use the following format: arn:aws:workmail:<region>:<awsAccountId>:organization/<workmailOrganizationId>. You can find the ID of your organization by using the ListOrganizations operation in Amazon WorkMail. Amazon WorkMail organization IDs begin with \"m-\", followed by a string of alphanumeric characters.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "TopicArn": {
+          "description": "The Amazon Resource Name (ARN) of the Amazon SNS topic to notify when the WorkMail action is called. You can find the ARN of a topic by using the ListTopics operation in Amazon SNS.",
+          "type": "string",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the Amazon SNS topic to notify when the WorkMail action is called. You can find the ARN of a topic by using the ListTopics operation in Amazon SNS.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "OrganizationArn"
+      ],
+      "markdownDescription": "When included in a receipt rule, this action calls Amazon WorkMail and, optionally, publishes a notification to Amazon Simple Notification Service (Amazon SNS). It usually isn't necessary to set this up manually, because Amazon WorkMail adds the rule automatically during its setup procedure.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "required": [
     "Rule",
     "RuleSetName"
   ],
+  "readOnlyProperties": [
+    "/properties/RuleName"
+  ],
+  "writeOnlyProperties": [
+    "/properties/After"
+  ],
   "createOnlyProperties": [
+    "/properties/Rule/Name",
     "/properties/RuleSetName"
   ],
   "primaryIdentifier": [
-    "/properties/Id"
+    "/properties/RuleName",
+    "/properties/RuleSetName"
   ],
-  "readOnlyProperties": [
-    "/properties/Id"
-  ],
+  "tagging": {
+    "taggable": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "iam:PassRole",
+        "ses:CreateReceiptRule",
+        "ses:DescribeReceiptRule"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "ses:DescribeReceiptRule"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "iam:PassRole",
+        "ses:SetReceiptRulePosition",
+        "ses:DescribeReceiptRuleSet",
+        "ses:ReorderReceiptRuleSet",
+        "ses:UpdateReceiptRule"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ses:DeleteReceiptRule",
+        "ses:DescribeReceiptRule"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "RuleSetName": {
+            "$ref": "resource-schema.json#/properties/RuleSetName"
+          }
+        },
+        "required": [
+          "RuleSetName"
+        ]
+      },
+      "permissions": [
+        "ses:DescribeReceiptRuleSet"
+      ]
+    }
+  },
   "attributes": {
-    "Id": {
+    "RuleName": {
+      "description": "The name of the rule",
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "The name of the rule\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }
