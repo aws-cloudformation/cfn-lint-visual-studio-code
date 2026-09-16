@@ -1,193 +1,111 @@
 {
-  "typeName": "AWS::CloudWatch::Alarm",
-  "description": "The ``AWS::CloudWatch::Alarm`` type specifies an alarm and associates it with the specified metric or metric math expression.\n When this operation creates an alarm, the alarm state is immediately set to ``INSUFFICIENT_DATA``. The alarm is then evaluated and its state is set appropriately. Any actions associated with the new state are then executed.\n When you update an existing alarm, its state is left unchanged, but the update completely overwrites the previous configuration of the alarm.",
-  "additionalProperties": false,
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-cloudwatch.git",
-  "properties": {
-    "ThresholdMetricId": {
-      "description": "In an alarm based on an anomaly detection model, this is the ID of the ``ANOMALY_DETECTION_BAND`` function used as the threshold for the alarm.",
-      "type": "string",
-      "markdownDescription": "In an alarm based on an anomaly detection model, this is the ID of the ``ANOMALY_DETECTION_BAND`` function used as the threshold for the alarm.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+  "tagging": {
+    "permissions": [
+      "cloudwatch:TagResource",
+      "cloudwatch:UntagResource",
+      "cloudwatch:ListTagsForResource"
+    ],
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "tagProperty": "/properties/Tags",
+    "cloudFormationSystemTags": true
+  },
+  "handlers": {
+    "read": {
+      "permissions": [
+        "cloudwatch:DescribeAlarms",
+        "cloudwatch:ListTagsForResource"
+      ]
     },
-    "EvaluateLowSampleCountPercentile": {
-      "description": "Used only for alarms based on percentiles. If ``ignore``, the alarm state does not change during periods with too few data points to be statistically significant. If ``evaluate`` or this parameter is not used, the alarm is always evaluated and possibly changes state no matter how many data points are available.",
-      "type": "string",
-      "markdownDescription": "Used only for alarms based on percentiles. If ``ignore``, the alarm state does not change during periods with too few data points to be statistically significant. If ``evaluate`` or this parameter is not used, the alarm is always evaluated and possibly changes state no matter how many data points are available.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    "create": {
+      "permissions": [
+        "cloudwatch:PutMetricAlarm",
+        "cloudwatch:DescribeAlarms",
+        "cloudwatch:TagResource"
+      ]
     },
-    "ExtendedStatistic": {
-      "description": "The percentile statistic for the metric associated with the alarm. Specify a value between p0.0 and p100.\n For an alarm based on a metric, you must specify either ``Statistic`` or ``ExtendedStatistic`` but not both.\n For an alarm based on a math expression, you can't specify ``ExtendedStatistic``. Instead, you use ``Metrics``.",
-      "type": "string",
-      "markdownDescription": "The percentile statistic for the metric associated with the alarm. Specify a value between p0.0 and p100.\n For an alarm based on a metric, you must specify either ``Statistic`` or ``ExtendedStatistic`` but not both.\n For an alarm based on a math expression, you can't specify ``ExtendedStatistic``. Instead, you use ``Metrics``.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    "update": {
+      "permissions": [
+        "cloudwatch:PutMetricAlarm",
+        "cloudwatch:DescribeAlarms",
+        "cloudwatch:TagResource",
+        "cloudwatch:UntagResource"
+      ]
     },
-    "ComparisonOperator": {
-      "description": "The arithmetic operation to use when comparing the specified statistic and threshold. The specified statistic value is used as the first operand.",
-      "type": "string",
-      "markdownDescription": "The arithmetic operation to use when comparing the specified statistic and threshold. The specified statistic value is used as the first operand.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    "list": {
+      "permissions": [
+        "cloudwatch:DescribeAlarms"
+      ]
     },
-    "TreatMissingData": {
-      "description": "Sets how this alarm is to handle missing data points. Valid values are ``breaching``, ``notBreaching``, ``ignore``, and ``missing``. For more information, see [Configuring How Alarms Treat Missing Data](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html#alarms-and-missing-data) in the *Amazon User Guide*.\n If you omit this parameter, the default behavior of ``missing`` is used.",
-      "type": "string",
-      "markdownDescription": "Sets how this alarm is to handle missing data points. Valid values are ``breaching``, ``notBreaching``, ``ignore``, and ``missing``. For more information, see [Configuring How Alarms Treat Missing Data](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html#alarms-and-missing-data) in the *Amazon User Guide*.\n If you omit this parameter, the default behavior of ``missing`` is used.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-    },
-    "Dimensions": {
-      "description": "The dimensions for the metric associated with the alarm. For an alarm based on a math expression, you can't specify ``Dimensions``. Instead, you use ``Metrics``.",
-      "type": "array",
-      "uniqueItems": false,
-      "insertionOrder": false,
-      "items": {
-        "$ref": "#/definitions/Dimension"
-      },
-      "markdownDescription": "The dimensions for the metric associated with the alarm. For an alarm based on a math expression, you can't specify ``Dimensions``. Instead, you use ``Metrics``.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-    },
-    "Period": {
-      "description": "The period, in seconds, over which the statistic is applied. This is required for an alarm based on a metric. Valid values are 10, 20, 30, 60, and any multiple of 60.\n For an alarm based on a math expression, you can't specify ``Period``, and instead you use the ``Metrics`` parameter.\n *Minimum:* 10",
-      "type": "integer",
-      "markdownDescription": "The period, in seconds, over which the statistic is applied. This is required for an alarm based on a metric. Valid values are 10, 20, 30, 60, and any multiple of 60.\n For an alarm based on a math expression, you can't specify ``Period``, and instead you use the ``Metrics`` parameter.\n *Minimum:* 10\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
-    },
-    "EvaluationPeriods": {
-      "description": "The number of periods over which data is compared to the specified threshold. If you are setting an alarm that requires that a number of consecutive data points be breaching to trigger the alarm, this value specifies that number. If you are setting an \"M out of N\" alarm, this value is the N, and ``DatapointsToAlarm`` is the M.\n For more information, see [Evaluating an Alarm](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html#alarm-evaluation) in the *User Guide*.",
-      "type": "integer",
-      "markdownDescription": "The number of periods over which data is compared to the specified threshold. If you are setting an alarm that requires that a number of consecutive data points be breaching to trigger the alarm, this value specifies that number. If you are setting an \"M out of N\" alarm, this value is the N, and ``DatapointsToAlarm`` is the M.\n For more information, see [Evaluating an Alarm](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html#alarm-evaluation) in the *User Guide*.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
-    },
-    "Unit": {
-      "description": "The unit of the metric associated with the alarm. Specify this only if you are creating an alarm based on a single metric. Do not specify this if you are specifying a ``Metrics`` array.\n  You can specify the following values: Seconds, Microseconds, Milliseconds, Bytes, Kilobytes, Megabytes, Gigabytes, Terabytes, Bits, Kilobits, Megabits, Gigabits, Terabits, Percent, Count, Bytes/Second, Kilobytes/Second, Megabytes/Second, Gigabytes/Second, Terabytes/Second, Bits/Second, Kilobits/Second, Megabits/Second, Gigabits/Second, Terabits/Second, Count/Second, or None.",
-      "type": "string",
-      "markdownDescription": "The unit of the metric associated with the alarm. Specify this only if you are creating an alarm based on a single metric. Do not specify this if you are specifying a ``Metrics`` array.\n  You can specify the following values: Seconds, Microseconds, Milliseconds, Bytes, Kilobytes, Megabytes, Gigabytes, Terabytes, Bits, Kilobits, Megabits, Gigabits, Terabits, Percent, Count, Bytes/Second, Kilobytes/Second, Megabytes/Second, Gigabytes/Second, Terabytes/Second, Bits/Second, Kilobits/Second, Megabits/Second, Gigabits/Second, Terabits/Second, Count/Second, or None.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-    },
-    "Namespace": {
-      "description": "The namespace of the metric associated with the alarm. This is required for an alarm based on a metric. For an alarm based on a math expression, you can't specify ``Namespace`` and you use ``Metrics`` instead.\n For a list of namespaces for metrics from AWS services, see [Services That Publish Metrics.](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-services-cloudwatch-metrics.html)",
-      "type": "string",
-      "markdownDescription": "The namespace of the metric associated with the alarm. This is required for an alarm based on a metric. For an alarm based on a math expression, you can't specify ``Namespace`` and you use ``Metrics`` instead.\n For a list of namespaces for metrics from AWS services, see [Services That Publish Metrics.](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-services-cloudwatch-metrics.html)\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-    },
-    "OKActions": {
-      "description": "The actions to execute when this alarm transitions to the ``OK`` state from any other state. Each action is specified as an Amazon Resource Name (ARN).",
-      "type": "array",
-      "uniqueItems": false,
-      "items": {
-        "type": "string",
-        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-      },
-      "markdownDescription": "The actions to execute when this alarm transitions to the ``OK`` state from any other state. Each action is specified as an Amazon Resource Name (ARN).\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-    },
-    "AlarmActions": {
-      "description": "The list of actions to execute when this alarm transitions into an ALARM state from any other state. Specify each action as an Amazon Resource Name (ARN). For more information about creating alarms and the actions that you can specify, see [PutMetricAlarm](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_PutMetricAlarm.html) in the *API Reference*.",
-      "type": "array",
-      "uniqueItems": false,
-      "items": {
-        "type": "string",
-        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-      },
-      "markdownDescription": "The list of actions to execute when this alarm transitions into an ALARM state from any other state. Specify each action as an Amazon Resource Name (ARN). For more information about creating alarms and the actions that you can specify, see [PutMetricAlarm](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_PutMetricAlarm.html) in the *API Reference*.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-    },
-    "MetricName": {
-      "description": "The name of the metric associated with the alarm. This is required for an alarm based on a metric. For an alarm based on a math expression, you use ``Metrics`` instead and you can't specify ``MetricName``.",
-      "type": "string",
-      "markdownDescription": "The name of the metric associated with the alarm. This is required for an alarm based on a metric. For an alarm based on a math expression, you use ``Metrics`` instead and you can't specify ``MetricName``.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-    },
-    "ActionsEnabled": {
-      "description": "Indicates whether actions should be executed during any changes to the alarm state. The default is TRUE.",
-      "type": "boolean",
-      "default": true,
-      "markdownDescription": "Indicates whether actions should be executed during any changes to the alarm state. The default is TRUE.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-    },
-    "Metrics": {
-      "description": "An array that enables you to create an alarm based on the result of a metric math expression. Each item in the array either retrieves a metric or performs a math expression.\n If you specify the ``Metrics`` parameter, you cannot specify ``MetricName``, ``Dimensions``, ``Period``, ``Namespace``, ``Statistic``, ``ExtendedStatistic``, or ``Unit``.",
-      "type": "array",
-      "uniqueItems": true,
-      "items": {
-        "$ref": "#/definitions/MetricDataQuery"
-      },
-      "markdownDescription": "An array that enables you to create an alarm based on the result of a metric math expression. Each item in the array either retrieves a metric or performs a math expression.\n If you specify the ``Metrics`` parameter, you cannot specify ``MetricName``, ``Dimensions``, ``Period``, ``Namespace``, ``Statistic``, ``ExtendedStatistic``, or ``Unit``.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-    },
-    "AlarmDescription": {
-      "description": "The description of the alarm.",
-      "type": "string",
-      "markdownDescription": "The description of the alarm.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-    },
-    "AlarmName": {
-      "description": "The name of the alarm. If you don't specify a name, CFN generates a unique physical ID and uses that ID for the alarm name. \n  If you specify a name, you cannot perform updates that require replacement of this resource. You can perform updates that require no or some interruption. If you must replace the resource, specify a new name.",
-      "type": "string",
-      "markdownDescription": "The name of the alarm. If you don't specify a name, CFN generates a unique physical ID and uses that ID for the alarm name. \n  If you specify a name, you cannot perform updates that require replacement of this resource. You can perform updates that require no or some interruption. If you must replace the resource, specify a new name.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
-    },
-    "Statistic": {
-      "description": "The statistic for the metric associated with the alarm, other than percentile. For percentile statistics, use ``ExtendedStatistic``.\n For an alarm based on a metric, you must specify either ``Statistic`` or ``ExtendedStatistic`` but not both.\n For an alarm based on a math expression, you can't specify ``Statistic``. Instead, you use ``Metrics``.",
-      "type": "string",
-      "markdownDescription": "The statistic for the metric associated with the alarm, other than percentile. For percentile statistics, use ``ExtendedStatistic``.\n For an alarm based on a metric, you must specify either ``Statistic`` or ``ExtendedStatistic`` but not both.\n For an alarm based on a math expression, you can't specify ``Statistic``. Instead, you use ``Metrics``.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-    },
-    "InsufficientDataActions": {
-      "description": "The actions to execute when this alarm transitions to the ``INSUFFICIENT_DATA`` state from any other state. Each action is specified as an Amazon Resource Name (ARN).",
-      "type": "array",
-      "uniqueItems": false,
-      "items": {
-        "type": "string",
-        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-      },
-      "markdownDescription": "The actions to execute when this alarm transitions to the ``INSUFFICIENT_DATA`` state from any other state. Each action is specified as an Amazon Resource Name (ARN).\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-    },
-    "Arn": {
-      "description": "",
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "DatapointsToAlarm": {
-      "description": "The number of datapoints that must be breaching to trigger the alarm. This is used only if you are setting an \"M out of N\" alarm. In that case, this value is the M, and the value that you set for ``EvaluationPeriods`` is the N value. For more information, see [Evaluating an Alarm](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html#alarm-evaluation) in the *User Guide*.\n If you omit this parameter, CW uses the same value here that you set for ``EvaluationPeriods``, and the alarm goes to alarm state if that many consecutive periods are breaching.",
-      "type": "integer",
-      "markdownDescription": "The number of datapoints that must be breaching to trigger the alarm. This is used only if you are setting an \"M out of N\" alarm. In that case, this value is the M, and the value that you set for ``EvaluationPeriods`` is the N value. For more information, see [Evaluating an Alarm](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html#alarm-evaluation) in the *User Guide*.\n If you omit this parameter, CW uses the same value here that you set for ``EvaluationPeriods``, and the alarm goes to alarm state if that many consecutive periods are breaching.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
-    },
-    "Threshold": {
-      "description": "The value to compare with the specified statistic.",
-      "type": "number",
-      "markdownDescription": "The value to compare with the specified statistic.\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
-    },
-    "Tags": {
-      "description": "A list of key-value pairs to associate with the alarm. You can associate as many as 50 tags with an alarm. To be able to associate tags with the alarm when you create the alarm, you must have the ``cloudwatch:TagResource`` permission.\n Tags can help you organize and categorize your resources. You can also use them to scope user permissions by granting a user permission to access or change only resources with certain tag values.",
-      "type": "array",
-      "maxItems": 50,
-      "uniqueItems": true,
-      "items": {
-        "$ref": "#/definitions/Tag"
-      },
-      "markdownDescription": "A list of key-value pairs to associate with the alarm. You can associate as many as 50 tags with an alarm. To be able to associate tags with the alarm when you create the alarm, you must have the ``cloudwatch:TagResource`` permission.\n Tags can help you organize and categorize your resources. You can also use them to scope user permissions by granting a user permission to access or change only resources with certain tag values.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-    },
-    "EvaluationCriteria": {
-      "description": "The evaluation criteria for the alarm.",
-      "$ref": "#/definitions/EvaluationCriteria",
-      "markdownDescription": "The evaluation criteria for the alarm.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
-    },
-    "EvaluationInterval": {
-      "description": "The frequency, in seconds, at which the alarm is evaluated.",
-      "type": "integer",
-      "markdownDescription": "The frequency, in seconds, at which the alarm is evaluated.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    "delete": {
+      "permissions": [
+        "cloudwatch:DeleteAlarms",
+        "cloudwatch:DescribeAlarms"
+      ]
     }
   },
+  "typeName": "AWS::CloudWatch::Alarm",
+  "readOnlyProperties": [
+    "/properties/Arn"
+  ],
+  "description": "The ``AWS::CloudWatch::Alarm`` type specifies an alarm and associates it with the specified metric or metric math expression.\n When this operation creates an alarm, the alarm state is immediately set to ``INSUFFICIENT_DATA``. The alarm is then evaluated and its state is set appropriately. Any actions associated with the new state are then executed.\n When you update an existing alarm, its state is left unchanged, but the update completely overwrites the previous configuration of the alarm.",
+  "createOnlyProperties": [
+    "/properties/AlarmName"
+  ],
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/AlarmName"
+  ],
   "definitions": {
-    "EvaluationCriteria": {
-      "description": "The evaluation criteria for an alarm. This is a union type that currently supports ``PromQLCriteria``.",
-      "type": "object",
+    "WallClockWindow": {
+      "description": "An evaluation window that aligns the evaluated range to fixed clock boundaries that match the alarm's period, such as the top of the hour, midnight, or the start of the calendar week, optionally in a specific time zone.\n When you use a wall clock window, the alarm's period must be 1 minute (60 seconds), 5 minutes (300 seconds), 1 hour (3,600 seconds), 1 day (86,400 seconds), or 1 week (604,800 seconds). Other period values aren't supported with a wall clock window.\n Choose a wall clock window when your monitoring is tied to a business or calendar period, such as daily reports, batch jobs, or backups, or when you want alarm evaluations to match the periods shown on a metric dashboard.",
       "additionalProperties": false,
+      "type": "object",
       "properties": {
-        "PromQLCriteria": {
-          "$ref": "#/definitions/AlarmPromQLCriteria",
-          "description": "The PromQL criteria for the alarm evaluation.",
-          "markdownDescription": "The PromQL criteria for the alarm evaluation.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        "Timezone": {
+          "description": "The time zone to use when the alarm aligns the evaluation window to clock boundaries. You can specify an IANA time zone name (for example, ``America/New_York``), a fixed UTC offset (for example, ``+05:30``), or an offset-prefixed identifier (for example, ``UTC+05:30``). The offset must be aligned to a multiple of 5 minutes. If you don't specify a time zone, CloudWatch uses ``UTC``.\n The time zone affects window alignment for all periods, including periods of one hour or shorter.",
+          "type": "string",
+          "markdownDescription": "The time zone to use when the alarm aligns the evaluation window to clock boundaries. You can specify an IANA time zone name (for example, ``America/New_York``), a fixed UTC offset (for example, ``+05:30``), or an offset-prefixed identifier (for example, ``UTC+05:30``). The offset must be aligned to a multiple of 5 minutes. If you don't specify a time zone, CloudWatch uses ``UTC``.\n The time zone affects window alignment for all periods, including periods of one hour or shorter.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         }
       },
-      "markdownDescription": "The evaluation criteria for an alarm. This is a union type that currently supports ``PromQLCriteria``.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "An evaluation window that aligns the evaluated range to fixed clock boundaries that match the alarm's period, such as the top of the hour, midnight, or the start of the calendar week, optionally in a specific time zone.\n When you use a wall clock window, the alarm's period must be 1 minute (60 seconds), 5 minutes (300 seconds), 1 hour (3,600 seconds), 1 day (86,400 seconds), or 1 week (604,800 seconds). Other period values aren't supported with a wall clock window.\n Choose a wall clock window when your monitoring is tied to a business or calendar period, such as daily reports, batch jobs, or backups, or when you want alarm evaluations to match the periods shown on a metric dashboard.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "WarmUpConfiguration": {
+      "description": "",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "WarmUpPeriodDurationInMinutes": {
+          "description": "The length of the warm-up period, in minutes. For this duration after you create or update the alarm, the alarm stays in INSUFFICIENT_DATA and doesn't perform alarm actions. Valid values range from 1 to 2880 minutes (2 days). You can change this value while the alarm is still in its warm-up period. Changes have no effect after the warm-up period ends.",
+          "maximum": 2880,
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "The length of the warm-up period, in minutes. For this duration after you create or update the alarm, the alarm stays in INSUFFICIENT_DATA and doesn't perform alarm actions. Valid values range from 1 to 2880 minutes (2 days). You can change this value while the alarm is still in its warm-up period. Changes have no effect after the warm-up period ends.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "OnlyStartEvaluatingAfterWarmUpPeriodEnds": {
+          "description": "Specifies whether the alarm waits for the full warm-up period before it starts evaluating. If true, the alarm waits the entire WarmUpPeriodDurationInMinutes before it starts evaluating, even if metric data arrives earlier. If false, the alarm ends the warm-up period early and starts evaluating as soon as it has enough metric data to fill its evaluation window. This is the default behavior.",
+          "type": "boolean",
+          "markdownDescription": "Specifies whether the alarm waits for the full warm-up period before it starts evaluating. If true, the alarm waits the entire WarmUpPeriodDurationInMinutes before it starts evaluating, even if metric data arrives earlier. If false, the alarm ends the warm-up period early and starts evaluating as soon as it has enough metric data to fill its evaluation window. This is the default behavior.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "AlarmPromQLCriteria": {
       "description": "Contains the configuration that determines how a PromQL alarm evaluates its contributors, including the query to run and the durations that define when contributors transition between states.",
-      "type": "object",
       "additionalProperties": false,
+      "type": "object",
       "properties": {
-        "Query": {
-          "description": "The PromQL query that the alarm evaluates. The query must return a result of vector type. Each entry in the vector result represents an alarm contributor.",
-          "type": "string",
-          "markdownDescription": "The PromQL query that the alarm evaluates. The query must return a result of vector type. Each entry in the vector result represents an alarm contributor.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
         "PendingPeriod": {
           "description": "The duration, in seconds, that a contributor must be continuously breaching before it transitions to the ``ALARM`` state.",
           "type": "integer",
           "markdownDescription": "The duration, in seconds, that a contributor must be continuously breaching before it transitions to the ``ALARM`` state.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Query": {
+          "description": "The PromQL query that the alarm evaluates. The query must return a result of vector type. Each entry in the vector result represents an alarm contributor.",
+          "type": "string",
+          "markdownDescription": "The PromQL query that the alarm evaluates. The query must return a result of vector type. Each entry in the vector result represents an alarm contributor.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
         "RecoveryPeriod": {
           "description": "The duration, in seconds, that a contributor must continuously not be breaching before it transitions back to the ``OK`` state.",
@@ -199,9 +117,14 @@
     },
     "MetricStat": {
       "description": "This structure defines the metric to be returned, along with the statistics, period, and units.\n ``MetricStat`` is a property of the [MetricDataQuery](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudwatch-alarm-metricdataquery.html) property type.",
-      "type": "object",
       "additionalProperties": false,
+      "type": "object",
       "properties": {
+        "Stat": {
+          "description": "The statistic to return. It can include any CW statistic or extended statistic. For a list of valid values, see the table in [Statistics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html#Statistic) in the *User Guide*.",
+          "type": "string",
+          "markdownDescription": "The statistic to return. It can include any CW statistic or extended statistic. For a list of valid values, see the table in [Statistics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html#Statistic) in the *User Guide*.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
         "Period": {
           "description": "The granularity, in seconds, of the returned data points. For metrics with regular resolution, a period can be as short as one minute (60 seconds) and must be a multiple of 60. For high-resolution metrics that are collected at intervals of less than one minute, the period can be 1, 5, 10, 20, 30, 60, or any multiple of 60. High-resolution metrics are those metrics stored by a ``PutMetricData`` call that includes a ``StorageResolution`` of 1 second.\n If the ``StartTime`` parameter specifies a time stamp that is greater than 3 hours ago, you must specify the period as follows or no data points in that time range is returned:\n  +  Start time between 3 hours and 15 days ago - Use a multiple of 60 seconds (1 minute).\n  +  Start time between 15 and 63 days ago - Use a multiple of 300 seconds (5 minutes).\n  +  Start time greater than 63 days ago - Use a multiple of 3600 seconds (1 hour).",
           "type": "integer",
@@ -211,11 +134,6 @@
           "description": "The metric to return, including the metric name, namespace, and dimensions.",
           "$ref": "#/definitions/Metric",
           "markdownDescription": "The metric to return, including the metric name, namespace, and dimensions.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
-        },
-        "Stat": {
-          "description": "The statistic to return. It can include any CW statistic or extended statistic. For a list of valid values, see the table in [Statistics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html#Statistic) in the *User Guide*.",
-          "type": "string",
-          "markdownDescription": "The statistic to return. It can include any CW statistic or extended statistic. For a list of valid values, see the table in [Statistics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html#Statistic) in the *User Guide*.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         },
         "Unit": {
           "description": "The unit to use for the returned data points. \n Valid values are: Seconds, Microseconds, Milliseconds, Bytes, Kilobytes, Megabytes, Gigabytes, Terabytes, Bits, Kilobits, Megabits, Gigabits, Terabits, Percent, Count, Bytes/Second, Kilobytes/Second, Megabytes/Second, Gigabytes/Second, Terabytes/Second, Bits/Second, Kilobits/Second, Megabits/Second, Gigabits/Second, Terabits/Second, Count/Second, or None.",
@@ -230,10 +148,41 @@
       ],
       "markdownDescription": "This structure defines the metric to be returned, along with the statistics, period, and units.\n ``MetricStat`` is a property of the [MetricDataQuery](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudwatch-alarm-metricdataquery.html) property type.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "EvaluationWindow": {
+      "oneOf": [
+        {
+          "required": [
+            "WallClockWindow"
+          ]
+        },
+        {
+          "required": [
+            "SlidingWindow"
+          ]
+        }
+      ],
+      "description": "The evaluation window that an alarm uses to select the range of metric data that it evaluates each time it runs. This is a union type. Set exactly one of its members, ``SlidingWindow`` or ``WallClockWindow``. If you don't set ``EvaluationWindow``, the alarm uses a ``SlidingWindow`` by default.\n For more information, see [Alarm evaluation windows](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/alarm-evaluation-window.html) in the *CloudWatch User Guide*.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "WallClockWindow": {
+          "description": "A wall clock window, which aligns the evaluated range to fixed clock boundaries that match the alarm's period, such as the top of the hour, midnight, or the start of the calendar week.",
+          "$ref": "#/definitions/WallClockWindow",
+          "markdownDescription": "A wall clock window, which aligns the evaluated range to fixed clock boundaries that match the alarm's period, such as the top of the hour, midnight, or the start of the calendar week.\n\n---\n\nRequired: Conditional  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "SlidingWindow": {
+          "description": "A sliding window, which advances each time the alarm is evaluated, forming a rolling time window. This is the default evaluation window.",
+          "additionalProperties": false,
+          "type": "object",
+          "markdownDescription": "A sliding window, which advances each time the alarm is evaluated, forming a rolling time window. This is the default evaluation window.\n\n---\n\nRequired: Conditional  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "The evaluation window that an alarm uses to select the range of metric data that it evaluates each time it runs. This is a union type. Set exactly one of its members, ``SlidingWindow`` or ``WallClockWindow``. If you don't set ``EvaluationWindow``, the alarm uses a ``SlidingWindow`` by default.\n For more information, see [Alarm evaluation windows](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/alarm-evaluation-window.html) in the *CloudWatch User Guide*.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "Metric": {
       "description": "The ``Metric`` property type represents a specific metric. ``Metric`` is a property of the [MetricStat](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudwatch-alarm-metricstat.html) property type.",
-      "type": "object",
       "additionalProperties": false,
+      "type": "object",
       "properties": {
         "MetricName": {
           "description": "The name of the metric that you want the alarm to watch. This is a required field.",
@@ -241,10 +190,10 @@
           "markdownDescription": "The name of the metric that you want the alarm to watch. This is a required field.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
         "Dimensions": {
-          "description": "The metric dimensions that you want to be used for the metric that the alarm will watch.",
-          "type": "array",
           "uniqueItems": false,
+          "description": "The metric dimensions that you want to be used for the metric that the alarm will watch.",
           "insertionOrder": false,
+          "type": "array",
           "items": {
             "$ref": "#/definitions/Dimension"
           },
@@ -260,8 +209,8 @@
     },
     "Dimension": {
       "description": "Dimension is an embedded property of the ``AWS::CloudWatch::Alarm`` type. Dimensions are name/value pairs that can be associated with a CW metric. You can specify a maximum of 30 dimensions for a given metric.",
-      "type": "object",
       "additionalProperties": false,
+      "type": "object",
       "properties": {
         "Value": {
           "description": "The value for the dimension, from 1\u2013255 characters in length.",
@@ -280,25 +229,54 @@
       ],
       "markdownDescription": "Dimension is an embedded property of the ``AWS::CloudWatch::Alarm`` type. Dimensions are name/value pairs that can be associated with a CW metric. You can specify a maximum of 30 dimensions for a given metric.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "Tag": {
+      "description": "One of the key-value pairs associated with the alarm. Tags can help you organize and categorize your resources.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "minLength": 1,
+          "description": "The value for the specified tag key.",
+          "type": "string",
+          "maxLength": 256,
+          "markdownDescription": "The value for the specified tag key.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        },
+        "Key": {
+          "minLength": 1,
+          "description": "A string that you can use to assign a value. The combination of tag keys and values can help you organize and categorize your resources.",
+          "type": "string",
+          "maxLength": 128,
+          "markdownDescription": "A string that you can use to assign a value. The combination of tag keys and values can help you organize and categorize your resources.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "One of the key-value pairs associated with the alarm. Tags can help you organize and categorize your resources.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EvaluationCriteria": {
+      "description": "The evaluation criteria for an alarm. This is a union type that currently supports ``PromQLCriteria``.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "PromQLCriteria": {
+          "description": "The PromQL criteria for the alarm evaluation.",
+          "$ref": "#/definitions/AlarmPromQLCriteria",
+          "markdownDescription": "The PromQL criteria for the alarm evaluation.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "The evaluation criteria for an alarm. This is a union type that currently supports ``PromQLCriteria``.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "MetricDataQuery": {
       "description": "The ``MetricDataQuery`` property type specifies the metric data to return, and whether this call is just retrieving a batch set of data for one metric, or is performing a math expression on metric data. \n Any expression used must return a single time series. For more information, see [Metric Math Syntax and Functions](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/using-metric-math.html#metric-math-syntax) in the *User Guide*.",
-      "type": "object",
       "additionalProperties": false,
+      "type": "object",
       "properties": {
-        "Label": {
-          "description": "A human-readable label for this metric or expression. This is especially useful if this is an expression, so that you know what the value represents. If the metric or expression is shown in a CW dashboard widget, the label is shown. If ``Label`` is omitted, CW generates a default.",
+        "AccountId": {
+          "description": "The ID of the account where the metrics are located, if this is a cross-account alarm.",
           "type": "string",
-          "markdownDescription": "A human-readable label for this metric or expression. This is especially useful if this is an expression, so that you know what the value represents. If the metric or expression is shown in a CW dashboard widget, the label is shown. If ``Label`` is omitted, CW generates a default.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "MetricStat": {
-          "description": "The metric to be returned, along with statistics, period, and units. Use this parameter only if this object is retrieving a metric and not performing a math expression on returned data.\n Within one MetricDataQuery object, you must specify either ``Expression`` or ``MetricStat`` but not both.",
-          "$ref": "#/definitions/MetricStat",
-          "markdownDescription": "The metric to be returned, along with statistics, period, and units. Use this parameter only if this object is retrieving a metric and not performing a math expression on returned data.\n Within one MetricDataQuery object, you must specify either ``Expression`` or ``MetricStat`` but not both.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
-        },
-        "Id": {
-          "description": "A short name used to tie this object to the results in the response. This name must be unique within a single call to ``GetMetricData``. If you are performing math expressions on this set of data, this name represents that data and can serve as a variable in the mathematical expression. The valid characters are letters, numbers, and underscore. The first character must be a lowercase letter.",
-          "type": "string",
-          "markdownDescription": "A short name used to tie this object to the results in the response. This name must be unique within a single call to ``GetMetricData``. If you are performing math expressions on this set of data, this name represents that data and can serve as a variable in the mathematical expression. The valid characters are letters, numbers, and underscore. The first character must be a lowercase letter.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The ID of the account where the metrics are located, if this is a cross-account alarm.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
         "ReturnData": {
           "description": "This option indicates whether to return the timestamps and raw data values of this metric.\n When you create an alarm based on a metric math expression, specify ``True`` for this value for only the one math expression that the alarm is based on. You must specify ``False`` for ``ReturnData`` for all the other metrics and expressions used in the alarm.\n This field is required.",
@@ -310,103 +288,199 @@
           "type": "string",
           "markdownDescription": "The math expression to be performed on the returned data, if this object is performing a math expression. This expression can use the ``Id`` of the other metrics to refer to those metrics, and can also use the ``Id`` of other expressions to use the result of those expressions. For more information about metric math expressions, see [Metric Math Syntax and Functions](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/using-metric-math.html#metric-math-syntax) in the *User Guide*.\n Within each MetricDataQuery object, you must specify either ``Expression`` or ``MetricStat`` but not both.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
+        "Label": {
+          "description": "A human-readable label for this metric or expression. This is especially useful if this is an expression, so that you know what the value represents. If the metric or expression is shown in a CW dashboard widget, the label is shown. If ``Label`` is omitted, CW generates a default.",
+          "type": "string",
+          "markdownDescription": "A human-readable label for this metric or expression. This is especially useful if this is an expression, so that you know what the value represents. If the metric or expression is shown in a CW dashboard widget, the label is shown. If ``Label`` is omitted, CW generates a default.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "MetricStat": {
+          "description": "The metric to be returned, along with statistics, period, and units. Use this parameter only if this object is retrieving a metric and not performing a math expression on returned data.\n Within one MetricDataQuery object, you must specify either ``Expression`` or ``MetricStat`` but not both.",
+          "$ref": "#/definitions/MetricStat",
+          "markdownDescription": "The metric to be returned, along with statistics, period, and units. Use this parameter only if this object is retrieving a metric and not performing a math expression on returned data.\n Within one MetricDataQuery object, you must specify either ``Expression`` or ``MetricStat`` but not both.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
         "Period": {
           "description": "The granularity, in seconds, of the returned data points. For metrics with regular resolution, a period can be as short as one minute (60 seconds) and must be a multiple of 60. For high-resolution metrics that are collected at intervals of less than one minute, the period can be 1, 5, 10, 20, 30, 60, or any multiple of 60. High-resolution metrics are those metrics stored by a ``PutMetricData`` operation that includes a ``StorageResolution of 1 second``.",
           "type": "integer",
           "markdownDescription": "The granularity, in seconds, of the returned data points. For metrics with regular resolution, a period can be as short as one minute (60 seconds) and must be a multiple of 60. For high-resolution metrics that are collected at intervals of less than one minute, the period can be 1, 5, 10, 20, 30, 60, or any multiple of 60. High-resolution metrics are those metrics stored by a ``PutMetricData`` operation that includes a ``StorageResolution of 1 second``.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
         },
-        "AccountId": {
-          "description": "The ID of the account where the metrics are located, if this is a cross-account alarm.",
+        "Id": {
+          "description": "A short name used to tie this object to the results in the response. This name must be unique within a single call to ``GetMetricData``. If you are performing math expressions on this set of data, this name represents that data and can serve as a variable in the mathematical expression. The valid characters are letters, numbers, and underscore. The first character must be a lowercase letter.",
           "type": "string",
-          "markdownDescription": "The ID of the account where the metrics are located, if this is a cross-account alarm.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          "markdownDescription": "A short name used to tie this object to the results in the response. This name must be unique within a single call to ``GetMetricData``. If you are performing math expressions on this set of data, this name represents that data and can serve as a variable in the mathematical expression. The valid characters are letters, numbers, and underscore. The first character must be a lowercase letter.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
         "Id"
       ],
       "markdownDescription": "The ``MetricDataQuery`` property type specifies the metric data to return, and whether this call is just retrieving a batch set of data for one metric, or is performing a math expression on metric data. \n Any expression used must return a single time series. For more information, see [Metric Math Syntax and Functions](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/using-metric-math.html#metric-math-syntax) in the *User Guide*.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "ThresholdMetricId": {
+      "description": "In an alarm based on an anomaly detection model, this is the ID of the ``ANOMALY_DETECTION_BAND`` function used as the threshold for the alarm.",
+      "type": "string",
+      "markdownDescription": "In an alarm based on an anomaly detection model, this is the ID of the ``ANOMALY_DETECTION_BAND`` function used as the threshold for the alarm.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
     },
-    "Tag": {
-      "description": "One of the key-value pairs associated with the alarm. Tags can help you organize and categorize your resources.",
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "Key": {
-          "description": "A string that you can use to assign a value. The combination of tag keys and values can help you organize and categorize your resources.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 128,
-          "markdownDescription": "A string that you can use to assign a value. The combination of tag keys and values can help you organize and categorize your resources.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
-        },
-        "Value": {
-          "description": "The value for the specified tag key.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 256,
-          "markdownDescription": "The value for the specified tag key.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
-        }
+    "ComparisonOperator": {
+      "description": "The arithmetic operation to use when comparing the specified statistic and threshold. The specified statistic value is used as the first operand.",
+      "type": "string",
+      "markdownDescription": "The arithmetic operation to use when comparing the specified statistic and threshold. The specified statistic value is used as the first operand.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "EvaluationPeriods": {
+      "description": "The number of periods over which data is compared to the specified threshold. If you are setting an alarm that requires that a number of consecutive data points be breaching to trigger the alarm, this value specifies that number. If you are setting an \"M out of N\" alarm, this value is the N, and ``DatapointsToAlarm`` is the M.\n For more information, see [Evaluating an Alarm](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html#alarm-evaluation) in the *User Guide*.",
+      "type": "integer",
+      "markdownDescription": "The number of periods over which data is compared to the specified threshold. If you are setting an alarm that requires that a number of consecutive data points be breaching to trigger the alarm, this value specifies that number. If you are setting an \"M out of N\" alarm, this value is the N, and ``DatapointsToAlarm`` is the M.\n For more information, see [Evaluating an Alarm](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html#alarm-evaluation) in the *User Guide*.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    },
+    "Unit": {
+      "description": "The unit of the metric associated with the alarm. Specify this only if you are creating an alarm based on a single metric. Do not specify this if you are specifying a ``Metrics`` array.\n  You can specify the following values: Seconds, Microseconds, Milliseconds, Bytes, Kilobytes, Megabytes, Gigabytes, Terabytes, Bits, Kilobits, Megabits, Gigabits, Terabits, Percent, Count, Bytes/Second, Kilobytes/Second, Megabytes/Second, Gigabytes/Second, Terabytes/Second, Bits/Second, Kilobits/Second, Megabits/Second, Gigabits/Second, Terabits/Second, Count/Second, or None.",
+      "type": "string",
+      "markdownDescription": "The unit of the metric associated with the alarm. Specify this only if you are creating an alarm based on a single metric. Do not specify this if you are specifying a ``Metrics`` array.\n  You can specify the following values: Seconds, Microseconds, Milliseconds, Bytes, Kilobytes, Megabytes, Gigabytes, Terabytes, Bits, Kilobits, Megabits, Gigabits, Terabits, Percent, Count, Bytes/Second, Kilobytes/Second, Megabytes/Second, Gigabytes/Second, Terabytes/Second, Bits/Second, Kilobits/Second, Megabits/Second, Gigabits/Second, Terabits/Second, Count/Second, or None.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "OKActions": {
+      "uniqueItems": false,
+      "description": "The actions to execute when this alarm transitions to the ``OK`` state from any other state. Each action is specified as an Amazon Resource Name (ARN).",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
       },
-      "required": [
-        "Key",
-        "Value"
-      ],
-      "markdownDescription": "One of the key-value pairs associated with the alarm. Tags can help you organize and categorize your resources.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The actions to execute when this alarm transitions to the ``OK`` state from any other state. Each action is specified as an Amazon Resource Name (ARN).\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "MetricName": {
+      "description": "The name of the metric associated with the alarm. This is required for an alarm based on a metric. For an alarm based on a math expression, you use ``Metrics`` instead and you can't specify ``MetricName``.",
+      "type": "string",
+      "markdownDescription": "The name of the metric associated with the alarm. This is required for an alarm based on a metric. For an alarm based on a math expression, you use ``Metrics`` instead and you can't specify ``MetricName``.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "ActionsEnabled": {
+      "default": true,
+      "description": "Indicates whether actions should be executed during any changes to the alarm state. The default is TRUE.",
+      "type": "boolean",
+      "markdownDescription": "Indicates whether actions should be executed during any changes to the alarm state. The default is TRUE.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+    },
+    "Metrics": {
+      "uniqueItems": true,
+      "description": "An array that enables you to create an alarm based on the result of a metric math expression. Each item in the array either retrieves a metric or performs a math expression.\n If you specify the ``Metrics`` parameter, you cannot specify ``MetricName``, ``Dimensions``, ``Period``, ``Namespace``, ``Statistic``, ``ExtendedStatistic``, or ``Unit``.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/MetricDataQuery"
+      },
+      "markdownDescription": "An array that enables you to create an alarm based on the result of a metric math expression. Each item in the array either retrieves a metric or performs a math expression.\n If you specify the ``Metrics`` parameter, you cannot specify ``MetricName``, ``Dimensions``, ``Period``, ``Namespace``, ``Statistic``, ``ExtendedStatistic``, or ``Unit``.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "AlarmName": {
+      "description": "The name of the alarm. If you don't specify a name, CFN generates a unique physical ID and uses that ID for the alarm name. \n  If you specify a name, you cannot perform updates that require replacement of this resource. You can perform updates that require no or some interruption. If you must replace the resource, specify a new name.",
+      "type": "string",
+      "markdownDescription": "The name of the alarm. If you don't specify a name, CFN generates a unique physical ID and uses that ID for the alarm name. \n  If you specify a name, you cannot perform updates that require replacement of this resource. You can perform updates that require no or some interruption. If you must replace the resource, specify a new name.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "Statistic": {
+      "description": "The statistic for the metric associated with the alarm, other than percentile. For percentile statistics, use ``ExtendedStatistic``.\n For an alarm based on a metric, you must specify either ``Statistic`` or ``ExtendedStatistic`` but not both.\n For an alarm based on a math expression, you can't specify ``Statistic``. Instead, you use ``Metrics``.",
+      "type": "string",
+      "markdownDescription": "The statistic for the metric associated with the alarm, other than percentile. For percentile statistics, use ``ExtendedStatistic``.\n For an alarm based on a metric, you must specify either ``Statistic`` or ``ExtendedStatistic`` but not both.\n For an alarm based on a math expression, you can't specify ``Statistic``. Instead, you use ``Metrics``.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "WarmUpConfiguration": {
+      "description": "",
+      "$ref": "#/definitions/WarmUpConfiguration",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "EvaluationWindow": {
+      "description": "The evaluation window that the alarm uses to select the range of metric data that it evaluates. This is either a sliding window or a wall clock window. For more information, see [Alarm evaluation windows](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/alarm-evaluation-window.html) in the *CloudWatch User Guide*.",
+      "$ref": "#/definitions/EvaluationWindow",
+      "markdownDescription": "The evaluation window that the alarm uses to select the range of metric data that it evaluates. This is either a sliding window or a wall clock window. For more information, see [Alarm evaluation windows](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/alarm-evaluation-window.html) in the *CloudWatch User Guide*.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "InsufficientDataActions": {
+      "uniqueItems": false,
+      "description": "The actions to execute when this alarm transitions to the ``INSUFFICIENT_DATA`` state from any other state. Each action is specified as an Amazon Resource Name (ARN).",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "The actions to execute when this alarm transitions to the ``INSUFFICIENT_DATA`` state from any other state. Each action is specified as an Amazon Resource Name (ARN).\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "EvaluationInterval": {
+      "description": "The frequency, in seconds, at which the alarm is evaluated.",
+      "type": "integer",
+      "markdownDescription": "The frequency, in seconds, at which the alarm is evaluated.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    },
+    "DatapointsToAlarm": {
+      "description": "The number of datapoints that must be breaching to trigger the alarm. This is used only if you are setting an \"M out of N\" alarm. In that case, this value is the M, and the value that you set for ``EvaluationPeriods`` is the N value. For more information, see [Evaluating an Alarm](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html#alarm-evaluation) in the *User Guide*.\n If you omit this parameter, CW uses the same value here that you set for ``EvaluationPeriods``, and the alarm goes to alarm state if that many consecutive periods are breaching.",
+      "type": "integer",
+      "markdownDescription": "The number of datapoints that must be breaching to trigger the alarm. This is used only if you are setting an \"M out of N\" alarm. In that case, this value is the M, and the value that you set for ``EvaluationPeriods`` is the N value. For more information, see [Evaluating an Alarm](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html#alarm-evaluation) in the *User Guide*.\n If you omit this parameter, CW uses the same value here that you set for ``EvaluationPeriods``, and the alarm goes to alarm state if that many consecutive periods are breaching.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    },
+    "Tags": {
+      "maxItems": 50,
+      "uniqueItems": true,
+      "description": "A list of key-value pairs to associate with the alarm. You can associate as many as 50 tags with an alarm. To be able to associate tags with the alarm when you create the alarm, you must have the ``cloudwatch:TagResource`` permission.\n Tags can help you organize and categorize your resources. You can also use them to scope user permissions by granting a user permission to access or change only resources with certain tag values.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "A list of key-value pairs to associate with the alarm. You can associate as many as 50 tags with an alarm. To be able to associate tags with the alarm when you create the alarm, you must have the ``cloudwatch:TagResource`` permission.\n Tags can help you organize and categorize your resources. You can also use them to scope user permissions by granting a user permission to access or change only resources with certain tag values.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "Threshold": {
+      "description": "The value to compare with the specified statistic.",
+      "type": "number",
+      "markdownDescription": "The value to compare with the specified statistic.\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+    },
+    "EvaluateLowSampleCountPercentile": {
+      "description": "Used only for alarms based on percentiles. If ``ignore``, the alarm state does not change during periods with too few data points to be statistically significant. If ``evaluate`` or this parameter is not used, the alarm is always evaluated and possibly changes state no matter how many data points are available.",
+      "type": "string",
+      "markdownDescription": "Used only for alarms based on percentiles. If ``ignore``, the alarm state does not change during periods with too few data points to be statistically significant. If ``evaluate`` or this parameter is not used, the alarm is always evaluated and possibly changes state no matter how many data points are available.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "ExtendedStatistic": {
+      "description": "The percentile statistic for the metric associated with the alarm. Specify a value between p0.0 and p100.\n For an alarm based on a metric, you must specify either ``Statistic`` or ``ExtendedStatistic`` but not both.\n For an alarm based on a math expression, you can't specify ``ExtendedStatistic``. Instead, you use ``Metrics``.",
+      "type": "string",
+      "markdownDescription": "The percentile statistic for the metric associated with the alarm. Specify a value between p0.0 and p100.\n For an alarm based on a metric, you must specify either ``Statistic`` or ``ExtendedStatistic`` but not both.\n For an alarm based on a math expression, you can't specify ``ExtendedStatistic``. Instead, you use ``Metrics``.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "TreatMissingData": {
+      "description": "Sets how this alarm is to handle missing data points. Valid values are ``breaching``, ``notBreaching``, ``ignore``, and ``missing``. For more information, see [Configuring How Alarms Treat Missing Data](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html#alarms-and-missing-data) in the *Amazon User Guide*.\n If you omit this parameter, the default behavior of ``missing`` is used.",
+      "type": "string",
+      "markdownDescription": "Sets how this alarm is to handle missing data points. Valid values are ``breaching``, ``notBreaching``, ``ignore``, and ``missing``. For more information, see [Configuring How Alarms Treat Missing Data](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html#alarms-and-missing-data) in the *Amazon User Guide*.\n If you omit this parameter, the default behavior of ``missing`` is used.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "Dimensions": {
+      "uniqueItems": false,
+      "description": "The dimensions for the metric associated with the alarm. For an alarm based on a math expression, you can't specify ``Dimensions``. Instead, you use ``Metrics``.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Dimension"
+      },
+      "markdownDescription": "The dimensions for the metric associated with the alarm. For an alarm based on a math expression, you can't specify ``Dimensions``. Instead, you use ``Metrics``.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "Period": {
+      "description": "The period, in seconds, over which the statistic is applied. This is required for an alarm based on a metric. Valid values are 10, 20, 30, 60, and any multiple of 60.\n For an alarm based on a math expression, you can't specify ``Period``, and instead you use the ``Metrics`` parameter.\n *Minimum:* 10",
+      "type": "integer",
+      "markdownDescription": "The period, in seconds, over which the statistic is applied. This is required for an alarm based on a metric. Valid values are 10, 20, 30, 60, and any multiple of 60.\n For an alarm based on a math expression, you can't specify ``Period``, and instead you use the ``Metrics`` parameter.\n *Minimum:* 10\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    },
+    "EvaluationCriteria": {
+      "description": "The evaluation criteria for the alarm.",
+      "$ref": "#/definitions/EvaluationCriteria",
+      "markdownDescription": "The evaluation criteria for the alarm.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "Namespace": {
+      "description": "The namespace of the metric associated with the alarm. This is required for an alarm based on a metric. For an alarm based on a math expression, you can't specify ``Namespace`` and you use ``Metrics`` instead.\n For a list of namespaces for metrics from AWS services, see [Services That Publish Metrics.](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-services-cloudwatch-metrics.html)",
+      "type": "string",
+      "markdownDescription": "The namespace of the metric associated with the alarm. This is required for an alarm based on a metric. For an alarm based on a math expression, you can't specify ``Namespace`` and you use ``Metrics`` instead.\n For a list of namespaces for metrics from AWS services, see [Services That Publish Metrics.](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-services-cloudwatch-metrics.html)\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "AlarmActions": {
+      "uniqueItems": false,
+      "description": "The list of actions to execute when this alarm transitions into an ALARM state from any other state. Specify each action as an Amazon Resource Name (ARN). For more information about creating alarms and the actions that you can specify, see [PutMetricAlarm](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_PutMetricAlarm.html) in the *API Reference*.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "The list of actions to execute when this alarm transitions into an ALARM state from any other state. Specify each action as an Amazon Resource Name (ARN). For more information about creating alarms and the actions that you can specify, see [PutMetricAlarm](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_PutMetricAlarm.html) in the *API Reference*.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "AlarmDescription": {
+      "description": "The description of the alarm.",
+      "type": "string",
+      "markdownDescription": "The description of the alarm.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "Arn": {
+      "description": "",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     }
-  },
-  "handlers": {
-    "create": {
-      "permissions": [
-        "cloudwatch:PutMetricAlarm",
-        "cloudwatch:DescribeAlarms",
-        "cloudwatch:TagResource"
-      ]
-    },
-    "update": {
-      "permissions": [
-        "cloudwatch:PutMetricAlarm",
-        "cloudwatch:DescribeAlarms",
-        "cloudwatch:TagResource",
-        "cloudwatch:UntagResource"
-      ]
-    },
-    "delete": {
-      "permissions": [
-        "cloudwatch:DeleteAlarms",
-        "cloudwatch:DescribeAlarms"
-      ]
-    },
-    "list": {
-      "permissions": [
-        "cloudwatch:DescribeAlarms"
-      ]
-    },
-    "read": {
-      "permissions": [
-        "cloudwatch:DescribeAlarms",
-        "cloudwatch:ListTagsForResource"
-      ]
-    }
-  },
-  "createOnlyProperties": [
-    "/properties/AlarmName"
-  ],
-  "primaryIdentifier": [
-    "/properties/AlarmName"
-  ],
-  "readOnlyProperties": [
-    "/properties/Arn"
-  ],
-  "tagging": {
-    "taggable": true,
-    "tagOnCreate": true,
-    "tagUpdatable": true,
-    "cloudFormationSystemTags": true,
-    "tagProperty": "/properties/Tags",
-    "permissions": [
-      "cloudwatch:TagResource",
-      "cloudwatch:UntagResource",
-      "cloudwatch:ListTagsForResource"
-    ]
   },
   "attributes": {
     "Arn": {

@@ -53,6 +53,9 @@
     "EksConfiguration": {
       "$ref": "#/definitions/EksConfiguration"
     },
+    "EcsSettings": {
+      "$ref": "#/definitions/EcsSettings"
+    },
     "Context": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
@@ -146,7 +149,7 @@
             "type": "string",
             "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
           },
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         },
         "Tags": {
           "type": "object",
@@ -168,14 +171,204 @@
           "type": "boolean",
           "default": false,
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "ManagedInstancesProvider": {
+          "$ref": "#/definitions/ManagedInstancesProvider"
+        },
+        "CapacityTags": {
+          "type": "object",
+          "description": "Capacity-level tags for compute environments.",
+          "patternProperties": {
+            ".*": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            }
+          },
+          "additionalProperties": false,
+          "markdownDescription": "Capacity-level tags for compute environments.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "Subnets",
         "Type",
         "MaxvCpus"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: Replacement\nRead only property: Yes"
+    },
+    "ManagedInstancesProvider": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "PropagateTags": {
+          "type": "string",
+          "enum": [
+            "CAPACITY_PROVIDER",
+            "NONE"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CAPACITY_PROVIDER | NONE  \nUpdate requires: No interruption\n"
+        },
+        "InfrastructureRoleArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "InstanceLaunchTemplate": {
+          "$ref": "#/definitions/InstanceLaunchTemplate"
+        },
+        "InfrastructureOptimization": {
+          "$ref": "#/definitions/InfrastructureOptimization"
+        }
+      },
+      "required": [
+        "InfrastructureRoleArn",
+        "InstanceLaunchTemplate"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "InstanceLaunchTemplate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Ec2InstanceProfileArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "NetworkConfiguration": {
+          "$ref": "#/definitions/ManagedInstancesNetworkConfiguration"
+        },
+        "InstanceRequirements": {
+          "$ref": "#/definitions/InstanceRequirements"
+        },
+        "CapacityOptionType": {
+          "type": "string",
+          "enum": [
+            "ON_DEMAND",
+            "SPOT",
+            "RESERVED"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ON_DEMAND | SPOT | RESERVED  \nUpdate requires: No interruption\n"
+        },
+        "StorageConfiguration": {
+          "$ref": "#/definitions/ManagedInstancesStorageConfiguration"
+        },
+        "Monitoring": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "FipsEnabled": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "CapacityReservations": {
+          "$ref": "#/definitions/CapacityReservations"
+        },
+        "InstanceMetadataTagsPropagation": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "LocalStorageConfiguration": {
+          "$ref": "#/definitions/ManagedInstancesLocalStorageConfiguration"
+        }
+      },
+      "required": [
+        "Ec2InstanceProfileArn",
+        "NetworkConfiguration"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ManagedInstancesNetworkConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Subnets": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "SecurityGroups": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Subnets",
+        "SecurityGroups"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "InstanceRequirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "AllowedInstanceTypes": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "InfrastructureOptimization": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ScaleInAfter": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ManagedInstancesStorageConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "StorageSizeGiB": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CapacityReservations": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ReservationGroupArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ReservationPreference": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ManagedInstancesLocalStorageConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "UseLocalStorage": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "ComputeScalingPolicy": {
       "type": "object",
@@ -324,6 +517,22 @@
         "KubernetesNamespace"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EcsSettings": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ContainerInsights": {
+          "type": "string",
+          "enum": [
+            "ENABLED",
+            "ENHANCED",
+            "DISABLED"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | ENHANCED | DISABLED  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "tagging": {
@@ -345,7 +554,9 @@
     "/properties/ComputeEnvironmentName",
     "/properties/Tags",
     "/properties/Type",
-    "/properties/EksConfiguration"
+    "/properties/EksConfiguration",
+    "/properties/ComputeResources/ManagedInstancesProvider/InstanceLaunchTemplate/CapacityOptionType",
+    "/properties/ComputeResources/ManagedInstancesProvider/InstanceLaunchTemplate/FipsEnabled"
   ],
   "conditionalCreateOnlyProperties": [
     "/properties/ComputeResources/AllocationStrategy",
@@ -389,7 +600,8 @@
         "iam:CreateServiceLinkedRole",
         "Iam:PassRole",
         "Eks:DescribeCluster",
-        "ec2:DescribeLaunchTemplateVersions"
+        "ec2:DescribeLaunchTemplateVersions",
+        "Batch:SetCapacityTags"
       ]
     },
     "read": {
@@ -405,7 +617,8 @@
         "Batch:UnTagResource",
         "Iam:PassRole",
         "Eks:DescribeCluster",
-        "ec2:DescribeLaunchTemplateVersions"
+        "ec2:DescribeLaunchTemplateVersions",
+        "Batch:SetCapacityTags"
       ]
     },
     "delete": {

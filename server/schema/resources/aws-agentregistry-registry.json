@@ -1,0 +1,428 @@
+{
+  "typeName": "AWS::AgentRegistry::Registry",
+  "description": "Definition of AWS::AgentRegistry::Registry Resource Type",
+  "definitions": {
+    "DiscoveryConfiguration": {
+      "type": "object",
+      "description": "Discovery configuration for the registry. Controls how consumers are authorized to search the registry and invoke its MCP endpoint.",
+      "properties": {
+        "AuthorizerConfiguration": {
+          "$ref": "#/definitions/AuthorizerConfiguration"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Discovery configuration for the registry. Controls how consumers are authorized to search the registry and invoke its MCP endpoint.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RegistryAuthorizerType": {
+      "type": "string",
+      "description": "The type of authorizer that controls how consumers access the registry's search and MCP invoke operations.",
+      "enum": [
+        "CUSTOM_JWT",
+        "AWS_IAM"
+      ],
+      "markdownDescription": "The type of authorizer that controls how consumers access the registry's search and MCP invoke operations.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CUSTOM_JWT | AWS_IAM  \nUpdate requires: No interruption\n"
+    },
+    "AuthorizerConfiguration": {
+      "type": "object",
+      "description": "The authorizer configuration for the registry. This is a union - specify exactly one member.",
+      "properties": {
+        "CustomJWTAuthorizer": {
+          "$ref": "#/definitions/CustomJWTAuthorizerConfiguration"
+        }
+      },
+      "required": [
+        "CustomJWTAuthorizer"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The authorizer configuration for the registry. This is a union - specify exactly one member.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CustomJWTAuthorizerConfiguration": {
+      "type": "object",
+      "description": "Configuration for a custom JWT authorizer that validates inbound bearer tokens against an OpenID Connect identity provider.",
+      "properties": {
+        "DiscoveryUrl": {
+          "type": "string",
+          "description": "The OpenID Connect discovery URL used to retrieve the identity provider's metadata and signing keys.",
+          "minLength": 1,
+          "maxLength": 2048,
+          "markdownDescription": "The OpenID Connect discovery URL used to retrieve the identity provider's metadata and signing keys.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^.+/\\.well-known/openid-configuration$  \nUpdate requires: No interruption\n"
+        },
+        "AllowedAudience": {
+          "type": "array",
+          "description": "The audience values accepted during JWT validation.",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 1,
+          "markdownDescription": "The audience values accepted during JWT validation.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "AllowedClients": {
+          "type": "array",
+          "description": "The client identifiers accepted during JWT validation.",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 1,
+          "markdownDescription": "The client identifiers accepted during JWT validation.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "AllowedScopes": {
+          "type": "array",
+          "description": "The scopes accepted during JWT validation.",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[\\x21\\x23-\\x5B\\x5D-\\x7E]+$  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 1,
+          "markdownDescription": "The scopes accepted during JWT validation.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "CustomClaims": {
+          "type": "array",
+          "description": "Additional custom claim validations applied to the inbound JWT.",
+          "items": {
+            "$ref": "#/definitions/CustomClaimValidationType"
+          },
+          "minItems": 1,
+          "markdownDescription": "Additional custom claim validations applied to the inbound JWT.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "DiscoveryUrl"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for a custom JWT authorizer that validates inbound bearer tokens against an OpenID Connect identity provider.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CustomClaimValidationType": {
+      "type": "object",
+      "description": "A validation rule applied to a single claim of an inbound JWT.",
+      "properties": {
+        "InboundTokenClaimName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[A-Za-z0-9_.-:]+$  \nUpdate requires: No interruption\n"
+        },
+        "InboundTokenClaimValueType": {
+          "type": "string",
+          "enum": [
+            "STRING",
+            "STRING_ARRAY"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: STRING | STRING_ARRAY  \nUpdate requires: No interruption\n"
+        },
+        "AuthorizingClaimMatchValue": {
+          "$ref": "#/definitions/AuthorizingClaimMatchValueType"
+        }
+      },
+      "required": [
+        "InboundTokenClaimName",
+        "InboundTokenClaimValueType",
+        "AuthorizingClaimMatchValue"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A validation rule applied to a single claim of an inbound JWT.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AuthorizingClaimMatchValueType": {
+      "type": "object",
+      "description": "The value and match operator used to authorize a claim during JWT validation.",
+      "properties": {
+        "ClaimMatchValue": {
+          "$ref": "#/definitions/ClaimMatchValueType"
+        },
+        "ClaimMatchOperator": {
+          "type": "string",
+          "enum": [
+            "EQUALS",
+            "CONTAINS",
+            "CONTAINS_ANY"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: EQUALS | CONTAINS | CONTAINS_ANY  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ClaimMatchValue",
+        "ClaimMatchOperator"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The value and match operator used to authorize a claim during JWT validation.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ClaimMatchValueType": {
+      "type": "object",
+      "description": "The expected value used to match a claim. Exactly one member is set.",
+      "properties": {
+        "MatchValueString": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[A-Za-z0-9_.:/-]+$  \nUpdate requires: No interruption\n"
+        },
+        "MatchValueStringList": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[A-Za-z0-9_.:/-]+$  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "required": [
+            "MatchValueString"
+          ]
+        },
+        {
+          "required": [
+            "MatchValueStringList"
+          ]
+        }
+      ],
+      "markdownDescription": "The expected value used to match a claim. Exactly one member is set.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ApprovalConfiguration": {
+      "type": "object",
+      "description": "Configuration for the registry's record approval workflow.",
+      "properties": {
+        "AutoApprovalRules": {
+          "type": "array",
+          "description": "The rules that determine which registry records are automatically approved on submission. When omitted or empty, submitted records require manual review.",
+          "items": {
+            "$ref": "#/definitions/AutoApprovalRule"
+          },
+          "maxItems": 10,
+          "insertionOrder": false,
+          "markdownDescription": "The rules that determine which registry records are automatically approved on submission. When omitted or empty, submitted records require manual review.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for the registry's record approval workflow.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AutoApprovalRule": {
+      "type": "string",
+      "description": "A rule that determines which registry records are automatically approved on submission.",
+      "enum": [
+        "APPROVE_ALL"
+      ],
+      "markdownDescription": "A rule that determines which registry records are automatically approved on submission.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: APPROVE_ALL  \nUpdate requires: No interruption\n"
+    },
+    "RegistryStatus": {
+      "type": "string",
+      "description": "The status of the registry.",
+      "enum": [
+        "CREATING",
+        "READY",
+        "UPDATING",
+        "CREATE_FAILED",
+        "UPDATE_FAILED",
+        "DELETING",
+        "DELETE_FAILED"
+      ],
+      "markdownDescription": "The status of the registry.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | READY | UPDATING | CREATE_FAILED | UPDATE_FAILED | DELETING | DELETE_FAILED  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "type": "object",
+      "description": "A tag to assign to the registry.",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key of the tag.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The key of the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9\\s._:/=+@-]*$  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value of the tag.",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The value of the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: ^[a-zA-Z0-9\\s._:/=+@-]*$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A tag to assign to the registry.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "RegistryId": {
+      "type": "string",
+      "description": "The unique identifier of the registry.",
+      "minLength": 12,
+      "maxLength": 16,
+      "markdownDescription": "The unique identifier of the registry.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 12  \nMaximum Length: 16  \nPattern: ^[a-zA-Z0-9]{12,16}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "RegistryArn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the registry.",
+      "minLength": 46,
+      "maxLength": 2048,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the registry.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 46  \nMaximum Length: 2048  \nPattern: ^arn:aws(-[^:]+)?:agent-registry:[a-z0-9-]+:[0-9]{12}:registry/[a-zA-Z0-9]{12,16}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Name": {
+      "type": "string",
+      "description": "The name of the registry.",
+      "minLength": 1,
+      "maxLength": 64,
+      "markdownDescription": "The name of the registry.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[a-zA-Z0-9][a-zA-Z0-9_\\-\\.\\/]*$  \nUpdate requires: No interruption\n"
+    },
+    "Description": {
+      "type": "string",
+      "description": "The description of the registry.",
+      "minLength": 1,
+      "maxLength": 4096,
+      "markdownDescription": "The description of the registry.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 4096  \nUpdate requires: No interruption\n"
+    },
+    "AuthorizerType": {
+      "$ref": "#/definitions/RegistryAuthorizerType"
+    },
+    "DiscoveryConfiguration": {
+      "$ref": "#/definitions/DiscoveryConfiguration"
+    },
+    "ApprovalConfiguration": {
+      "$ref": "#/definitions/ApprovalConfiguration"
+    },
+    "Status": {
+      "$ref": "#/definitions/RegistryStatus"
+    },
+    "CreatedAt": {
+      "type": "string",
+      "description": "The timestamp when the registry was created.",
+      "format": "date-time",
+      "markdownDescription": "The timestamp when the registry was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "UpdatedAt": {
+      "type": "string",
+      "description": "The timestamp when the registry was last updated.",
+      "format": "date-time",
+      "markdownDescription": "The timestamp when the registry was last updated.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Tags": {
+      "type": "array",
+      "description": "Tags to assign to the registry.",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "maxItems": 50,
+      "insertionOrder": false,
+      "markdownDescription": "Tags to assign to the registry.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "required": [
+    "Name"
+  ],
+  "readOnlyProperties": [
+    "/properties/RegistryId",
+    "/properties/RegistryArn",
+    "/properties/Status",
+    "/properties/CreatedAt",
+    "/properties/UpdatedAt"
+  ],
+  "createOnlyProperties": [
+    "/properties/AuthorizerType"
+  ],
+  "primaryIdentifier": [
+    "/properties/RegistryArn"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/RegistryId"
+    ]
+  ],
+  "additionalProperties": false,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "agent-registry:TagResource",
+      "agent-registry:UntagResource",
+      "agent-registry:ListTagsForResource"
+    ]
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "agent-registry:CreateRegistry",
+        "agent-registry:GetRegistry",
+        "agent-registry:TagResource",
+        "agent-registry:ListTagsForResource",
+        "bedrock-agentcore:CreateWorkloadIdentity",
+        "iam:CreateServiceLinkedRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "agent-registry:GetRegistry",
+        "agent-registry:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "agent-registry:UpdateRegistry",
+        "agent-registry:GetRegistry",
+        "agent-registry:TagResource",
+        "agent-registry:UntagResource",
+        "agent-registry:ListTagsForResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "agent-registry:DeleteRegistry",
+        "agent-registry:GetRegistry",
+        "bedrock-agentcore:DeleteWorkloadIdentity"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "agent-registry:ListRegistries"
+      ]
+    }
+  },
+  "attributes": {
+    "RegistryId": {
+      "type": "string",
+      "description": "The unique identifier of the registry.",
+      "minLength": 12,
+      "maxLength": 16,
+      "markdownDescription": "The unique identifier of the registry.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 12  \nMaximum Length: 16  \nPattern: ^[a-zA-Z0-9]{12,16}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "RegistryArn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the registry.",
+      "minLength": 46,
+      "maxLength": 2048,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the registry.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 46  \nMaximum Length: 2048  \nPattern: ^arn:aws(-[^:]+)?:agent-registry:[a-z0-9-]+:[0-9]{12}:registry/[a-zA-Z0-9]{12,16}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Status": {
+      "$ref": "#/definitions/RegistryStatus"
+    },
+    "CreatedAt": {
+      "type": "string",
+      "description": "The timestamp when the registry was created.",
+      "format": "date-time",
+      "markdownDescription": "The timestamp when the registry was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "UpdatedAt": {
+      "type": "string",
+      "description": "The timestamp when the registry was last updated.",
+      "format": "date-time",
+      "markdownDescription": "The timestamp when the registry was last updated.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}
