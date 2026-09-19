@@ -127,6 +127,16 @@
         }
       },
       "markdownDescription": "A map of event names to function identifiers for custom processing during session lifecycle events.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AdsPersonalizationTimeouts": {
+      "description": "The ad decision server (ADS) request timeouts and personalization time budgets for live, VOD, and prefetch workflows.",
+      "$ref": "#/definitions/AdsPersonalizationTimeouts",
+      "markdownDescription": "The ad decision server (ADS) request timeouts and personalization time budgets for live, VOD, and prefetch workflows.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "AdsPersonalizationConcurrency": {
+      "description": "The settings that control how many concurrent requests MediaTailor makes to the ad decision server (ADS).",
+      "$ref": "#/definitions/AdsPersonalizationConcurrency",
+      "markdownDescription": "The settings that control how many concurrent requests MediaTailor makes to the ad decision server (ADS).\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
     }
   },
   "definitions": {
@@ -280,9 +290,40 @@
           "description": "The maximum allowed duration for the pre-roll ad avail. AWS Elemental MediaTailor won't play pre-roll ads to exceed this duration, regardless of the total duration of ads that the ADS returns.",
           "type": "integer",
           "markdownDescription": "The maximum allowed duration for the pre-roll ad avail. AWS Elemental MediaTailor won't play pre-roll ads to exceed this duration, regardless of the total duration of ads that the ADS returns.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "AdDecisionServerConfiguration": {
+          "$ref": "#/definitions/PreRollAdDecisionServerConfiguration"
         }
       },
       "markdownDescription": "The configuration for pre-roll ad insertion.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PreRollAdDecisionServerConfiguration": {
+      "description": "The configuration for the request to the pre-roll Ad Decision Server.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "VastResponse": {
+          "$ref": "#/definitions/PreRollVastResponse"
+        }
+      },
+      "markdownDescription": "The configuration for the request to the pre-roll Ad Decision Server.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PreRollVastResponse": {
+      "description": "The configuration for how MediaTailor processes the VAST response returned by the pre-roll Ad Decision Server.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "AdSequencingMode": {
+          "description": "Determines how MediaTailor sequences ads returned in the pre-roll VAST response.",
+          "type": "string",
+          "enum": [
+            "FOLLOW_AD_SEQUENCE",
+            "IGNORE_AD_SEQUENCE"
+          ],
+          "markdownDescription": "Determines how MediaTailor sequences ads returned in the pre-roll VAST response.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: FOLLOW_AD_SEQUENCE | IGNORE_AD_SEQUENCE  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "The configuration for how MediaTailor processes the VAST response returned by the pre-roll Ad Decision Server.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "ManifestProcessingRules": {
       "description": "The configuration for manifest processing rules. Manifest processing rules enable customization of the personalized manifests created by MediaTailor.",
@@ -425,12 +466,34 @@
       "properties": {
         "HttpRequest": {
           "$ref": "#/definitions/HttpRequest"
+        },
+        "VastResponse": {
+          "$ref": "#/definitions/VastResponse"
         }
       },
       "required": [
         "HttpRequest"
       ],
       "markdownDescription": "The configuration for the request to the specified Ad Decision Server URL.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "VastResponse": {
+      "description": "The configuration for how MediaTailor processes the VAST response returned by the Ad Decision Server.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "AdSequencingMode": {
+          "description": "Determines how MediaTailor sequences ads returned in the VAST response from the Ad Decision Server.",
+          "type": "string",
+          "enum": [
+            "FOLLOW_AD_SEQUENCE",
+            "IGNORE_AD_SEQUENCE",
+            "FOLLOW_AD_SEQUENCE_ONLY_LIVE",
+            "FOLLOW_AD_SEQUENCE_ONLY_VOD"
+          ],
+          "markdownDescription": "Determines how MediaTailor sequences ads returned in the VAST response from the Ad Decision Server.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: FOLLOW_AD_SEQUENCE | IGNORE_AD_SEQUENCE | FOLLOW_AD_SEQUENCE_ONLY_LIVE | FOLLOW_AD_SEQUENCE_ONLY_VOD  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "The configuration for how MediaTailor processes the VAST response returned by the Ad Decision Server.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "HttpRequest": {
       "description": "The configuration for the request to the Ad Decision Server URL.",
@@ -477,6 +540,57 @@
         }
       },
       "markdownDescription": "The headers in the request sent to the Ad Decision Server URL. The max length is 10,000 characters.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AdsPersonalizationTimeouts": {
+      "description": "The ad decision server (ADS) request timeouts and personalization time budgets for live, VOD, and prefetch workflows.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "AdsRequestTimeoutMilliseconds": {
+          "description": "The maximum time, in milliseconds, that MediaTailor waits for a single ADS response during live or VOD playback. The default is 3000.",
+          "type": "integer",
+          "markdownDescription": "The maximum time, in milliseconds, that MediaTailor waits for a single ADS response during live or VOD playback. The default is 3000.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "LiveMaximumAdsPersonalizationTimeMilliseconds": {
+          "description": "The maximum total time, in milliseconds, that MediaTailor spends on ADS activity for live manifests. The default is 10000.",
+          "type": "integer",
+          "markdownDescription": "The maximum total time, in milliseconds, that MediaTailor spends on ADS activity for live manifests. The default is 10000.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "VodMaximumAdsPersonalizationTimeMilliseconds": {
+          "description": "The maximum total time, in milliseconds, that MediaTailor spends on ADS activity for VOD manifests. The default is 10000.",
+          "type": "integer",
+          "markdownDescription": "The maximum total time, in milliseconds, that MediaTailor spends on ADS activity for VOD manifests. The default is 10000.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "PrefetchAdsRequestTimeoutMilliseconds": {
+          "description": "The maximum time, in milliseconds, that MediaTailor waits for a single ADS response during prefetch retrieval. If not set, MediaTailor uses the AdsRequestTimeoutMilliseconds value.",
+          "type": "integer",
+          "markdownDescription": "The maximum time, in milliseconds, that MediaTailor waits for a single ADS response during prefetch retrieval. If not set, MediaTailor uses the AdsRequestTimeoutMilliseconds value.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "PrefetchMaximumAdsPersonalizationTimeMilliseconds": {
+          "description": "The maximum total time, in milliseconds, that MediaTailor spends on ADS activity during prefetch retrieval.",
+          "type": "integer",
+          "markdownDescription": "The maximum total time, in milliseconds, that MediaTailor spends on ADS activity during prefetch retrieval.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "The ad decision server (ADS) request timeouts and personalization time budgets for live, VOD, and prefetch workflows.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AdsPersonalizationConcurrency": {
+      "description": "The settings that control how many concurrent requests MediaTailor makes to the ad decision server (ADS).",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "MaxConcurrentAdsRequests": {
+          "description": "The maximum number of simultaneous requests that MediaTailor makes to the ADS for each manifest request. The default is 1.",
+          "type": "integer",
+          "markdownDescription": "The maximum number of simultaneous requests that MediaTailor makes to the ADS for each manifest request. The default is 1.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "EnableVodVastParallelization": {
+          "description": "Enables parallel processing of ADS requests in VOD workflows when the ADS returns VAST responses. The default is false.",
+          "type": "boolean",
+          "markdownDescription": "Enables parallel processing of ADS requests in VOD workflows when the ADS returns VAST responses. The default is false.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "The settings that control how many concurrent requests MediaTailor makes to the ad decision server (ADS).\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "tagging": {
