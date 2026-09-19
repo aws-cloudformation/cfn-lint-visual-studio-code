@@ -1,0 +1,199 @@
+{
+  "typeName": "AWS::Personalize::MetricAttribution",
+  "description": "Creates a metric attribution for reporting on recommendation impact in Amazon Personalize.",
+  "definitions": {
+    "MetricAttribute": {
+      "type": "object",
+      "description": "A metric attribute for the metric attribution.",
+      "properties": {
+        "EventType": {
+          "type": "string",
+          "description": "The metric's event type.",
+          "maxLength": 256,
+          "markdownDescription": "The metric's event type.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        },
+        "MetricName": {
+          "type": "string",
+          "description": "The metric's name.",
+          "maxLength": 256,
+          "markdownDescription": "The metric's name.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        },
+        "Expression": {
+          "type": "string",
+          "description": "The attribute's expression.",
+          "maxLength": 256,
+          "markdownDescription": "The attribute's expression.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "EventType",
+        "MetricName",
+        "Expression"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A metric attribute for the metric attribution.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "S3DataDestination": {
+      "type": "object",
+      "description": "The configuration details of an Amazon S3 output bucket.",
+      "properties": {
+        "Path": {
+          "type": "string",
+          "description": "The file path of the Amazon S3 bucket.",
+          "maxLength": 256,
+          "markdownDescription": "The file path of the Amazon S3 bucket.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: ^(s3|http|https)://.+$  \nUpdate requires: No interruption\n"
+        },
+        "KmsKeyArn": {
+          "type": "string",
+          "description": "The ARN of the KMS key.",
+          "maxLength": 2048,
+          "markdownDescription": "The ARN of the KMS key.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nPattern: ^arn:aws.*:kms:.*:[0-9]{12}:key/  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Path"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The configuration details of an Amazon S3 output bucket.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "MetricsOutputConfig": {
+      "type": "object",
+      "description": "The output configuration details for the metric attribution.",
+      "properties": {
+        "S3DataDestination": {
+          "$ref": "#/definitions/S3DataDestination"
+        },
+        "RoleArn": {
+          "type": "string",
+          "description": "The ARN of the IAM role for the metric attribution.",
+          "maxLength": 256,
+          "markdownDescription": "The ARN of the IAM role for the metric attribution.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: ^arn:([a-z\\d-]+):iam::\\d{12}:role/?[a-zA-Z_0-9+=,.@\\-_/]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "RoleArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The output configuration details for the metric attribution.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "Name": {
+      "type": "string",
+      "description": "The name of the metric attribution.",
+      "minLength": 1,
+      "maxLength": 63,
+      "markdownDescription": "The name of the metric attribution.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 63  \nPattern: ^[a-zA-Z0-9][a-zA-Z0-9\\-_]*$  \nUpdate requires: Replacement\n"
+    },
+    "MetricAttributionArn": {
+      "type": "string",
+      "description": "The ARN of the metric attribution.",
+      "maxLength": 256,
+      "markdownDescription": "The ARN of the metric attribution.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nPattern: ^arn:([a-z\\d-]+):personalize:.*:.*:.+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "DatasetGroupArn": {
+      "type": "string",
+      "description": "The ARN of the destination dataset group.",
+      "maxLength": 256,
+      "markdownDescription": "The ARN of the destination dataset group.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: ^arn:([a-z\\d-]+):personalize:.*:.*:.+$  \nUpdate requires: Replacement\n"
+    },
+    "Metrics": {
+      "type": "array",
+      "description": "A list of metric attributes for the metric attribution.",
+      "items": {
+        "$ref": "#/definitions/MetricAttribute"
+      },
+      "maxItems": 10,
+      "insertionOrder": false,
+      "markdownDescription": "A list of metric attributes for the metric attribution.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: Replacement\n"
+    },
+    "MetricsOutputConfig": {
+      "$ref": "#/definitions/MetricsOutputConfig"
+    },
+    "Status": {
+      "type": "string",
+      "description": "The status of the metric attribution.",
+      "markdownDescription": "The status of the metric attribution.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  },
+  "required": [
+    "Name",
+    "DatasetGroupArn",
+    "Metrics",
+    "MetricsOutputConfig"
+  ],
+  "readOnlyProperties": [
+    "/properties/MetricAttributionArn",
+    "/properties/Status"
+  ],
+  "createOnlyProperties": [
+    "/properties/Name",
+    "/properties/DatasetGroupArn",
+    "/properties/Metrics"
+  ],
+  "primaryIdentifier": [
+    "/properties/MetricAttributionArn"
+  ],
+  "tagging": {
+    "taggable": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "personalize:CreateMetricAttribution",
+        "personalize:DescribeMetricAttribution",
+        "iam:PassRole",
+        "kms:CreateGrant",
+        "kms:DescribeKey",
+        "kms:GenerateDataKey",
+        "kms:Decrypt"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "personalize:DescribeMetricAttribution",
+        "personalize:ListMetricAttributionMetrics"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "personalize:UpdateMetricAttribution",
+        "personalize:DescribeMetricAttribution",
+        "iam:PassRole",
+        "kms:CreateGrant",
+        "kms:DescribeKey",
+        "kms:GenerateDataKey",
+        "kms:Decrypt"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "personalize:DeleteMetricAttribution",
+        "personalize:DescribeMetricAttribution"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "personalize:ListMetricAttributions"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "propertyTransform": {
+    "/properties/Metrics/*/EventType": "$uppercase(EventType)",
+    "/properties/Metrics/*/MetricName": "$uppercase(MetricName)"
+  },
+  "attributes": {
+    "MetricAttributionArn": {
+      "type": "string",
+      "description": "The ARN of the metric attribution.",
+      "maxLength": 256,
+      "markdownDescription": "The ARN of the metric attribution.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nPattern: ^arn:([a-z\\d-]+):personalize:.*:.*:.+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Status": {
+      "type": "string",
+      "description": "The status of the metric attribution.",
+      "markdownDescription": "The status of the metric attribution.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}
