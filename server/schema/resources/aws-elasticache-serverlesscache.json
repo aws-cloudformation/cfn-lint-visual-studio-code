@@ -1,24 +1,93 @@
 {
+  "tagging": {
+    "permissions": [
+      "elasticache:AddTagsToResource",
+      "elasticache:RemoveTagsFromResource"
+    ],
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "tagProperty": "/properties/Tags",
+    "cloudFormationSystemTags": false
+  },
   "typeName": "AWS::ElastiCache::ServerlessCache",
+  "readOnlyProperties": [
+    "/properties/FullEngineVersion",
+    "/properties/CreateTime",
+    "/properties/Status",
+    "/properties/Endpoint/Address",
+    "/properties/Endpoint/Port",
+    "/properties/ReaderEndpoint/Address",
+    "/properties/ReaderEndpoint/Port",
+    "/properties/ARN"
+  ],
   "description": "The AWS::ElastiCache::ServerlessCache resource creates an Amazon ElastiCache Serverless Cache.",
+  "createOnlyProperties": [
+    "/properties/ServerlessCacheName",
+    "/properties/KmsKeyId",
+    "/properties/SnapshotArnsToRestore",
+    "/properties/SubnetIds",
+    "/properties/NetworkType"
+  ],
+  "primaryIdentifier": [
+    "/properties/ServerlessCacheName"
+  ],
+  "required": [
+    "ServerlessCacheName",
+    "Engine"
+  ],
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-elasticache",
-  "definitions": {
-    "CacheUsageLimits": {
-      "description": "The cache capacity limit of the Serverless Cache.",
-      "type": "object",
-      "properties": {
-        "DataStorage": {
-          "$ref": "#/definitions/DataStorage"
-        },
-        "ECPUPerSecond": {
-          "$ref": "#/definitions/ECPUPerSecond"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "The cache capacity limit of the Serverless Cache.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+  "handlers": {
+    "read": {
+      "permissions": [
+        "elasticache:DescribeServerlessCaches",
+        "elasticache:ListTagsForResource"
+      ]
     },
+    "create": {
+      "permissions": [
+        "elasticache:CreateServerlessCache",
+        "elasticache:DescribeServerlessCaches",
+        "elasticache:AddTagsToResource",
+        "elasticache:ListTagsForResource",
+        "ec2:CreateTags",
+        "ec2:CreateVpcEndpoint",
+        "kms:CreateGrant",
+        "kms:DescribeKey"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "elasticache:ModifyServerlessCache",
+        "elasticache:DescribeServerlessCaches",
+        "elasticache:AddTagsToResource",
+        "elasticache:ListTagsForResource",
+        "elasticache:RemoveTagsFromResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "elasticache:DescribeServerlessCaches",
+        "elasticache:ListTagsForResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "elasticache:DeleteServerlessCache",
+        "elasticache:DescribeServerlessCaches",
+        "elasticache:ListTagsForResource"
+      ]
+    }
+  },
+  "writeOnlyProperties": [
+    "/properties/SnapshotArnsToRestore",
+    "/properties/FinalSnapshotName"
+  ],
+  "additionalProperties": false,
+  "definitions": {
     "DataStorage": {
       "description": "The cached data capacity of the Serverless Cache.",
+      "additionalProperties": false,
       "type": "object",
       "properties": {
         "Minimum": {
@@ -40,57 +109,23 @@
           "markdownDescription": "The unit of cached data capacity of the Serverless Cache.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: GB  \nUpdate requires: No interruption\n"
         }
       },
-      "additionalProperties": false,
       "required": [
         "Unit"
       ],
       "markdownDescription": "The cached data capacity of the Serverless Cache.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "ECPUPerSecond": {
-      "description": "The ECPU per second of the Serverless Cache.",
-      "type": "object",
-      "properties": {
-        "Minimum": {
-          "description": "The minimum ECPU per second of the Serverless Cache.",
-          "type": "integer",
-          "markdownDescription": "The minimum ECPU per second of the Serverless Cache.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
-        },
-        "Maximum": {
-          "description": "The maximum ECPU per second of the Serverless Cache.",
-          "type": "integer",
-          "markdownDescription": "The maximum ECPU per second of the Serverless Cache.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "The ECPU per second of the Serverless Cache.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "Tag": {
-      "description": "A key-value pair to associate with Serverless Cache.",
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "Key": {
-          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with 'aws:'. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 128,
-          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with 'aws:'. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^(?!aws:)[a-zA-Z0-9 _\\.\\/=+:\\-@]*$  \nUpdate requires: No interruption\n"
-        },
-        "Value": {
-          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
-          "type": "string",
-          "minLength": 0,
-          "maxLength": 256,
-          "markdownDescription": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nPattern: ^[a-zA-Z0-9 _\\.\\/=+:\\-@]*$  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Key"
+    "ConnectionType": {
+      "description": "The connection type for the serverless cache. Valid values are vpc or public.",
+      "type": "string",
+      "enum": [
+        "vpc",
+        "public"
       ],
-      "markdownDescription": "A key-value pair to associate with Serverless Cache.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The connection type for the serverless cache. Valid values are vpc or public.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: vpc | public  \nUpdate requires: No interruption\n"
     },
     "Endpoint": {
       "description": "The address and the port.",
+      "additionalProperties": false,
       "type": "object",
       "properties": {
         "Address": {
@@ -104,49 +139,115 @@
           "markdownDescription": "Endpoint port.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         }
       },
-      "additionalProperties": false,
       "markdownDescription": "The address and the port.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "NetworkType": {
+      "description": "The network type for the serverless cache. Valid values are ipv4, ipv6, or dual_stack.",
+      "type": "string",
+      "enum": [
+        "ipv4",
+        "ipv6",
+        "dual_stack"
+      ],
+      "markdownDescription": "The network type for the serverless cache. Valid values are ipv4, ipv6, or dual_stack.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ipv4 | ipv6 | dual_stack  \nUpdate requires: No interruption\n"
+    },
+    "ECPUPerSecond": {
+      "description": "The ECPU per second of the Serverless Cache.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Minimum": {
+          "description": "The minimum ECPU per second of the Serverless Cache.",
+          "type": "integer",
+          "markdownDescription": "The minimum ECPU per second of the Serverless Cache.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Maximum": {
+          "description": "The maximum ECPU per second of the Serverless Cache.",
+          "type": "integer",
+          "markdownDescription": "The maximum ECPU per second of the Serverless Cache.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "The ECPU per second of the Serverless Cache.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with Serverless Cache.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "minLength": 0,
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "type": "string",
+          "maxLength": 256,
+          "markdownDescription": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nPattern: ^[a-zA-Z0-9 _\\.\\/=+:\\-@]*$  \nUpdate requires: No interruption\n"
+        },
+        "Key": {
+          "minLength": 1,
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with 'aws:'. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "type": "string",
+          "maxLength": 128,
+          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with 'aws:'. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^(?!aws:)[a-zA-Z0-9 _\\.\\/=+:\\-@]*$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key"
+      ],
+      "markdownDescription": "A key-value pair to associate with Serverless Cache.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CacheUsageLimits": {
+      "description": "The cache capacity limit of the Serverless Cache.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "DataStorage": {
+          "$ref": "#/definitions/DataStorage"
+        },
+        "ECPUPerSecond": {
+          "$ref": "#/definitions/ECPUPerSecond"
+        }
+      },
+      "markdownDescription": "The cache capacity limit of the Serverless Cache.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
-    "ServerlessCacheName": {
-      "description": "The name of the Serverless Cache. This value must be unique.",
+    "Status": {
+      "description": "The status of the Serverless Cache.",
       "type": "string",
-      "markdownDescription": "The name of the Serverless Cache. This value must be unique.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
+      "markdownDescription": "The status of the Serverless Cache.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Description": {
       "description": "The description of the Serverless Cache.",
       "type": "string",
       "markdownDescription": "The description of the Serverless Cache.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
     },
-    "Engine": {
-      "description": "The engine name of the Serverless Cache.",
-      "type": "string",
-      "markdownDescription": "The engine name of the Serverless Cache.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-    },
-    "MajorEngineVersion": {
-      "description": "The major engine version of the Serverless Cache.",
-      "type": "string",
-      "markdownDescription": "The major engine version of the Serverless Cache.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-    },
-    "FullEngineVersion": {
-      "description": "The full engine version of the Serverless Cache.",
-      "type": "string",
-      "markdownDescription": "The full engine version of the Serverless Cache.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "CacheUsageLimits": {
-      "$ref": "#/definitions/CacheUsageLimits"
-    },
     "KmsKeyId": {
       "description": "The ID of the KMS key used to encrypt the cluster.",
       "type": "string",
       "markdownDescription": "The ID of the KMS key used to encrypt the cluster.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
     },
+    "FinalSnapshotName": {
+      "description": "The final snapshot name which is taken before Serverless Cache is deleted.",
+      "type": "string",
+      "markdownDescription": "The final snapshot name which is taken before Serverless Cache is deleted.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "UserGroupId": {
+      "description": "The ID of the user group.",
+      "type": "string",
+      "markdownDescription": "The ID of the user group.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "CreateTime": {
+      "description": "The creation time of the Serverless Cache.",
+      "type": "string",
+      "markdownDescription": "The creation time of the Serverless Cache.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CacheUsageLimits": {
+      "$ref": "#/definitions/CacheUsageLimits"
+    },
     "SecurityGroupIds": {
-      "description": "One or more Amazon VPC security groups associated with this Serverless Cache.",
-      "type": "array",
       "uniqueItems": true,
+      "description": "One or more Amazon VPC security groups associated with this Serverless Cache.",
       "insertionOrder": false,
+      "type": "array",
       "items": {
         "type": "string",
         "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
@@ -154,175 +255,97 @@
       "markdownDescription": "One or more Amazon VPC security groups associated with this Serverless Cache.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     },
     "SnapshotArnsToRestore": {
-      "description": "The ARN's of snapshot to restore Serverless Cache.",
-      "type": "array",
       "uniqueItems": true,
+      "description": "The ARN's of snapshot to restore Serverless Cache.",
       "insertionOrder": false,
+      "type": "array",
       "items": {
         "type": "string",
         "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
       },
       "markdownDescription": "The ARN's of snapshot to restore Serverless Cache.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement\n"
     },
-    "Tags": {
-      "description": "An array of key-value pairs to apply to this Serverless Cache.",
-      "type": "array",
-      "uniqueItems": true,
-      "insertionOrder": false,
-      "items": {
-        "$ref": "#/definitions/Tag"
-      },
-      "markdownDescription": "An array of key-value pairs to apply to this Serverless Cache.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-    },
-    "UserGroupId": {
-      "description": "The ID of the user group.",
-      "type": "string",
-      "markdownDescription": "The ID of the user group.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-    },
     "SubnetIds": {
-      "description": "The subnet id's of the Serverless Cache.",
-      "type": "array",
       "uniqueItems": true,
+      "description": "The subnet id's of the Serverless Cache.",
       "insertionOrder": false,
+      "type": "array",
       "items": {
         "type": "string",
         "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
       },
       "markdownDescription": "The subnet id's of the Serverless Cache.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement\n"
     },
-    "SnapshotRetentionLimit": {
-      "description": "The snapshot retention limit of the Serverless Cache.",
-      "type": "integer",
-      "markdownDescription": "The snapshot retention limit of the Serverless Cache.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
-    },
     "DailySnapshotTime": {
       "description": "The daily time range (in UTC) during which the service takes automatic snapshot of the Serverless Cache.",
       "type": "string",
       "markdownDescription": "The daily time range (in UTC) during which the service takes automatic snapshot of the Serverless Cache.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
     },
-    "CreateTime": {
-      "description": "The creation time of the Serverless Cache.",
-      "type": "string",
-      "markdownDescription": "The creation time of the Serverless Cache.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    "ReaderEndpoint": {
+      "$ref": "#/definitions/Endpoint"
     },
-    "Status": {
-      "description": "The status of the Serverless Cache.",
+    "SnapshotRetentionLimit": {
+      "description": "The snapshot retention limit of the Serverless Cache.",
+      "type": "integer",
+      "markdownDescription": "The snapshot retention limit of the Serverless Cache.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    },
+    "FullEngineVersion": {
+      "description": "The full engine version of the Serverless Cache.",
       "type": "string",
-      "markdownDescription": "The status of the Serverless Cache.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "The full engine version of the Serverless Cache.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Endpoint": {
       "$ref": "#/definitions/Endpoint"
     },
-    "ReaderEndpoint": {
-      "$ref": "#/definitions/Endpoint"
+    "NetworkType": {
+      "$ref": "#/definitions/NetworkType"
+    },
+    "ServerlessCacheName": {
+      "description": "The name of the Serverless Cache. This value must be unique.",
+      "type": "string",
+      "markdownDescription": "The name of the Serverless Cache. This value must be unique.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "MajorEngineVersion": {
+      "description": "The major engine version of the Serverless Cache.",
+      "type": "string",
+      "markdownDescription": "The major engine version of the Serverless Cache.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
     },
     "ARN": {
       "description": "The ARN of the Serverless Cache.",
       "type": "string",
       "markdownDescription": "The ARN of the Serverless Cache.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
-    "FinalSnapshotName": {
-      "description": "The final snapshot name which is taken before Serverless Cache is deleted.",
+    "Engine": {
+      "description": "The engine name of the Serverless Cache.",
       "type": "string",
-      "markdownDescription": "The final snapshot name which is taken before Serverless Cache is deleted.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-    }
-  },
-  "tagging": {
-    "taggable": true,
-    "tagOnCreate": true,
-    "tagUpdatable": true,
-    "cloudFormationSystemTags": false,
-    "tagProperty": "/properties/Tags",
-    "permissions": [
-      "elasticache:AddTagsToResource",
-      "elasticache:RemoveTagsFromResource"
-    ]
-  },
-  "additionalProperties": false,
-  "readOnlyProperties": [
-    "/properties/FullEngineVersion",
-    "/properties/CreateTime",
-    "/properties/Status",
-    "/properties/Endpoint/Address",
-    "/properties/Endpoint/Port",
-    "/properties/ReaderEndpoint/Address",
-    "/properties/ReaderEndpoint/Port",
-    "/properties/ARN"
-  ],
-  "writeOnlyProperties": [
-    "/properties/SnapshotArnsToRestore",
-    "/properties/FinalSnapshotName"
-  ],
-  "createOnlyProperties": [
-    "/properties/ServerlessCacheName",
-    "/properties/KmsKeyId",
-    "/properties/SnapshotArnsToRestore",
-    "/properties/SubnetIds"
-  ],
-  "required": [
-    "ServerlessCacheName",
-    "Engine"
-  ],
-  "primaryIdentifier": [
-    "/properties/ServerlessCacheName"
-  ],
-  "handlers": {
-    "create": {
-      "permissions": [
-        "elasticache:CreateServerlessCache",
-        "elasticache:DescribeServerlessCaches",
-        "elasticache:AddTagsToResource",
-        "elasticache:ListTagsForResource",
-        "ec2:CreateTags",
-        "ec2:CreateVpcEndpoint",
-        "kms:CreateGrant",
-        "kms:DescribeKey"
-      ]
+      "markdownDescription": "The engine name of the Serverless Cache.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
     },
-    "read": {
-      "permissions": [
-        "elasticache:DescribeServerlessCaches",
-        "elasticache:ListTagsForResource"
-      ]
-    },
-    "update": {
-      "permissions": [
-        "elasticache:ModifyServerlessCache",
-        "elasticache:DescribeServerlessCaches",
-        "elasticache:AddTagsToResource",
-        "elasticache:ListTagsForResource",
-        "elasticache:RemoveTagsFromResource"
-      ]
-    },
-    "delete": {
-      "permissions": [
-        "elasticache:DeleteServerlessCache",
-        "elasticache:DescribeServerlessCaches",
-        "elasticache:ListTagsForResource"
-      ]
-    },
-    "list": {
-      "permissions": [
-        "elasticache:DescribeServerlessCaches",
-        "elasticache:ListTagsForResource"
-      ]
+    "Tags": {
+      "uniqueItems": true,
+      "description": "An array of key-value pairs to apply to this Serverless Cache.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "An array of key-value pairs to apply to this Serverless Cache.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "attributes": {
-    "FullEngineVersion": {
-      "description": "The full engine version of the Serverless Cache.",
+    "Status": {
+      "description": "The status of the Serverless Cache.",
       "type": "string",
-      "markdownDescription": "The full engine version of the Serverless Cache.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "The status of the Serverless Cache.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "CreateTime": {
       "description": "The creation time of the Serverless Cache.",
       "type": "string",
       "markdownDescription": "The creation time of the Serverless Cache.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
-    "Status": {
-      "description": "The status of the Serverless Cache.",
+    "FullEngineVersion": {
+      "description": "The full engine version of the Serverless Cache.",
       "type": "string",
-      "markdownDescription": "The status of the Serverless Cache.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "The full engine version of the Serverless Cache.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "ARN": {
       "description": "The ARN of the Serverless Cache.",
