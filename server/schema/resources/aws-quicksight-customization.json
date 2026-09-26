@@ -1,0 +1,159 @@
+{
+  "typeName": "AWS::QuickSight::Customization",
+  "description": "Definition of the AWS::QuickSight::Customization Resource Type.",
+  "definitions": {
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "Tag key.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "Tag key.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "description": "Tag value.",
+          "minLength": 1,
+          "maxLength": 256,
+          "markdownDescription": "Tag value.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "Arn": {
+      "type": "string",
+      "description": "The Amazon Resource Name of the namespace-scoped account customization, arn:{Partition}:quicksight:{Region}:{AccountId}:customization/namespace/{Namespace}. Returned by the service and used as the primary identifier.",
+      "markdownDescription": "The Amazon Resource Name of the namespace-scoped account customization, arn:{Partition}:quicksight:{Region}:{AccountId}:customization/namespace/{Namespace}. Returned by the service and used as the primary identifier.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "AwsAccountId": {
+      "type": "string",
+      "description": "The AWS account that owns the customization. Supplied by CloudFormation from the invoking account rather than by the template, so it is read-only.",
+      "minLength": 12,
+      "maxLength": 12,
+      "markdownDescription": "The AWS account that owns the customization. Supplied by CloudFormation from the invoking account rather than by the template, so it is read-only.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 12  \nMaximum Length: 12  \nPattern: ^[0-9]{12}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Namespace": {
+      "type": "string",
+      "description": "The QuickSight namespace the customization applies to. One customization exists per (account, region, namespace), so this is create-only: changing it addresses a different resource.",
+      "minLength": 1,
+      "maxLength": 64,
+      "markdownDescription": "The QuickSight namespace the customization applies to. One customization exists per (account, region, namespace), so this is create-only: changing it addresses a different resource.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[a-zA-Z0-9._-]*$  \nUpdate requires: Replacement\n"
+    },
+    "DefaultTheme": {
+      "type": "string",
+      "description": "The ARN of the theme applied by default in the QuickSight console for this namespace. May be an AWS-managed starter theme such as arn:{Partition}:quicksight::aws:theme/MIDNIGHT or a theme owned by this account.",
+      "markdownDescription": "The ARN of the theme applied by default in the QuickSight console for this namespace. May be an AWS-managed starter theme such as arn:{Partition}:quicksight::aws:theme/MIDNIGHT or a theme owned by this account.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "Tags": {
+      "type": "array",
+      "description": "Tags applied to the customization. QuickSight rejects any key prefixed aws: or quicksight:, so CloudFormation system tags are not propagated.",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "minItems": 1,
+      "maxItems": 200,
+      "markdownDescription": "Tags applied to the customization. QuickSight rejects any key prefixed aws: or quicksight:, so CloudFormation system tags are not propagated.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "required": [
+    "Namespace",
+    "DefaultTheme"
+  ],
+  "additionalProperties": false,
+  "createOnlyProperties": [
+    "/properties/Namespace"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/AwsAccountId"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/Namespace"
+    ]
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "quicksight:TagResource",
+      "quicksight:UntagResource",
+      "quicksight:ListTagsForResource"
+    ]
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "quicksight:CreateAccountCustomization",
+        "quicksight:DescribeAccountCustomization",
+        "quicksight:TagResource",
+        "quicksight:ListTagsForResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "quicksight:DescribeAccountCustomization",
+        "quicksight:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "quicksight:UpdateAccountCustomization",
+        "quicksight:TagResource",
+        "quicksight:UntagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "quicksight:DeleteAccountCustomization"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "Namespace": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[a-zA-Z0-9._-]*$  \nUpdate requires: No interruption\n"
+          }
+        },
+        "required": [
+          "Namespace"
+        ]
+      },
+      "permissions": [
+        "quicksight:DescribeAccountCustomization"
+      ]
+    }
+  },
+  "attributes": {
+    "Arn": {
+      "type": "string",
+      "description": "The Amazon Resource Name of the namespace-scoped account customization, arn:{Partition}:quicksight:{Region}:{AccountId}:customization/namespace/{Namespace}. Returned by the service and used as the primary identifier.",
+      "markdownDescription": "The Amazon Resource Name of the namespace-scoped account customization, arn:{Partition}:quicksight:{Region}:{AccountId}:customization/namespace/{Namespace}. Returned by the service and used as the primary identifier.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "AwsAccountId": {
+      "type": "string",
+      "description": "The AWS account that owns the customization. Supplied by CloudFormation from the invoking account rather than by the template, so it is read-only.",
+      "minLength": 12,
+      "maxLength": 12,
+      "markdownDescription": "The AWS account that owns the customization. Supplied by CloudFormation from the invoking account rather than by the template, so it is read-only.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 12  \nMaximum Length: 12  \nPattern: ^[0-9]{12}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}
