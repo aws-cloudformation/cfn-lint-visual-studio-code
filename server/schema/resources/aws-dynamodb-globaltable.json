@@ -160,6 +160,29 @@
   ],
   "additionalProperties": false,
   "definitions": {
+    "SearchSchemaElement": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "AttributeName": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "SearchSchemaElementType": {
+          "type": "string",
+          "enum": [
+            "HASH",
+            "INLINE_FILTER"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: HASH | INLINE_FILTER  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "AttributeName",
+        "SearchSchemaElementType"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "LocalSecondaryIndex": {
       "additionalProperties": false,
       "type": "object",
@@ -187,6 +210,20 @@
         "IndexName",
         "Projection",
         "KeySchema"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "VectorAttribute": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "AttributeName": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "AttributeName"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
@@ -408,6 +445,55 @@
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "VectorIndex": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "IndexName": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "VectorAttribute": {
+          "$ref": "#/definitions/VectorAttribute"
+        },
+        "Projection": {
+          "$ref": "#/definitions/Projection"
+        },
+        "Dimensions": {
+          "maximum": 4096,
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "SearchSchema": {
+          "minItems": 1,
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SearchSchemaElement"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "DistanceFunction": {
+          "type": "string",
+          "enum": [
+            "COSINE",
+            "DOT_PRODUCT",
+            "EUCLIDEAN"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: COSINE | DOT_PRODUCT | EUCLIDEAN  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "IndexName",
+        "VectorAttribute",
+        "Projection",
+        "Dimensions",
+        "DistanceFunction"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "WriteOnDemandThroughputSettings": {
       "additionalProperties": false,
       "type": "object",
@@ -421,16 +507,34 @@
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "ReplicaStreamSpecification": {
+      "anyOf": [
+        {
+          "required": [
+            "ResourcePolicy"
+          ]
+        },
+        {
+          "required": [
+            "Tags"
+          ]
+        }
+      ],
       "additionalProperties": false,
       "type": "object",
       "properties": {
         "ResourcePolicy": {
           "$ref": "#/definitions/ResourcePolicy"
+        },
+        "Tags": {
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Tag"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: Array  \nUpdate requires: No interruption\n"
         }
       },
-      "required": [
-        "ResourcePolicy"
-      ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "GlobalTableWitness": {
@@ -775,6 +879,16 @@
     },
     "WarmThroughput": {
       "$ref": "#/definitions/WarmThroughput"
+    },
+    "VectorIndexes": {
+      "minItems": 1,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/VectorIndex"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     },
     "Replicas": {
       "minItems": 1,

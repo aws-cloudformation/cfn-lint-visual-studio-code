@@ -53,6 +53,9 @@
     "EksConfiguration": {
       "$ref": "#/definitions/EksConfiguration"
     },
+    "EcsSettings": {
+      "$ref": "#/definitions/EcsSettings"
+    },
     "Context": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
@@ -146,7 +149,7 @@
             "type": "string",
             "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
           },
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         },
         "Tags": {
           "type": "object",
@@ -168,14 +171,204 @@
           "type": "boolean",
           "default": false,
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "ManagedInstancesProvider": {
+          "$ref": "#/definitions/ManagedInstancesProvider"
+        },
+        "CapacityTags": {
+          "type": "object",
+          "description": "Capacity-level tags for compute environments.",
+          "patternProperties": {
+            ".*": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            }
+          },
+          "additionalProperties": false,
+          "markdownDescription": "Capacity-level tags for compute environments.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "Subnets",
         "Type",
         "MaxvCpus"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: Replacement\nRead only property: Yes"
+    },
+    "ManagedInstancesProvider": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "PropagateTags": {
+          "type": "string",
+          "enum": [
+            "CAPACITY_PROVIDER",
+            "NONE"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CAPACITY_PROVIDER | NONE  \nUpdate requires: No interruption\n"
+        },
+        "InfrastructureRoleArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "InstanceLaunchTemplate": {
+          "$ref": "#/definitions/InstanceLaunchTemplate"
+        },
+        "InfrastructureOptimization": {
+          "$ref": "#/definitions/InfrastructureOptimization"
+        }
+      },
+      "required": [
+        "InfrastructureRoleArn",
+        "InstanceLaunchTemplate"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "InstanceLaunchTemplate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Ec2InstanceProfileArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "NetworkConfiguration": {
+          "$ref": "#/definitions/ManagedInstancesNetworkConfiguration"
+        },
+        "InstanceRequirements": {
+          "$ref": "#/definitions/InstanceRequirements"
+        },
+        "CapacityOptionType": {
+          "type": "string",
+          "enum": [
+            "ON_DEMAND",
+            "SPOT",
+            "RESERVED"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ON_DEMAND | SPOT | RESERVED  \nUpdate requires: No interruption\n"
+        },
+        "StorageConfiguration": {
+          "$ref": "#/definitions/ManagedInstancesStorageConfiguration"
+        },
+        "Monitoring": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "FipsEnabled": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "CapacityReservations": {
+          "$ref": "#/definitions/CapacityReservations"
+        },
+        "InstanceMetadataTagsPropagation": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "LocalStorageConfiguration": {
+          "$ref": "#/definitions/ManagedInstancesLocalStorageConfiguration"
+        }
+      },
+      "required": [
+        "Ec2InstanceProfileArn",
+        "NetworkConfiguration"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ManagedInstancesNetworkConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Subnets": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "SecurityGroups": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Subnets",
+        "SecurityGroups"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "InstanceRequirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "AllowedInstanceTypes": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "InfrastructureOptimization": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ScaleInAfter": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ManagedInstancesStorageConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "StorageSizeGiB": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CapacityReservations": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ReservationGroupArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ReservationPreference": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ManagedInstancesLocalStorageConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "UseLocalStorage": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "ComputeScalingPolicy": {
       "type": "object",
@@ -317,12 +510,59 @@
           "type": "string",
           "default": false,
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "AccessEntry": {
+          "$ref": "#/definitions/EksAccessEntry"
         }
       },
       "required": [
         "EksClusterArn",
         "KubernetesNamespace"
       ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: Replacement\nRead only property: Yes"
+    },
+    "EksAccessEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "The EKS access entry configuration for the compute environment. Controls whether AWS Batch manages the EKS access entry for the compute environment's service role, or inherits it from the cluster.",
+      "properties": {
+        "DesiredState": {
+          "type": "string",
+          "description": "The desired state of the EKS access entry managed by AWS Batch. When omitted, AWS Batch applies INHERIT_FROM_CLUSTER.",
+          "enum": [
+            "ENABLED",
+            "DISABLED",
+            "INHERIT_FROM_CLUSTER"
+          ],
+          "markdownDescription": "The desired state of the EKS access entry managed by AWS Batch. When omitted, AWS Batch applies INHERIT_FROM_CLUSTER.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED | INHERIT_FROM_CLUSTER  \nUpdate requires: No interruption\n"
+        },
+        "Status": {
+          "type": "string",
+          "description": "The read-only status of the EKS access entry, returned by DescribeComputeEnvironments.",
+          "enum": [
+            "ACTIVE",
+            "INACTIVE"
+          ],
+          "markdownDescription": "The read-only status of the EKS access entry, returned by DescribeComputeEnvironments.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ACTIVE | INACTIVE  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "The EKS access entry configuration for the compute environment. Controls whether AWS Batch manages the EKS access entry for the compute environment's service role, or inherits it from the cluster.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EcsSettings": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ContainerInsights": {
+          "type": "string",
+          "description": "The CloudWatch Container Insights setting applied to the Amazon ECS cluster that backs this compute environment. After you set this property, you can't revert it to the default (unset) state in which the setting is managed outside of AWS Batch. If you remove this property after previously setting it, AWS Batch treats the omission as DISABLED, because the underlying API has no way to unset the value. Because of this, if a stack rollback would return this property to its previous unset state, AWS Batch sets it to DISABLED instead.",
+          "enum": [
+            "ENABLED",
+            "ENHANCED",
+            "DISABLED"
+          ],
+          "markdownDescription": "The CloudWatch Container Insights setting applied to the Amazon ECS cluster that backs this compute environment. After you set this property, you can't revert it to the default (unset) state in which the setting is managed outside of AWS Batch. If you remove this property after previously setting it, AWS Batch treats the omission as DISABLED, because the underlying API has no way to unset the value. Because of this, if a stack rollback would return this property to its previous unset state, AWS Batch sets it to DISABLED instead.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | ENHANCED | DISABLED  \nUpdate requires: No interruption\n"
+        }
+      },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
@@ -345,7 +585,10 @@
     "/properties/ComputeEnvironmentName",
     "/properties/Tags",
     "/properties/Type",
-    "/properties/EksConfiguration"
+    "/properties/EksConfiguration/EksClusterArn",
+    "/properties/EksConfiguration/KubernetesNamespace",
+    "/properties/ComputeResources/ManagedInstancesProvider/InstanceLaunchTemplate/CapacityOptionType",
+    "/properties/ComputeResources/ManagedInstancesProvider/InstanceLaunchTemplate/FipsEnabled"
   ],
   "conditionalCreateOnlyProperties": [
     "/properties/ComputeResources/AllocationStrategy",
@@ -373,7 +616,8 @@
   ],
   "readOnlyProperties": [
     "/properties/ComputeEnvironmentArn",
-    "/properties/ComputeResources/Ec2Configuration/*/BatchImageStatus"
+    "/properties/ComputeResources/Ec2Configuration/*/BatchImageStatus",
+    "/properties/EksConfiguration/AccessEntry/Status"
   ],
   "additionalIdentifiers": [
     [
@@ -388,8 +632,14 @@
         "Batch:DescribeComputeEnvironments",
         "iam:CreateServiceLinkedRole",
         "Iam:PassRole",
+        "Eks:AssociateAccessPolicy",
+        "Eks:CreateAccessEntry",
+        "Eks:DeleteAccessEntry",
+        "Eks:DescribeAccessEntry",
         "Eks:DescribeCluster",
-        "ec2:DescribeLaunchTemplateVersions"
+        "Eks:ListAssociatedAccessPolicies",
+        "ec2:DescribeLaunchTemplateVersions",
+        "Batch:SetCapacityTags"
       ]
     },
     "read": {
@@ -404,8 +654,14 @@
         "Batch:TagResource",
         "Batch:UnTagResource",
         "Iam:PassRole",
+        "Eks:AssociateAccessPolicy",
+        "Eks:CreateAccessEntry",
+        "Eks:DeleteAccessEntry",
+        "Eks:DescribeAccessEntry",
         "Eks:DescribeCluster",
-        "ec2:DescribeLaunchTemplateVersions"
+        "Eks:ListAssociatedAccessPolicies",
+        "ec2:DescribeLaunchTemplateVersions",
+        "Batch:SetCapacityTags"
       ]
     },
     "delete": {
@@ -414,7 +670,12 @@
         "Batch:DescribeComputeEnvironments",
         "Batch:UpdateComputeEnvironment",
         "Iam:PassRole",
+        "Eks:AssociateAccessPolicy",
+        "Eks:CreateAccessEntry",
+        "Eks:DeleteAccessEntry",
+        "Eks:DescribeAccessEntry",
         "Eks:DescribeCluster",
+        "Eks:ListAssociatedAccessPolicies",
         "ec2:DescribeLaunchTemplateVersions"
       ]
     },

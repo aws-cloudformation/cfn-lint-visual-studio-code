@@ -1,0 +1,487 @@
+{
+  "tagging": {
+    "permissions": [
+      "agent-registry:TagResource",
+      "agent-registry:UntagResource",
+      "agent-registry:ListTagsForResource"
+    ],
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "tagProperty": "/properties/Tags",
+    "cloudFormationSystemTags": true
+  },
+  "handlers": {
+    "read": {
+      "permissions": [
+        "agent-registry:GetRegistry",
+        "agent-registry:ListTagsForResource"
+      ]
+    },
+    "create": {
+      "permissions": [
+        "agent-registry:CreateRegistry",
+        "agent-registry:GetRegistry",
+        "agent-registry:TagResource",
+        "agent-registry:ListTagsForResource",
+        "bedrock-agentcore:CreateWorkloadIdentity",
+        "iam:CreateServiceLinkedRole",
+        "kms:DescribeKey",
+        "kms:CreateGrant",
+        "kms:GenerateDataKeyWithoutPlaintext",
+        "kms:ReEncryptFrom",
+        "kms:ReEncryptTo"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "agent-registry:UpdateRegistry",
+        "agent-registry:GetRegistry",
+        "agent-registry:TagResource",
+        "agent-registry:UntagResource",
+        "agent-registry:ListTagsForResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "agent-registry:ListRegistries"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "agent-registry:DeleteRegistry",
+        "agent-registry:GetRegistry",
+        "bedrock-agentcore:DeleteWorkloadIdentity"
+      ]
+    }
+  },
+  "typeName": "AWS::AgentRegistry::Registry",
+  "readOnlyProperties": [
+    "/properties/RegistryId",
+    "/properties/RegistryArn",
+    "/properties/AutoDetectionStatus",
+    "/properties/Status",
+    "/properties/CreatedAt",
+    "/properties/UpdatedAt"
+  ],
+  "description": "Definition of AWS::AgentRegistry::Registry Resource Type",
+  "additionalIdentifiers": [
+    [
+      "/properties/RegistryId"
+    ]
+  ],
+  "createOnlyProperties": [
+    "/properties/AuthorizerType",
+    "/properties/EncryptionConfiguration"
+  ],
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/RegistryArn"
+  ],
+  "definitions": {
+    "RegistryStatus": {
+      "description": "The status of the registry.",
+      "type": "string",
+      "enum": [
+        "CREATING",
+        "READY",
+        "UPDATING",
+        "CREATE_FAILED",
+        "UPDATE_FAILED",
+        "DELETING",
+        "DELETE_FAILED"
+      ],
+      "markdownDescription": "The status of the registry.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | READY | UPDATING | CREATE_FAILED | UPDATE_FAILED | DELETING | DELETE_FAILED  \nUpdate requires: No interruption\n"
+    },
+    "ApprovalConfiguration": {
+      "description": "Configuration for the registry's record approval workflow.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "AutoApprovalRules": {
+          "maxItems": 10,
+          "description": "The rules that determine which registry records are automatically approved on submission. When omitted or empty, submitted records require manual review.",
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AutoApprovalRule"
+          },
+          "markdownDescription": "The rules that determine which registry records are automatically approved on submission. When omitted or empty, submitted records require manual review.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Configuration for the registry's record approval workflow.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EncryptionConfiguration": {
+      "description": "The server-side encryption configuration for a registry. Specifies a customer managed key used to encrypt the registry's content. When omitted, the registry's content is encrypted with an AWS owned key. You cannot change the encryption configuration after registry creation. Specifying a different KMS key, adding this property to an existing registry, or removing it replaces the registry: CloudFormation creates a new registry with a new Amazon Resource Name (ARN) and then deletes the original, including all registry records it contains. Registry records that are not managed by the stack are not re-created in the new registry, and if any remain in the original registry its deletion fails and it is left behind.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "KmsKeyArn": {
+          "minLength": 1,
+          "description": "The Amazon Resource Name (ARN) of the customer-managed AWS KMS key used to encrypt the registry's content. The key must be a symmetric encryption key in the same AWS account and Region as the registry. Multi-Region keys are not supported.",
+          "type": "string",
+          "maxLength": 2048,
+          "markdownDescription": "The Amazon Resource Name (ARN) of the customer-managed AWS KMS key used to encrypt the registry's content. The key must be a symmetric encryption key in the same AWS account and Region as the registry. Multi-Region keys are not supported.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws(-[^:]+)?:kms:[a-zA-Z0-9-]*:[0-9]{12}:key/[a-zA-Z0-9-]{36}$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "KmsKeyArn"
+      ],
+      "markdownDescription": "The server-side encryption configuration for a registry. Specifies a customer managed key used to encrypt the registry's content. When omitted, the registry's content is encrypted with an AWS owned key. You cannot change the encryption configuration after registry creation. Specifying a different KMS key, adding this property to an existing registry, or removing it replaces the registry: CloudFormation creates a new registry with a new Amazon Resource Name (ARN) and then deletes the original, including all registry records it contains. Registry records that are not managed by the stack are not re-created in the new registry, and if any remain in the original registry its deletion fails and it is left behind.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DiscoveryConfiguration": {
+      "description": "Discovery configuration for the registry. Controls how consumers are authorized to search the registry and invoke its MCP endpoint.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "AuthorizerConfiguration": {
+          "$ref": "#/definitions/AuthorizerConfiguration"
+        }
+      },
+      "markdownDescription": "Discovery configuration for the registry. Controls how consumers are authorized to search the registry and invoke its MCP endpoint.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AutoApprovalRule": {
+      "description": "A rule that determines which registry records are automatically approved on submission.",
+      "type": "string",
+      "enum": [
+        "APPROVE_ALL"
+      ],
+      "markdownDescription": "A rule that determines which registry records are automatically approved on submission.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: APPROVE_ALL  \nUpdate requires: No interruption\n"
+    },
+    "CustomClaimValidationType": {
+      "description": "A validation rule applied to a single claim of an inbound JWT.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "AuthorizingClaimMatchValue": {
+          "$ref": "#/definitions/AuthorizingClaimMatchValueType"
+        },
+        "InboundTokenClaimName": {
+          "minLength": 1,
+          "type": "string",
+          "maxLength": 255,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[A-Za-z0-9_.-:]+$  \nUpdate requires: No interruption\n"
+        },
+        "InboundTokenClaimValueType": {
+          "type": "string",
+          "enum": [
+            "STRING",
+            "STRING_ARRAY"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: STRING | STRING_ARRAY  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "InboundTokenClaimName",
+        "InboundTokenClaimValueType",
+        "AuthorizingClaimMatchValue"
+      ],
+      "markdownDescription": "A validation rule applied to a single claim of an inbound JWT.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ClaimMatchValueType": {
+      "oneOf": [
+        {
+          "required": [
+            "MatchValueString"
+          ]
+        },
+        {
+          "required": [
+            "MatchValueStringList"
+          ]
+        }
+      ],
+      "description": "The expected value used to match a claim. Exactly one member is set.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "MatchValueString": {
+          "minLength": 1,
+          "type": "string",
+          "maxLength": 255,
+          "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[A-Za-z0-9_.:/-]+$  \nUpdate requires: No interruption\n"
+        },
+        "MatchValueStringList": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "minLength": 1,
+            "type": "string",
+            "maxLength": 255,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[A-Za-z0-9_.:/-]+$  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "The expected value used to match a claim. Exactly one member is set.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AutoDetectionScope": {
+      "description": "The source from which resources are detected. ORGANIZATION sources resources from all member accounts of an AWS Organization.",
+      "type": "string",
+      "enum": [
+        "ORGANIZATION"
+      ],
+      "markdownDescription": "The source from which resources are detected. ORGANIZATION sources resources from all member accounts of an AWS Organization.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ORGANIZATION  \nUpdate requires: No interruption\n"
+    },
+    "CustomJWTAuthorizerConfiguration": {
+      "description": "Configuration for a custom JWT authorizer that validates inbound bearer tokens against an OpenID Connect identity provider.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "DiscoveryUrl": {
+          "minLength": 1,
+          "description": "The OpenID Connect discovery URL used to retrieve the identity provider's metadata and signing keys.",
+          "type": "string",
+          "maxLength": 2048,
+          "markdownDescription": "The OpenID Connect discovery URL used to retrieve the identity provider's metadata and signing keys.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^.+/\\.well-known/openid-configuration$  \nUpdate requires: No interruption\n"
+        },
+        "AllowedAudience": {
+          "minItems": 1,
+          "description": "The audience values accepted during JWT validation.",
+          "type": "array",
+          "items": {
+            "minLength": 1,
+            "type": "string",
+            "maxLength": 255,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "The audience values accepted during JWT validation.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "CustomClaims": {
+          "minItems": 1,
+          "description": "Additional custom claim validations applied to the inbound JWT.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CustomClaimValidationType"
+          },
+          "markdownDescription": "Additional custom claim validations applied to the inbound JWT.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "AllowedClients": {
+          "minItems": 1,
+          "description": "The client identifiers accepted during JWT validation.",
+          "type": "array",
+          "items": {
+            "minLength": 1,
+            "type": "string",
+            "maxLength": 255,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "The client identifiers accepted during JWT validation.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "AllowedScopes": {
+          "minItems": 1,
+          "description": "The scopes accepted during JWT validation.",
+          "type": "array",
+          "items": {
+            "minLength": 1,
+            "type": "string",
+            "maxLength": 255,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[\\x21\\x23-\\x5B\\x5D-\\x7E]+$  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "The scopes accepted during JWT validation.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "DiscoveryUrl"
+      ],
+      "markdownDescription": "Configuration for a custom JWT authorizer that validates inbound bearer tokens against an OpenID Connect identity provider.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AuthorizingClaimMatchValueType": {
+      "description": "The value and match operator used to authorize a claim during JWT validation.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ClaimMatchValue": {
+          "$ref": "#/definitions/ClaimMatchValueType"
+        },
+        "ClaimMatchOperator": {
+          "type": "string",
+          "enum": [
+            "EQUALS",
+            "CONTAINS",
+            "CONTAINS_ANY"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: EQUALS | CONTAINS | CONTAINS_ANY  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ClaimMatchValue",
+        "ClaimMatchOperator"
+      ],
+      "markdownDescription": "The value and match operator used to authorize a claim during JWT validation.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AutoDetectionStatus": {
+      "description": "The current auto-detection status. ACTIVE indicates that the registry is actively being populated with detected resources. INACTIVE indicates that the preconditions required at the configured scope are not currently met.",
+      "type": "string",
+      "enum": [
+        "ACTIVE",
+        "INACTIVE"
+      ],
+      "markdownDescription": "The current auto-detection status. ACTIVE indicates that the registry is actively being populated with detected resources. INACTIVE indicates that the preconditions required at the configured scope are not currently met.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ACTIVE | INACTIVE  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "description": "A tag to assign to the registry.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "minLength": 0,
+          "description": "The value of the tag.",
+          "type": "string",
+          "maxLength": 256,
+          "markdownDescription": "The value of the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: ^[a-zA-Z0-9\\s._:/=+@-]*$  \nUpdate requires: No interruption\n"
+        },
+        "Key": {
+          "minLength": 1,
+          "description": "The key of the tag.",
+          "type": "string",
+          "maxLength": 128,
+          "markdownDescription": "The key of the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9\\s._:/=+@-]*$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "A tag to assign to the registry.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RegistryAuthorizerType": {
+      "description": "The type of authorizer that controls how consumers access the registry's search and MCP invoke operations.",
+      "type": "string",
+      "enum": [
+        "CUSTOM_JWT",
+        "AWS_IAM"
+      ],
+      "markdownDescription": "The type of authorizer that controls how consumers access the registry's search and MCP invoke operations.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CUSTOM_JWT | AWS_IAM  \nUpdate requires: No interruption\n"
+    },
+    "AuthorizerConfiguration": {
+      "description": "The authorizer configuration for the registry. This is a union - specify exactly one member.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "CustomJWTAuthorizer": {
+          "$ref": "#/definitions/CustomJWTAuthorizerConfiguration"
+        }
+      },
+      "required": [
+        "CustomJWTAuthorizer"
+      ],
+      "markdownDescription": "The authorizer configuration for the registry. This is a union - specify exactly one member.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "Status": {
+      "$ref": "#/definitions/RegistryStatus"
+    },
+    "Description": {
+      "minLength": 1,
+      "description": "The description of the registry.",
+      "type": "string",
+      "maxLength": 4096,
+      "markdownDescription": "The description of the registry.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 4096  \nUpdate requires: No interruption\n"
+    },
+    "ApprovalConfiguration": {
+      "$ref": "#/definitions/ApprovalConfiguration"
+    },
+    "AuthorizerType": {
+      "$ref": "#/definitions/RegistryAuthorizerType"
+    },
+    "EncryptionConfiguration": {
+      "$ref": "#/definitions/EncryptionConfiguration"
+    },
+    "CreatedAt": {
+      "format": "date-time",
+      "description": "The timestamp when the registry was created.",
+      "type": "string",
+      "markdownDescription": "The timestamp when the registry was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "DiscoveryConfiguration": {
+      "$ref": "#/definitions/DiscoveryConfiguration"
+    },
+    "AutoDetectionEnabled": {
+      "description": "Specifies whether auto-detection is requested for the registry. Must be specified together with AutoDetectionScope. Setting this to true is necessary but not sufficient for auto-detection to become active; the preconditions of the configured scope must also be met. To turn auto-detection off, explicitly set this to false - removing AutoDetectionEnabled and AutoDetectionScope from the template is a no-op and leaves the existing auto-detection settings unchanged. A registry cannot be deleted while auto-detection is enabled: set this to false and update the stack before deleting the registry.",
+      "type": "boolean",
+      "markdownDescription": "Specifies whether auto-detection is requested for the registry. Must be specified together with AutoDetectionScope. Setting this to true is necessary but not sufficient for auto-detection to become active; the preconditions of the configured scope must also be met. To turn auto-detection off, explicitly set this to false - removing AutoDetectionEnabled and AutoDetectionScope from the template is a no-op and leaves the existing auto-detection settings unchanged. A registry cannot be deleted while auto-detection is enabled: set this to false and update the stack before deleting the registry.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+    },
+    "UpdatedAt": {
+      "format": "date-time",
+      "description": "The timestamp when the registry was last updated.",
+      "type": "string",
+      "markdownDescription": "The timestamp when the registry was last updated.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Name": {
+      "minLength": 1,
+      "description": "The name of the registry.",
+      "type": "string",
+      "maxLength": 64,
+      "markdownDescription": "The name of the registry.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[a-zA-Z0-9][a-zA-Z0-9_\\-\\.\\/]*$  \nUpdate requires: No interruption\n"
+    },
+    "AutoDetectionScope": {
+      "$ref": "#/definitions/AutoDetectionScope"
+    },
+    "AutoDetectionStatus": {
+      "$ref": "#/definitions/AutoDetectionStatus"
+    },
+    "RegistryId": {
+      "minLength": 12,
+      "description": "The unique identifier of the registry.",
+      "type": "string",
+      "maxLength": 16,
+      "markdownDescription": "The unique identifier of the registry.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 12  \nMaximum Length: 16  \nPattern: ^[a-zA-Z0-9]{12,16}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "RegistryArn": {
+      "minLength": 46,
+      "description": "The Amazon Resource Name (ARN) of the registry.",
+      "type": "string",
+      "maxLength": 2048,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the registry.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 46  \nMaximum Length: 2048  \nPattern: ^arn:aws(-[^:]+)?:agent-registry:[a-z0-9-]+:[0-9]{12}:registry/[a-zA-Z0-9]{12,16}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Tags": {
+      "maxItems": 50,
+      "description": "Tags to assign to the registry.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "Tags to assign to the registry.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "required": [
+    "Name"
+  ],
+  "attributes": {
+    "Status": {
+      "$ref": "#/definitions/RegistryStatus"
+    },
+    "CreatedAt": {
+      "format": "date-time",
+      "description": "The timestamp when the registry was created.",
+      "type": "string",
+      "markdownDescription": "The timestamp when the registry was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "UpdatedAt": {
+      "format": "date-time",
+      "description": "The timestamp when the registry was last updated.",
+      "type": "string",
+      "markdownDescription": "The timestamp when the registry was last updated.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "AutoDetectionStatus": {
+      "$ref": "#/definitions/AutoDetectionStatus"
+    },
+    "RegistryId": {
+      "minLength": 12,
+      "description": "The unique identifier of the registry.",
+      "type": "string",
+      "maxLength": 16,
+      "markdownDescription": "The unique identifier of the registry.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 12  \nMaximum Length: 16  \nPattern: ^[a-zA-Z0-9]{12,16}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "RegistryArn": {
+      "minLength": 46,
+      "description": "The Amazon Resource Name (ARN) of the registry.",
+      "type": "string",
+      "maxLength": 2048,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the registry.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 46  \nMaximum Length: 2048  \nPattern: ^arn:aws(-[^:]+)?:agent-registry:[a-z0-9-]+:[0-9]{12}:registry/[a-zA-Z0-9]{12,16}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

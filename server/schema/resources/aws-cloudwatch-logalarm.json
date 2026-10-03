@@ -53,18 +53,23 @@
           "markdownDescription": "The expression that defines when the scheduled query runs, e.g. rate(1 minute).\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         },
         "StartTimeOffset": {
-          "description": "The number of seconds into the past to start the query window.",
+          "description": "The number of seconds into the past to start the query window. Must be a positive value and cannot exceed 2592000 seconds (30 days).",
           "type": "integer",
-          "markdownDescription": "The number of seconds into the past to start the query window.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+          "minimum": 1,
+          "maximum": 2592000,
+          "markdownDescription": "The number of seconds into the past to start the query window. Must be a positive value and cannot exceed 2592000 seconds (30 days).\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
         },
         "EndTimeOffset": {
-          "description": "The number of seconds into the past to end the query window.",
+          "description": "The number of seconds into the past to end the query window. Must be a non-negative value and cannot exceed 2592000 seconds (30 days).",
           "type": "integer",
-          "markdownDescription": "The number of seconds into the past to end the query window.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+          "minimum": 0,
+          "maximum": 2592000,
+          "markdownDescription": "The number of seconds into the past to end the query window. Must be a non-negative value and cannot exceed 2592000 seconds (30 days).\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "ScheduleExpression"
+        "ScheduleExpression",
+        "StartTimeOffset"
       ],
       "markdownDescription": "The schedule configuration for the scheduled query.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
@@ -81,7 +86,8 @@
         "AggregationExpression": {
           "description": "The aggregation expression for the scheduled query, e.g. count(*) or avg(latency) by host.",
           "type": "string",
-          "markdownDescription": "The aggregation expression for the scheduled query, e.g. count(*) or avg(latency) by host.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+          "maxLength": 2048,
+          "markdownDescription": "The aggregation expression for the scheduled query, e.g. count(*) or avg(latency) by host.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nUpdate requires: No interruption\n"
         },
         "LogGroupIdentifiers": {
           "description": "The log groups to query.",
@@ -91,7 +97,7 @@
             "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
           },
           "insertionOrder": false,
-          "markdownDescription": "The log groups to query.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The log groups to query.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         },
         "ScheduledQueryRoleARN": {
           "description": "The ARN of the IAM role that grants permissions to execute the scheduled query.",
@@ -102,16 +108,46 @@
           "description": "The schedule configuration.",
           "$ref": "#/definitions/ScheduleConfiguration",
           "markdownDescription": "The schedule configuration.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "Tags": {
+          "description": "A list of key-value pairs to associate with the scheduled query that backs the log alarm.",
+          "type": "array",
+          "maxItems": 50,
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/Tag"
+          },
+          "markdownDescription": "A list of key-value pairs to associate with the scheduled query that backs the log alarm.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
         "QueryString",
         "AggregationExpression",
-        "LogGroupIdentifiers",
         "ScheduledQueryRoleARN",
         "ScheduleConfiguration"
       ],
       "markdownDescription": "The scheduled query configuration for the log alarm.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "WarmUpConfiguration": {
+      "description": "The warm-up configuration for an alarm. A warm-up period delays alarm evaluation after you create or update the alarm. This reduces alarm noise from missing data while a new resource or service starts up. During the warm-up period, the alarm stays in INSUFFICIENT_DATA and doesn't perform alarm actions.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "WarmUpPeriodDurationInMinutes": {
+          "description": "The length of the warm-up period, in minutes. For this duration after you create or update the alarm, the alarm stays in INSUFFICIENT_DATA and doesn't perform alarm actions. Valid values range from 1 to 2,880 minutes (2 days). You can change this value while the alarm is still in its warm-up period. Changes have no effect after the warm-up period ends.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2880,
+          "markdownDescription": "The length of the warm-up period, in minutes. For this duration after you create or update the alarm, the alarm stays in INSUFFICIENT_DATA and doesn't perform alarm actions. Valid values range from 1 to 2,880 minutes (2 days). You can change this value while the alarm is still in its warm-up period. Changes have no effect after the warm-up period ends.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "OnlyStartEvaluatingAfterWarmUpPeriodEnds": {
+          "description": "Specifies whether the alarm waits for the full warm-up period before it starts evaluating. If true, the alarm waits the entire WarmUpPeriodDurationInMinutes before it starts evaluating, even if metric data arrives earlier. If false, the alarm ends the warm-up period early and starts evaluating as soon as it has enough metric data to fill its evaluation window. This is the default behavior.",
+          "type": "boolean",
+          "markdownDescription": "Specifies whether the alarm waits for the full warm-up period before it starts evaluating. If true, the alarm waits the entire WarmUpPeriodDurationInMinutes before it starts evaluating, even if metric data arrives earlier. If false, the alarm ends the warm-up period early and starts evaluating as soon as it has enough metric data to fill its evaluation window. This is the default behavior.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "The warm-up configuration for an alarm. A warm-up period delays alarm evaluation after you create or update the alarm. This reduces alarm noise from missing data while a new resource or service starts up. During the warm-up period, the alarm stays in INSUFFICIENT_DATA and doesn't perform alarm actions.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -193,6 +229,11 @@
       "$ref": "#/definitions/ScheduledQueryConfiguration",
       "markdownDescription": "The scheduled query configuration for the log alarm.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
     },
+    "WarmUpConfiguration": {
+      "description": "The warm-up configuration for the alarm. During the warm-up period, the alarm stays in INSUFFICIENT_DATA and doesn't perform alarm actions. For more information, see Alarm warm-up periods in the Amazon CloudWatch User Guide.",
+      "$ref": "#/definitions/WarmUpConfiguration",
+      "markdownDescription": "The warm-up configuration for the alarm. During the warm-up period, the alarm stays in INSUFFICIENT_DATA and doesn't perform alarm actions. For more information, see Alarm warm-up periods in the Amazon CloudWatch User Guide.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
     "ActionLogLineCount": {
       "description": "The number of log lines to include in alarm notifications. Valid values are 0 to 50.",
       "type": "integer",
@@ -248,6 +289,8 @@
         "logs:CreateScheduledQuery",
         "logs:UpdateScheduledQuery",
         "logs:DeleteScheduledQuery",
+        "logs:ListTagsForResource",
+        "logs:TagResource",
         "iam:PassRole"
       ]
     },
@@ -261,6 +304,9 @@
         "logs:CreateScheduledQuery",
         "logs:UpdateScheduledQuery",
         "logs:DeleteScheduledQuery",
+        "logs:ListTagsForResource",
+        "logs:TagResource",
+        "logs:UntagResource",
         "iam:PassRole"
       ]
     },
@@ -281,7 +327,8 @@
     "read": {
       "permissions": [
         "cloudwatch:DescribeAlarms",
-        "cloudwatch:ListTagsForResource"
+        "cloudwatch:ListTagsForResource",
+        "logs:ListTagsForResource"
       ]
     }
   },
