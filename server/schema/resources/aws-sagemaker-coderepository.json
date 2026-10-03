@@ -4,23 +4,30 @@
   "additionalProperties": false,
   "properties": {
     "GitConfig": {
-      "$ref": "#/definitions/GitConfig"
+      "$ref": "#/definitions/GitConfig",
+      "description": "Configuration details for the Git repository, including the URL where it is located and the ARN of the AWS Secrets Manager secret that contains the credentials used to access the repository.",
+      "markdownDescription": "Configuration details for the Git repository, including the URL where it is located and the ARN of the AWS Secrets Manager secret that contains the credentials used to access the repository.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: Replacement\n"
     },
     "CodeRepositoryName": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+      "description": "The name of the Git repository.",
+      "minLength": 1,
+      "maxLength": 63,
+      "markdownDescription": "The name of the Git repository.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 63  \nUpdate requires: Replacement\n"
     },
-    "Id": {
+    "CodeRepositoryArn": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+      "description": "The Amazon Resource Name (ARN) of the code repository.",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the code repository.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:.*  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Tags": {
       "type": "array",
+      "description": "An array of key-value pairs.",
       "uniqueItems": false,
       "items": {
         "$ref": "#/definitions/Tag"
       },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+      "markdownDescription": "An array of key-value pairs.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "definitions": {
@@ -30,58 +37,109 @@
       "properties": {
         "SecretArn": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          "description": "The Amazon Resource Name (ARN) of the AWS Secrets Manager secret that contains the credentials used to access the git repository.",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the AWS Secrets Manager secret that contains the credentials used to access the git repository.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
         "RepositoryUrl": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+          "description": "The URL where the Git repository is located.",
+          "markdownDescription": "The URL where the Git repository is located.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         },
         "Branch": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          "description": "The default branch for the Git repository.",
+          "markdownDescription": "The default branch for the Git repository.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
         "RepositoryUrl"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
     },
     "Tag": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "Value": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        },
         "Key": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+          "description": "The key of the tag.",
+          "markdownDescription": "The key of the tag.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value of the tag.",
+          "markdownDescription": "The value of the tag.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "Value",
-        "Key"
+        "Key",
+        "Value"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "sagemaker:ListTags",
+      "sagemaker:AddTags",
+      "sagemaker:DeleteTags"
+    ]
   },
   "required": [
     "GitConfig"
   ],
   "createOnlyProperties": [
-    "/properties/CodeRepositoryName"
+    "/properties/CodeRepositoryName",
+    "/properties/GitConfig/RepositoryUrl",
+    "/properties/GitConfig/Branch"
   ],
   "primaryIdentifier": [
-    "/properties/Id"
+    "/properties/CodeRepositoryArn"
   ],
   "readOnlyProperties": [
-    "/properties/Id"
+    "/properties/CodeRepositoryArn"
   ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "sagemaker:CreateCodeRepository",
+        "sagemaker:AddTags"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "sagemaker:DescribeCodeRepository",
+        "sagemaker:ListTags"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "sagemaker:UpdateCodeRepository",
+        "sagemaker:AddTags",
+        "sagemaker:DeleteTags"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "sagemaker:DeleteCodeRepository"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "sagemaker:ListCodeRepositories"
+      ]
+    }
+  },
   "attributes": {
-    "Id": {
+    "CodeRepositoryArn": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+      "description": "The Amazon Resource Name (ARN) of the code repository.",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the code repository.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:.*  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

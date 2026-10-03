@@ -3,17 +3,19 @@
   "description": "Resource Type definition for AWS::DocDB::DBSubnetGroup",
   "additionalProperties": false,
   "properties": {
-    "Id": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
     "DBSubnetGroupName": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+      "description": "The name for the db subnet group. This value is stored as a lowercase string.",
+      "minLength": 1,
+      "maxLength": 255,
+      "markdownDescription": "The name for the db subnet group. This value is stored as a lowercase string.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: [a-zA-Z][0-9a-zA-Z-:._ ]*  \nUpdate requires: Replacement\n"
     },
     "DBSubnetGroupDescription": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+      "description": "The description for the subnet group.",
+      "minLength": 1,
+      "maxLength": 100,
+      "markdownDescription": "The description for the subnet group.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nUpdate requires: No interruption\n"
     },
     "SubnetIds": {
       "type": "array",
@@ -22,7 +24,10 @@
         "type": "string",
         "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
       },
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+      "minItems": 1,
+      "maxItems": 20,
+      "description": "One or more subnet IDs to be assigned to the db subnet group.",
+      "markdownDescription": "One or more subnet IDs to be assigned to the db subnet group.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
     },
     "Tags": {
       "type": "array",
@@ -30,7 +35,8 @@
       "items": {
         "$ref": "#/definitions/Tag"
       },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+      "description": "One or more tags to be assigned to the db subnet group",
+      "markdownDescription": "One or more tags to be assigned to the db subnet group\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "definitions": {
@@ -48,8 +54,8 @@
         }
       },
       "required": [
-        "Value",
-        "Key"
+        "Key",
+        "Value"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
@@ -62,15 +68,51 @@
     "/properties/DBSubnetGroupName"
   ],
   "primaryIdentifier": [
-    "/properties/Id"
+    "/properties/DBSubnetGroupName"
   ],
-  "readOnlyProperties": [
-    "/properties/Id"
-  ],
-  "attributes": {
-    "Id": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "rds:AddTagsToResource",
+      "rds:ListTagsForResource",
+      "rds:RemoveTagsFromResource"
+    ]
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "rds:CreateDBSubnetGroup",
+        "rds:AddTagsToResource",
+        "rds:ListTagsForResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "rds:DescribeDBSubnetGroups",
+        "rds:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "rds:ModifyDBSubnetGroup",
+        "rds:AddTagsToResource",
+        "rds:RemoveTagsFromResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "rds:DescribeDBSubnetGroups"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "rds:DeleteDBSubnetGroup"
+      ]
     }
-  }
+  },
+  "attributes": {}
 }
