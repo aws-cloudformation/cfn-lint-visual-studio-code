@@ -19,16 +19,17 @@
         "mcpserversplunk",
         "mcpservernewrelic",
         "gitlab",
+        "github",
         "servicenow",
         "pagerduty",
         "azureidentity",
         "mcpserversigv4",
         "mcpservergrafana"
       ],
-      "markdownDescription": "The type of service being registered\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: dynatrace | mcpserver | mcpserversplunk | mcpservernewrelic | gitlab | servicenow | pagerduty | azureidentity | mcpserversigv4 | mcpservergrafana  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The type of service being registered\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: dynatrace | mcpserver | mcpserversplunk | mcpservernewrelic | gitlab | github | servicenow | pagerduty | azureidentity | mcpserversigv4 | mcpservergrafana  \nUpdate requires: No interruption\n"
     },
     "ServiceDetails": {
-      "description": "Service-specific configuration details - only MCPServerSigV4 supports in-place updates, all other service types require replacement when modified",
+      "description": "Service-specific configuration details - MCPServerSigV4 supports in-place updates; GitLab (TokenValue), MCPServer (ApiKey or BearerToken credential rotation), MCPServerNewRelic (ApiKey rotation), and MCPServerGrafana (BearerToken rotation) support in-place credential rotation; all other service types and fields, including GitHub, require replacement when modified",
       "type": "object",
       "oneOf": [
         {
@@ -88,6 +89,17 @@
         },
         {
           "properties": {
+            "GitHub": {
+              "$ref": "#/definitions/GitHubDetails"
+            }
+          },
+          "required": [
+            "GitHub"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
             "ServiceNow": {
               "$ref": "#/definitions/ServiceNowServiceDetails"
             }
@@ -142,7 +154,7 @@
           "additionalProperties": false
         }
       ],
-      "markdownDescription": "Service-specific configuration details - only MCPServerSigV4 supports in-place updates, all other service types require replacement when modified\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
+      "markdownDescription": "Service-specific configuration details - MCPServerSigV4 supports in-place updates; GitLab (TokenValue), MCPServer (ApiKey or BearerToken credential rotation), MCPServerNewRelic (ApiKey rotation), and MCPServerGrafana (BearerToken rotation) support in-place credential rotation; all other service types and fields, including GitHub, require replacement when modified\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
     },
     "DynatraceServiceDetails": {
       "description": "Dynatrace service configuration",
@@ -288,9 +300,14 @@
           "markdownDescription": "AWS service name for SigV4 signing\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nUpdate requires: No interruption\n"
         },
         "RoleArn": {
-          "description": "IAM role ARN to assume for SigV4 signing",
+          "description": "Deprecated - use McpRoleArn instead. IAM role ARN to assume for SigV4 signing. Set to an empty string to remove a previously configured role and make the server role-less (cross-account).",
           "type": "string",
-          "markdownDescription": "IAM role ARN to assume for SigV4 signing\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:aws:iam::\\d{12}:role/[a-zA-Z0-9+=,.@_/-]+$  \nUpdate requires: No interruption\n"
+          "markdownDescription": "Deprecated - use McpRoleArn instead. IAM role ARN to assume for SigV4 signing. Set to an empty string to remove a previously configured role and make the server role-less (cross-account).\n\n---\n\nRequired: No  \nType: String  \nPattern: ^$|^arn:aws:iam::\\d{12}:role/[a-zA-Z0-9+=,.@_/-]+$  \nUpdate requires: No interruption\n"
+        },
+        "McpRoleArn": {
+          "description": "IAM role ARN to assume for SigV4 signing. Optional - when omitted, credentials are resolved at runtime via a monitor account association.",
+          "type": "string",
+          "markdownDescription": "IAM role ARN to assume for SigV4 signing. Optional - when omitted, credentials are resolved at runtime via a monitor account association.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws:iam::\\d{12}:role/[a-zA-Z0-9+=,.@_/-]+$  \nUpdate requires: No interruption\n"
         },
         "CustomHeaders": {
           "description": "Custom headers for the SigV4 MCP server",
@@ -308,8 +325,7 @@
       },
       "required": [
         "Region",
-        "Service",
-        "RoleArn"
+        "Service"
       ],
       "additionalProperties": false,
       "markdownDescription": "SigV4 authorization configuration for MCP server\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
@@ -369,6 +385,17 @@
           },
           "required": [
             "ApiKey"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "BearerToken": {
+              "$ref": "#/definitions/BearerTokenDetails"
+            }
+          },
+          "required": [
+            "BearerToken"
           ],
           "additionalProperties": false
         }
@@ -461,7 +488,7 @@
         "TokenValue": {
           "description": "GitLab access token value",
           "type": "string",
-          "markdownDescription": "GitLab access token value\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^glpat-[a-zA-Z0-9._-]+$  \nUpdate requires: No interruption\n"
+          "markdownDescription": "GitLab access token value\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[a-zA-Z0-9._-]+$  \nUpdate requires: No interruption\n"
         },
         "GroupId": {
           "description": "Optional GitLab group ID for group-level access tokens",
@@ -476,6 +503,110 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "GitLab service configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "GitHubDetails": {
+      "description": "GitHub personal access token (PAT) service configuration. Exactly one of AppVerification or DirectAccess selects how the token is used",
+      "type": "object",
+      "oneOf": [
+        {
+          "properties": {
+            "AppVerification": {
+              "$ref": "#/definitions/GitHubAppVerificationDetails"
+            }
+          },
+          "required": [
+            "AppVerification"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "DirectAccess": {
+              "$ref": "#/definitions/GitHubPatDetails"
+            }
+          },
+          "required": [
+            "DirectAccess"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "GitHub personal access token (PAT) service configuration. Exactly one of AppVerification or DirectAccess selects how the token is used\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "GitHubAppVerificationDetails": {
+      "description": "The token verifies an existing DevOps Agent GitHub App installation on github.com and is then discarded. Not supported for GitHub Enterprise Server",
+      "type": "object",
+      "properties": {
+        "TokenValue": {
+          "description": "GitHub personal access token (PAT) value. Accepts classic PATs (ghp_...), fine-grained PATs (github_pat_...), and GitHub Enterprise Server token formats",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "markdownDescription": "GitHub personal access token (PAT) value. Accepts classic PATs (ghp_...), fine-grained PATs (github_pat_...), and GitHub Enterprise Server token formats\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^[A-Za-z0-9_]+$  \nUpdate requires: No interruption\n"
+        },
+        "TargetUrl": {
+          "description": "GitHub instance URL. Omit for github.com. Provide the instance host for GitHub Enterprise Server or GitHub Enterprise Cloud with data residency (e.g. https://github.example.com)",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "markdownDescription": "GitHub instance URL. Omit for github.com. Provide the instance host for GitHub Enterprise Server or GitHub Enterprise Cloud with data residency (e.g. https://github.example.com)\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^https://[a-zA-Z0-9]([a-zA-Z0-9.-]*[a-zA-Z0-9])?(?::[0-9]{1,5})?/?$  \nUpdate requires: No interruption\n"
+        },
+        "OrganizationName": {
+          "description": "GitHub organization to scope the service to. The token must be an active member of the organization and only that organization's repositories are accessible. Omit to register the token's own user account",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 39,
+          "markdownDescription": "GitHub organization to scope the service to. The token must be an active member of the organization and only that organization's repositories are accessible. Omit to register the token's own user account\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 39  \nPattern: ^[a-zA-Z0-9](?:-?[a-zA-Z0-9])*$  \nUpdate requires: No interruption\n"
+        },
+        "AppVariant": {
+          "description": "Permission variant of the DevOps Agent GitHub App that must already be installed on the organization or account",
+          "type": "string",
+          "enum": [
+            "READ_ONLY",
+            "READ_WRITE",
+            "CUSTOM_APP"
+          ],
+          "markdownDescription": "Permission variant of the DevOps Agent GitHub App that must already be installed on the organization or account\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: READ_ONLY | READ_WRITE | CUSTOM_APP  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "TokenValue",
+        "AppVariant"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The token verifies an existing DevOps Agent GitHub App installation on github.com and is then discarded. Not supported for GitHub Enterprise Server\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "GitHubPatDetails": {
+      "description": "The token is stored and used as the long-lived credential for GitHub API access",
+      "type": "object",
+      "properties": {
+        "TokenValue": {
+          "description": "GitHub personal access token (PAT) value. Accepts classic PATs (ghp_...), fine-grained PATs (github_pat_...), and GitHub Enterprise Server token formats",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "markdownDescription": "GitHub personal access token (PAT) value. Accepts classic PATs (ghp_...), fine-grained PATs (github_pat_...), and GitHub Enterprise Server token formats\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^[A-Za-z0-9_]+$  \nUpdate requires: No interruption\n"
+        },
+        "TargetUrl": {
+          "description": "GitHub instance URL. Omit for github.com. Provide the instance host for GitHub Enterprise Server or GitHub Enterprise Cloud with data residency (e.g. https://github.example.com)",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "markdownDescription": "GitHub instance URL. Omit for github.com. Provide the instance host for GitHub Enterprise Server or GitHub Enterprise Cloud with data residency (e.g. https://github.example.com)\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^https://[a-zA-Z0-9]([a-zA-Z0-9.-]*[a-zA-Z0-9])?(?::[0-9]{1,5})?/?$  \nUpdate requires: No interruption\n"
+        },
+        "OrganizationName": {
+          "description": "GitHub organization to scope the service to. The token must be an active member of the organization and only that organization's repositories are accessible. Omit to register the token's own user account",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 39,
+          "markdownDescription": "GitHub organization to scope the service to. The token must be an active member of the organization and only that organization's repositories are accessible. Omit to register the token's own user account\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 39  \nPattern: ^[a-zA-Z0-9](?:-?[a-zA-Z0-9])*$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "TokenValue"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The token is stored and used as the long-lived credential for GitHub API access\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "OAuthClientDetails": {
       "description": "OAuth client credentials",
@@ -801,6 +932,17 @@
         },
         {
           "properties": {
+            "GitHub": {
+              "$ref": "#/definitions/RegisteredGitHubServiceDetails"
+            }
+          },
+          "required": [
+            "GitHub"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
             "MCPServerSplunk": {
               "$ref": "#/definitions/RegisteredMCPServerDetails"
             }
@@ -1030,6 +1172,66 @@
       "additionalProperties": false,
       "markdownDescription": "GitLab service details returned after registration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "RegisteredGitHubServiceDetails": {
+      "description": "GitHub service details returned after registration",
+      "type": "object",
+      "properties": {
+        "Owner": {
+          "description": "The GitHub repository owner name derived from the token",
+          "type": "string",
+          "markdownDescription": "The GitHub repository owner name derived from the token\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "OwnerType": {
+          "description": "Type of repository owner",
+          "type": "string",
+          "enum": [
+            "organization",
+            "user"
+          ],
+          "markdownDescription": "Type of repository owner\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: organization | user  \nUpdate requires: No interruption\n"
+        },
+        "TargetUrl": {
+          "description": "GitHub instance URL (absent for github.com)",
+          "type": "string",
+          "markdownDescription": "GitHub instance URL (absent for github.com)\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "AppVariant": {
+          "description": "The GitHub App variant the service was registered with",
+          "type": "string",
+          "enum": [
+            "READ_ONLY",
+            "READ_WRITE",
+            "CUSTOM_APP"
+          ],
+          "markdownDescription": "The GitHub App variant the service was registered with\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: READ_ONLY | READ_WRITE | CUSTOM_APP  \nUpdate requires: No interruption\n"
+        },
+        "HostingType": {
+          "description": "The GitHub hosting type the service was registered with",
+          "type": "string",
+          "enum": [
+            "SAAS",
+            "SELF_MANAGED",
+            "DEDICATED"
+          ],
+          "markdownDescription": "The GitHub hosting type the service was registered with\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SAAS | SELF_MANAGED | DEDICATED  \nUpdate requires: No interruption\n"
+        },
+        "AuthMode": {
+          "description": "How the service authenticates against the GitHub API: app after AppVerification, pat after DirectAccess",
+          "type": "string",
+          "enum": [
+            "app",
+            "pat"
+          ],
+          "markdownDescription": "How the service authenticates against the GitHub API: app after AppVerification, pat after DirectAccess\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: app | pat  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Owner",
+        "OwnerType"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "GitHub service details returned after registration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "RegisteredDynatraceDetails": {
       "description": "Dynatrace service details returned after registration",
       "type": "object",
@@ -1150,9 +1352,14 @@
           "markdownDescription": "AWS service name for SigV4 signing\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         },
         "RoleArn": {
-          "description": "IAM role ARN for SigV4 signing",
+          "description": "Deprecated - use McpRoleArn instead. IAM role ARN for SigV4 signing",
           "type": "string",
-          "markdownDescription": "IAM role ARN for SigV4 signing\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+          "markdownDescription": "Deprecated - use McpRoleArn instead. IAM role ARN for SigV4 signing\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "McpRoleArn": {
+          "description": "IAM role ARN for SigV4 signing. Absent when no dedicated role is configured.",
+          "type": "string",
+          "markdownDescription": "IAM role ARN for SigV4 signing. Absent when no dedicated role is configured.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
         "CustomHeaders": {
           "description": "Custom headers for the SigV4 MCP server",
@@ -1215,6 +1422,13 @@
       "$ref": "#/definitions/ServiceType",
       "markdownDescription": "The type of service being registered\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: Replacement\n"
     },
+    "Name": {
+      "description": "The display name for the service registration.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "markdownDescription": "The display name for the service registration.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[\\p{L}\\p{N} _-]+$  \nUpdate requires: No interruption\n"
+    },
     "ServiceDetails": {
       "description": "Service-specific configuration details for create operation",
       "$ref": "#/definitions/ServiceDetails",
@@ -1246,6 +1460,27 @@
       "minLength": 1,
       "maxLength": 2048,
       "markdownDescription": "The ARN of the KMS key to use for encryption.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: Replacement\n"
+    },
+    "PrivateConnectionName": {
+      "description": "The name of the private connection to use for VPC connectivity.",
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 30,
+      "markdownDescription": "The name of the private connection to use for VPC connectivity.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 30  \nPattern: ^[a-z0-9]([a-z0-9-]*[a-z0-9])?$  \nUpdate requires: Replacement\n"
+    },
+    "TargetUrlPrivateConnectionName": {
+      "description": "The name of the private connection to use for API calls (target URL) only. Cannot be specified when PrivateConnectionName is provided.",
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 30,
+      "markdownDescription": "The name of the private connection to use for API calls (target URL) only. Cannot be specified when PrivateConnectionName is provided.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 30  \nPattern: ^[a-z0-9]([a-z0-9-]*[a-z0-9])?$  \nUpdate requires: Replacement\n"
+    },
+    "ExchangeUrlPrivateConnectionName": {
+      "description": "The name of the private connection to use for OAuth token exchange requests only. Cannot be specified when PrivateConnectionName is provided.",
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 30,
+      "markdownDescription": "The name of the private connection to use for OAuth token exchange requests only. Cannot be specified when PrivateConnectionName is provided.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 30  \nPattern: ^[a-z0-9]([a-z0-9-]*[a-z0-9])?$  \nUpdate requires: Replacement\n"
     },
     "Arn": {
       "description": "The Amazon Resource Name (ARN) of the Service.",
@@ -1286,20 +1521,22 @@
     "/properties/Arn"
   ],
   "writeOnlyProperties": [
-    "/properties/ServiceDetails"
+    "/properties/ServiceDetails",
+    "/properties/TargetUrlPrivateConnectionName",
+    "/properties/ExchangeUrlPrivateConnectionName"
   ],
   "createOnlyProperties": [
     "/properties/ServiceType",
     "/properties/ServiceDetails/Dynatrace",
-    "/properties/ServiceDetails/MCPServer",
+    "/properties/ServiceDetails/GitHub",
     "/properties/ServiceDetails/MCPServerSplunk",
-    "/properties/ServiceDetails/MCPServerNewRelic",
-    "/properties/ServiceDetails/GitLab",
     "/properties/ServiceDetails/ServiceNow",
     "/properties/ServiceDetails/PagerDuty",
     "/properties/ServiceDetails/AzureIdentity",
-    "/properties/ServiceDetails/MCPServerGrafana",
-    "/properties/KmsKeyArn"
+    "/properties/KmsKeyArn",
+    "/properties/PrivateConnectionName",
+    "/properties/TargetUrlPrivateConnectionName",
+    "/properties/ExchangeUrlPrivateConnectionName"
   ],
   "primaryIdentifier": [
     "/properties/ServiceId"
@@ -1336,7 +1573,17 @@
         "aidevops:GetService",
         "aidevops:TagResource",
         "aidevops:UntagResource",
-        "aidevops:ListTagsForResource"
+        "aidevops:ListTagsForResource",
+        "iam:PassRole",
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:GenerateDataKey",
+        "kms:GenerateDataKeyPair",
+        "kms:GenerateDataKeyPairWithoutPlaintext",
+        "kms:GenerateDataKeyWithoutPlaintext",
+        "kms:ReEncryptFrom",
+        "kms:ReEncryptTo"
       ]
     },
     "delete": {

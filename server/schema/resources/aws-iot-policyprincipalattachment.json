@@ -1,39 +1,68 @@
 {
   "typeName": "AWS::IoT::PolicyPrincipalAttachment",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
   "description": "Resource Type definition for AWS::IoT::PolicyPrincipalAttachment",
   "additionalProperties": false,
   "properties": {
-    "Id": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
     "PolicyName": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
+      "description": "The name of the AWS IoT policy",
+      "markdownDescription": "The name of the AWS IoT policy\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
     },
     "Principal": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
+      "description": "The principal, which can be a certificate ARN (as returned from the CreateCertificate operation) or an Amazon Cognito ID",
+      "markdownDescription": "The principal, which can be a certificate ARN (as returned from the CreateCertificate operation) or an Amazon Cognito ID\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
     }
   },
   "required": [
-    "Principal",
-    "PolicyName"
+    "PolicyName",
+    "Principal"
   ],
   "createOnlyProperties": [
     "/properties/PolicyName",
     "/properties/Principal"
   ],
   "primaryIdentifier": [
-    "/properties/Id"
+    "/properties/PolicyName",
+    "/properties/Principal"
   ],
-  "readOnlyProperties": [
-    "/properties/Id"
-  ],
-  "attributes": {
-    "Id": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+  "tagging": {
+    "taggable": false
+  },
+  "handlers": {
+    "read": {
+      "permissions": [
+        "iot:ListAttachedPolicies"
+      ]
+    },
+    "create": {
+      "permissions": [
+        "iot:AttachPrincipalPolicy",
+        "iot:ListAttachedPolicies"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "Principal": {
+            "$ref": "resource-schema.json#/properties/Principal"
+          }
+        },
+        "required": [
+          "Principal"
+        ]
+      },
+      "permissions": [
+        "iot:ListAttachedPolicies"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "iot:DetachPrincipalPolicy",
+        "iot:ListAttachedPolicies"
+      ]
     }
-  }
+  },
+  "attributes": {}
 }
