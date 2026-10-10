@@ -73,9 +73,23 @@
             "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^[.\\-_/#A-Za-z0-9]+$  \nUpdate requires: No interruption\n"
           },
           "minItems": 1,
+          "maxItems": 10,
+          "insertionOrder": false,
+          "markdownDescription": "The list of CloudWatch log group names to monitor for agent traces.\n\n---\n\nRequired: Conditional  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "LogGroupNamePrefixes": {
+          "type": "array",
+          "description": "The list of CloudWatch log group name prefixes to monitor for agent traces. Mutually exclusive with LogGroupNames; specify exactly one of the two selectors.",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^[.\\-_/#A-Za-z0-9]+$  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 1,
           "maxItems": 5,
           "insertionOrder": false,
-          "markdownDescription": "The list of CloudWatch log group names to monitor for agent traces.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The list of CloudWatch log group name prefixes to monitor for agent traces. Mutually exclusive with LogGroupNames; specify exactly one of the two selectors.\n\n---\n\nRequired: Conditional  \nType: Array  \nUpdate requires: No interruption\n"
         },
         "ServiceNames": {
           "type": "array",
@@ -89,12 +103,23 @@
           "minItems": 1,
           "maxItems": 1,
           "insertionOrder": false,
-          "markdownDescription": "The list of service names to filter traces within the specified log groups.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The list of service names to filter traces within the specified log groups.\n\n---\n\nRequired: Conditional  \nType: Array  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "LogGroupNames",
         "ServiceNames"
+      ],
+      "oneOf": [
+        {
+          "required": [
+            "LogGroupNames"
+          ]
+        },
+        {
+          "required": [
+            "LogGroupNamePrefixes"
+          ]
+        }
       ],
       "additionalProperties": false,
       "markdownDescription": "The configuration for reading agent traces from CloudWatch logs.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
@@ -106,7 +131,7 @@
         "EvaluatorId": {
           "type": "string",
           "description": "The unique identifier of the evaluator.",
-          "markdownDescription": "The unique identifier of the evaluator.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^(Builtin\\.[a-zA-Z0-9_-]+|[a-zA-Z][a-zA-Z0-9-_]{0,99}-[a-zA-Z0-9]{10})$  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The unique identifier of the evaluator.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^(Builtin\\.[a-zA-Z0-9._-]+|ThirdParty\\.[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]+|[a-zA-Z][a-zA-Z0-9-_]{0,99}-[a-zA-Z0-9]{10})$  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
@@ -259,8 +284,26 @@
       "properties": {
         "LogGroupName": {
           "type": "string",
-          "description": "The CloudWatch log group name for evaluation results.",
-          "markdownDescription": "The CloudWatch log group name for evaluation results.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          "description": "The CloudWatch log group name for evaluation results. Omit to use the service-managed default log group.",
+          "minLength": 1,
+          "maxLength": 512,
+          "markdownDescription": "The CloudWatch log group name for evaluation results. Omit to use the service-managed default log group.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^[.\\-_/#A-Za-z0-9]+$  \nUpdate requires: No interruption\n"
+        },
+        "MetricsNamespace": {
+          "type": "string",
+          "description": "The CloudWatch metrics namespace for evaluation result metrics. Omit to use the service-managed default namespace.",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "The CloudWatch metrics namespace for evaluation result metrics. Omit to use the service-managed default namespace.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[a-zA-Z0-9._#/:-]+$  \nUpdate requires: No interruption\n"
+        },
+        "ResultDestination": {
+          "type": "string",
+          "description": "Where evaluation results are written. DEDICATED_LOG_GROUP, the default when omitted, writes to a dedicated result log group. SOURCE_LOG_GROUP writes results back to the trace source log group; LogGroupName must not be specified with SOURCE_LOG_GROUP.",
+          "enum": [
+            "DEDICATED_LOG_GROUP",
+            "SOURCE_LOG_GROUP"
+          ],
+          "markdownDescription": "Where evaluation results are written. DEDICATED_LOG_GROUP, the default when omitted, writes to a dedicated result log group. SOURCE_LOG_GROUP writes results back to the trace source log group; LogGroupName must not be specified with SOURCE_LOG_GROUP.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DEDICATED_LOG_GROUP | SOURCE_LOG_GROUP  \nUpdate requires: No interruption\n"
         }
       },
       "additionalProperties": false,
@@ -359,7 +402,7 @@
         "$ref": "#/definitions/EvaluatorReference"
       },
       "minItems": 0,
-      "maxItems": 10,
+      "maxItems": 25,
       "insertionOrder": false,
       "markdownDescription": "The list of evaluators to apply during online evaluation.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     },
@@ -381,7 +424,7 @@
     "OutputConfig": {
       "$ref": "#/definitions/OutputConfig",
       "description": "The configuration that specifies where evaluation results should be written.",
-      "markdownDescription": "The configuration that specifies where evaluation results should be written.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "The configuration that specifies where evaluation results should be written.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
     },
     "CreatedAt": {
       "type": "string",
@@ -431,7 +474,6 @@
     "/properties/OnlineEvaluationConfigId",
     "/properties/OnlineEvaluationConfigArn",
     "/properties/Status",
-    "/properties/OutputConfig",
     "/properties/CreatedAt",
     "/properties/UpdatedAt"
   ],
@@ -519,11 +561,6 @@
       "$ref": "#/definitions/OnlineEvaluationConfigStatus",
       "description": "The status of the online evaluation configuration.",
       "markdownDescription": "The status of the online evaluation configuration.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "OutputConfig": {
-      "$ref": "#/definitions/OutputConfig",
-      "description": "The configuration that specifies where evaluation results should be written.",
-      "markdownDescription": "The configuration that specifies where evaluation results should be written.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "CreatedAt": {
       "type": "string",

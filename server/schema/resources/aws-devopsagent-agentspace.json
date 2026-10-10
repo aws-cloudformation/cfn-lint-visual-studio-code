@@ -38,6 +38,9 @@
         },
         "Idc": {
           "$ref": "#/definitions/IdcAuthConfiguration"
+        },
+        "Idp": {
+          "$ref": "#/definitions/IdpAuthConfiguration"
         }
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\nRead only property: Yes"
@@ -98,6 +101,82 @@
         "IdcInstanceArn"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "IdpAuthConfiguration": {
+      "description": "External identity provider configuration for the Operator App.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "OperatorAppRoleArn": {
+          "description": "The IAM role that Operator App users assume to access DevOps Agent APIs.",
+          "type": "string",
+          "markdownDescription": "The IAM role that Operator App users assume to access DevOps Agent APIs.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "IssuerUrl": {
+          "description": "The OIDC issuer URL for the external identity provider.",
+          "type": "string",
+          "markdownDescription": "The OIDC issuer URL for the external identity provider.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^https://[a-zA-Z0-9.-]+(?::[0-9]+)?(?:/.*)?$  \nUpdate requires: No interruption\n"
+        },
+        "ClientId": {
+          "description": "The OIDC client identifier for the external identity provider application.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "markdownDescription": "The OIDC client identifier for the external identity provider application.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nUpdate requires: No interruption\n"
+        },
+        "ClientSecret": {
+          "description": "The OIDC client secret for the external identity provider application. Use a Secrets Manager dynamic reference to avoid storing the secret in the template.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "markdownDescription": "The OIDC client secret for the external identity provider application. Use a Secrets Manager dynamic reference to avoid storing the secret in the template.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+        },
+        "Provider": {
+          "description": "The external identity provider type.",
+          "type": "string",
+          "enum": [
+            "okta",
+            "entra"
+          ],
+          "markdownDescription": "The external identity provider type.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: okta | entra  \nUpdate requires: No interruption\n"
+        },
+        "UserIdClaim": {
+          "description": "The identity claim used to identify users. This value is selected by the service for the configured provider.",
+          "type": "string",
+          "markdownDescription": "The identity claim used to identify users. This value is selected by the service for the configured provider.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "CreatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "UpdatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "OperatorAppRoleArn",
+        "IssuerUrl",
+        "ClientId",
+        "ClientSecret",
+        "Provider"
+      ],
+      "markdownDescription": "External identity provider configuration for the Operator App.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Preferences": {
+      "description": "Preferences that configure behavior of this AgentSpace. This container fully owns the AgentSpace preferences: the properties supplied here replace the stored preferences in their entirety, and omitting the Preferences container reverts all preferences to their service defaults.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ElevatedActionsEnabled": {
+          "description": "Indicates whether elevated directed actions are permitted in this AgentSpace. Defaults to false when not set.",
+          "type": "boolean",
+          "markdownDescription": "Indicates whether elevated directed actions are permitted in this AgentSpace. Defaults to false when not set.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Preferences that configure behavior of this AgentSpace. This container fully owns the AgentSpace preferences: the properties supplied here replace the stored preferences in their entirety, and omitting the Preferences container reverts all preferences to their service defaults.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -135,6 +214,9 @@
       "minLength": 2,
       "maxLength": 35,
       "markdownDescription": "The locale for the AgentSpace, which determines the language used in agent responses.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 2  \nMaximum Length: 35  \nPattern: ^[a-zA-Z]{2,3}(-[a-zA-Z0-9]{2,8})*$  \nUpdate requires: No interruption\n"
+    },
+    "Preferences": {
+      "$ref": "#/definitions/Preferences"
     },
     "OperatorApp": {
       "$ref": "#/definitions/OperatorApp"
@@ -192,7 +274,13 @@
     "/properties/OperatorApp/Iam/UpdatedAt",
     "/properties/OperatorApp/Idc/IdcApplicationArn",
     "/properties/OperatorApp/Idc/CreatedAt",
-    "/properties/OperatorApp/Idc/UpdatedAt"
+    "/properties/OperatorApp/Idc/UpdatedAt",
+    "/properties/OperatorApp/Idp/UserIdClaim",
+    "/properties/OperatorApp/Idp/CreatedAt",
+    "/properties/OperatorApp/Idp/UpdatedAt"
+  ],
+  "writeOnlyProperties": [
+    "/properties/OperatorApp/Idp/ClientSecret"
   ],
   "createOnlyProperties": [
     "/properties/KmsKeyArn"
@@ -206,6 +294,7 @@
         "aidevops:CreateAgentSpace",
         "aidevops:GetAgentSpace",
         "aidevops:EnableOperatorApp",
+        "aidevops:GetOperatorApp",
         "aidevops:GetOperatorAppTeams",
         "aidevops:TagResource",
         "aidevops:ListTagsForResource",
@@ -236,6 +325,7 @@
     "read": {
       "permissions": [
         "aidevops:GetAgentSpace",
+        "aidevops:GetOperatorApp",
         "aidevops:GetOperatorAppTeams",
         "aidevops:ListTagsForResource",
         "kms:Decrypt"
@@ -246,7 +336,9 @@
         "aidevops:UpdateAgentSpace",
         "aidevops:GetAgentSpace",
         "aidevops:EnableOperatorApp",
+        "aidevops:UpdateOperatorAppIdpConfig",
         "aidevops:DisableOperatorApp",
+        "aidevops:GetOperatorApp",
         "aidevops:GetOperatorAppTeams",
         "aidevops:TagResource",
         "aidevops:UntagResource",
@@ -279,6 +371,7 @@
         "aidevops:DeleteAgentSpace",
         "aidevops:GetAgentSpace",
         "aidevops:DisableOperatorApp",
+        "kms:Decrypt",
         "sso:DeleteApplication",
         "sso:DeleteApplicationAccessScope",
         "sso:DeleteApplicationAuthenticationMethod",

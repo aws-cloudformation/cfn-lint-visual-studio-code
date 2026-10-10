@@ -25,9 +25,14 @@
         "AWS::EKS::Cluster",
         "AWS::ElasticLoadBalancingV2::LoadBalancer",
         "AWS::EC2::Instance",
-        "AWS::SecurityHub::Hub"
+        "AWS::SecurityHub::Hub",
+        "AWS::SecurityHub::HubV2",
+        "AWS::S3::Bucket",
+        "AWS::MSK::Cluster",
+        "AWS::CloudFront::Distribution",
+        "AWS::CloudWatch::OTelEnrichment"
       ],
-      "markdownDescription": "Resource Type associated with the Organization Telemetry Rule\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AWS::EC2::VPC | AWS::WAFv2::WebACL | AWS::CloudTrail | AWS::EKS::Cluster | AWS::ElasticLoadBalancingV2::LoadBalancer | AWS::EC2::Instance | AWS::SecurityHub::Hub  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Resource Type associated with the Organization Telemetry Rule\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AWS::EC2::VPC | AWS::WAFv2::WebACL | AWS::CloudTrail | AWS::EKS::Cluster | AWS::ElasticLoadBalancingV2::LoadBalancer | AWS::EC2::Instance | AWS::SecurityHub::Hub | AWS::SecurityHub::HubV2 | AWS::S3::Bucket | AWS::MSK::Cluster | AWS::CloudFront::Distribution | AWS::CloudWatch::OTelEnrichment  \nUpdate requires: No interruption\n"
     },
     "TelemetryType": {
       "description": "Telemetry Type associated with the Organization Telemetry Rule",
@@ -71,6 +76,13 @@
       "description": "Number of days to retain the telemetry data in the specified destination",
       "type": "integer",
       "markdownDescription": "Number of days to retain the telemetry data in the specified destination\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    },
+    "KmsKeyArn": {
+      "description": "The Amazon Resource Name (ARN) of the customer-managed AWS KMS key used to encrypt the destination log groups specified in the Telemetry Rule.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the customer-managed AWS KMS key used to encrypt the destination log groups specified in the Telemetry Rule.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws[a-zA-Z-]*:kms:[a-z0-9-]+:\\d{12}:key/(mrk-)?[a-f0-9-]+$  \nUpdate requires: No interruption\n"
     },
     "VPCFlowLogParameters": {
       "description": "Telemetry parameters for VPC Flow logs",
@@ -181,6 +193,25 @@
       },
       "markdownDescription": "Telemetry parameters for ELB/NLB Load Balancer Logs\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "MskMonitoringParameters": {
+      "description": "Configuration parameters for Amazon MSK cluster monitoring.",
+      "type": "object",
+      "properties": {
+        "EnhancedMonitoring": {
+          "description": "The level of enhanced monitoring for the MSK cluster.",
+          "type": "string",
+          "enum": [
+            "DEFAULT",
+            "PER_BROKER",
+            "PER_TOPIC_PER_BROKER",
+            "PER_TOPIC_PER_PARTITION"
+          ],
+          "markdownDescription": "The level of enhanced monitoring for the MSK cluster.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DEFAULT | PER_BROKER | PER_TOPIC_PER_BROKER | PER_TOPIC_PER_PARTITION  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Configuration parameters for Amazon MSK cluster monitoring.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "TelemetryDestinationConfiguration": {
       "description": "The destination configuration for telemetry data",
       "type": "object",
@@ -194,6 +225,9 @@
         "RetentionInDays": {
           "$ref": "#/definitions/RetentionInDays"
         },
+        "KmsKeyArn": {
+          "$ref": "#/definitions/KmsKeyArn"
+        },
         "VPCFlowLogParameters": {
           "$ref": "#/definitions/VPCFlowLogParameters"
         },
@@ -205,6 +239,9 @@
         },
         "WAFLoggingParameters": {
           "$ref": "#/definitions/WAFLoggingParameters"
+        },
+        "MskMonitoringParameters": {
+          "$ref": "#/definitions/MskMonitoringParameters"
         },
         "LogDeliveryParameters": {
           "description": "Parameters for log delivery configuration",
@@ -219,9 +256,15 @@
               "items": {
                 "type": "string",
                 "enum": [
-                  "SECURITY_FINDING_LOGS"
+                  "SECURITY_FINDING_LOGS",
+                  "S3_SERVER_ACCESS_LOGS",
+                  "ACCESS_LOGS",
+                  "CONNECTION_LOGS",
+                  "ALB_ACCESS_LOGS",
+                  "ALB_CONNECTION_LOGS",
+                  "ALB_HEALTH_CHECK_LOGS"
                 ],
-                "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SECURITY_FINDING_LOGS  \nUpdate requires: No interruption\n"
+                "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SECURITY_FINDING_LOGS | S3_SERVER_ACCESS_LOGS | ACCESS_LOGS | CONNECTION_LOGS | ALB_ACCESS_LOGS | ALB_CONNECTION_LOGS | ALB_HEALTH_CHECK_LOGS  \nUpdate requires: No interruption\n"
               },
               "markdownDescription": "Types of logs to deliver\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
             }
@@ -665,6 +708,9 @@
     "/properties/RuleName",
     "/properties/Rule/AllRegions"
   ],
+  "writeOnlyProperties": [
+    "/properties/Rule/Regions"
+  ],
   "readOnlyProperties": [
     "/properties/RuleArn",
     "/properties/RegionStatuses"
@@ -681,7 +727,8 @@
         "observabilityadmin:ListTagsForResource",
         "observabilityadmin:GetTelemetryEvaluationStatusForOrganization",
         "organizations:ListDelegatedAdministrators",
-        "iam:CreateServiceLinkedRole"
+        "iam:CreateServiceLinkedRole",
+        "kms:DescribeKey"
       ]
     },
     "read": {
@@ -700,12 +747,14 @@
         "observabilityadmin:UntagResource",
         "observabilityadmin:ListTagsForResource",
         "observabilityadmin:GetTelemetryEvaluationStatusForOrganization",
-        "organizations:ListDelegatedAdministrators"
+        "organizations:ListDelegatedAdministrators",
+        "kms:DescribeKey"
       ]
     },
     "delete": {
       "permissions": [
         "observabilityadmin:DeleteTelemetryRuleForOrganization",
+        "observabilityadmin:GetTelemetryRuleForOrganization",
         "observabilityadmin:GetTelemetryEvaluationStatusForOrganization",
         "organizations:ListDelegatedAdministrators"
       ]

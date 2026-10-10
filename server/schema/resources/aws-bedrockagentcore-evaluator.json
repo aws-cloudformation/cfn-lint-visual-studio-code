@@ -1,6 +1,6 @@
 {
   "typeName": "AWS::BedrockAgentCore::Evaluator",
-  "description": "Resource Type definition for AWS::BedrockAgentCore::Evaluator - Creates a custom evaluator for agent quality assessment using LLM-as-a-Judge configurations.",
+  "description": "Resource Type definition for AWS::BedrockAgentCore::Evaluator - Creates a custom evaluator for agent quality assessment using LLM-as-a-Judge, code-based, or derived evaluator configurations. Derived evaluators run an existing built-in or third-party evaluator's logic on a model that you supply.",
   "definitions": {
     "EvaluatorStatus": {
       "type": "string",
@@ -13,6 +13,29 @@
         "DELETING"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ACTIVE | CREATING | CREATE_FAILED | UPDATING | UPDATE_FAILED | DELETING  \nUpdate requires: No interruption\n"
+    },
+    "EvaluatorType": {
+      "type": "string",
+      "description": "The kind of evaluator resource. Builtin and ThirdParty are AWS-managed global evaluators that you reference but don't create; Custom, CustomCode, and CustomDerived are evaluators that you create.",
+      "enum": [
+        "Builtin",
+        "ThirdParty",
+        "Custom",
+        "CustomCode",
+        "CustomDerived"
+      ],
+      "markdownDescription": "The kind of evaluator resource. Builtin and ThirdParty are AWS-managed global evaluators that you reference but don't create; Custom, CustomCode, and CustomDerived are evaluators that you create.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Builtin | ThirdParty | Custom | CustomCode | CustomDerived  \nUpdate requires: No interruption\n"
+    },
+    "Provider": {
+      "type": "string",
+      "description": "Where the evaluator's logic comes from: AWS for AWS-authored evaluators, DeepEval or AutoEval for the corresponding third-party libraries, or Custom for an evaluator that you authored.",
+      "enum": [
+        "AWS",
+        "DeepEval",
+        "AutoEval",
+        "Custom"
+      ],
+      "markdownDescription": "Where the evaluator's logic comes from: AWS for AWS-authored evaluators, DeepEval or AutoEval for the corresponding third-party libraries, or Custom for an evaluator that you authored.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AWS | DeepEval | AutoEval | Custom  \nUpdate requires: No interruption\n"
     },
     "EvaluatorLevel": {
       "type": "string",
@@ -32,6 +55,9 @@
         },
         "CodeBased": {
           "$ref": "#/definitions/CodeBasedEvaluatorConfig"
+        },
+        "Derived": {
+          "$ref": "#/definitions/DerivedEvaluatorConfig"
         }
       },
       "oneOf": [
@@ -44,10 +70,35 @@
           "required": [
             "CodeBased"
           ]
+        },
+        {
+          "required": [
+            "Derived"
+          ]
         }
       ],
       "additionalProperties": false,
-      "markdownDescription": "The configuration that defines how an evaluator assesses agent performance.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The configuration that defines how an evaluator assesses agent performance.\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
+    },
+    "DerivedEvaluatorConfig": {
+      "type": "object",
+      "description": "The configuration for an evaluator derived from an existing base evaluator (a built-in or third-party evaluator), run on your own model. The base evaluator supplies the prompt and scoring logic.",
+      "properties": {
+        "BaseEvaluatorId": {
+          "type": "string",
+          "description": "The identifier of the base evaluator whose logic to run (a Builtin.* or ThirdParty.* evaluator).",
+          "markdownDescription": "The identifier of the base evaluator whose logic to run (a Builtin.* or ThirdParty.* evaluator).\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^(Builtin\\.[a-zA-Z0-9._-]+|ThirdParty\\.[a-zA-Z0-9._-]+|[a-zA-Z][a-zA-Z0-9-_]{0,99}-[a-zA-Z0-9]{10})$  \nUpdate requires: No interruption\n"
+        },
+        "ModelConfig": {
+          "$ref": "#/definitions/EvaluatorModelConfig"
+        }
+      },
+      "required": [
+        "BaseEvaluatorId",
+        "ModelConfig"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The configuration for an evaluator derived from an existing base evaluator (a built-in or third-party evaluator), run on your own model. The base evaluator supplies the prompt and scoring logic.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "CodeBasedEvaluatorConfig": {
       "type": "object",
@@ -207,13 +258,79 @@
       "properties": {
         "BedrockEvaluatorModelConfig": {
           "$ref": "#/definitions/BedrockEvaluatorModelConfig"
+        },
+        "ResponsesEvaluatorModelConfig": {
+          "$ref": "#/definitions/OpenResponsesEvaluatorModelConfig"
         }
       },
-      "required": [
-        "BedrockEvaluatorModelConfig"
+      "oneOf": [
+        {
+          "required": [
+            "BedrockEvaluatorModelConfig"
+          ]
+        },
+        {
+          "required": [
+            "ResponsesEvaluatorModelConfig"
+          ]
+        }
       ],
       "additionalProperties": false,
       "markdownDescription": "The model configuration that specifies which foundation model to use for evaluation.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "OpenResponsesEvaluatorModelConfig": {
+      "type": "object",
+      "description": "The configuration for using OpenResponses-compatible models in evaluator assessments.",
+      "properties": {
+        "ModelId": {
+          "type": "string",
+          "description": "The identifier of the model to use for evaluation.",
+          "markdownDescription": "The identifier of the model to use for evaluation.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "MaxOutputTokens": {
+          "type": "integer",
+          "description": "The maximum number of output tokens to generate, including visible output and reasoning tokens.",
+          "minimum": 1,
+          "markdownDescription": "The maximum number of output tokens to generate, including visible output and reasoning tokens.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Temperature": {
+          "type": "number",
+          "description": "The sampling temperature between 0 and 2.",
+          "minimum": 0,
+          "maximum": 2,
+          "markdownDescription": "The sampling temperature between 0 and 2.\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "TopP": {
+          "type": "number",
+          "description": "The nucleus sampling probability mass between 0 and 1.",
+          "minimum": 0,
+          "maximum": 1,
+          "markdownDescription": "The nucleus sampling probability mass between 0 and 1.\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "Reasoning": {
+          "$ref": "#/definitions/ReasoningConfiguration"
+        }
+      },
+      "required": [
+        "ModelId"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The configuration for using OpenResponses-compatible models in evaluator assessments.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ReasoningConfiguration": {
+      "type": "object",
+      "description": "The reasoning configuration for reasoning models.",
+      "properties": {
+        "Effort": {
+          "type": "string",
+          "description": "The level of reasoning effort the model applies.",
+          "minLength": 1,
+          "maxLength": 64,
+          "markdownDescription": "The level of reasoning effort the model applies.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The reasoning configuration for reasoning models.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "BedrockEvaluatorModelConfig": {
       "type": "object",
@@ -316,13 +433,23 @@
     },
     "EvaluatorConfig": {
       "$ref": "#/definitions/EvaluatorConfig",
-      "description": "The configuration for the evaluator.",
-      "markdownDescription": "The configuration for the evaluator.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+      "description": "The configuration for the evaluator, including LLM-as-a-Judge, code-based, or derived settings.",
+      "markdownDescription": "The configuration for the evaluator, including LLM-as-a-Judge, code-based, or derived settings.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: Replacement\n"
     },
     "Level": {
       "$ref": "#/definitions/EvaluatorLevel",
-      "description": "The evaluation level that determines the scope of evaluation.",
-      "markdownDescription": "The evaluation level that determines the scope of evaluation.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+      "description": "The evaluation level that determines the scope of evaluation. Required for all evaluator configuration types. For Derived evaluators it must match the level of the base evaluator identified by BaseEvaluatorId.",
+      "markdownDescription": "The evaluation level that determines the scope of evaluation. Required for all evaluator configuration types. For Derived evaluators it must match the level of the base evaluator identified by BaseEvaluatorId.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "EvaluatorType": {
+      "$ref": "#/definitions/EvaluatorType",
+      "description": "The kind of evaluator resource. Builtin and ThirdParty are AWS-managed global evaluators that you reference but don't create; Custom, CustomCode, and CustomDerived are evaluators that you create.",
+      "markdownDescription": "The kind of evaluator resource. Builtin and ThirdParty are AWS-managed global evaluators that you reference but don't create; Custom, CustomCode, and CustomDerived are evaluators that you create.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Provider": {
+      "$ref": "#/definitions/Provider",
+      "description": "Where the evaluator's logic comes from: AWS, a third-party library (DeepEval or AutoEval), or you. Derived evaluators inherit the provider of their base evaluator.",
+      "markdownDescription": "Where the evaluator's logic comes from: AWS, a third-party library (DeepEval or AutoEval), or you. Derived evaluators inherit the provider of their base evaluator.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Status": {
       "$ref": "#/definitions/EvaluatorStatus",
@@ -368,12 +495,15 @@
   "readOnlyProperties": [
     "/properties/EvaluatorId",
     "/properties/EvaluatorArn",
+    "/properties/EvaluatorType",
+    "/properties/Provider",
     "/properties/Status",
     "/properties/CreatedAt",
     "/properties/UpdatedAt"
   ],
   "createOnlyProperties": [
-    "/properties/EvaluatorName"
+    "/properties/EvaluatorName",
+    "/properties/EvaluatorConfig/Derived/BaseEvaluatorId"
   ],
   "primaryIdentifier": [
     "/properties/EvaluatorArn"
@@ -402,6 +532,8 @@
         "bedrock-agentcore:GetEvaluator",
         "bedrock-agentcore:TagResource",
         "bedrock:InvokeModel",
+        "bedrock-mantle:CreateInference",
+        "bedrock-mantle:CallWithBearerToken",
         "lambda:GetFunction",
         "lambda:InvokeFunction",
         "kms:DescribeKey",
@@ -424,6 +556,8 @@
         "bedrock-agentcore:UntagResource",
         "bedrock-agentcore:ListTagsForResource",
         "bedrock:InvokeModel",
+        "bedrock-mantle:CreateInference",
+        "bedrock-mantle:CallWithBearerToken",
         "lambda:GetFunction",
         "lambda:InvokeFunction",
         "kms:DescribeKey",
@@ -453,6 +587,16 @@
       "type": "string",
       "description": "The Amazon Resource Name (ARN) of the evaluator.",
       "markdownDescription": "The Amazon Resource Name (ARN) of the evaluator.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws|aws-cn|aws-us-gov):bedrock-agentcore:[a-z0-9-]+:[0-9]{12}:evaluator/[a-zA-Z][a-zA-Z0-9-_]{0,99}-[a-zA-Z0-9]{10}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "EvaluatorType": {
+      "$ref": "#/definitions/EvaluatorType",
+      "description": "The kind of evaluator resource. Builtin and ThirdParty are AWS-managed global evaluators that you reference but don't create; Custom, CustomCode, and CustomDerived are evaluators that you create.",
+      "markdownDescription": "The kind of evaluator resource. Builtin and ThirdParty are AWS-managed global evaluators that you reference but don't create; Custom, CustomCode, and CustomDerived are evaluators that you create.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Provider": {
+      "$ref": "#/definitions/Provider",
+      "description": "Where the evaluator's logic comes from: AWS, a third-party library (DeepEval or AutoEval), or you. Derived evaluators inherit the provider of their base evaluator.",
+      "markdownDescription": "Where the evaluator's logic comes from: AWS, a third-party library (DeepEval or AutoEval), or you. Derived evaluators inherit the provider of their base evaluator.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Status": {
       "$ref": "#/definitions/EvaluatorStatus",
