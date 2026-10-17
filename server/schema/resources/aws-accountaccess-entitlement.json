@@ -1,0 +1,188 @@
+{
+  "typeName": "AWS::AccountAccess::Entitlement",
+  "description": "Resource Type definition for AWS::AccountAccess::Entitlement specifying an entitlement for account access",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-accountaccess.git",
+  "resourceLink": {
+    "templateUri": "/account-access/home?region=${awsRegion}#/entitlement/${EntitlementId}",
+    "mappings": {
+      "EntitlementId": "/EntitlementId"
+    }
+  },
+  "definitions": {
+    "IdentityCenterPrincipal": {
+      "type": "object",
+      "properties": {
+        "UserId": {
+          "type": "string",
+          "description": "The ID of the user",
+          "minLength": 1,
+          "maxLength": 47,
+          "markdownDescription": "The ID of the user\n\n---\n\nRequired: Conditional  \nType: String  \nMinimum Length: 1  \nMaximum Length: 47  \nPattern: ^([0-9a-f]{10}-|)[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}$  \nUpdate requires: No interruption\n"
+        },
+        "GroupId": {
+          "type": "string",
+          "description": "The ID of the group",
+          "minLength": 1,
+          "maxLength": 47,
+          "markdownDescription": "The ID of the group\n\n---\n\nRequired: Conditional  \nType: String  \nMinimum Length: 1  \nMaximum Length: 47  \nPattern: ^([0-9a-f]{10}-|)[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "required": [
+            "UserId"
+          ]
+        },
+        {
+          "required": [
+            "GroupId"
+          ]
+        }
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Principal": {
+      "type": "object",
+      "properties": {
+        "IdentityCenter": {
+          "$ref": "#/definitions/IdentityCenterPrincipal"
+        }
+      },
+      "required": [
+        "IdentityCenter"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PrincipalRoleEntitlement": {
+      "type": "object",
+      "properties": {
+        "Principal": {
+          "$ref": "#/definitions/Principal"
+        },
+        "RoleArn": {
+          "description": "The ARN of the IAM role",
+          "type": "string",
+          "markdownDescription": "The ARN of the IAM role\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:[a-z0-9-]+:iam::[0-9]{12}:role\\/([a-zA-Z0-9+=,.@_-]+\\/)*[a-zA-Z0-9+=,.@_-]+$  \nUpdate requires: No interruption\n"
+        },
+        "Account": {
+          "description": "The AWS account ID",
+          "type": "string",
+          "minLength": 12,
+          "maxLength": 12,
+          "markdownDescription": "The AWS account ID\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 12  \nMaximum Length: 12  \nPattern: ^[0-9]{12}$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Principal",
+        "RoleArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Entitlement": {
+      "type": "object",
+      "properties": {
+        "PrincipalRole": {
+          "$ref": "#/definitions/PrincipalRoleEntitlement"
+        }
+      },
+      "required": [
+        "PrincipalRole"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  },
+  "properties": {
+    "ApplicationArn": {
+      "description": "The ARN of the application",
+      "type": "string",
+      "markdownDescription": "The ARN of the application\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:[a-z0-9-]+:account-access:[a-z0-9]+(-[a-z0-9]+)*:[0-9]{12}:application/[a-zA-Z0-9-]+$  \nUpdate requires: Replacement\n"
+    },
+    "EntitlementId": {
+      "description": "The ID of the entitlement",
+      "type": "string",
+      "markdownDescription": "The ID of the entitlement\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Entitlement": {
+      "description": "The entitlement details",
+      "$ref": "#/definitions/Entitlement",
+      "markdownDescription": "The entitlement details\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: Replacement\nRead only property: Yes"
+    },
+    "CreatedAt": {
+      "description": "The timestamp when the entitlement was created",
+      "type": "string",
+      "markdownDescription": "The timestamp when the entitlement was created\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  },
+  "required": [
+    "ApplicationArn",
+    "Entitlement"
+  ],
+  "readOnlyProperties": [
+    "/properties/EntitlementId",
+    "/properties/Entitlement/PrincipalRole/Account",
+    "/properties/CreatedAt"
+  ],
+  "createOnlyProperties": [
+    "/properties/ApplicationArn",
+    "/properties/Entitlement"
+  ],
+  "primaryIdentifier": [
+    "/properties/ApplicationArn",
+    "/properties/EntitlementId"
+  ],
+  "additionalProperties": false,
+  "handlers": {
+    "create": {
+      "permissions": [
+        "account-access:CreateEntitlement",
+        "account-access:GetEntitlement",
+        "account-access:ListEntitlements"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "account-access:GetEntitlement"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "account-access:DeleteEntitlement",
+        "account-access:GetEntitlement"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "ApplicationArn": {
+            "$ref": "resource-schema.json#/properties/ApplicationArn"
+          }
+        },
+        "required": [
+          "ApplicationArn"
+        ]
+      },
+      "permissions": [
+        "account-access:ListEntitlements"
+      ]
+    }
+  },
+  "tagging": {
+    "taggable": false
+  },
+  "attributes": {
+    "EntitlementId": {
+      "description": "The ID of the entitlement",
+      "type": "string",
+      "markdownDescription": "The ID of the entitlement\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreatedAt": {
+      "description": "The timestamp when the entitlement was created",
+      "type": "string",
+      "markdownDescription": "The timestamp when the entitlement was created\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

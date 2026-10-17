@@ -1,0 +1,354 @@
+{
+  "typeName": "AWS::SecurityHub::Connector",
+  "description": "Creates a connector to a third-party cloud provider in Security Hub CSPM. A connector establishes a connection between Security Hub CSPM and a third-party cloud provider, enabling Security Hub CSPM to ingest security findings and resource data from the connected environment.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-securityhub",
+  "definitions": {
+    "Tags": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^(?!aws:)[a-zA-Z+-=._:/]{1,128}$": {
+          "type": "string",
+          "description": "The value for the tag.",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The value for the tag.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ISO8601DateString": {
+      "description": "The timestamp formatted in ISO8601",
+      "type": "string",
+      "markdownDescription": "The timestamp formatted in ISO8601\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(\\d\\d\\d\\d)-([0][1-9]|[1][0-2])-([0][1-9]|[1-2](\\d)|[3][0-1])[T](?:([0-1](\\d)|[2][0-3]):[0-5](\\d):[0-5](\\d)|23:59:60)(?:\\.(\\d)+)?([Z]|[+-](\\d\\d)(:?(\\d\\d))?)$  \nUpdate requires: No interruption\n"
+    },
+    "AzureScopeConfiguration": {
+      "type": "object",
+      "description": "The scope configuration for an Azure connector, defining the tenant or subscription scope.",
+      "properties": {
+        "ScopeType": {
+          "description": "The type of scope. Valid values are ``tenant`` and ``subscription``.",
+          "type": "string",
+          "enum": [
+            "TENANT",
+            "SUBSCRIPTION"
+          ],
+          "markdownDescription": "The type of scope. Valid values are ``tenant`` and ``subscription``.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: TENANT | SUBSCRIPTION  \nUpdate requires: No interruption\n"
+        },
+        "ScopeValues": {
+          "description": "The list of scope values, such as subscription IDs, when the scope type is ``subscription``.",
+          "insertionOrder": false,
+          "uniqueItems": true,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 0,
+          "maxItems": 100,
+          "markdownDescription": "The list of scope values, such as subscription IDs, when the scope type is ``subscription``.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ScopeType"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The scope configuration for an Azure connector, defining the tenant or subscription scope.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AzureProviderConfiguration": {
+      "type": "object",
+      "description": "The configuration for connecting to an Azure environment.",
+      "properties": {
+        "AWSConfigConnectorArn": {
+          "description": "The ARN of the multi-cloud configuration connector used to establish the connection to Azure.",
+          "type": "string",
+          "markdownDescription": "The ARN of the multi-cloud configuration connector used to establish the connection to Azure.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ScopeConfiguration": {
+          "$ref": "#/definitions/AzureScopeConfiguration",
+          "description": "The scope configuration that defines which Azure resources are monitored.",
+          "markdownDescription": "The scope configuration that defines which Azure resources are monitored.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "AzureRegions": {
+          "description": "The list of Azure regions to monitor.",
+          "type": "array",
+          "insertionOrder": false,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "minItems": 1,
+          "maxItems": 100,
+          "markdownDescription": "The list of Azure regions to monitor.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "AWSConfigConnectorArn",
+        "ScopeConfiguration",
+        "AzureRegions"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The configuration for connecting to an Azure environment.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Provider": {
+      "type": "object",
+      "description": "",
+      "properties": {
+        "Azure": {
+          "$ref": "#/definitions/AzureProviderConfiguration",
+          "description": "",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Azure"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
+    },
+    "ConnectorStatus": {
+      "description": "The status of the connector",
+      "type": "string",
+      "markdownDescription": "The status of the connector\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "HealthIssueCode": {
+      "description": "The code identifying the type of health issue",
+      "type": "string",
+      "markdownDescription": "The code identifying the type of health issue\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "HealthIssue": {
+      "description": "Represents a specific health issue detected for a connector.",
+      "type": "object",
+      "properties": {
+        "Code": {
+          "description": "The error code that identifies the type of health issue.",
+          "$ref": "#/definitions/HealthIssueCode",
+          "markdownDescription": "The error code that identifies the type of health issue.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "Message": {
+          "description": "A human-readable message that describes the health issue.",
+          "type": "string",
+          "markdownDescription": "A human-readable message that describes the health issue.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Code",
+        "Message"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Represents a specific health issue detected for a connector.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EnablementStatus": {
+      "description": "The enablement status of the connector",
+      "type": "string",
+      "markdownDescription": "The enablement status of the connector\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "Name": {
+      "description": "The name of the connector.",
+      "type": "string",
+      "markdownDescription": "The name of the connector.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "Description": {
+      "description": "The description of the connector.",
+      "type": "string",
+      "markdownDescription": "The description of the connector.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "Provider": {
+      "$ref": "#/definitions/Provider",
+      "description": "",
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: Replacement\n"
+    },
+    "Tags": {
+      "$ref": "#/definitions/Tags",
+      "description": "",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "ConnectorArn": {
+      "description": "",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws\\S*:securityhub:[a-z0-9-]+:[0-9]{12}:connector/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ConnectorId": {
+      "description": "",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ConnectorStatus": {
+      "$ref": "#/definitions/ConnectorStatus",
+      "description": "",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Message": {
+      "description": "",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "LastCheckedAt": {
+      "description": "",
+      "$ref": "#/definitions/ISO8601DateString",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreatedAt": {
+      "description": "",
+      "$ref": "#/definitions/ISO8601DateString",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "LastUpdatedAt": {
+      "description": "",
+      "$ref": "#/definitions/ISO8601DateString",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreatedBy": {
+      "description": "",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "EnablementStatus": {
+      "description": "",
+      "$ref": "#/definitions/EnablementStatus",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Issues": {
+      "description": "",
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/HealthIssue"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  },
+  "required": [
+    "Name",
+    "Provider"
+  ],
+  "createOnlyProperties": [
+    "/properties/Name",
+    "/properties/Provider/Azure/AWSConfigConnectorArn"
+  ],
+  "readOnlyProperties": [
+    "/properties/ConnectorArn",
+    "/properties/ConnectorId",
+    "/properties/ConnectorStatus",
+    "/properties/Message",
+    "/properties/LastCheckedAt",
+    "/properties/CreatedAt",
+    "/properties/LastUpdatedAt",
+    "/properties/CreatedBy",
+    "/properties/EnablementStatus",
+    "/properties/Issues"
+  ],
+  "primaryIdentifier": [
+    "/properties/ConnectorArn"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "securityhub:ListTagsForResource",
+      "securityhub:TagResource",
+      "securityhub:UntagResource"
+    ]
+  },
+  "additionalProperties": false,
+  "handlers": {
+    "create": {
+      "permissions": [
+        "securityhub:CreateConnector",
+        "securityhub:GetConnector",
+        "securityhub:TagResource",
+        "securityhub:ListTagsForResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "securityhub:GetConnector",
+        "securityhub:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "securityhub:UpdateConnector",
+        "securityhub:GetConnector",
+        "securityhub:TagResource",
+        "securityhub:UntagResource",
+        "securityhub:ListTagsForResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "securityhub:GetConnector",
+        "securityhub:DeleteConnector"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "securityhub:ListConnectors",
+        "securityhub:ListTagsForResource"
+      ]
+    }
+  },
+  "attributes": {
+    "ConnectorArn": {
+      "description": "",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws\\S*:securityhub:[a-z0-9-]+:[0-9]{12}:connector/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ConnectorId": {
+      "description": "",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ConnectorStatus": {
+      "$ref": "#/definitions/ConnectorStatus",
+      "description": "",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Message": {
+      "description": "",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "LastCheckedAt": {
+      "description": "",
+      "$ref": "#/definitions/ISO8601DateString",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreatedAt": {
+      "description": "",
+      "$ref": "#/definitions/ISO8601DateString",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "LastUpdatedAt": {
+      "description": "",
+      "$ref": "#/definitions/ISO8601DateString",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreatedBy": {
+      "description": "",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "EnablementStatus": {
+      "description": "",
+      "$ref": "#/definitions/EnablementStatus",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Issues": {
+      "description": "",
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/HealthIssue"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

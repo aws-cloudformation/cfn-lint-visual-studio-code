@@ -591,7 +591,7 @@
     "Namespace": {
       "type": "string",
       "description": "Namespace for the memory strategy",
-      "markdownDescription": "Namespace for the memory strategy\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9\\-_/]*(\\{(actorId|sessionId|memoryStrategyId)\\}[a-zA-Z0-9\\-_/]*)*$  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Namespace for the memory strategy\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z0-9\\-_/]*(\\{[a-zA-Z][a-zA-Z0-9]*\\}[a-zA-Z0-9\\-_/]*)*$  \nUpdate requires: No interruption\n"
     },
     "NamespacesList": {
       "type": "array",
@@ -1066,6 +1066,77 @@
       "description": "List of indexed keys for the memory",
       "markdownDescription": "List of indexed keys for the memory\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     },
+    "NamespaceVariableKey": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 32,
+      "description": "A namespace variable key name. Must start with a lowercase letter and contain only lowercase alphanumeric characters. Cannot be a built-in variable (memoryStrategyId, sessionId, actorId).",
+      "markdownDescription": "A namespace variable key name. Must start with a lowercase letter and contain only lowercase alphanumeric characters. Cannot be a built-in variable (memoryStrategyId, sessionId, actorId).\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 32  \nPattern: ^(?!memoryStrategyId$|actorId$|sessionId$)[a-z][a-z0-9]*$  \nUpdate requires: No interruption\n"
+    },
+    "NamespaceAllowedValue": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "description": "A single allowed value for a namespace variable",
+      "markdownDescription": "A single allowed value for a namespace variable\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[a-z0-9][a-z0-9-_]*$  \nUpdate requires: No interruption\n"
+    },
+    "NamespaceRegexPattern": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "description": "A regex pattern that a namespace variable value must match",
+      "markdownDescription": "A regex pattern that a namespace variable value must match\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nUpdate requires: No interruption\n"
+    },
+    "NamespaceKeyValidation": {
+      "type": "object",
+      "properties": {
+        "AllowedValues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/NamespaceAllowedValue"
+          },
+          "minItems": 1,
+          "maxItems": 10,
+          "insertionOrder": false,
+          "description": "List of allowed values for this namespace variable",
+          "markdownDescription": "List of allowed values for this namespace variable\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "RegexPattern": {
+          "$ref": "#/definitions/NamespaceRegexPattern"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Validation rules for namespace variable values. Multiple rules can be specified and all must pass.",
+      "markdownDescription": "Validation rules for namespace variable values. Multiple rules can be specified and all must pass.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "NamespaceKeyEntry": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "$ref": "#/definitions/NamespaceVariableKey"
+        },
+        "Validation": {
+          "$ref": "#/definitions/NamespaceKeyValidation"
+        }
+      },
+      "required": [
+        "Key"
+      ],
+      "additionalProperties": false,
+      "description": "A namespace variable key definition with optional validation rules",
+      "markdownDescription": "A namespace variable key definition with optional validation rules\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "NamespaceKeysList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/NamespaceKeyEntry"
+      },
+      "minItems": 1,
+      "maxItems": 5,
+      "insertionOrder": false,
+      "description": "List of namespace variable key definitions for a memory resource",
+      "markdownDescription": "List of namespace variable key definitions for a memory resource\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
     "Definition": {
       "type": "string",
       "minLength": 1,
@@ -1189,6 +1260,15 @@
       "minProperties": 1,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "ExtractionType": {
+      "type": "string",
+      "enum": [
+        "LLM_INFERRED",
+        "STRICTLY_CONSISTENT"
+      ],
+      "description": "Specifies whether the metadata value is extracted by the LLM or passed through deterministically from the event",
+      "markdownDescription": "Specifies whether the metadata value is extracted by the LLM or passed through deterministically from the event\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: LLM_INFERRED | STRICTLY_CONSISTENT  \nUpdate requires: No interruption\n"
+    },
     "MetadataSchemaEntry": {
       "type": "object",
       "properties": {
@@ -1197,6 +1277,9 @@
         },
         "Type": {
           "$ref": "#/definitions/MetadataValueType"
+        },
+        "ExtractionType": {
+          "$ref": "#/definitions/ExtractionType"
         },
         "ExtractionConfig": {
           "$ref": "#/definitions/ExtractionConfig"
@@ -1295,6 +1378,9 @@
     },
     "IndexedKeys": {
       "$ref": "#/definitions/IndexedKeysList"
+    },
+    "NamespaceKeys": {
+      "$ref": "#/definitions/NamespaceKeysList"
     },
     "StreamDeliveryResources": {
       "$ref": "#/definitions/StreamDeliveryResources"
@@ -1410,7 +1496,7 @@
     }
   },
   "tagging": {
-    "cloudFormationSystemTags": false,
+    "cloudFormationSystemTags": true,
     "tagOnCreate": true,
     "tagProperty": "/properties/Tags",
     "tagUpdatable": true,
