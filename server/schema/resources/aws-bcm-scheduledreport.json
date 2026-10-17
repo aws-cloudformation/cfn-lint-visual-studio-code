@@ -1,0 +1,363 @@
+{
+  "typeName": "AWS::BCM::ScheduledReport",
+  "description": "Creates and manages a scheduled report for an AWS Billing and Cost Management Dashboards dashboard. A scheduled report renders a snapshot of the dashboard on a cron schedule, using an IAM role that the service assumes to read the underlying cost and usage data.",
+  "definitions": {
+    "ScheduleConfig": {
+      "type": "object",
+      "properties": {
+        "ScheduleExpression": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 1024,
+          "description": "The schedule expression that specifies when to trigger the scheduled report run. This value must be a cron expression consisting of six fields separated by white spaces: cron(minutes hours day_of_month month day_of_week year).",
+          "markdownDescription": "The schedule expression that specifies when to trigger the scheduled report run. This value must be a cron expression consisting of six fields separated by white spaces: cron(minutes hours day_of_month month day_of_week year).\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nPattern: ^[\\S\\s]*$  \nUpdate requires: No interruption\n"
+        },
+        "ScheduleExpressionTimeZone": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 1024,
+          "description": "The time zone for the schedule expression, for example, UTC.",
+          "markdownDescription": "The time zone for the schedule expression, for example, UTC.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nPattern: ^[\\S\\s]*$  \nUpdate requires: No interruption\n"
+        },
+        "SchedulePeriod": {
+          "$ref": "#/definitions/SchedulePeriod",
+          "description": "The time period during which the schedule is active.",
+          "markdownDescription": "The time period during which the schedule is active.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "State": {
+          "$ref": "#/definitions/ScheduleState",
+          "description": "The state of the schedule. ENABLED means the scheduled report runs according to its schedule expression. DISABLED means the scheduled report is paused and will not run until re-enabled.",
+          "markdownDescription": "The state of the schedule. ENABLED means the scheduled report runs according to its schedule expression. DISABLED means the scheduled report is paused and will not run until re-enabled.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Defines when and how often a scheduled report runs.",
+      "markdownDescription": "Defines when and how often a scheduled report runs.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SchedulePeriod": {
+      "type": "object",
+      "properties": {
+        "StartTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time at which the schedule becomes active.",
+          "markdownDescription": "The time at which the schedule becomes active.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "EndTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time at which the schedule stops being active.",
+          "markdownDescription": "The time at which the schedule stops being active.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "description": "The window during which the schedule is active. When omitted the service defaults it. EndTime must be within three years of the time of the request.",
+      "markdownDescription": "The window during which the schedule is active. When omitted the service defaults it. EndTime must be within three years of the time of the request.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ScheduleState": {
+      "type": "string",
+      "enum": [
+        "ENABLED",
+        "DISABLED"
+      ],
+      "description": "Whether the schedule is active.",
+      "markdownDescription": "Whether the schedule is active.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption\n"
+    },
+    "DateTimeRange": {
+      "type": "object",
+      "properties": {
+        "StartTime": {
+          "$ref": "#/definitions/DateTimeValue",
+          "description": "The start of the range.",
+          "markdownDescription": "The start of the range.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "EndTime": {
+          "$ref": "#/definitions/DateTimeValue",
+          "description": "The end of the range.",
+          "markdownDescription": "The end of the range.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "StartTime",
+        "EndTime"
+      ],
+      "additionalProperties": false,
+      "description": "An absolute or relative date range.",
+      "markdownDescription": "An absolute or relative date range.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DateTimeValue": {
+      "type": "object",
+      "properties": {
+        "Type": {
+          "$ref": "#/definitions/DateTimeType",
+          "description": "Whether Value is an absolute date or a duration relative to now.",
+          "markdownDescription": "Whether Value is an absolute date or a duration relative to now.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 1024,
+          "description": "The date, or an ISO 8601 duration when Type is RELATIVE.",
+          "markdownDescription": "The date, or an ISO 8601 duration when Type is RELATIVE.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 1024  \nPattern: ^[\\S\\s]*$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Type",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "description": "A date expressed either as an absolute instant or as an offset from now.",
+      "markdownDescription": "A date expressed either as an absolute instant or as an offset from now.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DateTimeType": {
+      "type": "string",
+      "enum": [
+        "ABSOLUTE",
+        "RELATIVE"
+      ],
+      "description": "Whether a date value is absolute or relative.",
+      "markdownDescription": "Whether a date value is absolute or relative.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ABSOLUTE | RELATIVE  \nUpdate requires: No interruption\n"
+    },
+    "HealthStatus": {
+      "type": "object",
+      "properties": {
+        "StatusCode": {
+          "$ref": "#/definitions/HealthStatusCode",
+          "description": "Whether the scheduled report is healthy.",
+          "markdownDescription": "Whether the scheduled report is healthy.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "LastRefreshedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time at which the health status was last refreshed.",
+          "markdownDescription": "The time at which the health status was last refreshed.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "StatusCode"
+      ],
+      "additionalProperties": false,
+      "description": "The health of the scheduled report as of its last refresh.",
+      "markdownDescription": "The health of the scheduled report as of its last refresh.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HealthStatusCode": {
+      "type": "string",
+      "enum": [
+        "HEALTHY",
+        "UNHEALTHY"
+      ],
+      "description": "The health status of a scheduled report.",
+      "markdownDescription": "The health status of a scheduled report.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: HEALTHY | UNHEALTHY  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "description": "The tag key.",
+          "markdownDescription": "The tag key.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[\\S\\s]*$  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 256,
+          "description": "The tag value.",
+          "markdownDescription": "The tag value.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: ^[\\S\\s]*$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "description": "A key-value pair applied to the scheduled report.",
+      "markdownDescription": "A key-value pair applied to the scheduled report.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "Arn": {
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 2048,
+      "description": "The Amazon Resource Name (ARN) of the scheduled report.",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the scheduled report.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:aws[-a-z0-9]*:bcm-dashboards::[0-9]{12}:scheduled-report/(\\*|[-a-z0-9]+)$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Name": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 50,
+      "description": "The name of the scheduled report.",
+      "markdownDescription": "The name of the scheduled report.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 2  \nMaximum Length: 50  \nPattern: ^(?!.* {2})[a-zA-Z][a-zA-Z0-9 _-]{0,48}[a-zA-Z0-9_-]$  \nUpdate requires: No interruption\n"
+    },
+    "Description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "description": "A description of the scheduled report's purpose or contents.",
+      "markdownDescription": "A description of the scheduled report's purpose or contents.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 200  \nPattern: ^(?!.* {2})[ a-zA-Z0-9.,!?;:@#$%&\\-_/\\\\]*$  \nUpdate requires: No interruption\n"
+    },
+    "DashboardArn": {
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 2048,
+      "description": "The ARN of the dashboard associated with the scheduled report. Managed dashboards cannot be used.",
+      "markdownDescription": "The ARN of the dashboard associated with the scheduled report. Managed dashboards cannot be used.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:aws[-a-z0-9]*:bcm-dashboards::[0-9]{12}:dashboard/(\\*|[-a-z0-9]+)$  \nUpdate requires: No interruption\n"
+    },
+    "ScheduledReportExecutionRoleArn": {
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 2048,
+      "description": "The ARN of the IAM role that the scheduled report uses to execute. AWS Billing and Cost Management Dashboards assumes this IAM role while executing the scheduled report.",
+      "markdownDescription": "The ARN of the IAM role that the scheduled report uses to execute. AWS Billing and Cost Management Dashboards assumes this IAM role while executing the scheduled report.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:aws[-a-z0-9]*:iam::[0-9]{12}:role/[a-zA-Z0-9+=,.@_/-]+$  \nUpdate requires: No interruption\n"
+    },
+    "ScheduleConfig": {
+      "$ref": "#/definitions/ScheduleConfig",
+      "description": "The schedule configuration that defines when and how often the report is generated.",
+      "markdownDescription": "The schedule configuration that defines when and how often the report is generated.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "WidgetIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      },
+      "maxItems": 1,
+      "insertionOrder": true,
+      "description": "The list of widget identifiers included in the scheduled report. If not specified, all widgets in the dashboard are included.",
+      "markdownDescription": "The list of widget identifiers included in the scheduled report. If not specified, all widgets in the dashboard are included.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "WidgetDateRangeOverride": {
+      "$ref": "#/definitions/DateTimeRange",
+      "description": "The date range override applied to widgets in the scheduled report.",
+      "markdownDescription": "The date range override applied to widgets in the scheduled report.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "CreatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The timestamp when the scheduled report was created.",
+      "markdownDescription": "The timestamp when the scheduled report was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "UpdatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The timestamp when the scheduled report was last modified.",
+      "markdownDescription": "The timestamp when the scheduled report was last modified.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "HealthStatus": {
+      "$ref": "#/definitions/HealthStatus",
+      "description": "The health status of the scheduled report at its last refresh time.",
+      "markdownDescription": "The health status of the scheduled report at its last refresh time.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Tags": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "maxItems": 200,
+      "insertionOrder": false,
+      "description": "The tags applied to the scheduled report.",
+      "markdownDescription": "The tags applied to the scheduled report.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "required": [
+    "Name",
+    "DashboardArn",
+    "ScheduledReportExecutionRoleArn",
+    "ScheduleConfig"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/CreatedAt",
+    "/properties/UpdatedAt",
+    "/properties/HealthStatus"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "bcm-dashboards:CreateScheduledReport",
+        "bcm-dashboards:GetDashboard",
+        "bcm-dashboards:TagResource",
+        "iam:PassRole",
+        "ce:GetCostAndUsage",
+        "ce:GetSavingsPlansCoverage",
+        "ce:GetSavingsPlansUtilization",
+        "ce:GetReservationCoverage",
+        "ce:GetReservationUtilization"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "bcm-dashboards:GetScheduledReport",
+        "bcm-dashboards:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "bcm-dashboards:UpdateScheduledReport",
+        "bcm-dashboards:GetDashboard",
+        "bcm-dashboards:TagResource",
+        "bcm-dashboards:UntagResource",
+        "iam:PassRole",
+        "ce:GetCostAndUsage",
+        "ce:GetSavingsPlansCoverage",
+        "ce:GetSavingsPlansUtilization",
+        "ce:GetReservationCoverage",
+        "ce:GetReservationUtilization"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "bcm-dashboards:DeleteScheduledReport"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "bcm-dashboards:ListScheduledReports"
+      ]
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "bcm-dashboards:TagResource",
+      "bcm-dashboards:UntagResource",
+      "bcm-dashboards:ListTagsForResource"
+    ]
+  },
+  "additionalProperties": false,
+  "attributes": {
+    "Arn": {
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 2048,
+      "description": "The Amazon Resource Name (ARN) of the scheduled report.",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the scheduled report.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:aws[-a-z0-9]*:bcm-dashboards::[0-9]{12}:scheduled-report/(\\*|[-a-z0-9]+)$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The timestamp when the scheduled report was created.",
+      "markdownDescription": "The timestamp when the scheduled report was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "UpdatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The timestamp when the scheduled report was last modified.",
+      "markdownDescription": "The timestamp when the scheduled report was last modified.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "HealthStatus": {
+      "$ref": "#/definitions/HealthStatus",
+      "description": "The health status of the scheduled report at its last refresh time.",
+      "markdownDescription": "The health status of the scheduled report at its last refresh time.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

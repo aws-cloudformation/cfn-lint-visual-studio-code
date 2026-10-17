@@ -1,7 +1,103 @@
 {
   "typeName": "AWS::BedrockAgentCore::GatewayTarget",
-  "description": "Resource Type definition for AWS::BedrockAgentCore::GatewayTarget",
+  "description": "Definition of AWS::BedrockAgentCore::GatewayTarget Resource Type",
   "definitions": {
+    "ApiGatewayTargetConfiguration": {
+      "type": "object",
+      "properties": {
+        "RestApiId": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Stage": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ApiGatewayToolConfiguration": {
+          "$ref": "#/definitions/ApiGatewayToolConfiguration"
+        }
+      },
+      "required": [
+        "ApiGatewayToolConfiguration",
+        "RestApiId",
+        "Stage"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ApiGatewayToolConfiguration": {
+      "type": "object",
+      "properties": {
+        "ToolOverrides": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ApiGatewayToolOverride"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "ToolFilters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ApiGatewayToolFilter"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ToolFilters"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ApiGatewayToolFilter": {
+      "type": "object",
+      "properties": {
+        "FilterPath": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Methods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RestApiMethod"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "FilterPath",
+        "Methods"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ApiGatewayToolOverride": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Description": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Path": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Method": {
+          "$ref": "#/definitions/RestApiMethod"
+        }
+      },
+      "required": [
+        "Method",
+        "Name",
+        "Path"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "ApiKeyCredentialLocation": {
       "type": "string",
       "enum": [
@@ -69,57 +165,55 @@
         }
       ]
     },
-    "ApiGatewayTargetConfiguration": {
-      "type": "object",
-      "properties": {
-        "RestApiId": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "Stage": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "ApiGatewayToolConfiguration": {
-          "$ref": "#/definitions/ApiGatewayToolConfiguration"
-        }
-      },
-      "required": [
-        "RestApiId",
-        "Stage",
-        "ApiGatewayToolConfiguration"
-      ],
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "ApiGatewayToolConfiguration": {
-      "type": "object",
-      "properties": {
-        "ToolOverrides": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ApiGatewayToolOverride"
+    "AuthorizationData": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "Oauth2",
+          "properties": {
+            "Oauth2": {
+              "$ref": "#/definitions/OAuth2AuthorizationData"
+            }
           },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "ToolFilters": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ApiGatewayToolFilter"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+          "required": [
+            "Oauth2"
+          ],
+          "additionalProperties": false
         }
-      },
-      "required": [
-        "ToolFilters"
-      ],
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      ]
     },
-    "ApiGatewayToolOverride": {
+    "ConnectorConfiguration": {
       "type": "object",
       "properties": {
         "Name": {
+          "type": "string",
+          "maxLength": 64,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 64  \nPattern: ^[a-zA-Z][a-zA-Z0-9_-]*$  \nUpdate requires: No interruption\n"
+        },
+        "Description": {
+          "type": "string",
+          "maxLength": 2000,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2000  \nUpdate requires: No interruption\n"
+        },
+        "ParameterValues": {},
+        "ParameterOverrides": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ConnectorParameterOverride"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Name"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ConnectorParameterOverride": {
+      "type": "object",
+      "properties": {
+        "Path": {
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         },
@@ -127,177 +221,62 @@
           "type": "string",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
-        "Path": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "Method": {
-          "$ref": "#/definitions/RestApiMethod"
+        "Visible": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "Name",
-        "Path",
-        "Method"
+        "Path"
       ],
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "ApiGatewayToolFilter": {
+    "ConnectorSource": {
       "type": "object",
       "properties": {
-        "FilterPath": {
+        "ConnectorId": {
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "Methods": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/RestApiMethod"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+          "maxLength": 256,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "FilterPath",
-        "Methods"
+        "ConnectorId"
       ],
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "PrivateEndpoint": {
-      "oneOf": [
-        {
-          "type": "object",
-          "title": "SelfManagedLatticeResource",
-          "properties": {
-            "SelfManagedLatticeResource": {
-              "$ref": "#/definitions/SelfManagedLatticeResource"
-            }
-          },
-          "required": [
-            "SelfManagedLatticeResource"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "title": "ManagedVpcResource",
-          "properties": {
-            "ManagedVpcResource": {
-              "$ref": "#/definitions/ManagedVpcResource"
-            }
-          },
-          "required": [
-            "ManagedVpcResource"
-          ],
-          "additionalProperties": false
-        }
-      ]
-    },
-    "SelfManagedLatticeResource": {
-      "oneOf": [
-        {
-          "type": "object",
-          "title": "ResourceConfigurationIdentifier",
-          "properties": {
-            "ResourceConfigurationIdentifier": {
-              "type": "string",
-              "maxLength": 2048,
-              "minLength": 20,
-              "pattern": "^((rcfg-[0-9a-z]{17})|(arn:[a-z0-9\\-]+:vpc-lattice:[a-zA-Z0-9\\-]+:\\d{12}:resourceconfiguration/rcfg-[0-9a-z]{17}))$"
-            }
-          },
-          "required": [
-            "ResourceConfigurationIdentifier"
-          ],
-          "additionalProperties": false
-        }
-      ]
-    },
-    "ManagedVpcResource": {
+    "ConnectorTargetConfiguration": {
       "type": "object",
       "properties": {
-        "VpcIdentifier": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^vpc-(([0-9a-z]{8})|([0-9a-z]{17}))$  \nUpdate requires: No interruption\n"
+        "Source": {
+          "$ref": "#/definitions/ConnectorSource"
         },
-        "SubnetIds": {
+        "Enabled": {
           "type": "array",
           "items": {
             "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^subnet-[0-9a-zA-Z]{8,17}$  \nUpdate requires: No interruption\n"
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
           },
+          "maxItems": 50,
           "minItems": 1,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "EndpointIpAddressType": {
-          "$ref": "#/definitions/EndpointIpAddressType"
-        },
-        "SecurityGroupIds": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^sg-(([0-9a-z]{8})|([0-9a-z]{17}))$  \nUpdate requires: No interruption\n"
-          },
-          "maxItems": 5,
-          "minItems": 0,
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         },
-        "RoutingDomain": {
-          "type": "string",
-          "maxLength": 255,
-          "minLength": 3,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+        "Configurations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ConnectorConfiguration"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
-        "EndpointIpAddressType",
-        "SubnetIds",
-        "VpcIdentifier"
+        "Source"
       ],
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "EndpointIpAddressType": {
-      "type": "string",
-      "enum": [
-        "IPV4",
-        "IPV6"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: IPV4 | IPV6  \nUpdate requires: No interruption\n"
-    },
-    "ManagedResourceDetails": {
-      "type": "object",
-      "properties": {
-        "Domain": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "ResourceGatewayArn": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:[a-z0-9\\-]+:vpc-lattice:[a-zA-Z0-9\\-]+:\\d{12}:resourcegateway/rgw-[0-9a-z]{17}$  \nUpdate requires: No interruption\n"
-        },
-        "ResourceAssociationArn": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(arn:[a-z0-9\\-]+:vpc-lattice:[a-zA-Z0-9\\-]+:\\d{12}:servicenetworkresourceassociation/)?snra-[0-9a-f]{17}$  \nUpdate requires: No interruption\n"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "RestApiMethod": {
-      "type": "string",
-      "enum": [
-        "GET",
-        "DELETE",
-        "HEAD",
-        "OPTIONS",
-        "PATCH",
-        "PUT",
-        "POST"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: GET | DELETE | HEAD | OPTIONS | PATCH | PUT | POST  \nUpdate requires: No interruption\n"
     },
     "CredentialProvider": {
       "oneOf": [
@@ -342,28 +321,6 @@
         }
       ]
     },
-    "IamCredentialProvider": {
-      "type": "object",
-      "properties": {
-        "Service": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 64,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[a-zA-Z0-9._-]+$  \nUpdate requires: No interruption\n"
-        },
-        "Region": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 32,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 32  \nPattern: ^[a-zA-Z0-9-]+$  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Service"
-      ],
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
     "CredentialProviderConfiguration": {
       "type": "object",
       "properties": {
@@ -391,6 +348,330 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: GATEWAY_IAM_ROLE | OAUTH | API_KEY | CALLER_IAM_CREDENTIALS | JWT_PASSTHROUGH  \nUpdate requires: No interruption\n"
     },
+    "EndpointIpAddressType": {
+      "type": "string",
+      "enum": [
+        "IPV4",
+        "IPV6"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: IPV4 | IPV6  \nUpdate requires: No interruption\n"
+    },
+    "HttpApiSchemaConfiguration": {
+      "type": "object",
+      "properties": {
+        "Source": {
+          "$ref": "#/definitions/ApiSchemaConfiguration"
+        }
+      },
+      "required": [
+        "Source"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HttpConnectorParameters": {
+      "type": "object",
+      "maxProperties": 10,
+      "minProperties": 0,
+      "patternProperties": {
+        "^[a-zA-Z][a-zA-Z0-9_-]*$": {
+          "type": "string",
+          "maxLength": 1024,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HttpConnectorSource": {
+      "type": "object",
+      "properties": {
+        "ConnectorId": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ConnectorId"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HttpConnectorTargetConfiguration": {
+      "type": "object",
+      "properties": {
+        "Source": {
+          "$ref": "#/definitions/HttpConnectorSource"
+        },
+        "Parameters": {
+          "$ref": "#/definitions/HttpConnectorParameters"
+        }
+      },
+      "required": [
+        "Source"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "HttpTargetConfiguration": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "AgentcoreRuntime",
+          "properties": {
+            "AgentcoreRuntime": {
+              "$ref": "#/definitions/RuntimeTargetConfiguration"
+            }
+          },
+          "required": [
+            "AgentcoreRuntime"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Passthrough",
+          "properties": {
+            "Passthrough": {
+              "$ref": "#/definitions/PassthroughTargetConfiguration"
+            }
+          },
+          "required": [
+            "Passthrough"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Connector",
+          "properties": {
+            "Connector": {
+              "$ref": "#/definitions/HttpConnectorTargetConfiguration"
+            }
+          },
+          "required": [
+            "Connector"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "IamCredentialProvider": {
+      "type": "object",
+      "properties": {
+        "Service": {
+          "type": "string",
+          "maxLength": 64,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[a-zA-Z0-9._-]+$  \nUpdate requires: No interruption\n"
+        },
+        "Region": {
+          "type": "string",
+          "maxLength": 32,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 32  \nPattern: ^[a-zA-Z0-9-]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Service"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "InferenceConnectorSource": {
+      "type": "object",
+      "properties": {
+        "ConnectorId": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ConnectorId"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "InferenceConnectorTargetConfiguration": {
+      "type": "object",
+      "properties": {
+        "Source": {
+          "$ref": "#/definitions/InferenceConnectorSource"
+        }
+      },
+      "required": [
+        "Source"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "InferenceOperationConfiguration": {
+      "type": "object",
+      "properties": {
+        "Path": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^/[a-zA-Z0-9\\-\\._/]+$  \nUpdate requires: No interruption\n"
+        },
+        "ProviderPath": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^/[a-zA-Z0-9\\-\\._/]+$  \nUpdate requires: No interruption\n"
+        },
+        "Models": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ModelEntry"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Path"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "InferenceProviderTargetConfiguration": {
+      "type": "object",
+      "properties": {
+        "Endpoint": {
+          "type": "string",
+          "maxLength": 2048,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^https://[a-zA-Z0-9\\-\\.]+(:[0-9]{1,5})?(/.*)?$  \nUpdate requires: No interruption\n"
+        },
+        "ModelMapping": {
+          "$ref": "#/definitions/ModelMapping"
+        },
+        "Operations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/InferenceOperationConfiguration"
+          },
+          "maxItems": 10,
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Endpoint"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "InferenceTargetConfiguration": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "Connector",
+          "properties": {
+            "Connector": {
+              "$ref": "#/definitions/InferenceConnectorTargetConfiguration"
+            }
+          },
+          "required": [
+            "Connector"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Provider",
+          "properties": {
+            "Provider": {
+              "$ref": "#/definitions/InferenceProviderTargetConfiguration"
+            }
+          },
+          "required": [
+            "Provider"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ListingMode": {
+      "type": "string",
+      "enum": [
+        "DEFAULT",
+        "DYNAMIC"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DEFAULT | DYNAMIC  \nUpdate requires: No interruption\n"
+    },
+    "ManagedResourceDetails": {
+      "type": "object",
+      "properties": {
+        "Domain": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ResourceGatewayArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:[a-z0-9\\-]+:vpc-lattice:[a-zA-Z0-9\\-]+:\\d{12}:resourcegateway/rgw-[0-9a-z]{17}$  \nUpdate requires: No interruption\n"
+        },
+        "ResourceAssociationArn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(arn:[a-z0-9\\-]+:vpc-lattice:[a-zA-Z0-9\\-]+:\\d{12}:servicenetworkresourceassociation/)?snra-[0-9a-f]{17}$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ManagedVpcResource": {
+      "type": "object",
+      "properties": {
+        "VpcIdentifier": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^vpc-(([0-9a-z]{8})|([0-9a-z]{17}))$  \nUpdate requires: No interruption\n"
+        },
+        "SubnetIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^subnet-[0-9a-zA-Z]{8,17}$  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "EndpointIpAddressType": {
+          "$ref": "#/definitions/EndpointIpAddressType"
+        },
+        "SecurityGroupIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^sg-(([0-9a-z]{8})|([0-9a-z]{17}))$  \nUpdate requires: No interruption\n"
+          },
+          "maxItems": 5,
+          "minItems": 0,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "RoutingDomain": {
+          "type": "string",
+          "maxLength": 255,
+          "minLength": 3,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+        },
+        "Tags": {
+          "$ref": "#/definitions/TagsMap"
+        }
+      },
+      "required": [
+        "EndpointIpAddressType",
+        "SubnetIds",
+        "VpcIdentifier"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "McpLambdaTargetConfiguration": {
       "type": "object",
       "properties": {
@@ -411,14 +692,6 @@
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "McpServerListingMode": {
-      "type": "string",
-      "enum": [
-        "DEFAULT",
-        "DYNAMIC"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DEFAULT | DYNAMIC  \nUpdate requires: No interruption\n"
-    },
     "McpServerTargetConfiguration": {
       "type": "object",
       "properties": {
@@ -430,85 +703,17 @@
           "$ref": "#/definitions/McpToolSchemaConfiguration"
         },
         "ListingMode": {
-          "$ref": "#/definitions/McpServerListingMode"
+          "$ref": "#/definitions/ListingMode"
         },
         "ResourcePriority": {
-          "type": "integer",
-          "minimum": 0,
+          "type": "number",
           "maximum": 1000,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+          "minimum": 0,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
         "Endpoint"
-      ],
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "McpToolSchemaConfiguration": {
-      "oneOf": [
-        {
-          "type": "object",
-          "title": "S3",
-          "properties": {
-            "S3": {
-              "$ref": "#/definitions/S3Configuration"
-            }
-          },
-          "required": [
-            "S3"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "title": "InlinePayload",
-          "properties": {
-            "InlinePayload": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "InlinePayload"
-          ],
-          "additionalProperties": false
-        }
-      ]
-    },
-    "AuthorizationData": {
-      "oneOf": [
-        {
-          "type": "object",
-          "title": "Oauth2",
-          "properties": {
-            "Oauth2": {
-              "$ref": "#/definitions/OAuth2AuthorizationData"
-            }
-          },
-          "required": [
-            "Oauth2"
-          ],
-          "additionalProperties": false
-        }
-      ]
-    },
-    "OAuth2AuthorizationData": {
-      "type": "object",
-      "properties": {
-        "AuthorizationUrl": {
-          "type": "string",
-          "minLength": 1,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nUpdate requires: No interruption\n"
-        },
-        "UserId": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 128,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "AuthorizationUrl"
       ],
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
@@ -595,6 +800,129 @@
         }
       ]
     },
+    "McpToolSchemaConfiguration": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "S3",
+          "properties": {
+            "S3": {
+              "$ref": "#/definitions/S3Configuration"
+            }
+          },
+          "required": [
+            "S3"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "InlinePayload",
+          "properties": {
+            "InlinePayload": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "InlinePayload"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "MetadataConfiguration": {
+      "type": "object",
+      "properties": {
+        "AllowedRequestHeaders": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nUpdate requires: No interruption\n"
+          },
+          "maxItems": 10,
+          "minItems": 1,
+          "uniqueItems": true,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "AllowedQueryParameters": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 1,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 40  \nUpdate requires: No interruption\n"
+          },
+          "maxItems": 10,
+          "minItems": 1,
+          "uniqueItems": true,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "AllowedResponseHeaders": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nUpdate requires: No interruption\n"
+          },
+          "maxItems": 10,
+          "minItems": 1,
+          "uniqueItems": true,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ModelEntry": {
+      "type": "object",
+      "properties": {
+        "Model": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^[a-zA-Z0-9\\-\\._\\*\\?@]+(/[a-zA-Z0-9\\-\\._\\*\\?@]+)*$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Model"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ModelMapping": {
+      "type": "object",
+      "properties": {
+        "ProviderPrefix": {
+          "$ref": "#/definitions/ProviderPrefix"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "OAuth2AuthorizationData": {
+      "type": "object",
+      "properties": {
+        "AuthorizationUrl": {
+          "type": "string",
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nUpdate requires: No interruption\n"
+        },
+        "UserId": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "AuthorizationUrl"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "OAuthCredentialProvider": {
       "type": "object",
       "properties": {
@@ -617,14 +945,20 @@
           "$ref": "#/definitions/OAuthCustomParameters"
         },
         "GrantType": {
-          "$ref": "#/definitions/OAuthGrantType"
+          "allOf": [
+            {
+              "$ref": "#/definitions/OAuthGrantType"
+            },
+            {
+              "default": "CLIENT_CREDENTIALS"
+            }
+          ]
         },
         "DefaultReturnUrl": {
           "type": "string",
           "maxLength": 2048,
           "minLength": 1,
-          "description": "Return URL for OAuth callback.",
-          "markdownDescription": "Return URL for OAuth callback.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: \\w+:(\\/?\\/?)[^\\s]+  \nUpdate requires: No interruption\n"
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^\\w+:(\\/?\\/?)[^\\s]+$  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
@@ -652,11 +986,130 @@
     "OAuthGrantType": {
       "type": "string",
       "enum": [
-        "AUTHORIZATION_CODE",
         "CLIENT_CREDENTIALS",
+        "AUTHORIZATION_CODE",
         "TOKEN_EXCHANGE"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AUTHORIZATION_CODE | CLIENT_CREDENTIALS | TOKEN_EXCHANGE  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CLIENT_CREDENTIALS | AUTHORIZATION_CODE | TOKEN_EXCHANGE  \nUpdate requires: No interruption\n"
+    },
+    "PassthroughProtocolType": {
+      "type": "string",
+      "enum": [
+        "MCP",
+        "A2A",
+        "INFERENCE",
+        "CUSTOM"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MCP | A2A | INFERENCE | CUSTOM  \nUpdate requires: No interruption\n"
+    },
+    "PassthroughTargetConfiguration": {
+      "type": "object",
+      "properties": {
+        "Endpoint": {
+          "type": "string",
+          "maxLength": 2048,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^https://[a-zA-Z0-9\\-\\.]+(:[0-9]{1,5})?(/.*)?$  \nUpdate requires: No interruption\n"
+        },
+        "ProtocolType": {
+          "$ref": "#/definitions/PassthroughProtocolType"
+        },
+        "Schema": {
+          "$ref": "#/definitions/HttpApiSchemaConfiguration"
+        },
+        "StickinessConfiguration": {
+          "$ref": "#/definitions/StickinessConfiguration"
+        }
+      },
+      "required": [
+        "Endpoint",
+        "ProtocolType"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PrivateEndpoint": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "SelfManagedLatticeResource",
+          "properties": {
+            "SelfManagedLatticeResource": {
+              "$ref": "#/definitions/SelfManagedLatticeResource"
+            }
+          },
+          "required": [
+            "SelfManagedLatticeResource"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "ManagedVpcResource",
+          "properties": {
+            "ManagedVpcResource": {
+              "$ref": "#/definitions/ManagedVpcResource"
+            }
+          },
+          "required": [
+            "ManagedVpcResource"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ProviderPrefix": {
+      "type": "object",
+      "properties": {
+        "Strip": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "Separator": {
+          "type": "string",
+          "default": ".",
+          "maxLength": 1,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RestApiMethod": {
+      "type": "string",
+      "enum": [
+        "GET",
+        "DELETE",
+        "HEAD",
+        "OPTIONS",
+        "PATCH",
+        "PUT",
+        "POST"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: GET | DELETE | HEAD | OPTIONS | PATCH | PUT | POST  \nUpdate requires: No interruption\n"
+    },
+    "RuntimeTargetConfiguration": {
+      "type": "object",
+      "properties": {
+        "Arn": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:aws(-[^:]+)?:bedrock-agentcore:[a-z0-9-]+:[0-9]{12}:runtime/[a-zA-Z][a-zA-Z0-9_]{0,47}-[a-zA-Z0-9]{10}$  \nUpdate requires: No interruption\n"
+        },
+        "Qualifier": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ([1-9][0-9]{0,4})|([a-zA-Z][a-zA-Z0-9_]{0,47})  \nUpdate requires: No interruption\n"
+        },
+        "Schema": {
+          "$ref": "#/definitions/HttpApiSchemaConfiguration"
+        }
+      },
+      "required": [
+        "Arn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "S3Configuration": {
       "type": "object",
@@ -726,6 +1179,48 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: string | number | object | array | boolean | integer  \nUpdate requires: No interruption\n"
     },
+    "SelfManagedLatticeResource": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "ResourceConfigurationIdentifier",
+          "properties": {
+            "ResourceConfigurationIdentifier": {
+              "type": "string",
+              "maxLength": 2048,
+              "minLength": 20,
+              "pattern": "^((rcfg-[0-9a-z]{17})|(arn:[a-z0-9\\-]+:vpc-lattice:[a-zA-Z0-9\\-]+:\\d{12}:resourceconfiguration/rcfg-[0-9a-z]{17}))$"
+            }
+          },
+          "required": [
+            "ResourceConfigurationIdentifier"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "StickinessConfiguration": {
+      "type": "object",
+      "properties": {
+        "Identifier": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        },
+        "Timeout": {
+          "type": "number",
+          "maximum": 86400,
+          "minimum": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Identifier"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "TargetConfiguration": {
       "oneOf": [
         {
@@ -753,8 +1248,29 @@
             "Http"
           ],
           "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Inference",
+          "properties": {
+            "Inference": {
+              "$ref": "#/definitions/InferenceTargetConfiguration"
+            }
+          },
+          "required": [
+            "Inference"
+          ],
+          "additionalProperties": false
         }
       ]
+    },
+    "TargetProtocolType": {
+      "type": "string",
+      "enum": [
+        "MCP",
+        "HTTP"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MCP | HTTP  \nUpdate requires: No interruption\n"
     },
     "TargetStatus": {
       "type": "string",
@@ -832,265 +1348,20 @@
         }
       ]
     },
-    "MetadataConfiguration": {
+    "TagsMap": {
       "type": "object",
-      "properties": {
-        "AllowedRequestHeaders": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "AllowedQueryParameters": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "AllowedResponseHeaders": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        }
-      },
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "HttpTargetConfiguration": {
-      "oneOf": [
-        {
-          "type": "object",
-          "title": "AgentcoreRuntime",
-          "properties": {
-            "AgentcoreRuntime": {
-              "$ref": "#/definitions/RuntimeTargetConfiguration"
-            }
-          },
-          "required": [
-            "AgentcoreRuntime"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "title": "Passthrough",
-          "properties": {
-            "Passthrough": {
-              "$ref": "#/definitions/PassthroughTargetConfiguration"
-            }
-          },
-          "required": [
-            "Passthrough"
-          ],
-          "additionalProperties": false
-        }
-      ]
-    },
-    "RuntimeTargetConfiguration": {
-      "type": "object",
-      "properties": {
-        "Arn": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:aws(-[^:]+)?:bedrock-agentcore:[a-z0-9-]+:[0-9]{12}:runtime/[a-zA-Z][a-zA-Z0-9_]{0,47}-[a-zA-Z0-9]{10}$  \nUpdate requires: No interruption\n"
-        },
-        "Qualifier": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(([1-9][0-9]{0,4})|([a-zA-Z][a-zA-Z0-9_]{0,47}))$  \nUpdate requires: No interruption\n"
-        },
-        "Schema": {
-          "$ref": "#/definitions/HttpApiSchemaConfiguration"
-        }
-      },
-      "required": [
-        "Arn"
-      ],
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "TargetProtocolType": {
-      "type": "string",
-      "enum": [
-        "MCP",
-        "HTTP"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MCP | HTTP  \nUpdate requires: No interruption\n"
-    },
-    "ConnectorConfiguration": {
-      "type": "object",
-      "properties": {
-        "Name": {
-          "type": "string",
-          "maxLength": 64,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 64  \nPattern: ^[a-zA-Z][a-zA-Z0-9_-]*$  \nUpdate requires: No interruption\n"
-        },
-        "Description": {
-          "type": "string",
-          "maxLength": 2000,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2000  \nUpdate requires: No interruption\n"
-        },
-        "ParameterValues": {
-          "type": "object",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-        },
-        "ParameterOverrides": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ConnectorParameterOverride"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Name"
-      ],
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "ConnectorParameterOverride": {
-      "type": "object",
-      "properties": {
-        "Path": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "Description": {
-          "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
-        "Visible": {
-          "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Path"
-      ],
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "ConnectorSource": {
-      "type": "object",
-      "properties": {
-        "ConnectorId": {
+      "description": "Tags applied to the AWS-managed VPC Lattice resource gateway when it is created on your behalf (tag-on-create). Useful for cost allocation. These tags are forwarded to VPC Lattice and are not stored on the gateway target itself.",
+      "maxProperties": 50,
+      "patternProperties": {
+        "^[a-zA-Z0-9\\s._:/=+@-]{1,128}$": {
           "type": "string",
           "maxLength": 256,
-          "minLength": 1,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+          "minLength": 0,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nPattern: ^[a-zA-Z0-9\\s._:/=+@-]*$  \nUpdate requires: No interruption\n"
         }
       },
-      "required": [
-        "ConnectorId"
-      ],
       "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "ConnectorTargetConfiguration": {
-      "type": "object",
-      "properties": {
-        "Source": {
-          "$ref": "#/definitions/ConnectorSource"
-        },
-        "Enabled": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-          },
-          "maxItems": 50,
-          "minItems": 1,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        },
-        "Configurations": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ConnectorConfiguration"
-          },
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Source"
-      ],
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "HttpApiSchemaConfiguration": {
-      "type": "object",
-      "properties": {
-        "Source": {
-          "$ref": "#/definitions/ApiSchemaConfiguration"
-        }
-      },
-      "required": [
-        "Source"
-      ],
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "PassthroughTargetConfiguration": {
-      "type": "object",
-      "properties": {
-        "Endpoint": {
-          "type": "string",
-          "maxLength": 2048,
-          "minLength": 1,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^https://[a-zA-Z0-9\\-\\.]+(:[0-9]{1,5})?(/.*)?$  \nUpdate requires: No interruption\n"
-        },
-        "ProtocolType": {
-          "$ref": "#/definitions/PassthroughProtocolType"
-        },
-        "Schema": {
-          "$ref": "#/definitions/HttpApiSchemaConfiguration"
-        },
-        "StickinessConfiguration": {
-          "$ref": "#/definitions/StickinessConfiguration"
-        }
-      },
-      "required": [
-        "Endpoint",
-        "ProtocolType"
-      ],
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
-    "PassthroughProtocolType": {
-      "type": "string",
-      "enum": [
-        "MCP",
-        "A2A",
-        "INFERENCE",
-        "CUSTOM"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MCP | A2A | INFERENCE | CUSTOM  \nUpdate requires: No interruption\n"
-    },
-    "StickinessConfiguration": {
-      "type": "object",
-      "properties": {
-        "Identifier": {
-          "type": "string",
-          "maxLength": 256,
-          "minLength": 1,
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
-        },
-        "Timeout": {
-          "type": "integer",
-          "maximum": 86400,
-          "minimum": 1,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
-        }
-      },
-      "required": [
-        "Identifier"
-      ],
-      "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Tags applied to the AWS-managed VPC Lattice resource gateway when it is created on your behalf (tag-on-create). Useful for cost allocation. These tags are forwarded to VPC Lattice and are not stored on the gateway target itself.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -1119,7 +1390,7 @@
     },
     "GatewayArn": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws(|-cn|-us-gov):bedrock-agentcore:[a-z0-9-]{1,20}:[0-9]{12}:gateway/([0-9a-z][-]?){1,100}-[a-z0-9]{10}$  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws(|-cn|-us-gov):bedrock-agentcore:[a-z0-9-]{1,20}:[0-9]{12}:gateway/([0-9a-z][-]?){1,48}-[a-z0-9]{10}$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "GatewayIdentifier": {
       "type": "string",
@@ -1147,6 +1418,9 @@
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
     },
+    "ProtocolType": {
+      "$ref": "#/definitions/TargetProtocolType"
+    },
     "Status": {
       "$ref": "#/definitions/TargetStatus"
     },
@@ -1171,9 +1445,6 @@
       "type": "string",
       "format": "date-time",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "ProtocolType": {
-      "$ref": "#/definitions/TargetProtocolType"
     }
   },
   "required": [
@@ -1183,16 +1454,16 @@
     "/properties/GatewayIdentifier"
   ],
   "readOnlyProperties": [
+    "/properties/AuthorizationData",
     "/properties/CreatedAt",
     "/properties/GatewayArn",
     "/properties/LastSynchronizedAt",
+    "/properties/PrivateEndpointManagedResources",
+    "/properties/ProtocolType",
     "/properties/Status",
     "/properties/StatusReasons",
     "/properties/TargetId",
-    "/properties/PrivateEndpointManagedResources",
-    "/properties/UpdatedAt",
-    "/properties/AuthorizationData",
-    "/properties/ProtocolType"
+    "/properties/UpdatedAt"
   ],
   "primaryIdentifier": [
     "/properties/GatewayIdentifier",
@@ -1209,62 +1480,27 @@
         "bedrock-agentcore:GetWorkloadAccessToken",
         "bedrock-agentcore:GetWorkloadAccessTokenForUserId",
         "bedrock-agentcore:SynchronizeGatewayTargets",
+        "bedrock-mantle:GetModel",
+        "bedrock-mantle:ListModels",
+        "ec2:CreateNetworkInterface",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeVpcs",
+        "iam:CreateServiceLinkedRole",
         "kms:Decrypt",
         "kms:GenerateDataKey",
         "kms:ListGrants",
         "s3:GetObject",
         "secretsmanager:GetSecretValue",
-        "iam:CreateServiceLinkedRole",
-        "ec2:DescribeVpcs",
-        "ec2:DescribeSubnets",
-        "ec2:DescribeSecurityGroups",
-        "ec2:CreateNetworkInterface",
         "vpc-lattice:AssociateViaAWSService",
-        "vpc-lattice:GetResourceConfiguration",
         "vpc-lattice:CreateResourceConfiguration",
         "vpc-lattice:CreateResourceGateway",
+        "vpc-lattice:CreateServiceNetworkResourceAssociation",
         "vpc-lattice:DeleteResourceConfiguration",
         "vpc-lattice:DeleteResourceGateway",
-        "vpc-lattice:GetServiceNetworkResourceAssociation",
-        "vpc-lattice:CreateServiceNetworkResourceAssociation",
         "vpc-lattice:DeleteServiceNetworkResourceAssociation",
-        "vpc-lattice:ListServiceNetworkResourceAssociations"
-      ]
-    },
-    "read": {
-      "permissions": [
-        "bedrock-agentcore:GetGatewayTarget"
-      ]
-    },
-    "update": {
-      "permissions": [
-        "apigateway:GET",
-        "bedrock-agentcore:GetAgentRuntime",
-        "bedrock-agentcore:GetGatewayTarget",
-        "bedrock-agentcore:GetResourceOauth2Token",
-        "bedrock-agentcore:GetWorkloadAccessToken",
-        "bedrock-agentcore:GetWorkloadAccessTokenForUserId",
-        "bedrock-agentcore:SynchronizeGatewayTargets",
-        "bedrock-agentcore:UpdateGatewayTarget",
-        "kms:Decrypt",
-        "kms:GenerateDataKey",
-        "kms:ListGrants",
-        "s3:GetObject",
-        "secretsmanager:GetSecretValue",
-        "iam:CreateServiceLinkedRole",
-        "ec2:DescribeVpcs",
-        "ec2:DescribeSubnets",
-        "ec2:DescribeSecurityGroups",
-        "ec2:CreateNetworkInterface",
-        "vpc-lattice:AssociateViaAWSService",
         "vpc-lattice:GetResourceConfiguration",
-        "vpc-lattice:CreateResourceConfiguration",
-        "vpc-lattice:CreateResourceGateway",
-        "vpc-lattice:DeleteResourceConfiguration",
-        "vpc-lattice:DeleteResourceGateway",
         "vpc-lattice:GetServiceNetworkResourceAssociation",
-        "vpc-lattice:CreateServiceNetworkResourceAssociation",
-        "vpc-lattice:DeleteServiceNetworkResourceAssociation",
         "vpc-lattice:ListServiceNetworkResourceAssociations"
       ]
     },
@@ -1283,6 +1519,55 @@
     "list": {
       "permissions": [
         "bedrock-agentcore:ListGatewayTargets"
+      ],
+      "handlerSchema": {
+        "properties": {
+          "GatewayIdentifier": {
+            "$ref": "resource-schema.json#/properties/GatewayIdentifier"
+          }
+        },
+        "required": [
+          "GatewayIdentifier"
+        ]
+      }
+    },
+    "read": {
+      "permissions": [
+        "bedrock-agentcore:GetGatewayTarget"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "apigateway:GET",
+        "bedrock-agentcore:GetAgentRuntime",
+        "bedrock-agentcore:GetGatewayTarget",
+        "bedrock-agentcore:GetResourceOauth2Token",
+        "bedrock-agentcore:GetWorkloadAccessToken",
+        "bedrock-agentcore:GetWorkloadAccessTokenForUserId",
+        "bedrock-agentcore:SynchronizeGatewayTargets",
+        "bedrock-agentcore:UpdateGatewayTarget",
+        "bedrock-mantle:GetModel",
+        "bedrock-mantle:ListModels",
+        "ec2:CreateNetworkInterface",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeVpcs",
+        "iam:CreateServiceLinkedRole",
+        "kms:Decrypt",
+        "kms:GenerateDataKey",
+        "kms:ListGrants",
+        "s3:GetObject",
+        "secretsmanager:GetSecretValue",
+        "vpc-lattice:AssociateViaAWSService",
+        "vpc-lattice:CreateResourceConfiguration",
+        "vpc-lattice:CreateResourceGateway",
+        "vpc-lattice:CreateServiceNetworkResourceAssociation",
+        "vpc-lattice:DeleteResourceConfiguration",
+        "vpc-lattice:DeleteResourceGateway",
+        "vpc-lattice:DeleteServiceNetworkResourceAssociation",
+        "vpc-lattice:GetResourceConfiguration",
+        "vpc-lattice:GetServiceNetworkResourceAssociation",
+        "vpc-lattice:ListServiceNetworkResourceAssociations"
       ]
     }
   },
@@ -1291,6 +1576,9 @@
     "taggable": false,
     "cloudFormationSystemTags": false
   },
+  "writeOnlyProperties": [
+    "/properties/PrivateEndpoint/ManagedVpcResource/Tags"
+  ],
   "attributes": {
     "AuthorizationData": {
       "$ref": "#/definitions/AuthorizationData"
@@ -1302,7 +1590,7 @@
     },
     "GatewayArn": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws(|-cn|-us-gov):bedrock-agentcore:[a-z0-9-]{1,20}:[0-9]{12}:gateway/([0-9a-z][-]?){1,100}-[a-z0-9]{10}$  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws(|-cn|-us-gov):bedrock-agentcore:[a-z0-9-]{1,20}:[0-9]{12}:gateway/([0-9a-z][-]?){1,48}-[a-z0-9]{10}$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "LastSynchronizedAt": {
       "type": "string",
@@ -1315,6 +1603,9 @@
         "$ref": "#/definitions/ManagedResourceDetails"
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ProtocolType": {
+      "$ref": "#/definitions/TargetProtocolType"
     },
     "Status": {
       "$ref": "#/definitions/TargetStatus"
@@ -1337,9 +1628,6 @@
       "type": "string",
       "format": "date-time",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "ProtocolType": {
-      "$ref": "#/definitions/TargetProtocolType"
     }
   }
 }

@@ -373,9 +373,10 @@
       "enum": [
         "BEDROCK_FOUNDATION_MODEL",
         "BEDROCK_DATA_AUTOMATION",
-        "SMART_PARSING"
+        "SMART_PARSING",
+        "MULTI_MODAL_EMBEDDINGS"
       ],
-      "markdownDescription": "The parsing strategy for the data source.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: BEDROCK_FOUNDATION_MODEL | BEDROCK_DATA_AUTOMATION | SMART_PARSING  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The parsing strategy for the data source.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: BEDROCK_FOUNDATION_MODEL | BEDROCK_DATA_AUTOMATION | SMART_PARSING | MULTI_MODAL_EMBEDDINGS  \nUpdate requires: No interruption\n"
     },
     "EnabledOrDisabledState": {
       "type": "string",
@@ -400,10 +401,128 @@
           "type": "object",
           "description": "Connector-specific parameters.",
           "markdownDescription": "Connector-specific parameters.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "SyncSchedule": {
+          "$ref": "#/definitions/SyncSchedule"
         }
       },
       "additionalProperties": false,
       "markdownDescription": "Configuration for managed knowledge base connector data sources.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SyncSchedule": {
+      "type": "object",
+      "description": "Recurring schedule on which the connector automatically refreshes ingested content. Exactly one frequency variant is set.",
+      "properties": {
+        "Daily": {
+          "$ref": "#/definitions/DailySchedule"
+        },
+        "Weekly": {
+          "$ref": "#/definitions/WeeklySchedule"
+        },
+        "Monthly": {
+          "$ref": "#/definitions/MonthlySchedule"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "Daily"
+          ]
+        },
+        {
+          "required": [
+            "Weekly"
+          ]
+        },
+        {
+          "required": [
+            "Monthly"
+          ]
+        }
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Recurring schedule on which the connector automatically refreshes ingested content. Exactly one frequency variant is set.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DailySchedule": {
+      "type": "object",
+      "description": "A daily refresh. The run time is system-chosen (off-peak) and not customer-configurable.",
+      "additionalProperties": false,
+      "markdownDescription": "A daily refresh. The run time is system-chosen (off-peak) and not customer-configurable.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "WeeklySchedule": {
+      "type": "object",
+      "description": "A weekly refresh on a specified day of the week.",
+      "properties": {
+        "DayOfWeek": {
+          "$ref": "#/definitions/DayOfWeek"
+        }
+      },
+      "required": [
+        "DayOfWeek"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A weekly refresh on a specified day of the week.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "MonthlySchedule": {
+      "type": "object",
+      "description": "A monthly refresh on a specified day of the month.",
+      "properties": {
+        "DayOfMonth": {
+          "$ref": "#/definitions/DayOfMonth"
+        }
+      },
+      "required": [
+        "DayOfMonth"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A monthly refresh on a specified day of the month.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DayOfMonth": {
+      "type": "object",
+      "description": "Day of the month on which a monthly refresh runs. Exactly one variant is set: an explicit day number, or the last calendar day of the month.",
+      "properties": {
+        "DayNumber": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 28,
+          "description": "Specific day of the month, 1 through 28 (capped at 28 to avoid month-length ambiguity).",
+          "markdownDescription": "Specific day of the month, 1 through 28 (capped at 28 to avoid month-length ambiguity).\n\n---\n\nRequired: Conditional  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "LastDayOfMonth": {
+          "type": "object",
+          "description": "Run on the last calendar day of each month.",
+          "additionalProperties": false,
+          "markdownDescription": "Run on the last calendar day of each month.\n\n---\n\nRequired: Conditional  \nUpdate requires: No interruption\n"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "DayNumber"
+          ]
+        },
+        {
+          "required": [
+            "LastDayOfMonth"
+          ]
+        }
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Day of the month on which a monthly refresh runs. Exactly one variant is set: an explicit day number, or the last calendar day of the month.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DayOfWeek": {
+      "type": "string",
+      "description": "Day of the week.",
+      "enum": [
+        "SUNDAY",
+        "MONDAY",
+        "TUESDAY",
+        "WEDNESDAY",
+        "THURSDAY",
+        "FRIDAY",
+        "SATURDAY"
+      ],
+      "markdownDescription": "Day of the week.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SUNDAY | MONDAY | TUESDAY | WEDNESDAY | THURSDAY | FRIDAY | SATURDAY  \nUpdate requires: No interruption\n"
     },
     "DeletionProtectionConfiguration": {
       "type": "object",
@@ -1207,7 +1326,8 @@
         "bedrock:GetKnowledgeBase",
         "kms:GenerateDataKey",
         "kms:Decrypt"
-      ]
+      ],
+      "timeoutInMinutes": 60
     },
     "read": {
       "permissions": [
@@ -1226,7 +1346,8 @@
       "permissions": [
         "bedrock:GetDataSource",
         "bedrock:DeleteDataSource"
-      ]
+      ],
+      "timeoutInMinutes": 60
     },
     "list": {
       "permissions": [
