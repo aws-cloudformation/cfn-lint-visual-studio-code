@@ -29,15 +29,14 @@
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
     },
-    "Id": {
+    "InstanceGroupId": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Configurations": {
       "type": "array",
-      "uniqueItems": true,
       "items": {
-        "$ref": "#/definitions/Configuration"
+        "$ref": "#/definitions/AppConfiguration"
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement\n"
     },
@@ -61,7 +60,6 @@
       "properties": {
         "Rules": {
           "type": "array",
-          "uniqueItems": true,
           "items": {
             "$ref": "#/definitions/ScalingRule"
           },
@@ -122,7 +120,6 @@
         },
         "Dimensions": {
           "type": "array",
-          "uniqueItems": true,
           "items": {
             "$ref": "#/definitions/MetricDimension"
           },
@@ -163,7 +160,8 @@
       "properties": {
         "EbsBlockDeviceConfigs": {
           "type": "array",
-          "uniqueItems": true,
+          "uniqueItems": false,
+          "insertionOrder": false,
           "items": {
             "$ref": "#/definitions/EbsBlockDeviceConfig"
           },
@@ -176,25 +174,25 @@
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
-    "Configuration": {
+    "AppConfiguration": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "ConfigurationProperties": {
           "type": "object",
           "patternProperties": {
-            "[a-zA-Z0-9]+": {
+            "^.*$": {
               "type": "string",
               "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
             }
           },
+          "additionalProperties": false,
           "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
         },
         "Configurations": {
           "type": "array",
-          "uniqueItems": true,
           "items": {
-            "$ref": "#/definitions/Configuration"
+            "$ref": "#/definitions/AppConfiguration"
           },
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         },
@@ -272,7 +270,8 @@
         },
         "VolumesPerInstance": {
           "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+          "description": "Use of this property can confuse CloudFormation drift detection. The EbsBlockDeviceConfigs read from the system may return a list with one entry per volume, replacing any entry specified in the template with a VolumesPerInstance greater than one by that many entries containing only the VolumeSpecification. Thus to avoid false drift detection, it is recommended to supply repeated entries in EbsBlockDeviceConfigs for any VolumeSpecification which is intended to be repeated and not to use this property.\n",
+          "markdownDescription": "Use of this property can confuse CloudFormation drift detection. The EbsBlockDeviceConfigs read from the system may return a list with one entry per volume, replacing any entry specified in the template with a VolumesPerInstance greater than one by that many entries containing only the VolumeSpecification. Thus to avoid false drift detection, it is recommended to supply repeated entries in EbsBlockDeviceConfigs for any VolumeSpecification which is intended to be repeated and not to use this property.\n\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
@@ -357,13 +356,68 @@
     "/properties/BidPrice"
   ],
   "primaryIdentifier": [
-    "/properties/Id"
+    "/properties/InstanceGroupId",
+    "/properties/JobFlowId"
   ],
   "readOnlyProperties": [
-    "/properties/Id"
+    "/properties/InstanceGroupId"
   ],
+  "writeOnlyProperties": [
+    "/properties/EbsConfiguration/EbsBlockDeviceConfigs/*/VolumesPerInstance"
+  ],
+  "tagging": {
+    "taggable": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "elasticmapreduce:AddInstanceGroups",
+        "elasticmapreduce:ListInstanceGroups",
+        "elasticmapreduce:DescribeCluster"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "elasticmapreduce:ListInstanceGroups",
+        "elasticmapreduce:ListClusters"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "elasticmapreduce:ModifyInstanceGroups",
+        "elasticmapreduce:PutAutoScalingPolicy",
+        "elasticmapreduce:RemoveAutoScalingPolicy",
+        "elasticmapreduce:ListInstanceGroups",
+        "elasticmapreduce:DescribeCluster"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "elasticmapreduce:ModifyInstanceGroups",
+        "elasticmapreduce:RemoveAutoScalingPolicy",
+        "elasticmapreduce:ListInstanceGroups",
+        "elasticmapreduce:DescribeCluster"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "elasticmapreduce:ListInstanceGroups"
+      ],
+      "handlerSchema": {
+        "properties": {
+          "JobFlowId": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+          }
+        },
+        "required": [
+          "JobFlowId"
+        ]
+      }
+    }
+  },
   "attributes": {
-    "Id": {
+    "InstanceGroupId": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     }

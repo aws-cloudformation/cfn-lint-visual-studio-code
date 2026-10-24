@@ -5,59 +5,106 @@
   "properties": {
     "Status": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      "description": "Initial state of the queue. Queues can be either ACTIVE or PAUSED. If you create a paused queue, then jobs that you send to that queue won't begin.",
+      "markdownDescription": "Initial state of the queue. Queues can be either ACTIVE or PAUSED. If you create a paused queue, then jobs that you send to that queue won't begin.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
     },
     "Description": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      "description": "A description of the queue that you are creating.",
+      "markdownDescription": "A description of the queue that you are creating.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
     },
     "PricingPlan": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-    },
-    "Id": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+      "description": "When you use CloudFormation, you can create only on-demand queues. Therefore, always set PricingPlan to the value ON_DEMAND when declaring an AWS::MediaConvert::Queue in your CloudFormation template. To create a reserved queue, use the AWS Elemental MediaConvert console at https://console.aws.amazon.com/mediaconvert to set up a contract. For more information, see Working with AWS Elemental MediaConvert Queues in the AWS Elemental MediaConvert User Guide.",
+      "markdownDescription": "When you use CloudFormation, you can create only on-demand queues. Therefore, always set PricingPlan to the value ON_DEMAND when declaring an AWS::MediaConvert::Queue in your CloudFormation template. To create a reserved queue, use the AWS Elemental MediaConvert console at https://console.aws.amazon.com/mediaconvert to set up a contract. For more information, see Working with AWS Elemental MediaConvert Queues in the AWS Elemental MediaConvert User Guide.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
     },
     "Arn": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    },
-    "MaximumConcurrentFeeds": {
-      "type": "integer",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+      "description": "The Amazon Resource Name (ARN) of the queue, such as arn:aws:mediaconvert:us-west-2:123456789012.",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the queue, such as arn:aws:mediaconvert:us-west-2:123456789012.\n\n---\n\nRequired: No  \nType: String  \nPattern: arn:(aws|aws-cn|aws-us-gov):mediaconvert:\\w+(?:-\\w+)+:[0-9]*(:queues/.*)?  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Tags": {
       "type": "object",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "description": "An array of key-value pairs to apply to this resource.",
+      "markdownDescription": "An array of key-value pairs to apply to this resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Name": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+      "description": "The name of the queue that you are creating.",
+      "markdownDescription": "The name of the queue that you are creating.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
     },
     "ConcurrentJobs": {
       "type": "integer",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+      "description": "Specify the maximum number of jobs your queue can process concurrently. For on-demand queues, the value you enter is constrained by your service quotas for Maximum concurrent jobs, per on-demand queue and Maximum concurrent jobs, per account. For reserved queues, specify the number of jobs you can process concurrently in your reservation plan instead.",
+      "markdownDescription": "Specify the maximum number of jobs your queue can process concurrently. For on-demand queues, the value you enter is constrained by your service quotas for Maximum concurrent jobs, per on-demand queue and Maximum concurrent jobs, per account. For reserved queues, specify the number of jobs you can process concurrently in your reservation plan instead.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    },
+    "MaximumConcurrentFeeds": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Specify the maximum number of Elemental Inference feeds MediaConvert can process concurrently.",
+      "markdownDescription": "Specify the maximum number of Elemental Inference feeds MediaConvert can process concurrently.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
     }
   },
   "createOnlyProperties": [
     "/properties/Name"
   ],
   "primaryIdentifier": [
-    "/properties/Id"
+    "/properties/Name"
   ],
   "readOnlyProperties": [
-    "/properties/Id",
     "/properties/Arn"
   ],
-  "attributes": {
-    "Id": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "mediaconvert:TagResource",
+      "mediaconvert:ListTagsForResource",
+      "mediaconvert:UntagResource"
+    ]
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "mediaconvert:CreateQueue",
+        "mediaconvert:GetQueue",
+        "mediaconvert:TagResource"
+      ]
     },
+    "read": {
+      "permissions": [
+        "mediaconvert:GetQueue",
+        "mediaconvert:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "mediaconvert:UpdateQueue",
+        "mediaconvert:TagResource",
+        "mediaconvert:UntagResource",
+        "mediaconvert:ListTagsForResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "mediaconvert:GetQueue",
+        "mediaconvert:DeleteQueue"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "mediaconvert:ListQueues"
+      ]
+    }
+  },
+  "attributes": {
     "Arn": {
       "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+      "description": "The Amazon Resource Name (ARN) of the queue, such as arn:aws:mediaconvert:us-west-2:123456789012.",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the queue, such as arn:aws:mediaconvert:us-west-2:123456789012.\n\n---\n\nRequired: No  \nType: String  \nPattern: arn:(aws|aws-cn|aws-us-gov):mediaconvert:\\w+(?:-\\w+)+:[0-9]*(:queues/.*)?  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

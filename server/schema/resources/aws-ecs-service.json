@@ -80,6 +80,7 @@
     }
   },
   "writeOnlyProperties": [
+    "/properties/GatewayConnectors",
     "/properties/ServiceConnectConfiguration",
     "/properties/VolumeConfigurations",
     "/properties/ForceNewDeployment",
@@ -104,6 +105,35 @@
         }
       },
       "markdownDescription": "An object that represents the timeout configurations for Service Connect.\n  If ``idleTimeout`` is set to a time that is less than ``perRequestTimeout``, the connection will close when the ``idleTimeout`` is reached and not the ``perRequestTimeout``.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DeploymentEarlySuccessCriteria": {
+      "description": "You can use early success criteria only with rolling deployment strategy.\n  The configuration that determines when a rolling update deployment is considered successful. Early success criteria defines the percentage of tasks that must be healthy before a deployment completes. It also controls whether Amazon ECS must remove the previous tasks before a deployment completes.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "SourceServiceRevisionCleanup": {
+          "description": "The time when Amazon ECS removes the source revisions' tasks relative to deployment completion. The valid values are:\n  +  ``BLOCKING``\u2014Amazon ECS removes the previous tasks before it marks the deployment as successful.\n  +  ``DEFERRED``\u2014Amazon ECS marks the deployment successful, and then removes the previous tasks in the background.",
+          "type": "string",
+          "enum": [
+            "BLOCKING",
+            "DEFERRED"
+          ],
+          "markdownDescription": "The time when Amazon ECS removes the source revisions' tasks relative to deployment completion. The valid values are:\n  +  ``BLOCKING``\u2014Amazon ECS removes the previous tasks before it marks the deployment as successful.\n  +  ``DEFERRED``\u2014Amazon ECS marks the deployment successful, and then removes the previous tasks in the background.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: BLOCKING | DEFERRED  \nUpdate requires: No interruption\n"
+        },
+        "HealthyPercent": {
+          "maximum": 100,
+          "description": "The percentage of healthy tasks that the target service revision must reach before Amazon ECS considers the deployment successful. This percentage is relative to the service's ``desiredCount`` and must be an integer between ``0`` and ``100``. This value must be greater than or equal to the ``minimumHealthyPercent`` value.\n After this percentage of tasks is healthy and the bake time elapses, Amazon ECS completes the deployment. Amazon ECS continues to scale the target service revision to 100 percent in the background.",
+          "type": "integer",
+          "minimum": 0,
+          "markdownDescription": "The percentage of healthy tasks that the target service revision must reach before Amazon ECS considers the deployment successful. This percentage is relative to the service's ``desiredCount`` and must be an integer between ``0`` and ``100``. This value must be greater than or equal to the ``minimumHealthyPercent`` value.\n After this percentage of tasks is healthy and the bake time elapses, Amazon ECS completes the deployment. Amazon ECS continues to scale the target service revision to 100 percent in the background.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Enable": {
+          "description": "Specifies whether to use the early success criteria for the service deployment. When set to ``false``, the deployment uses the default behavior, where Amazon ECS considers the deployment successful when the target service revision fully stabilizes and the previous tasks are removed. The default value is ``false``.\n When set to ``true``, Amazon ECS monitors the deployment to meet early success criteria. You must also specify ``healthyPercent`` and ``sourceServiceRevisionCleanup``.",
+          "type": "boolean",
+          "markdownDescription": "Specifies whether to use the early success criteria for the service deployment. When set to ``false``, the deployment uses the default behavior, where Amazon ECS considers the deployment successful when the target service revision fully stabilizes and the previous tasks are removed. The default value is ``false``.\n When set to ``true``, Amazon ECS monitors the deployment to meet early success criteria. You must also specify ``healthyPercent`` and ``sourceServiceRevisionCleanup``.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "You can use early success criteria only with rolling deployment strategy.\n  The configuration that determines when a rolling update deployment is considered successful. Early success criteria defines the percentage of tasks that must be healthy before a deployment completes. It also controls whether Amazon ECS must remove the previous tasks before a deployment completes.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "ServiceConnectTlsCertificateAuthority": {
       "description": "The certificate root authority that secures your service.",
@@ -137,6 +167,11 @@
           "description": "The ARN of the IAM role to associate with this VPC Lattice configuration. This is the Amazon ECS infrastructure IAM role that is used to manage your VPC Lattice infrastructure.",
           "type": "string",
           "markdownDescription": "The ARN of the IAM role to associate with this VPC Lattice configuration. This is the Amazon ECS infrastructure IAM role that is used to manage your VPC Lattice infrastructure.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "AdvancedConfiguration": {
+          "description": "",
+          "$ref": "#/definitions/VpcLatticeAdvancedConfiguration",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
         }
       },
       "required": [
@@ -362,9 +397,9 @@
       "type": "object",
       "properties": {
         "ThresholdConfiguration": {
-          "description": "",
+          "description": "The threshold configuration that controls when the deployment circuit breaker triggers. The ``type`` and ``value`` together determine how many task failures are tolerated before the circuit breaker activates.",
           "$ref": "#/definitions/ThresholdConfiguration",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+          "markdownDescription": "The threshold configuration that controls when the deployment circuit breaker triggers. The ``type`` and ``value`` together determine how many task failures are tolerated before the circuit breaker activates.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
         },
         "Enable": {
           "description": "Determines whether to use the deployment circuit breaker logic for the service.",
@@ -372,9 +407,9 @@
           "markdownDescription": "Determines whether to use the deployment circuit breaker logic for the service.\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption\n"
         },
         "ResetOnHealthyTask": {
-          "description": "",
+          "description": "Specifies whether the deployment circuit breaker resets its failure count when a task reaches a healthy state. When set to ``true``, a task that reaches a healthy state resets the failure count to ``0``. When set to ``false``, Amazon ECS does not reset the failure count. The default is ``true``.",
           "type": "boolean",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+          "markdownDescription": "Specifies whether the deployment circuit breaker resets its failure count when a task reaches a healthy state. When set to ``true``, a task that reaches a healthy state resets the failure count to ``0``. When set to ``false``, Amazon ECS does not reset the failure count. The default is ``true``.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
         },
         "Rollback": {
           "description": "Determines whether to configure Amazon ECS to roll back the service if a service deployment fails. If rollback is on, when a service deployment fails, the service is rolled back to the last deployment that completed successfully.",
@@ -569,6 +604,29 @@
       },
       "markdownDescription": "Determines whether to force a new deployment of the service. By default, deployments aren't forced. You can use this option to start a new deployment with no service definition changes. For example, you can update a service's tasks to use a newer Docker image with the same image/tag combination (``my_image:latest``) or to roll Fargate tasks onto a newer platform version.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "VpcLatticeAdvancedConfiguration": {
+      "description": "The advanced settings for VPC Lattice used in blue/green deployments. Specify the alternate target group and listener rules required for traffic shifting during blue/green deployments. For more information, see [Required resources for Amazon ECS blue/green deployments](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/blue-green-deployment-implementation.html) in the *Amazon Elastic Container Service Developer Guide*.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "TestListenerRule": {
+          "description": "The Amazon Resource Name (ARN) that identifies the test listener rule or listener for routing test traffic.",
+          "type": "string",
+          "markdownDescription": "The Amazon Resource Name (ARN) that identifies the test listener rule or listener for routing test traffic.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "AlternateTargetGroupArn": {
+          "description": "The Amazon Resource Name (ARN) of the alternate target group associated with the VPC Lattice Configuration for Amazon ECS blue/green deployments.",
+          "type": "string",
+          "markdownDescription": "The Amazon Resource Name (ARN) of the alternate target group associated with the VPC Lattice Configuration for Amazon ECS blue/green deployments.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ProductionListenerRule": {
+          "description": "The Amazon Resource Name (ARN) that identifies the production listener rule or listener for routing production traffic.",
+          "type": "string",
+          "markdownDescription": "The Amazon Resource Name (ARN) that identifies the production listener rule or listener for routing production traffic.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "The advanced settings for VPC Lattice used in blue/green deployments. Specify the alternate target group and listener rules required for traffic shifting during blue/green deployments. For more information, see [Required resources for Amazon ECS blue/green deployments](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/blue-green-deployment-implementation.html) in the *Amazon Elastic Container Service Developer Guide*.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "DeploymentAlarms": {
       "description": "One of the methods which provide a way for you to quickly identify when a deployment has failed, and then to optionally roll back the failure to the last working deployment.\n When the alarms are generated, Amazon ECS sets the service deployment to failed. Set the rollback parameter to have Amazon ECS to roll back your service to the last completed deployment after a failure.\n You can only use the ``DeploymentAlarms`` method to detect failures when the ``DeploymentController`` is set to ``ECS``.\n For more information, see [Rolling update](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-type-ecs.html) in the *Amazon Elastic Container Service Developer Guide*.",
       "additionalProperties": false,
@@ -696,6 +754,16 @@
             "$ref": "#/definitions/ServiceConnectService"
           },
           "markdownDescription": "The list of Service Connect service objects. These are names and aliases (also known as endpoints) that are used by other Amazon ECS services to connect to this service. \n This field is not required for a \"client\" Amazon ECS service that's a member of a namespace only to connect to other services within the namespace. An example of this would be a frontend application that accepts incoming requests from either a load balancer that's attached to the service or by other means.\n An object selects a port from the task definition, assigns a name for the CMAPlong service, and a list of aliases (endpoints) and ports for client applications to refer to this service.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "ContainerConfigurations": {
+          "minItems": 0,
+          "maxItems": 10,
+          "description": "",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ServiceConnectContainerConfiguration"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         },
         "AccessLogConfiguration": {
           "description": "The configuration for Service Connect access logging. Access logs capture detailed information about requests made to your service, including request patterns, response codes, and timing data. They can be useful for debugging connectivity issues, monitoring service performance, and auditing service-to-service communication for security and compliance purposes.\n  To enable access logs, you must also specify a ``logConfiguration`` in the ``serviceConnectConfiguration``.",
@@ -829,6 +897,61 @@
         }
       },
       "markdownDescription": "The deployment controller to use for the service.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "GatewayConnectorHealthCheckMatcher": {
+      "description": "",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "GrpcCode": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "HttpCode": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ServiceConnectContainerConfiguration": {
+      "description": "",
+      "maxProperties": 1,
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "LogLevel": {
+          "type": "string",
+          "enum": [
+            "debug",
+            "info"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: debug | info  \nUpdate requires: No interruption\n"
+        }
+      },
+      "minProperties": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "GatewayConnector": {
+      "description": "",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Filters": {
+          "$ref": "#/definitions/GatewayConnectorFilters"
+        },
+        "HealthCheck": {
+          "$ref": "#/definitions/GatewayConnectorHealthCheck"
+        },
+        "PortName": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "PortName"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Secret": {
       "description": "An object representing the secret to expose to your container. Secrets can be exposed to a container in the following ways:\n  +  To inject sensitive data into your containers as environment variables, use the ``secrets`` container definition parameter.\n  +  To reference sensitive information in the log configuration of a container, use the ``secretOptions`` container definition parameter.\n  \n For more information, see [Specifying sensitive data](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/specifying-sensitive-data.html) in the *Amazon Elastic Container Service Developer Guide*.",
@@ -984,29 +1107,31 @@
       "markdownDescription": "The configuration for the Amazon EBS volume that Amazon ECS creates and manages on your behalf. These settings are used to create each Amazon EBS volume, with one volume created for each task in the service. For information about the supported launch types and operating systems, see [Supported operating systems and launch types](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ebs-volumes.html#ebs-volumes-configuration) in the*Amazon Elastic Container Service Developer Guide*.\n Many of these parameters map 1:1 with the Amazon EBS ``CreateVolume`` API request parameters.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "ThresholdConfiguration": {
-      "description": "",
+      "description": "Defines the failure threshold that the deployment circuit breaker uses to monitor a deployment. The ``type`` and ``value`` together determine the number of task failures that are tolerated before the circuit breaker triggers.\n By default, the threshold configuration uses a ``type`` of ``BOUNDED_PERCENT`` with a ``value`` of ``50``.",
       "additionalProperties": false,
       "type": "object",
       "properties": {
         "Type": {
+          "description": "Determines how Amazon ECS uses ``value`` to calculate the failure threshold. For the percentage types (``BOUNDED_PERCENT`` and ``UNBOUNDED_PERCENT``), Amazon ECS multiplies ``value`` by the latest service desired count. For ``COUNT``, Amazon ECS uses ``value`` directly as the threshold. The default is ``BOUNDED_PERCENT``.",
           "type": "string",
           "enum": [
             "COUNT",
             "BOUNDED_PERCENT",
             "UNBOUNDED_PERCENT"
           ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: COUNT | BOUNDED_PERCENT | UNBOUNDED_PERCENT  \nUpdate requires: No interruption\n"
+          "markdownDescription": "Determines how Amazon ECS uses ``value`` to calculate the failure threshold. For the percentage types (``BOUNDED_PERCENT`` and ``UNBOUNDED_PERCENT``), Amazon ECS multiplies ``value`` by the latest service desired count. For ``COUNT``, Amazon ECS uses ``value`` directly as the threshold. The default is ``BOUNDED_PERCENT``.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: COUNT | BOUNDED_PERCENT | UNBOUNDED_PERCENT  \nUpdate requires: No interruption\n"
         },
         "Value": {
+          "description": "Specifies the integer that Amazon ECS uses to calculate the failure threshold. When ``type`` is ``COUNT``, this value is the failure threshold itself. When ``type`` is a percentage type, Amazon ECS multiplies this value by the latest service desired count to produce the failure threshold. The default is ``50``.",
           "type": "integer",
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+          "markdownDescription": "Specifies the integer that Amazon ECS uses to calculate the failure threshold. When ``type`` is ``COUNT``, this value is the failure threshold itself. When ``type`` is a percentage type, Amazon ECS multiplies this value by the latest service desired count to produce the failure threshold. The default is ``50``.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
         "Type",
         "Value"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Defines the failure threshold that the deployment circuit breaker uses to monitor a deployment. The ``type`` and ``value`` together determine the number of task failures that are tolerated before the circuit breaker triggers.\n By default, the threshold configuration uses a ``type`` of ``BOUNDED_PERCENT`` with a ``value`` of ``50``.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "ServiceRegistry": {
       "description": "The details for the service registry.\n Each service may be associated with one service registry. Multiple service registries for each service are not supported.\n When you add, update, or remove the service registries configuration, Amazon ECS starts a new deployment. New tasks are registered and deregistered to the updated service registry configuration.",
@@ -1054,6 +1179,49 @@
       },
       "markdownDescription": "The metadata that you apply to a resource to help you categorize and organize them. Each tag consists of a key and an optional value. You define them.\n The following basic restrictions apply to tags:\n  +  Maximum number of tags per resource - 50\n  +  For each resource, each tag key must be unique, and each tag key can have only one value.\n  +  Maximum key length - 128 Unicode characters in UTF-8\n  +  Maximum value length - 256 Unicode characters in UTF-8\n  +  If your tagging schema is used across multiple services and resources, remember that other services may have restrictions on allowed characters. Generally allowed characters are: letters, numbers, and spaces representable in UTF-8, and the following characters: + - = . _ : / @.\n  +  Tag keys and values are case-sensitive.\n  +  Do not use ``aws:``, ``AWS:``, or any upper or lowercase combination of such as a prefix for either keys or values as it is reserved for AWS use. You cannot edit or delete tag keys or values with this prefix. Tags with this prefix do not count against your tags per resource limit.\n  \n In order to tag a service that has the following ARN format, you need to migrate the service to the long ARN. You must use the API, CLI or console to migrate the service ARN. For more information, see [Migrate an short service ARN to a long ARN](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-arn-migration.html) in the *Developer Guide*.\n  ``arn:aws:ecs:region:aws_account_id:service/service-name`` \n After the migration is complete, the following are true:\n  +   The service ARN is: ``arn:aws:ecs:region:aws_account_id:service/cluster-name/service-name``\n  +  You can use CFN to tag the service as you would a service with a long ARN format.\n  +  When the ``PhysicalResourceId`` in the CFN stack represents a service, the value does not change and will be the short service ARN.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "GatewayConnectorHealthCheck": {
+      "description": "",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "HealthCheckIntervalSeconds": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Matcher": {
+          "$ref": "#/definitions/GatewayConnectorHealthCheckMatcher"
+        },
+        "HealthyThresholdCount": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "HealthCheckPath": {
+          "type": "string",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "HealthCheckProtocol": {
+          "type": "string",
+          "enum": [
+            "HTTP",
+            "HTTPS"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: HTTP | HTTPS  \nUpdate requires: No interruption\n"
+        },
+        "HealthCheckPort": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "UnhealthyThresholdCount": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "HealthCheckTimeoutSeconds": {
+          "type": "integer",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "DeploymentConfiguration": {
       "description": "Optional deployment parameters that control how many tasks run during a deployment and the ordering of stopping and starting tasks.",
       "additionalProperties": false,
@@ -1078,6 +1246,11 @@
             "$ref": "#/definitions/DeploymentLifecycleHook"
           },
           "markdownDescription": "An array of deployment lifecycle hook objects to run custom logic or pause the deployment at specific stages of the deployment lifecycle.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "EarlySuccessCriteria": {
+          "description": "The early success criteria configuration for a rolling deployment. With early success criteria, you can configure an Amazon ECS deployment to complete faster. Amazon ECS declares a deployment successful once a target percentage of tasks are healthy, instead of waiting for the service to fully stabilize.",
+          "$ref": "#/definitions/DeploymentEarlySuccessCriteria",
+          "markdownDescription": "The early success criteria configuration for a rolling deployment. With early success criteria, you can configure an Amazon ECS deployment to complete faster. Amazon ECS declares a deployment successful once a target percentage of tasks are healthy, instead of waiting for the service to fully stabilize.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
         },
         "Alarms": {
           "description": "Information about the CloudWatch alarms.",
@@ -1161,6 +1334,27 @@
         "PortName"
       ],
       "markdownDescription": "The Service Connect service object configuration. For more information, see [Service Connect](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-connect.html) in the *Amazon Elastic Container Service Developer Guide*.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "GatewayConnectorFilters": {
+      "description": "",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "AccessTypes": {
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "PUBLIC",
+              "PRIVATE"
+            ],
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PUBLIC | PRIVATE  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -1351,6 +1545,14 @@
       "description": "Optional deployment parameters that control how many tasks run during the deployment and the ordering of stopping and starting tasks.",
       "$ref": "#/definitions/DeploymentConfiguration",
       "markdownDescription": "Optional deployment parameters that control how many tasks run during the deployment and the ordering of stopping and starting tasks.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "GatewayConnectors": {
+      "description": "",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/GatewayConnector"
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "attributes": {

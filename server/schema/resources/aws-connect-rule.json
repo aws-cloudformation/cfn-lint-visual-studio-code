@@ -37,6 +37,7 @@
       "properties": {
         "StringValue": {
           "type": "string",
+          "description": "",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         }
       },
@@ -114,6 +115,37 @@
       },
       "additionalProperties": false,
       "markdownDescription": "The type of notification recipient.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "InAppNotificationRecipientType": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "UserTags": {
+          "description": "The collection of recipients who are identified by user tags",
+          "patternProperties": {
+            "^.{1,128}$": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            }
+          },
+          "additionalProperties": false,
+          "markdownDescription": "The collection of recipients who are identified by user tags\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "UserArns": {
+          "description": "The list of recipients by user arns.",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 100,
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/UserArn"
+          },
+          "markdownDescription": "The list of recipients by user arns.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Reference": {
       "description": "Information about the reference when the ``referenceType`` is ``URL``. Otherwise, null. (Supports variable injection in the ``Value`` field.)",
@@ -277,6 +309,84 @@
       "additionalProperties": false,
       "markdownDescription": "Information about the send notification action.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "LocalizedString": {
+      "description": "Localized notification content.",
+      "type": "string",
+      "minLength": 0,
+      "maxLength": 3000,
+      "markdownDescription": "Localized notification content.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 3000  \nUpdate requires: No interruption\n"
+    },
+    "NotificationContent": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "EnUS": {
+          "$ref": "#/definitions/LocalizedString"
+        },
+        "DeDE": {
+          "$ref": "#/definitions/LocalizedString"
+        },
+        "EsES": {
+          "$ref": "#/definitions/LocalizedString"
+        },
+        "FrFR": {
+          "$ref": "#/definitions/LocalizedString"
+        },
+        "IdID": {
+          "$ref": "#/definitions/LocalizedString"
+        },
+        "ItIT": {
+          "$ref": "#/definitions/LocalizedString"
+        },
+        "JaJP": {
+          "$ref": "#/definitions/LocalizedString"
+        },
+        "KoKR": {
+          "$ref": "#/definitions/LocalizedString"
+        },
+        "PtBR": {
+          "$ref": "#/definitions/LocalizedString"
+        },
+        "ZhCN": {
+          "$ref": "#/definitions/LocalizedString"
+        },
+        "ZhTW": {
+          "$ref": "#/definitions/LocalizedString"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SendInAppNotificationAction": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "Content": {
+          "$ref": "#/definitions/NotificationContent"
+        },
+        "Recipient": {
+          "$ref": "#/definitions/InAppNotificationRecipientType"
+        },
+        "Exclusion": {
+          "$ref": "#/definitions/InAppNotificationRecipientType"
+        },
+        "Priority": {
+          "description": "The priority of the notification.",
+          "type": "string",
+          "enum": [
+            "HIGH",
+            "LOW"
+          ],
+          "markdownDescription": "The priority of the notification.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: HIGH | LOW  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Content",
+        "Recipient"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "CreateCaseAction": {
       "description": "",
       "type": "object",
@@ -409,6 +519,18 @@
       "maxItems": 1,
       "markdownDescription": "The action will send notification when a rule is triggered.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     },
+    "SendInAppNotificationActions": {
+      "description": "This action will send an in-app notification when a rule is triggered.",
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/SendInAppNotificationAction"
+      },
+      "minItems": 1,
+      "maxItems": 1,
+      "markdownDescription": "This action will send an in-app notification when a rule is triggered.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
     "CreateCaseActions": {
       "description": "This action will create a case when a rule is triggered.",
       "type": "array",
@@ -481,6 +603,11 @@
           "description": "Information about the send notification action.",
           "markdownDescription": "Information about the send notification action.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
         },
+        "SendInAppNotificationActions": {
+          "$ref": "#/definitions/SendInAppNotificationActions",
+          "description": "",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
         "CreateCaseActions": {
           "$ref": "#/definitions/CreateCaseActions",
           "description": "",
@@ -540,15 +667,15 @@
       "type": "object",
       "properties": {
         "SlaAssignmentType": {
-          "description": "The type of SLA assignment.",
+          "description": "",
           "type": "string",
           "enum": [
             "CASES"
           ],
-          "markdownDescription": "The type of SLA assignment.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: CASES  \nUpdate requires: No interruption\n"
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: CASES  \nUpdate requires: No interruption\n"
         },
         "CaseSlaConfiguration": {
-          "description": "The SLA configuration for cases.",
+          "description": "",
           "type": "object",
           "properties": {
             "Type": {
@@ -596,7 +723,7 @@
             "TargetSlaMinutes"
           ],
           "additionalProperties": false,
-          "markdownDescription": "The SLA configuration for cases.\n\n---\n\nRequired: Yes  \nUpdate requires: No interruption\n"
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nUpdate requires: No interruption\n"
         }
       },
       "required": [

@@ -106,6 +106,11 @@
       "minimum": 0,
       "markdownDescription": "Actions will be suppressed if WaitPeriod is active. The length of time that actions are suppressed is in seconds.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
     },
+    "ActionConfiguration": {
+      "description": "Configuration that applies to the notifications this alarm sends when it performs its actions.",
+      "$ref": "#/definitions/ActionConfiguration",
+      "markdownDescription": "Configuration that applies to the notifications this alarm sends when it performs its actions.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
     "Tags": {
       "description": "A list of key-value pairs to associate with the composite alarm. You can associate as many as 50 tags with an alarm.",
       "type": "array",
@@ -118,6 +123,65 @@
     }
   },
   "definitions": {
+    "ActionConfiguration": {
+      "description": "Configuration that applies to the notifications this alarm sends when it performs its actions.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "AlarmTagsPropagation": {
+          "description": "Whether the alarm's tags are included in its action notifications and state-change events.",
+          "$ref": "#/definitions/AlarmTagsPropagation",
+          "markdownDescription": "Whether the alarm's tags are included in its action notifications and state-change events.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Configuration that applies to the notifications this alarm sends when it performs its actions.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AlarmTagsPropagation": {
+      "description": "Controls whether the alarm's tags are included in its action notifications and state-change events, and which tag keys are included. Specify IncludedTagKeys or ExcludedTagKeys, but not both. Omit both to include every tag.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Enabled": {
+          "description": "Whether the alarm's tags are included in its action notifications and state-change events.",
+          "type": "boolean",
+          "markdownDescription": "Whether the alarm's tags are included in its action notifications and state-change events.\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "IncludedTagKeys": {
+          "description": "The only tag keys to include. Cannot be specified together with ExcludedTagKeys.",
+          "type": "array",
+          "insertionOrder": false,
+          "uniqueItems": true,
+          "minItems": 1,
+          "maxItems": 50,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "The only tag keys to include. Cannot be specified together with ExcludedTagKeys.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "ExcludedTagKeys": {
+          "description": "The tag keys to leave out. Cannot be specified together with IncludedTagKeys.",
+          "type": "array",
+          "insertionOrder": false,
+          "uniqueItems": true,
+          "minItems": 1,
+          "maxItems": 50,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "The tag keys to leave out. Cannot be specified together with IncludedTagKeys.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Enabled"
+      ],
+      "markdownDescription": "Controls whether the alarm's tags are included in its action notifications and state-change events, and which tag keys are included. Specify IncludedTagKeys or ExcludedTagKeys, but not both. Omit both to include every tag.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "AlarmActionARN": {
       "type": "string",
       "description": "Amazon Resource Name (ARN) of the action",
@@ -170,7 +234,8 @@
       "permissions": [
         "cloudwatch:DescribeAlarms",
         "cloudwatch:PutCompositeAlarm",
-        "cloudwatch:TagResource"
+        "cloudwatch:TagResource",
+        "cloudwatch:ListTagsForResource"
       ]
     },
     "read": {
@@ -184,7 +249,8 @@
         "cloudwatch:DescribeAlarms",
         "cloudwatch:PutCompositeAlarm",
         "cloudwatch:TagResource",
-        "cloudwatch:UntagResource"
+        "cloudwatch:UntagResource",
+        "cloudwatch:ListTagsForResource"
       ]
     },
     "delete": {

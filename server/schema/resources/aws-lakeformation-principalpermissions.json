@@ -6,8 +6,8 @@
     "CatalogIdString": {
       "type": "string",
       "minLength": 12,
-      "maxLength": 12,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 12  \nMaximum Length: 12  \nUpdate requires: No interruption\n"
+      "maxLength": 255,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 12  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
     },
     "PathString": {
       "type": "string",
@@ -113,8 +113,16 @@
     },
     "CatalogResource": {
       "type": "object",
+      "properties": {
+        "Id": {
+          "$ref": "#/definitions/CatalogIdString",
+          "description": "An identifier for the catalog resource.",
+          "markdownDescription": "An identifier for the catalog resource.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
       "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "description": "A structure for the catalog object.\n  This is an object with no properties that effectively behaves as a true or false. A valid input for this property type in both yaml or json is null or ``{}``.",
+      "markdownDescription": "A structure for the catalog object.\n  This is an object with no properties that effectively behaves as a true or false. A valid input for this property type in both yaml or json is null or ``{}``.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "DatabaseResource": {
       "type": "object",
@@ -554,6 +562,9 @@
     "/properties/PrincipalIdentifier",
     "/properties/ResourceIdentifier"
   ],
+  "writeOnlyProperties": [
+    "/properties/Catalog"
+  ],
   "replacementStrategy": "delete_then_create",
   "tagging": {
     "taggable": false
@@ -585,6 +596,23 @@
     "delete": {
       "permissions": [
         "lakeformation:RevokePermissions",
+        "lakeformation:ListPermissions",
+        "glue:GetTable",
+        "glue:GetDatabase"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "Resource": {
+            "$ref": "resource-schema.json#/properties/Resource"
+          }
+        },
+        "required": [
+          "Resource"
+        ]
+      },
+      "permissions": [
         "lakeformation:ListPermissions",
         "glue:GetTable",
         "glue:GetDatabase"
