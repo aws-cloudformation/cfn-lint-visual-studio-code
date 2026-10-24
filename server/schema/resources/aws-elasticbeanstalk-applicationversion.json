@@ -17,10 +17,25 @@
       "type": "string",
       "markdownDescription": "A description of this application version.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
     },
+    "Process": {
+      "description": "Pre-process and validate the environment manifest (`env.yaml`) and configuration files in the source bundle. Leave unset for the service default.",
+      "type": "boolean",
+      "markdownDescription": "Pre-process and validate the environment manifest (`env.yaml`) and configuration files in the source bundle. Leave unset for the service default.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: Replacement\n"
+    },
     "SourceBundle": {
       "description": "The Amazon S3 bucket and key that identify the location of the source bundle for this version. ",
       "$ref": "#/definitions/SourceBundle",
-      "markdownDescription": "The Amazon S3 bucket and key that identify the location of the source bundle for this version. \n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: Replacement\n"
+      "markdownDescription": "The Amazon S3 bucket and key that identify the location of the source bundle for this version. \n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
+    },
+    "BuildConfiguration": {
+      "description": "Settings for an AWS CodeBuild build that packages and builds an application version from source code.",
+      "$ref": "#/definitions/BuildConfiguration",
+      "markdownDescription": "Settings for an AWS CodeBuild build that packages and builds an application version from source code.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
+    },
+    "ImageConfiguration": {
+      "description": "Configuration for image-based application versions.",
+      "$ref": "#/definitions/ImageConfiguration",
+      "markdownDescription": "Configuration for image-based application versions.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
     }
   },
   "definitions": {
@@ -44,11 +59,151 @@
         "S3Key"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ImageSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Uri": {
+          "description": "The URI of the container image, e.g. an ECR image URI.",
+          "type": "string",
+          "markdownDescription": "The URI of the container image, e.g. an ECR image URI.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "BuildConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "CodeBuildServiceRole": {
+          "description": "The ARN of the IAM role that AWS CodeBuild assumes to build the application version.",
+          "type": "string",
+          "markdownDescription": "The ARN of the IAM role that AWS CodeBuild assumes to build the application version.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Image": {
+          "description": "The CodeBuild image used for the build environment.",
+          "type": "string",
+          "markdownDescription": "The CodeBuild image used for the build environment.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ComputeType": {
+          "description": "The compute type for the CodeBuild build environment.",
+          "type": "string",
+          "enum": [
+            "BUILD_GENERAL1_SMALL",
+            "BUILD_GENERAL1_MEDIUM",
+            "BUILD_GENERAL1_LARGE"
+          ],
+          "markdownDescription": "The compute type for the CodeBuild build environment.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: BUILD_GENERAL1_SMALL | BUILD_GENERAL1_MEDIUM | BUILD_GENERAL1_LARGE  \nUpdate requires: No interruption\n"
+        },
+        "TimeoutInMinutes": {
+          "description": "The timeout for the CodeBuild build, in minutes.",
+          "type": "integer",
+          "markdownDescription": "The timeout for the CodeBuild build, in minutes.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "ArtifactName": {
+          "description": "The name of the build artifact.",
+          "type": "string",
+          "markdownDescription": "The name of the build artifact.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "CodeBuildServiceRole",
+        "Image"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ImageConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Source": {
+          "description": "The container image source for this version, as an ECR image URI.",
+          "$ref": "#/definitions/ImageSource",
+          "markdownDescription": "The container image source for this version, as an ECR image URI.\n\n---\n\nRequired: Conditional  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "Build": {
+          "description": "Configuration for building a container image from source code.",
+          "$ref": "#/definitions/ImageBuildConfiguration",
+          "markdownDescription": "Configuration for building a container image from source code.\n\n---\n\nRequired: Conditional  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "Source"
+          ]
+        },
+        {
+          "required": [
+            "Build"
+          ]
+        }
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ImageBuildConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Type": {
+          "description": "The type of image build: docker or buildpack.",
+          "type": "string",
+          "enum": [
+            "docker",
+            "buildpack"
+          ],
+          "markdownDescription": "The type of image build: docker or buildpack.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: docker | buildpack  \nUpdate requires: No interruption\n"
+        },
+        "DockerfileLocation": {
+          "description": "The path to the Dockerfile, relative to the source root.",
+          "type": "string",
+          "markdownDescription": "The path to the Dockerfile, relative to the source root.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Buildpack": {
+          "description": "The buildpack to use for building the image.",
+          "type": "string",
+          "markdownDescription": "The buildpack to use for building the image.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Architecture": {
+          "description": "The target architecture for the built container image.",
+          "type": "string",
+          "enum": [
+            "amd64",
+            "arm64"
+          ],
+          "markdownDescription": "The target architecture for the built container image.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: amd64 | arm64  \nUpdate requires: No interruption\n"
+        },
+        "CodeBuildServiceRole": {
+          "description": "The ARN of the IAM role that AWS CodeBuild assumes to build the application version.",
+          "type": "string",
+          "markdownDescription": "The ARN of the IAM role that AWS CodeBuild assumes to build the application version.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ComputeType": {
+          "description": "The compute type for the CodeBuild build environment.",
+          "type": "string",
+          "enum": [
+            "BUILD_GENERAL1_SMALL",
+            "BUILD_GENERAL1_MEDIUM",
+            "BUILD_GENERAL1_LARGE"
+          ],
+          "markdownDescription": "The compute type for the CodeBuild build environment.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: BUILD_GENERAL1_SMALL | BUILD_GENERAL1_MEDIUM | BUILD_GENERAL1_LARGE  \nUpdate requires: No interruption\n"
+        },
+        "TimeoutInMinutes": {
+          "description": "The timeout for the CodeBuild build, in minutes.",
+          "type": "integer",
+          "markdownDescription": "The timeout for the CodeBuild build, in minutes.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Type",
+        "CodeBuildServiceRole"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "required": [
-    "ApplicationName",
-    "SourceBundle"
+    "ApplicationName"
   ],
   "additionalProperties": false,
   "tagging": {
@@ -59,7 +214,10 @@
   },
   "createOnlyProperties": [
     "/properties/SourceBundle",
-    "/properties/ApplicationName"
+    "/properties/ApplicationName",
+    "/properties/ImageConfiguration",
+    "/properties/BuildConfiguration",
+    "/properties/Process"
   ],
   "primaryIdentifier": [
     "/properties/ApplicationName",
@@ -67,6 +225,11 @@
   ],
   "readOnlyProperties": [
     "/properties/Id"
+  ],
+  "writeOnlyProperties": [
+    "/properties/BuildConfiguration",
+    "/properties/ImageConfiguration",
+    "/properties/Process"
   ],
   "handlers": {
     "create": {

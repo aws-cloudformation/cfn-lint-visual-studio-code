@@ -60,6 +60,84 @@
       "type": "string",
       "markdownDescription": "An analysis type.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: TLS_SNI | HTTP_HOST  \nUpdate requires: No interruption\n"
     },
+    "NatGatewayMapping": {
+      "description": "A mapping to a NAT gateway that a proxy-mode firewall proxies egress traffic through.",
+      "type": "object",
+      "properties": {
+        "NatGatewayId": {
+          "description": "The unique identifier of a NAT gateway.",
+          "type": "string",
+          "markdownDescription": "The unique identifier of a NAT gateway.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "NatGatewayId"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A mapping to a NAT gateway that a proxy-mode firewall proxies egress traffic through.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ListenerProperty": {
+      "description": "A port and protocol that a proxy-mode firewall's proxy listener accepts traffic on.",
+      "type": "object",
+      "properties": {
+        "Port": {
+          "description": "The port the proxy listener accepts traffic on.",
+          "type": "integer",
+          "markdownDescription": "The port the proxy listener accepts traffic on.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "Type": {
+          "description": "The protocol the proxy listener uses.",
+          "enum": [
+            "HTTP",
+            "HTTPS"
+          ],
+          "type": "string",
+          "markdownDescription": "The protocol the proxy listener uses.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: HTTP | HTTPS  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "A port and protocol that a proxy-mode firewall's proxy listener accepts traffic on.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ProxySettings": {
+      "description": "The proxy listener configuration for a proxy-mode (no source preservation) firewall.",
+      "type": "object",
+      "properties": {
+        "ListenerProperties": {
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/ListenerProperty"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The proxy listener configuration for a proxy-mode (no source preservation) firewall.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "VpcEndpoint": {
+      "description": "The VPC and subnets for a proxy-mode firewall's endpoint. Provide this instead of the top-level VpcId and SubnetMappings when NoSourcePreservation is true.",
+      "type": "object",
+      "properties": {
+        "VpcId": {
+          "description": "The unique identifier of the VPC for the firewall endpoint.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The unique identifier of the VPC for the firewall endpoint.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^vpc-[0-9a-f]+$  \nUpdate requires: No interruption\n"
+        },
+        "SubnetMappings": {
+          "type": "array",
+          "insertionOrder": false,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/SubnetMapping"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The VPC and subnets for a proxy-mode firewall's endpoint. Provide this instead of the top-level VpcId and SubnetMappings when NoSourcePreservation is true.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "Tag": {
       "type": "object",
       "properties": {
@@ -176,6 +254,32 @@
       "description": "The types of analysis to enable for the firewall. Can be TLS_SNI, HTTP_HOST, or both.",
       "markdownDescription": "The types of analysis to enable for the firewall. Can be TLS_SNI, HTTP_HOST, or both.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     },
+    "NoSourcePreservation": {
+      "description": "Indicates whether the firewall operates in proxy mode, where the source IP address of traffic is not preserved. When true, specify NatGatewayMappings and VpcEndpoint instead of the top-level VpcId and SubnetMappings. You can't change this setting after you create the firewall.",
+      "type": "boolean",
+      "markdownDescription": "Indicates whether the firewall operates in proxy mode, where the source IP address of traffic is not preserved. When true, specify NatGatewayMappings and VpcEndpoint instead of the top-level VpcId and SubnetMappings. You can't change this setting after you create the firewall.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: Replacement\n"
+    },
+    "NatGatewayMappings": {
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/NatGatewayMapping"
+      },
+      "description": "The NAT gateways that the firewall proxies egress traffic through when NoSourcePreservation is true.",
+      "markdownDescription": "The NAT gateways that the firewall proxies egress traffic through when NoSourcePreservation is true.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement\n"
+    },
+    "ProxySettings": {
+      "$ref": "#/definitions/ProxySettings"
+    },
+    "VpcEndpoint": {
+      "$ref": "#/definitions/VpcEndpoint"
+    },
+    "NumberOfAssociations": {
+      "description": "The number of VPC endpoint associations attached to the firewall.",
+      "type": "integer",
+      "markdownDescription": "The number of VPC endpoint associations attached to the firewall.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
     "Tags": {
       "type": "array",
       "insertionOrder": false,
@@ -206,14 +310,18 @@
     "/properties/FirewallArn",
     "/properties/FirewallId",
     "/properties/TransitGatewayAttachmentId",
-    "/properties/EndpointIds"
+    "/properties/EndpointIds",
+    "/properties/NumberOfAssociations"
   ],
   "primaryIdentifier": [
     "/properties/FirewallArn"
   ],
   "createOnlyProperties": [
     "/properties/VpcId",
-    "/properties/FirewallName"
+    "/properties/FirewallName",
+    "/properties/NoSourcePreservation",
+    "/properties/NatGatewayMappings",
+    "/properties/VpcEndpoint"
   ],
   "handlers": {
     "create": {
@@ -222,6 +330,9 @@
         "ec2:DescribeVpcEndpoints",
         "ec2:DescribeSubnets",
         "ec2:DescribeVpcs",
+        "ec2:DescribeNatGateways",
+        "ec2:AttachApplianceToNatGateway",
+        "ec2:CreateNetworkInterfacePermission",
         "iam:CreateServiceLinkedRole",
         "network-firewall:CreateFirewall",
         "network-firewall:DescribeFirewallPolicy",
@@ -254,13 +365,16 @@
         "network-firewall:UpdateFirewallAnalysisSettings",
         "network-firewall:DisassociateAvailabilityZones",
         "network-firewall:AssociateAvailabilityZones",
-        "network-firewall:UpdateAvailabilityZoneChangeProtection"
+        "network-firewall:UpdateAvailabilityZoneChangeProtection",
+        "network-firewall:UpdateProxySettings"
       ]
     },
     "delete": {
       "permissions": [
         "ec2:DeleteVpcEndpoints",
         "ec2:DescribeRouteTables",
+        "ec2:DetachApplianceFromNatGateway",
+        "ec2:DeleteNetworkInterfacePermission",
         "logs:DescribeLogGroups",
         "logs:DescribeResourcePolicies",
         "logs:GetLogDelivery",
@@ -299,6 +413,11 @@
         "$ref": "#/definitions/EndpointId"
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "NumberOfAssociations": {
+      "description": "The number of VPC endpoint associations attached to the firewall.",
+      "type": "integer",
+      "markdownDescription": "The number of VPC endpoint associations attached to the firewall.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }
