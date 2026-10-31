@@ -1,12 +1,12 @@
 {
   "typeName": "AWS::ImageBuilder::InfrastructureConfiguration",
-  "description": "Resource schema for AWS::ImageBuilder::InfrastructureConfiguration",
+  "description": "Resource Type definition for AWS::ImageBuilder::InfrastructureConfiguration",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-imagebuilder.git",
   "properties": {
     "Arn": {
       "description": "The Amazon Resource Name (ARN) of the infrastructure configuration.",
       "type": "string",
-      "markdownDescription": "The Amazon Resource Name (ARN) of the infrastructure configuration.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "The Amazon Resource Name (ARN) of the infrastructure configuration.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:[^:]+:imagebuilder:[^:]+:[^:]+:infrastructure-configuration/.+$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Name": {
       "description": "The name of the infrastructure configuration.",
@@ -101,6 +101,16 @@
       "description": "The placement option settings for the infrastructure configuration.",
       "$ref": "#/definitions/Placement",
       "markdownDescription": "The placement option settings for the infrastructure configuration.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "ParentInstance": {
+      "description": "The Amazon EC2 Auto Scaling group that Image Builder takes the build instance from, instead of launching a new instance. This applies only to the build phase.",
+      "$ref": "#/definitions/ParentInstance",
+      "markdownDescription": "The Amazon EC2 Auto Scaling group that Image Builder takes the build instance from, instead of launching a new instance. This applies only to the build phase.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "TerminateInstanceOnCompletion": {
+      "description": "Specifies whether Image Builder terminates build and test instances that are still running when image creation ends without a failure. A TerminateInstance step in a workflow runs even when this is false.",
+      "type": "boolean",
+      "markdownDescription": "Specifies whether Image Builder terminates build and test instances that are still running when image creation ends without a failure. A TerminateInstance step in a workflow runs even when this is false.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
     }
   },
   "definitions": {
@@ -209,6 +219,47 @@
         }
       },
       "markdownDescription": "The placement options\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ParentInstance": {
+      "description": "Settings for building on an instance that is already running, instead of an instance that Image Builder launches for the build.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "AutoScalingGroup": {
+          "description": "The Amazon EC2 Auto Scaling group that Image Builder takes the build instance from.",
+          "$ref": "#/definitions/AutoScalingGroup",
+          "markdownDescription": "The Amazon EC2 Auto Scaling group that Image Builder takes the build instance from.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "AutoScalingGroup"
+      ],
+      "markdownDescription": "Settings for building on an instance that is already running, instead of an instance that Image Builder launches for the build.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AutoScalingGroup": {
+      "description": "Identifies the Amazon EC2 Auto Scaling group that Image Builder takes the build instance from, and how long Image Builder waits when the group has no instance available.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Name": {
+          "description": "The name of the Auto Scaling group, in the same account and AWS Region as the infrastructure configuration.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "markdownDescription": "The name of the Auto Scaling group, in the same account and AWS Region as the infrastructure configuration.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+        },
+        "CapacityWaitTimeoutSeconds": {
+          "description": "The number of seconds that Image Builder waits for an instance to become available in the group before the build fails. If you set this value to 0 or omit it, the build fails as soon as the group has no instance available.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3600,
+          "markdownDescription": "The number of seconds that Image Builder waits for an instance to become available in the group before the build fails. If you set this value to 0 or omit it, the build fails as soon as the group has no instance available.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Name"
+      ],
+      "markdownDescription": "Identifies the Amazon EC2 Auto Scaling group that Image Builder takes the build instance from, and how long Image Builder waits when the group has no instance available.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "required": [
@@ -228,7 +279,7 @@
     "taggable": true,
     "tagOnCreate": true,
     "tagUpdatable": true,
-    "cloudFormationSystemTags": true,
+    "cloudFormationSystemTags": false,
     "tagProperty": "/properties/Tags",
     "permissions": [
       "imagebuilder:TagResource",
@@ -245,7 +296,8 @@
         "sns:Publish",
         "imagebuilder:TagResource",
         "imagebuilder:GetInfrastructureConfiguration",
-        "imagebuilder:CreateInfrastructureConfiguration"
+        "imagebuilder:CreateInfrastructureConfiguration",
+        "autoscaling:DescribeAutoScalingGroups"
       ]
     },
     "update": {
@@ -255,7 +307,8 @@
         "imagebuilder:GetInfrastructureConfiguration",
         "imagebuilder:UpdateInfrastructureConfiguration",
         "imagebuilder:TagResource",
-        "imagebuilder:UntagResource"
+        "imagebuilder:UntagResource",
+        "autoscaling:DescribeAutoScalingGroups"
       ]
     },
     "read": {
@@ -281,7 +334,7 @@
     "Arn": {
       "description": "The Amazon Resource Name (ARN) of the infrastructure configuration.",
       "type": "string",
-      "markdownDescription": "The Amazon Resource Name (ARN) of the infrastructure configuration.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "The Amazon Resource Name (ARN) of the infrastructure configuration.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:[^:]+:imagebuilder:[^:]+:[^:]+:infrastructure-configuration/.+$  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

@@ -51,15 +51,17 @@
       "markdownDescription": "The user-generated name for the Data Store.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
     },
     "DatastoreStatus": {
-      "description": "The status of the Data Store. Possible statuses are 'CREATING', 'ACTIVE', 'DELETING', or 'DELETED'.",
+      "description": "The status of the Data Store. Possible statuses are 'CREATING', 'ACTIVE', 'UPDATING', 'UPDATE_FAILED', 'DELETING', or 'DELETED'.",
       "type": "string",
       "enum": [
         "CREATING",
         "ACTIVE",
+        "UPDATING",
+        "UPDATE_FAILED",
         "DELETING",
         "DELETED"
       ],
-      "markdownDescription": "The status of the Data Store. Possible statuses are 'CREATING', 'ACTIVE', 'DELETING', or 'DELETED'.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | ACTIVE | DELETING | DELETED  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The status of the Data Store. Possible statuses are 'CREATING', 'ACTIVE', 'UPDATING', 'UPDATE_FAILED', 'DELETING', or 'DELETED'.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | ACTIVE | UPDATING | UPDATE_FAILED | DELETING | DELETED  \nUpdate requires: No interruption\n"
     },
     "DatastoreTypeVersion": {
       "description": "The FHIR version. Only R4 version data is supported.",
@@ -176,6 +178,68 @@
       "additionalProperties": false,
       "markdownDescription": "The identity provider configuration for the datastore\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "AnalyticsConfiguration": {
+      "description": "The analytics configuration for the Data Store. Omitted when the Data Store can't carry analytics.",
+      "type": "object",
+      "properties": {
+        "Status": {
+          "description": "The analytics status for the Data Store.",
+          "type": "string",
+          "enum": [
+            "ENABLED",
+            "PAUSED"
+          ],
+          "markdownDescription": "The analytics status for the Data Store.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: ENABLED | PAUSED  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Status"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The analytics configuration for the Data Store. Omitted when the Data Store can't carry analytics.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "NlpConfiguration": {
+      "description": "The natural language processing (NLP) configuration for the Data Store.",
+      "type": "object",
+      "properties": {
+        "Status": {
+          "description": "The NLP status for the Data Store.",
+          "type": "string",
+          "enum": [
+            "ENABLED",
+            "DISABLED"
+          ],
+          "markdownDescription": "The NLP status for the Data Store.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Status"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The natural language processing (NLP) configuration for the Data Store.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ProfileConfiguration": {
+      "description": "The profile configuration for the Data Store.",
+      "type": "object",
+      "properties": {
+        "DefaultProfiles": {
+          "description": "The FHIR profiles the Data Store validates resources against by default, for example us-core-3.1.1.",
+          "type": "array",
+          "insertionOrder": false,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "The FHIR profiles the Data Store validates resources against by default, for example us-core-3.1.1.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "DefaultProfiles"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The profile configuration for the Data Store.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "Tag": {
       "description": "A key-value pair. A tag consists of a tag key and a tag value. Tag keys and tag values are both required, but tag values can be empty (null) strings.",
       "type": "object",
@@ -234,6 +298,15 @@
     "IdentityProviderConfiguration": {
       "$ref": "#/definitions/IdentityProviderConfiguration"
     },
+    "AnalyticsConfiguration": {
+      "$ref": "#/definitions/AnalyticsConfiguration"
+    },
+    "NlpConfiguration": {
+      "$ref": "#/definitions/NlpConfiguration"
+    },
+    "ProfileConfiguration": {
+      "$ref": "#/definitions/ProfileConfiguration"
+    },
     "Tags": {
       "type": "array",
       "insertionOrder": false,
@@ -258,11 +331,9 @@
     "/properties/DatastoreId"
   ],
   "createOnlyProperties": [
-    "/properties/DatastoreName",
     "/properties/DatastoreTypeVersion",
     "/properties/PreloadDataConfig",
-    "/properties/SseConfiguration",
-    "/properties/IdentityProviderConfiguration"
+    "/properties/SseConfiguration"
   ],
   "tagging": {
     "taggable": true,
@@ -296,7 +367,8 @@
         "healthlake:TagResource",
         "healthlake:UntagResource",
         "healthlake:ListTagsForResource"
-      ]
+      ],
+      "timeoutInMinutes": 360
     },
     "read": {
       "permissions": [
@@ -306,6 +378,7 @@
     },
     "update": {
       "permissions": [
+        "healthlake:UpdateFHIRDatastore",
         "healthlake:TagResource",
         "healthlake:UntagResource",
         "healthlake:ListTagsForResource",
@@ -313,7 +386,8 @@
         "iam:PassRole",
         "iam:GetRole",
         "iam:CreateServiceLinkedRole"
-      ]
+      ],
+      "timeoutInMinutes": 360
     },
     "delete": {
       "permissions": [
@@ -326,7 +400,8 @@
         "ram:AcceptResourceShareInvitation",
         "glue:CreateDatabase",
         "glue:DeleteDatabase"
-      ]
+      ],
+      "timeoutInMinutes": 360
     },
     "list": {
       "permissions": [

@@ -1,0 +1,977 @@
+{
+  "typeName": "AWS::Glue::ConnectionType",
+  "description": "Registers a custom connection type in Glue based on the configuration provided. This enables customers to configure custom connectors for any data source with REST-based APIs.",
+  "definitions": {
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ConnectorProperty": {
+      "type": "object",
+      "description": "Defines a property configuration for connection types.",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "description": "The name of the property.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The name of the property.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "KeyOverride": {
+          "type": "string",
+          "description": "A key name to use when sending this property in API requests.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "A key name to use when sending this property in API requests.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9_-]+$  \nUpdate requires: No interruption\n"
+        },
+        "Required": {
+          "type": "boolean",
+          "description": "Indicates whether the property is required.",
+          "markdownDescription": "Indicates whether the property is required.\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "DefaultValue": {
+          "type": "string",
+          "description": "The default value for the property.",
+          "markdownDescription": "The default value for the property.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "AllowedValues": {
+          "type": "array",
+          "description": "A list of allowed values for the property.",
+          "items": {
+            "type": "string",
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "A list of allowed values for the property.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "PropertyLocation": {
+          "type": "string",
+          "description": "Specifies where this property should be included in REST requests.",
+          "enum": [
+            "HEADER",
+            "BODY",
+            "QUERY_PARAM",
+            "PATH"
+          ],
+          "markdownDescription": "Specifies where this property should be included in REST requests.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: HEADER | BODY | QUERY_PARAM | PATH  \nUpdate requires: No interruption\n"
+        },
+        "PropertyType": {
+          "type": "string",
+          "description": "The data type of this property.",
+          "enum": [
+            "USER_INPUT",
+            "SECRET",
+            "READ_ONLY",
+            "UNUSED",
+            "SECRET_OR_USER_INPUT"
+          ],
+          "markdownDescription": "The data type of this property.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: USER_INPUT | SECRET | READ_ONLY | UNUSED | SECRET_OR_USER_INPUT  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Name",
+        "Required",
+        "PropertyType"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Defines a property configuration for connection types.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SecretConnectorProperty": {
+      "type": "object",
+      "description": "Defines a secret property configuration. SECRET-type properties cannot have DefaultValue or AllowedValues.",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "description": "The name of the property.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The name of the property.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "KeyOverride": {
+          "type": "string",
+          "description": "A key name to use when sending this property in API requests.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "A key name to use when sending this property in API requests.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9_-]+$  \nUpdate requires: No interruption\n"
+        },
+        "Required": {
+          "type": "boolean",
+          "description": "Indicates whether the property is required.",
+          "markdownDescription": "Indicates whether the property is required.\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "PropertyLocation": {
+          "type": "string",
+          "description": "Specifies where this property should be included in REST requests.",
+          "enum": [
+            "HEADER",
+            "BODY",
+            "QUERY_PARAM",
+            "PATH"
+          ],
+          "markdownDescription": "Specifies where this property should be included in REST requests.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: HEADER | BODY | QUERY_PARAM | PATH  \nUpdate requires: No interruption\n"
+        },
+        "PropertyType": {
+          "type": "string",
+          "description": "The data type of this property. Must be SECRET for secret properties.",
+          "enum": [
+            "SECRET"
+          ],
+          "markdownDescription": "The data type of this property. Must be SECRET for secret properties.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: SECRET  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Name",
+        "Required",
+        "PropertyType"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Defines a secret property configuration. SECRET-type properties cannot have DefaultValue or AllowedValues.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ConnectionPropertiesConfiguration": {
+      "type": "object",
+      "description": "Configuration that defines the base URL and additional request parameters needed during connection creation.",
+      "properties": {
+        "Url": {
+          "$ref": "#/definitions/ConnectorProperty"
+        },
+        "AdditionalRequestParameters": {
+          "type": "array",
+          "description": "Key-value pairs of additional request parameters.",
+          "items": {
+            "$ref": "#/definitions/ConnectorProperty"
+          },
+          "markdownDescription": "Key-value pairs of additional request parameters.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Configuration that defines the base URL and additional request parameters needed during connection creation.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "BasicAuthenticationProperties": {
+      "type": "object",
+      "description": "Basic authentication configuration.",
+      "properties": {
+        "Username": {
+          "$ref": "#/definitions/SecretConnectorProperty"
+        },
+        "Password": {
+          "$ref": "#/definitions/SecretConnectorProperty"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Basic authentication configuration.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ClientCredentialsProperties": {
+      "type": "object",
+      "description": "OAuth2 client credentials configuration.",
+      "properties": {
+        "TokenUrl": {
+          "$ref": "#/definitions/ConnectorProperty"
+        },
+        "RequestMethod": {
+          "type": "string",
+          "enum": [
+            "GET",
+            "POST"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: GET | POST  \nUpdate requires: No interruption\n"
+        },
+        "ContentType": {
+          "type": "string",
+          "enum": [
+            "APPLICATION_JSON",
+            "URL_ENCODED"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: APPLICATION_JSON | URL_ENCODED  \nUpdate requires: No interruption\n"
+        },
+        "ClientId": {
+          "$ref": "#/definitions/SecretConnectorProperty"
+        },
+        "ClientSecret": {
+          "$ref": "#/definitions/SecretConnectorProperty"
+        },
+        "Scope": {
+          "$ref": "#/definitions/ConnectorProperty"
+        },
+        "TokenUrlParameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ConnectorProperty"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "OAuth2 client credentials configuration.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "JWTBearerProperties": {
+      "type": "object",
+      "description": "JWT bearer token configuration.",
+      "properties": {
+        "TokenUrl": {
+          "$ref": "#/definitions/ConnectorProperty"
+        },
+        "RequestMethod": {
+          "type": "string",
+          "enum": [
+            "GET",
+            "POST"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: GET | POST  \nUpdate requires: No interruption\n"
+        },
+        "ContentType": {
+          "type": "string",
+          "enum": [
+            "APPLICATION_JSON",
+            "URL_ENCODED"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: APPLICATION_JSON | URL_ENCODED  \nUpdate requires: No interruption\n"
+        },
+        "JwtToken": {
+          "$ref": "#/definitions/SecretConnectorProperty"
+        },
+        "TokenUrlParameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ConnectorProperty"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "JWT bearer token configuration.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ConnectorAuthorizationCodeProperties": {
+      "type": "object",
+      "description": "OAuth2 authorization code configuration.",
+      "properties": {
+        "AuthorizationCodeUrl": {
+          "$ref": "#/definitions/ConnectorProperty"
+        },
+        "AuthorizationCode": {
+          "$ref": "#/definitions/ConnectorProperty"
+        },
+        "RedirectUri": {
+          "$ref": "#/definitions/ConnectorProperty"
+        },
+        "TokenUrl": {
+          "$ref": "#/definitions/ConnectorProperty"
+        },
+        "RequestMethod": {
+          "type": "string",
+          "enum": [
+            "GET",
+            "POST"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: GET | POST  \nUpdate requires: No interruption\n"
+        },
+        "ContentType": {
+          "type": "string",
+          "enum": [
+            "APPLICATION_JSON",
+            "URL_ENCODED"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: APPLICATION_JSON | URL_ENCODED  \nUpdate requires: No interruption\n"
+        },
+        "ClientId": {
+          "$ref": "#/definitions/SecretConnectorProperty"
+        },
+        "ClientSecret": {
+          "$ref": "#/definitions/SecretConnectorProperty"
+        },
+        "Scope": {
+          "$ref": "#/definitions/ConnectorProperty"
+        },
+        "Prompt": {
+          "$ref": "#/definitions/ConnectorProperty"
+        },
+        "TokenUrlParameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ConnectorProperty"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "OAuth2 authorization code configuration.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ConnectorOAuth2Properties": {
+      "type": "object",
+      "description": "OAuth2 configuration container.",
+      "properties": {
+        "OAuth2GrantType": {
+          "type": "string",
+          "description": "The OAuth2 grant type to use.",
+          "enum": [
+            "CLIENT_CREDENTIALS",
+            "JWT_BEARER",
+            "AUTHORIZATION_CODE"
+          ],
+          "markdownDescription": "The OAuth2 grant type to use.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: CLIENT_CREDENTIALS | JWT_BEARER | AUTHORIZATION_CODE  \nUpdate requires: No interruption\n"
+        },
+        "ClientCredentialsProperties": {
+          "$ref": "#/definitions/ClientCredentialsProperties"
+        },
+        "JWTBearerProperties": {
+          "$ref": "#/definitions/JWTBearerProperties"
+        },
+        "AuthorizationCodeProperties": {
+          "$ref": "#/definitions/ConnectorAuthorizationCodeProperties"
+        }
+      },
+      "required": [
+        "OAuth2GrantType"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "OAuth2 configuration container.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CustomAuthenticationProperties": {
+      "type": "object",
+      "description": "Custom authentication configuration.",
+      "properties": {
+        "AuthenticationParameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SecretConnectorProperty"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "AuthenticationParameters"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Custom authentication configuration.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ConnectorAuthenticationConfiguration": {
+      "type": "object",
+      "description": "Configuration that defines supported authentication types and required properties.",
+      "properties": {
+        "AuthenticationTypes": {
+          "type": "array",
+          "description": "A list of authentication types supported.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "BASIC",
+              "OAUTH2",
+              "CUSTOM",
+              "IAM"
+            ],
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: BASIC | OAUTH2 | CUSTOM | IAM  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "A list of authentication types supported.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "OAuth2Properties": {
+          "$ref": "#/definitions/ConnectorOAuth2Properties"
+        },
+        "BasicAuthenticationProperties": {
+          "$ref": "#/definitions/BasicAuthenticationProperties"
+        },
+        "CustomAuthenticationProperties": {
+          "$ref": "#/definitions/CustomAuthenticationProperties"
+        }
+      },
+      "required": [
+        "AuthenticationTypes"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration that defines supported authentication types and required properties.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ResponseExtractionMapping": {
+      "type": "object",
+      "description": "Defines how to extract values from HTTP responses.",
+      "properties": {
+        "ContentPath": {
+          "type": "string",
+          "description": "A JSON path expression to extract a value from response body.",
+          "minLength": 1,
+          "maxLength": 512,
+          "markdownDescription": "A JSON path expression to extract a value from response body.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^\\$(\\.[a-zA-Z0-9_.@\\[\\]\\(\\)-]+)*$  \nUpdate requires: No interruption\n"
+        },
+        "HeaderKey": {
+          "type": "string",
+          "description": "The name of an HTTP response header from which to extract the value.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The name of an HTTP response header from which to extract the value.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9_-]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Defines how to extract values from HTTP responses.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ExtractedParameter": {
+      "type": "object",
+      "description": "Parameter extraction configuration.",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The parameter key name.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The parameter key name.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9_-]+$  \nUpdate requires: No interruption\n"
+        },
+        "DefaultValue": {
+          "type": "string",
+          "description": "The default value.",
+          "minLength": 1,
+          "maxLength": 1024,
+          "markdownDescription": "The default value.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+        },
+        "PropertyLocation": {
+          "type": "string",
+          "description": "Specifies where to place the parameter in requests.",
+          "enum": [
+            "HEADER",
+            "BODY",
+            "QUERY_PARAM",
+            "PATH"
+          ],
+          "markdownDescription": "Specifies where to place the parameter in requests.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: HEADER | BODY | QUERY_PARAM | PATH  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "$ref": "#/definitions/ResponseExtractionMapping"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Parameter extraction configuration.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ResponseConfiguration": {
+      "type": "object",
+      "description": "Configuration for parsing JSON responses from REST API calls.",
+      "properties": {
+        "ResultPath": {
+          "type": "string",
+          "description": "JSON path expression for result data location.",
+          "minLength": 1,
+          "maxLength": 512,
+          "markdownDescription": "JSON path expression for result data location.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^\\$(\\.[a-zA-Z0-9_.@\\[\\]\\(\\)-]+)*$  \nUpdate requires: No interruption\n"
+        },
+        "ErrorPath": {
+          "type": "string",
+          "description": "JSON path expression for error information location.",
+          "minLength": 1,
+          "maxLength": 512,
+          "markdownDescription": "JSON path expression for error information location.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^\\$(\\.[a-zA-Z0-9_.@\\[\\]\\(\\)-]+)*$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ResultPath"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for parsing JSON responses from REST API calls.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CursorConfiguration": {
+      "type": "object",
+      "description": "Cursor-based pagination configuration.",
+      "properties": {
+        "NextPage": {
+          "$ref": "#/definitions/ExtractedParameter"
+        },
+        "LimitParameter": {
+          "$ref": "#/definitions/ExtractedParameter"
+        }
+      },
+      "required": [
+        "NextPage"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Cursor-based pagination configuration.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "OffsetConfiguration": {
+      "type": "object",
+      "description": "Offset-based pagination configuration.",
+      "properties": {
+        "OffsetParameter": {
+          "$ref": "#/definitions/ExtractedParameter"
+        },
+        "LimitParameter": {
+          "$ref": "#/definitions/ExtractedParameter"
+        }
+      },
+      "required": [
+        "OffsetParameter",
+        "LimitParameter"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Offset-based pagination configuration.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PaginationConfiguration": {
+      "type": "object",
+      "description": "Configuration for handling paginated responses.",
+      "properties": {
+        "CursorConfiguration": {
+          "$ref": "#/definitions/CursorConfiguration"
+        },
+        "OffsetConfiguration": {
+          "$ref": "#/definitions/OffsetConfiguration"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for handling paginated responses.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "BetweenConfiguration": {
+      "type": "object",
+      "description": "Configuration that defines how BETWEEN range filter operations are translated into REST API request parameters.",
+      "properties": {
+        "LowBoundKey": {
+          "type": "string",
+          "description": "The parameter name used for the lower bound value in a BETWEEN filter operation.",
+          "markdownDescription": "The parameter name used for the lower bound value in a BETWEEN filter operation.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "HighBoundKey": {
+          "type": "string",
+          "description": "The parameter name used for the upper bound value in a BETWEEN filter operation.",
+          "markdownDescription": "The parameter name used for the upper bound value in a BETWEEN filter operation.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Template": {
+          "type": "string",
+          "description": "A template string for constructing the BETWEEN filter expression.",
+          "markdownDescription": "A template string for constructing the BETWEEN filter expression.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Configuration that defines how BETWEEN range filter operations are translated into REST API request parameters.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "FilterStringConfiguration": {
+      "type": "object",
+      "description": "Configuration for constructing filter expression strings when using the FILTER_STRING filter mode.",
+      "properties": {
+        "QueryParameterName": {
+          "type": "string",
+          "description": "The query parameter name used to send the constructed filter expression string in API requests.",
+          "markdownDescription": "The query parameter name used to send the constructed filter expression string in API requests.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "QuoteStringValues": {
+          "type": "boolean",
+          "description": "Indicates whether string and date values should be wrapped with a quote character in the filter expression.",
+          "markdownDescription": "Indicates whether string and date values should be wrapped with a quote character in the filter expression.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "QuoteCharacter": {
+          "type": "string",
+          "description": "The character used to quote values when QuoteStringValues is true. Defaults to double quotes if not specified.",
+          "markdownDescription": "The character used to quote values when QuoteStringValues is true. Defaults to double quotes if not specified.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "QueryParameterName"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for constructing filter expression strings when using the FILTER_STRING filter mode.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "FilterConfiguration": {
+      "type": "object",
+      "description": "Configuration that defines how filter predicates are applied to REST API requests, supporting both query parameter and filter string strategies.",
+      "properties": {
+        "FilterMode": {
+          "type": "string",
+          "description": "The strategy for applying filters to requests.",
+          "enum": [
+            "QUERY_PARAMS",
+            "FILTER_STRING"
+          ],
+          "markdownDescription": "The strategy for applying filters to requests.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: QUERY_PARAMS | FILTER_STRING  \nUpdate requires: No interruption\n"
+        },
+        "OperatorMappings": {
+          "type": "object",
+          "description": "A map of logical filter operators to their API-specific string representations.",
+          "patternProperties": {
+            "^.+$": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            }
+          },
+          "additionalProperties": false,
+          "markdownDescription": "A map of logical filter operators to their API-specific string representations.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "DateTimeFormat": {
+          "type": "string",
+          "description": "The global date and time format for filter expressions.",
+          "markdownDescription": "The global date and time format for filter expressions.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "StripQuotes": {
+          "type": "boolean",
+          "description": "Indicates whether surrounding double quotes should be stripped from filter values before processing.",
+          "markdownDescription": "Indicates whether surrounding double quotes should be stripped from filter values before processing.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "BetweenConfiguration": {
+          "$ref": "#/definitions/BetweenConfiguration"
+        },
+        "FilterStringConfiguration": {
+          "$ref": "#/definitions/FilterStringConfiguration"
+        }
+      },
+      "required": [
+        "FilterMode"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration that defines how filter predicates are applied to REST API requests, supporting both query parameter and filter string strategies.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "FilterOverrides": {
+      "type": "object",
+      "description": "Configuration that defines per-field overrides for filter behavior, allowing individual fields to customize how filter operations are applied.",
+      "properties": {
+        "FieldName": {
+          "type": "string",
+          "description": "An override for the field name to use in filter expressions, if different from the schema field name.",
+          "markdownDescription": "An override for the field name to use in filter expressions, if different from the schema field name.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "OperatorMappings": {
+          "type": "object",
+          "description": "A map of logical filter operators to their field-specific API representations, overriding the global operator mappings.",
+          "patternProperties": {
+            "^.+$": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            }
+          },
+          "additionalProperties": false,
+          "markdownDescription": "A map of logical filter operators to their field-specific API representations, overriding the global operator mappings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "BetweenConfiguration": {
+          "$ref": "#/definitions/BetweenConfiguration"
+        },
+        "DateTimeFormat": {
+          "type": "string",
+          "description": "The date and time format for filter expressions on this field, overriding the global DateTimeFormat.",
+          "markdownDescription": "The date and time format for filter expressions on this field, overriding the global DateTimeFormat.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Configuration that defines per-field overrides for filter behavior, allowing individual fields to customize how filter operations are applied.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SourceConfiguration": {
+      "type": "object",
+      "description": "Configuration that defines how to make requests to endpoints.",
+      "properties": {
+        "RequestMethod": {
+          "type": "string",
+          "description": "The HTTP method to use.",
+          "enum": [
+            "GET",
+            "POST"
+          ],
+          "markdownDescription": "The HTTP method to use.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: GET | POST  \nUpdate requires: No interruption\n"
+        },
+        "RequestPath": {
+          "type": "string",
+          "description": "The URL path for the REST endpoint.",
+          "minLength": 1,
+          "maxLength": 512,
+          "markdownDescription": "The URL path for the REST endpoint.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^/[a-zA-Z0-9._~:/?#\\[\\]@!$&'()*+,;={}-]*$  \nUpdate requires: No interruption\n"
+        },
+        "RequestParameters": {
+          "type": "array",
+          "description": "Request parameters configuration.",
+          "items": {
+            "$ref": "#/definitions/ConnectorProperty"
+          },
+          "markdownDescription": "Request parameters configuration.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "ResponseConfiguration": {
+          "$ref": "#/definitions/ResponseConfiguration"
+        },
+        "PaginationConfiguration": {
+          "$ref": "#/definitions/PaginationConfiguration"
+        },
+        "FilterConfiguration": {
+          "$ref": "#/definitions/FilterConfiguration"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Configuration that defines how to make requests to endpoints.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "FieldDefinition": {
+      "type": "object",
+      "description": "Defines a field in an entity schema.",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "description": "The name of the field.",
+          "markdownDescription": "The name of the field.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "FieldDataType": {
+          "type": "string",
+          "description": "The data type of the field.",
+          "enum": [
+            "INT",
+            "SMALLINT",
+            "BIGINT",
+            "FLOAT",
+            "LONG",
+            "DATE",
+            "BOOLEAN",
+            "MAP",
+            "ARRAY",
+            "STRING",
+            "TIMESTAMP",
+            "DECIMAL",
+            "BYTE",
+            "SHORT",
+            "DOUBLE",
+            "STRUCT",
+            "BINARY",
+            "UNION"
+          ],
+          "markdownDescription": "The data type of the field.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: INT | SMALLINT | BIGINT | FLOAT | LONG | DATE | BOOLEAN | MAP | ARRAY | STRING | TIMESTAMP | DECIMAL | BYTE | SHORT | DOUBLE | STRUCT | BINARY | UNION  \nUpdate requires: No interruption\n"
+        },
+        "ResponseDateFormat": {
+          "type": "string",
+          "description": "The format pattern for parsing date values from API responses. Accepts Java DateTimeFormatter patterns, EPOCH_SECONDS, or EPOCH_MILLIS.",
+          "markdownDescription": "The format pattern for parsing date values from API responses. Accepts Java DateTimeFormatter patterns, EPOCH_SECONDS, or EPOCH_MILLIS.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "IsPartitionable": {
+          "type": "boolean",
+          "description": "Indicates whether this field can be used for partitioning queries to the data source.",
+          "markdownDescription": "Indicates whether this field can be used for partitioning queries to the data source.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "IsNullable": {
+          "type": "boolean",
+          "description": "Indicates whether this field can contain null values.",
+          "markdownDescription": "Indicates whether this field can contain null values.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "IsQueryable": {
+          "type": "boolean",
+          "description": "Indicates whether this field can be used in filter predicates when querying data.",
+          "markdownDescription": "Indicates whether this field can be used in filter predicates when querying data.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "IsOrderable": {
+          "type": "boolean",
+          "description": "Indicates whether this field can be used for ordering results.",
+          "markdownDescription": "Indicates whether this field can be used for ordering results.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "FilterOverrides": {
+          "$ref": "#/definitions/FilterOverrides"
+        }
+      },
+      "required": [
+        "Name",
+        "FieldDataType"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Defines a field in an entity schema.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EntityConfiguration": {
+      "type": "object",
+      "description": "Configuration for interacting with a specific data entity.",
+      "properties": {
+        "SourceConfiguration": {
+          "$ref": "#/definitions/SourceConfiguration"
+        },
+        "Schema": {
+          "type": "object",
+          "description": "The schema definition for this entity.",
+          "patternProperties": {
+            "^[a-zA-Z0-9_ -]+$": {
+              "$ref": "#/definitions/FieldDefinition"
+            }
+          },
+          "additionalProperties": false,
+          "markdownDescription": "The schema definition for this entity.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for interacting with a specific data entity.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RestConfiguration": {
+      "type": "object",
+      "description": "Configuration for HTTP request and response handling.",
+      "properties": {
+        "GlobalSourceConfiguration": {
+          "$ref": "#/definitions/SourceConfiguration"
+        },
+        "ValidationEndpointConfiguration": {
+          "type": "object",
+          "description": "Configuration for the validation endpoint. Only supports RequestMethod and RequestPath.",
+          "properties": {
+            "RequestMethod": {
+              "type": "string",
+              "description": "The HTTP method to use.",
+              "enum": [
+                "GET",
+                "POST"
+              ],
+              "markdownDescription": "The HTTP method to use.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: GET | POST  \nUpdate requires: No interruption\n"
+            },
+            "RequestPath": {
+              "type": "string",
+              "description": "The URL path for the REST endpoint.",
+              "minLength": 1,
+              "maxLength": 512,
+              "markdownDescription": "The URL path for the REST endpoint.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^/[a-zA-Z0-9._~:/?#\\[\\]@!$&'()*+,;={}-]*$  \nUpdate requires: No interruption\n"
+            }
+          },
+          "additionalProperties": false,
+          "markdownDescription": "Configuration for the validation endpoint. Only supports RequestMethod and RequestPath.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        },
+        "EntityConfigurations": {
+          "type": "object",
+          "description": "A map of entity configurations.",
+          "patternProperties": {
+            "^[a-zA-Z0-9_ -]+$": {
+              "$ref": "#/definitions/EntityConfiguration"
+            }
+          },
+          "additionalProperties": false,
+          "markdownDescription": "A map of entity configurations.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for HTTP request and response handling.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "ConnectionType": {
+      "type": "string",
+      "description": "The name of the connection type. Must be prefixed with REST-.",
+      "minLength": 1,
+      "maxLength": 255,
+      "markdownDescription": "The name of the connection type. Must be prefixed with REST-.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: Replacement\n"
+    },
+    "ConnectionTypeArn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the registered connection type.",
+      "minLength": 1,
+      "maxLength": 10240,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the registered connection type.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 10240  \nPattern: ^arn:aws(-(cn|us-gov|iso(-[bef])?))?:glue:  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "IntegrationType": {
+      "type": "string",
+      "description": "The integration type for the connection. Currently only REST is supported.",
+      "enum": [
+        "REST"
+      ],
+      "markdownDescription": "The integration type for the connection. Currently only REST is supported.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: REST  \nUpdate requires: Replacement\n"
+    },
+    "Description": {
+      "type": "string",
+      "description": "A description of the connection type.",
+      "minLength": 0,
+      "maxLength": 1024,
+      "markdownDescription": "A description of the connection type.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nUpdate requires: Replacement\n"
+    },
+    "ConnectionProperties": {
+      "$ref": "#/definitions/ConnectionPropertiesConfiguration"
+    },
+    "ConnectorAuthenticationConfiguration": {
+      "$ref": "#/definitions/ConnectorAuthenticationConfiguration"
+    },
+    "RestConfiguration": {
+      "$ref": "#/definitions/RestConfiguration"
+    },
+    "Tags": {
+      "type": "array",
+      "description": "Tags to assign to the connection type.",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "maxItems": 50,
+      "insertionOrder": false,
+      "markdownDescription": "Tags to assign to the connection type.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "required": [
+    "ConnectionType",
+    "RestConfiguration"
+  ],
+  "additionalProperties": false,
+  "readOnlyProperties": [
+    "/properties/ConnectionTypeArn"
+  ],
+  "writeOnlyProperties": [
+    "/properties/ConnectionProperties",
+    "/properties/ConnectorAuthenticationConfiguration",
+    "/properties/IntegrationType"
+  ],
+  "createOnlyProperties": [
+    "/properties/ConnectionType",
+    "/properties/IntegrationType",
+    "/properties/Description",
+    "/properties/RestConfiguration",
+    "/properties/ConnectionProperties",
+    "/properties/ConnectorAuthenticationConfiguration"
+  ],
+  "primaryIdentifier": [
+    "/properties/ConnectionTypeArn"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/ConnectionType"
+    ]
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "glue:TagResource",
+      "glue:UntagResource",
+      "glue:GetTags"
+    ]
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "glue:RegisterConnectionType",
+        "glue:DescribeConnectionType",
+        "glue:GetTags",
+        "glue:TagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "glue:DescribeConnectionType",
+        "glue:GetTags"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "glue:DescribeConnectionType",
+        "glue:GetTags",
+        "glue:TagResource",
+        "glue:UntagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "glue:DeleteConnectionType",
+        "glue:DescribeConnectionType",
+        "glue:GetTags"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "glue:ListConnectionTypes"
+      ]
+    }
+  },
+  "attributes": {
+    "ConnectionTypeArn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the registered connection type.",
+      "minLength": 1,
+      "maxLength": 10240,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the registered connection type.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 10240  \nPattern: ^arn:aws(-(cn|us-gov|iso(-[bef])?))?:glue:  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}
