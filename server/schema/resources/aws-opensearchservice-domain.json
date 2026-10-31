@@ -456,6 +456,15 @@
         "Enabled": {
           "type": "boolean",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "EncryptionMode": {
+          "type": "string",
+          "description": "The type of encryption at rest applied to the domain's data. Valid values are DISK and NATIVE. DISK is the default and uses volume-level encryption. NATIVE uses engine-native, index-level encryption and requires encryption at rest to be enabled and OpenSearch version 3.3 or later. After the mode is set to NATIVE, it can't be changed back to DISK.",
+          "enum": [
+            "DISK",
+            "NATIVE"
+          ],
+          "markdownDescription": "The type of encryption at rest applied to the domain's data. Valid values are DISK and NATIVE. DISK is the default and uses volume-level encryption. NATIVE uses engine-native, index-level encryption and requires encryption at rest to be enabled and OpenSearch version 3.3 or later. After the mode is set to NATIVE, it can't be changed back to DISK.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: DISK | NATIVE  \nUpdate requires: No interruption\n"
         }
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: Some interruptions\n"
@@ -576,6 +585,10 @@
       "additionalProperties": false,
       "properties": {
         "AutoSoftwareUpdateEnabled": {
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "UseLatestServiceSoftwareForBlueGreen": {
           "type": "boolean",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
         }
@@ -817,6 +830,36 @@
     },
     "AutomatedSnapshotPauseOptions": {
       "$ref": "#/definitions/AutomatedSnapshotPauseOptions"
+    },
+    "EngineMode": {
+      "type": "string",
+      "description": "The engine mode of the domain. Determines whether the domain runs the standard (GENERAL) engine or the optimized multi-engine (OPTIMIZED) engine. This value cannot be changed after the domain is created.",
+      "enum": [
+        "GENERAL",
+        "OPTIMIZED"
+      ],
+      "markdownDescription": "The engine mode of the domain. Determines whether the domain runs the standard (GENERAL) engine or the optimized multi-engine (OPTIMIZED) engine. This value cannot be changed after the domain is created.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: GENERAL | OPTIMIZED  \nUpdate requires: Replacement\n"
+    },
+    "UseCase": {
+      "type": "string",
+      "description": "The primary use case of the domain. Determines the default configuration tuned for the workload. For GENERAL engine-mode domains, this value can be changed after creation. For OPTIMIZED engine-mode domains, this value cannot be changed after creation.",
+      "enum": [
+        "SEARCH",
+        "VECTOR",
+        "OBSERVABILITY",
+        "MIXED"
+      ],
+      "markdownDescription": "The primary use case of the domain. Determines the default configuration tuned for the workload. For GENERAL engine-mode domains, this value can be changed after creation. For OPTIMIZED engine-mode domains, this value cannot be changed after creation.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SEARCH | VECTOR | OBSERVABILITY | MIXED  \nUpdate requires: No interruption\n"
+    },
+    "AcceptedWarnings": {
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      },
+      "description": "Warning codes to accept for this domain configuration update. Accepting a warning lets the update proceed past a validation that would otherwise block it. This property applies only to the current update and is not persisted on the domain. You can find warning codes in the ValidationFailures returned by DescribeDomainChangeProgress or DescribeDryRunProgress.",
+      "markdownDescription": "Warning codes to accept for this domain configuration update. Accepting a warning lets the update proceed past a validation that would otherwise block it. This property applies only to the current update and is not persisted on the domain. You can find warning codes in the ValidationFailures returned by DescribeDomainChangeProgress or DescribeDryRunProgress.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "propertyTransform": {
@@ -836,7 +879,8 @@
   },
   "additionalProperties": false,
   "createOnlyProperties": [
-    "/properties/DomainName"
+    "/properties/DomainName",
+    "/properties/EngineMode"
   ],
   "conditionalCreateOnlyProperties": [
     "/properties/EncryptionAtRestOptions/properties",
@@ -858,7 +902,8 @@
     "/properties/AdvancedSecurityOptions/MasterUserOptions",
     "/properties/AdvancedSecurityOptions/SAMLOptions/MasterUserName",
     "/properties/AdvancedSecurityOptions/SAMLOptions/MasterBackendRole",
-    "/properties/AdvancedSecurityOptions/JWTOptions/PublicKey"
+    "/properties/AdvancedSecurityOptions/JWTOptions/PublicKey",
+    "/properties/AcceptedWarnings"
   ],
   "primaryIdentifier": [
     "/properties/DomainName"
