@@ -281,6 +281,9 @@
       "/properties/StateMachineName"
     ]
   ],
+  "propertyTransform": {
+    "/properties/DefinitionString": "( $meta := ['\\\\', '^', '$', '.', '|', '?', '*', '+', '(', ')', '[', ']', '{', '}']; $esc := function($s) { $join($split($reduce($meta, function($acc, $c) { $join($split($acc, $c), '\\\\' & $c) }, $s), '\"'), '\\\\x22') }; $cls := function($v) { ($v = '' or $contains($v, /^\\\\x22/)) ? '' : ($substring($v, 0, 1) = '\\\\' ? $substring($v, 0, 2) : ($substring($v, 0, 1) = '-' ? '\\\\-' : $substring($v, 0, 1))) }; $subs := DefinitionSubstitutions; $pass := function($s) { ( $segs := $split($s, /\\$\\{[^\\{\\}]*\\}/); $toks := [$match($s, /\\$\\{[^\\{\\}]*\\}/).match]; $join($map($zip($segs, $toks), function($p) { $p[0] & ($k := $substring($p[1], 2, $length($p[1]) - 3); $exists($lookup($subs, $k)) ? $string($lookup($subs, $k)) : $p[1]) })) & $segs[-1] ) }; $expand := function($s, $n) { ($r := $pass($s); ($r = $s or $n <= 0) ? $r : $expand($r, $n - 1)) }; $tpl := DefinitionString; ($type($tpl) = 'string' and $count($split($tpl, /\\$\\{[^\\{\\}]*\\}/)) <= 500 + 1) ? ( $type($subs) = 'object' ? $esc($expand($tpl, $count($keys($subs)))) : ( $segs := $split($esc($tpl), /\\\\\\$\\\\\\{[^\\{\\}]*?\\\\\\}/); $last := $count($segs) - 1; $join($map($segs, function($v, $i) { $i = 0 ? $v : (($v = '' and $i < $last) ? '' : '[^\\\\x22' & $cls($v) & ']*' & $v) })) ) ) )"
+  },
   "handlers": {
     "create": {
       "permissions": [

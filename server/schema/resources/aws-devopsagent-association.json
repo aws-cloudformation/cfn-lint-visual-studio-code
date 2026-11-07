@@ -229,6 +229,11 @@
           "type": "string",
           "markdownDescription": "Role ARN to be assumed by DevOpsAgent to operate on behalf of customer\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
         },
+        "AgentElevatedRoleArn": {
+          "description": "The IAM role that AWS DevOps Agent assumes to perform elevated directed actions in this AWS account. Elevated actions also require ElevatedActionsEnabled to be set in the Preferences of the AgentSpace. When not provided, only non-elevated directed actions are available. Removing this property from the template clears the role on update. Setting this role is subject to the same iam:PassRole requirement as AssumableRoleArn.",
+          "type": "string",
+          "markdownDescription": "The IAM role that AWS DevOps Agent assumes to perform elevated directed actions in this AWS account. Elevated actions also require ElevatedActionsEnabled to be set in the Preferences of the AgentSpace. When not provided, only non-elevated directed actions are available. Removing this property from the template clears the role on update. Setting this role is subject to the same iam:PassRole requirement as AssumableRoleArn.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
         "Resources": {
           "$ref": "#/definitions/AWSResourceList"
         },
@@ -265,6 +270,11 @@
           "description": "Role ARN to be assumed by DevOpsAgent to operate on behalf of customer",
           "type": "string",
           "markdownDescription": "Role ARN to be assumed by DevOpsAgent to operate on behalf of customer\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "AgentElevatedRoleArn": {
+          "description": "The IAM role that AWS DevOps Agent assumes to perform elevated directed actions in this AWS account. Elevated actions also require ElevatedActionsEnabled to be set in the Preferences of the AgentSpace. When not provided, only non-elevated directed actions are available. Removing this property from the template clears the role on update. Setting this role is subject to the same iam:PassRole requirement as AssumableRoleArn.",
+          "type": "string",
+          "markdownDescription": "The IAM role that AWS DevOps Agent assumes to perform elevated directed actions in this AWS account. Elevated actions also require ElevatedActionsEnabled to be set in the Preferences of the AgentSpace. When not provided, only non-elevated directed actions are available. Removing this property from the template clears the role on update. Setting this role is subject to the same iam:PassRole requirement as AssumableRoleArn.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
         "Resources": {
           "$ref": "#/definitions/AWSResourceList"
@@ -335,6 +345,9 @@
         },
         "TransmissionTarget": {
           "$ref": "#/definitions/SlackTransmissionTarget"
+        },
+        "Bidirectional": {
+          "$ref": "#/definitions/SlackBidirectionalConfiguration"
         }
       },
       "required": [
@@ -344,6 +357,29 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "Slack workspace integration configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SlackBidirectionalConfiguration": {
+      "description": "Optional bidirectional communication configuration. Supply this configuration and set Enabled to true so you can interact with the agent directly from Slack",
+      "type": "object",
+      "properties": {
+        "RoleArn": {
+          "description": "IAM role ARN that AWS DevOps Agent assumes to exchange messages with your Slack workspace on behalf of this association",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "IAM role ARN that AWS DevOps Agent assumes to exchange messages with your Slack workspace on behalf of this association\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^arn:(aws|aws-cn|aws-us-gov):iam::\\d{12}:role/[a-zA-Z0-9+=,.@_/-]+$  \nUpdate requires: No interruption\n"
+        },
+        "Enabled": {
+          "description": "Whether bidirectional communication is enabled for this association. When set to true, you can mention the agent in a configured Slack channel and it responds in that channel. When omitted or set to false, the agent ignores mentions and only sends notifications",
+          "type": "boolean",
+          "markdownDescription": "Whether bidirectional communication is enabled for this association. When set to true, you can mention the agent in a configured Slack channel and it responds in that channel. When omitted or set to false, the agent ignores mentions and only sends notifications\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "RoleArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Optional bidirectional communication configuration. Supply this configuration and set Enabled to true so you can interact with the agent directly from Slack\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "SlackTransmissionTarget": {
       "description": "Transmission targets for agent notifications",
@@ -491,6 +527,18 @@
           "type": "string",
           "markdownDescription": "The description of the MCP server\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
+        "EnabledElevatedTools": {
+          "description": "The mutative MCP tools enabled for this integration, by tool name. Only tools the service classifies as MUTATIVE may be listed; other names are rejected. Tool names can be found in the console or from the association's current configuration. The list fully replaces the stored value on update: removing a name disables that tool, and removing the property disables all elevated tools.",
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9_-]+$  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "The mutative MCP tools enabled for this integration, by tool name. Only tools the service classifies as MUTATIVE may be listed; other names are rejected. Tool names can be found in the console or from the association's current configuration. The list fully replaces the stored value on update: removing a name disables that tool, and removing the property disables all elevated tools.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
         "EnableWebhookUpdates": {
           "description": "When set to true, enables the Agent Space to create and update webhooks for receiving notifications and events from the service",
           "type": "boolean",
@@ -566,6 +614,18 @@
             "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: alerting | annotations | asserts | cloudwatch | dashboard | datasource | elasticsearch | examples | incident | loki | navigation | oncall | prometheus | pyroscope | rendering | runpanelquery | search | searchlogs | sift  \nUpdate requires: No interruption\n"
           },
           "markdownDescription": "List of tool categories to enable for the Grafana MCP server\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "EnabledElevatedTools": {
+          "description": "The mutative MCP tools enabled for this integration, by tool name. Only tools the service classifies as MUTATIVE may be listed; other names are rejected. Tool names can be found in the console or from the association's current configuration. The list fully replaces the stored value on update: removing a name disables that tool, and removing the property disables all elevated tools. Independent of Tools, which selects the toolsets available to the agent.",
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9_-]+$  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "The mutative MCP tools enabled for this integration, by tool name. Only tools the service classifies as MUTATIVE may be listed; other names are rejected. Tool names can be found in the console or from the association's current configuration. The list fully replaces the stored value on update: removing a name disables that tool, and removing the property disables all elevated tools. Independent of Tools, which selects the toolsets available to the agent.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         },
         "EnableWebhookUpdates": {
           "description": "When set to true, enables the Agent Space to create and update webhooks for receiving notifications and events from the service",

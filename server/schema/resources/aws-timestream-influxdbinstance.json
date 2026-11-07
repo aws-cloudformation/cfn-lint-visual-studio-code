@@ -34,7 +34,9 @@
         "ec2:DescribeNetworkInterfaces",
         "ec2:DescribeSecurityGroups",
         "ec2:CreateNetworkInterface",
-        "iam:CreateServiceLinkedRole"
+        "iam:CreateServiceLinkedRole",
+        "kms:DescribeKey",
+        "kms:CreateGrant"
       ],
       "timeoutInMinutes": 2160
     },
@@ -73,6 +75,7 @@
     "/properties/Status",
     "/properties/Arn",
     "/properties/Id",
+    "/properties/DbClusterId",
     "/properties/AvailabilityZone",
     "/properties/Endpoint",
     "/properties/SecondaryAvailabilityZone",
@@ -95,7 +98,8 @@
     "/properties/VpcSubnetIds",
     "/properties/VpcSecurityGroupIds",
     "/properties/PubliclyAccessible",
-    "/properties/NetworkType"
+    "/properties/NetworkType",
+    "/properties/KmsKeyId"
   ],
   "additionalProperties": false,
   "primaryIdentifier": [
@@ -165,7 +169,7 @@
     "InfluxAuthParametersSecretArn": {
       "description": "The Auth parameters secret Amazon Resource name (ARN) that is associated with the InfluxDB instance.",
       "type": "string",
-      "markdownDescription": "The Auth parameters secret Amazon Resource name (ARN) that is associated with the InfluxDB instance.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:[a-z]*:secretsmanager:[a-z\\-0-9]*:[0-9]*:secret:[a-zA-Z0-9\\-]*  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "The Auth parameters secret Amazon Resource name (ARN) that is associated with the InfluxDB instance.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[a-z\\-]*:secretsmanager:[a-z\\-0-9]*:[0-9]*:secret:[a-zA-Z0-9\\-]*  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Port": {
       "maximum": 65535,
@@ -295,6 +299,13 @@
       ],
       "markdownDescription": "Status of the InfluxDB Instance.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | AVAILABLE | DELETING | MODIFYING | MAINTENANCE | UPDATING | UPDATING_DEPLOYMENT_TYPE | UPDATING_INSTANCE_TYPE | REBOOTING | REBOOT_FAILED | DELETED | FAILED  \nUpdate requires: No interruption\nRead only property: Yes"
     },
+    "KmsKeyId": {
+      "minLength": 1,
+      "description": "The customer managed key used to encrypt data in the InfluxDB instance.",
+      "type": "string",
+      "maxLength": 2048,
+      "markdownDescription": "The customer managed key used to encrypt data in the InfluxDB instance.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^[a-zA-Z0-9:/_\\-]+$  \nUpdate requires: Replacement\n"
+    },
     "AvailabilityZone": {
       "description": "The Availability Zone (AZ) where the InfluxDB instance is created.",
       "type": "string",
@@ -366,6 +377,13 @@
       "maxLength": 64,
       "markdownDescription": "The bucket for the InfluxDB instance.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 2  \nMaximum Length: 64  \nPattern: ^[^_][^\"]*$  \nUpdate requires: Replacement\n"
     },
+    "DbClusterId": {
+      "minLength": 3,
+      "description": "The service generated unique identifier of the InfluxDB cluster containing this instance.",
+      "type": "string",
+      "maxLength": 64,
+      "markdownDescription": "The service generated unique identifier of the InfluxDB cluster containing this instance.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 64  \nPattern: ^[a-zA-Z0-9]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
     "PubliclyAccessible": {
       "default": false,
       "description": "Attach a public IP to the customer ENI.",
@@ -401,7 +419,7 @@
     "InfluxAuthParametersSecretArn": {
       "description": "The Auth parameters secret Amazon Resource name (ARN) that is associated with the InfluxDB instance.",
       "type": "string",
-      "markdownDescription": "The Auth parameters secret Amazon Resource name (ARN) that is associated with the InfluxDB instance.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:[a-z]*:secretsmanager:[a-z\\-0-9]*:[0-9]*:secret:[a-zA-Z0-9\\-]*  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "The Auth parameters secret Amazon Resource name (ARN) that is associated with the InfluxDB instance.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:aws[a-z\\-]*:secretsmanager:[a-z\\-0-9]*:[0-9]*:secret:[a-zA-Z0-9\\-]*  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Endpoint": {
       "description": "The connection endpoint for the InfluxDB instance.",
@@ -437,6 +455,13 @@
       "description": "The Availability Zone (AZ) where the InfluxDB instance is created.",
       "type": "string",
       "markdownDescription": "The Availability Zone (AZ) where the InfluxDB instance is created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "DbClusterId": {
+      "minLength": 3,
+      "description": "The service generated unique identifier of the InfluxDB cluster containing this instance.",
+      "type": "string",
+      "maxLength": 64,
+      "markdownDescription": "The service generated unique identifier of the InfluxDB cluster containing this instance.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 64  \nPattern: ^[a-zA-Z0-9]+$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "SecondaryAvailabilityZone": {
       "description": "The Secondary Availability Zone (AZ) where the InfluxDB instance is created, if DeploymentType is set as WITH_MULTIAZ_STANDBY.",

@@ -8,7 +8,7 @@
     "tagOnCreate": true,
     "tagUpdatable": true,
     "tagProperty": "/properties/Tags",
-    "cloudFormationSystemTags": true
+    "cloudFormationSystemTags": false
   },
   "typeName": "AWS::ImageBuilder::Image",
   "readOnlyProperties": [
@@ -22,25 +22,8 @@
     "/properties/LatestVersion/Minor",
     "/properties/LatestVersion/Patch"
   ],
-  "description": "Resource schema for AWS::ImageBuilder::Image",
-  "createOnlyProperties": [
-    "/properties/ImageRecipeArn",
-    "/properties/ContainerRecipeArn",
-    "/properties/InfrastructureConfigurationArn",
-    "/properties/Workflows",
-    "/properties/DistributionConfigurationArn",
-    "/properties/ImageTestsConfiguration",
-    "/properties/ImageScanningConfiguration",
-    "/properties/EnhancedImageMetadataEnabled"
-  ],
-  "primaryIdentifier": [
-    "/properties/Arn"
-  ],
-  "conditionalCreateOnlyProperties": [
-    "/properties/ImagePipelineExecutionSettings"
-  ],
-  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-imagebuilder",
-  "oneOf": [
+  "description": "Resource Type definition for AWS::ImageBuilder::Image",
+  "anyOf": [
     {
       "required": [
         "ContainerRecipeArn",
@@ -59,6 +42,23 @@
       ]
     }
   ],
+  "createOnlyProperties": [
+    "/properties/ImageRecipeArn",
+    "/properties/ContainerRecipeArn",
+    "/properties/InfrastructureConfigurationArn",
+    "/properties/Workflows",
+    "/properties/DistributionConfigurationArn",
+    "/properties/ImageTestsConfiguration",
+    "/properties/ImageScanningConfiguration",
+    "/properties/EnhancedImageMetadataEnabled"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "conditionalCreateOnlyProperties": [
+    "/properties/ImagePipelineExecutionSettings"
+  ],
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-imagebuilder",
   "handlers": {
     "read": {
       "permissions": [
@@ -86,6 +86,7 @@
     },
     "update": {
       "permissions": [
+        "imagebuilder:GetImage",
         "imagebuilder:TagResource",
         "imagebuilder:UntagResource"
       ]
@@ -141,10 +142,31 @@
           "$ref": "#/definitions/EcrConfiguration",
           "markdownDescription": "Contains ECR settings for vulnerability scans.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
         },
+        "ScanResultCondition": {
+          "description": "The condition that the output AMI's scan results must meet for the image to pass. You can set ScanResultCondition only when ImageScanningTypes is ON_DEMAND_AMI_CVE. If you omit it, Image Builder starts the scan but does not wait for it or use its results to pass or fail the image.",
+          "$ref": "#/definitions/ScanResultCondition",
+          "markdownDescription": "The condition that the output AMI's scan results must meet for the image to pass. You can set ScanResultCondition only when ImageScanningTypes is ON_DEMAND_AMI_CVE. If you omit it, Image Builder starts the scan but does not wait for it or use its results to pass or fail the image.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "ImageScanningTypes": {
+          "minItems": 1,
+          "maxItems": 1,
+          "description": "The type of vulnerability scan that Image Builder runs for AMI output when ImageScanningEnabled is true. Specify a single value. If you omit ImageScanningTypes, Image Builder uses TEST_INSTANCE_CVE. With TEST_INSTANCE_CVE, Amazon Inspector scans the test instance during image tests, and you must activate Amazon Inspector for Amazon EC2 scanning in your account. With ON_DEMAND_AMI_CVE, Amazon Inspector starts an on-demand scan of the output AMI during image tests. You must build from an image recipe, but you do not need to activate Amazon Inspector in your account.",
+          "insertionOrder": true,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "TEST_INSTANCE_CVE",
+              "ON_DEMAND_AMI_CVE"
+            ],
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: TEST_INSTANCE_CVE | ON_DEMAND_AMI_CVE  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "The type of vulnerability scan that Image Builder runs for AMI output when ImageScanningEnabled is true. Specify a single value. If you omit ImageScanningTypes, Image Builder uses TEST_INSTANCE_CVE. With TEST_INSTANCE_CVE, Amazon Inspector scans the test instance during image tests, and you must activate Amazon Inspector for Amazon EC2 scanning in your account. With ON_DEMAND_AMI_CVE, Amazon Inspector starts an on-demand scan of the output AMI during image tests. You must build from an image recipe, but you do not need to activate Amazon Inspector in your account.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
         "ImageScanningEnabled": {
-          "description": "This sets whether Image Builder keeps a snapshot of the vulnerability scans that Amazon Inspector runs against the build instance when you create a new image.",
+          "description": "This sets whether Image Builder keeps a snapshot of the vulnerability scans that Amazon Inspector runs against the test instance when you create a new image.",
           "type": "boolean",
-          "markdownDescription": "This sets whether Image Builder keeps a snapshot of the vulnerability scans that Amazon Inspector runs against the build instance when you create a new image.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+          "markdownDescription": "This sets whether Image Builder keeps a snapshot of the vulnerability scans that Amazon Inspector runs against the test instance when you create a new image.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
         }
       },
       "markdownDescription": "Contains settings for Image Builder image resource and container image scans.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
@@ -207,6 +229,33 @@
         }
       },
       "markdownDescription": "Settings for Image Builder to configure the ECR repository and output container images that are scanned.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ScanResultCondition": {
+      "description": "The condition that the output AMI's scan results must meet for the image to pass. When you set it, the test phase waits for the scan to finish, and Image Builder fails the image if a counted finding exceeds MaximumSeverityLabel.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "FixAvailable": {
+          "description": "Specifies whether only findings that have a fix available count toward MaximumSeverityLabel. When false, Image Builder counts every finding. The default is true.",
+          "type": "boolean",
+          "markdownDescription": "Specifies whether only findings that have a fix available count toward MaximumSeverityLabel. When false, Image Builder counts every finding. The default is true.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "MaximumSeverityLabel": {
+          "description": "The maximum severity allowed for findings on the output AMI. A finding above this severity fails the image, unless FixAvailable excludes it.",
+          "type": "string",
+          "enum": [
+            "INFORMATIONAL",
+            "LOW",
+            "MEDIUM",
+            "HIGH"
+          ],
+          "markdownDescription": "The maximum severity allowed for findings on the output AMI. A finding above this severity fails the image, unless FixAvailable excludes it.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: INFORMATIONAL | LOW | MEDIUM | HIGH  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "MaximumSeverityLabel"
+      ],
+      "markdownDescription": "The condition that the output AMI's scan results must meet for the image to pass. When you set it, the test phase waits for the scan to finish, and Image Builder fails the image if a counted finding exceeds MaximumSeverityLabel.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "LatestVersion": {
       "description": "The latest version references of the image.",
@@ -318,9 +367,9 @@
   },
   "properties": {
     "ImageScanningConfiguration": {
-      "description": "Contains settings for vulnerability scans.",
+      "description": "Contains settings for vulnerability scans that Amazon Inspector runs against the test instance during image creation.",
       "$ref": "#/definitions/ImageScanningConfiguration",
-      "markdownDescription": "Contains settings for vulnerability scans.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
+      "markdownDescription": "Contains settings for vulnerability scans that Amazon Inspector runs against the test instance during image creation.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
     },
     "ContainerRecipeArn": {
       "description": "The Amazon Resource Name (ARN) of the container recipe that defines how images are configured and tested.",
@@ -445,7 +494,7 @@
     "Arn": {
       "description": "The Amazon Resource Name (ARN) of the image.",
       "type": "string",
-      "markdownDescription": "The Amazon Resource Name (ARN) of the image.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "The Amazon Resource Name (ARN) of the image.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:[^:]+:imagebuilder:[^:]+:[^:]+:image/.+$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "EnhancedImageMetadataEnabled": {
       "description": "Collects additional information about the image being created, including the operating system (OS) version and package list.",
@@ -494,7 +543,7 @@
     "Arn": {
       "description": "The Amazon Resource Name (ARN) of the image.",
       "type": "string",
-      "markdownDescription": "The Amazon Resource Name (ARN) of the image.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+      "markdownDescription": "The Amazon Resource Name (ARN) of the image.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:[^:]+:imagebuilder:[^:]+:[^:]+:image/.+$  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }
