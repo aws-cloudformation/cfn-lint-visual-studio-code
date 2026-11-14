@@ -28,7 +28,8 @@
     "/properties/FunctionName"
   ],
   "conditionalCreateOnlyProperties": [
-    "/properties/DurableConfig"
+    "/properties/DurableConfig",
+    "/properties/AcceleratorConfig"
   ],
   "required": [
     "Code",
@@ -72,7 +73,10 @@
         "lambda:PutFunctionRecursionConfig",
         "lambda:GetFunctionRecursionConfig",
         "lambda:PutFunctionScalingConfig",
-        "lambda:PassCapacityProvider"
+        "lambda:PassCapacityProvider",
+        "lambda:AssociateRuntimeAlias",
+        "ecr:BatchGetImage",
+        "ecr:GetDownloadUrlForLayer"
       ]
     },
     "update": {
@@ -106,8 +110,12 @@
         "lambda:GetFunctionRecursionConfig",
         "lambda:PutFunctionScalingConfig",
         "lambda:PublishVersion",
-        "lambda:PassCapacityProvider"
-      ]
+        "lambda:PassCapacityProvider",
+        "lambda:AssociateRuntimeAlias",
+        "ecr:BatchGetImage",
+        "ecr:GetDownloadUrlForLayer"
+      ],
+      "timeoutInMinutes": 180
     },
     "list": {
       "permissions": [
@@ -333,14 +341,14 @@
       "markdownDescription": "Sets the runtime management configuration for a function's version. For more information, see [Runtime updates](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-update.html).\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "DurableConfig": {
-      "description": "Configuration settings for [durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html), including execution timeout and retention period for execution history.",
+      "description": "Configuration settings for [durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html), including execution timeout, retention period for execution history, and an optional ARN of the KMSlong (KMS) customer managed key that is used to encrypt your durable execution's payload data, including input, output, and error payloads.",
       "additionalProperties": false,
       "type": "object",
       "properties": {
         "KMSKeyArn": {
-          "description": "",
+          "description": "The ARN of the KMSlong (KMS) customer managed key that is used to encrypt your durable execution's payload data, including input, output, and error payloads.",
           "type": "string",
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(arn:(aws[a-zA-Z-]*)?:[a-z0-9-.]+:.*)|()$  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The ARN of the KMSlong (KMS) customer managed key that is used to encrypt your durable execution's payload data, including input, output, and error payloads.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^(arn:(aws[a-zA-Z-]*)?:[a-z0-9-.]+:.*)|()$  \nUpdate requires: No interruption\n"
         },
         "ExecutionTimeout": {
           "description": "The maximum time (in seconds) that a durable execution can run before timing out. This timeout applies to the entire durable execution, not individual function invocations.",
@@ -361,7 +369,7 @@
       "required": [
         "ExecutionTimeout"
       ],
-      "markdownDescription": "Configuration settings for [durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html), including execution timeout and retention period for execution history.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Configuration settings for [durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html), including execution timeout, retention period for execution history, and an optional ARN of the KMSlong (KMS) customer managed key that is used to encrypt your durable execution's payload data, including input, output, and error payloads.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "SnapStart": {
       "description": "The function's [SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html) setting.",
@@ -446,13 +454,13 @@
           "markdownDescription": "The Amazon S3 key of the deployment package.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
         },
         "S3ObjectStorageMode": {
-          "description": "",
+          "description": "Specifies the storage mode for the deployment package. Use ``COPY`` to store the package in LAMlong-managed storage. Use ``REFERENCE`` to read the package directly from the Amazon S3 bucket. If omitted, the default is ``COPY``.",
           "type": "string",
           "enum": [
             "COPY",
             "REFERENCE"
           ],
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: COPY | REFERENCE  \nUpdate requires: No interruption\n"
+          "markdownDescription": "Specifies the storage mode for the deployment package. Use ``COPY`` to store the package in LAMlong-managed storage. Use ``REFERENCE`` to read the package directly from the Amazon S3 bucket. If omitted, the default is ``COPY``.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: COPY | REFERENCE  \nUpdate requires: No interruption\n"
         },
         "ImageUri": {
           "description": "URI of a [container image](https://docs.aws.amazon.com/lambda/latest/dg/lambda-images.html) in the Amazon ECR registry.",
@@ -461,6 +469,40 @@
         }
       },
       "markdownDescription": "The [deployment package](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html) for a Lambda function. To deploy a function defined as a container image, you specify the location of a container image in the Amazon ECR registry. For a .zip file deployment package, you can specify the location of an object in Amazon S3. For Node.js and Python functions, you can specify the function code inline in the template.\n  When you specify source code inline for a Node.js function, the ``index`` file that CFN creates uses the extension ``.js``. This means that Node.js treats the file as a CommonJS module.\n  Changes to a deployment package in Amazon S3 or a container image in ECR are not detected automatically during stack updates. To update the function code, change the object key or version in the template.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AcceleratorConfig": {
+      "description": "",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "AcceleratorMemorySize": {
+          "description": "The minimum amount of memory (in GB) of each accelerator device exposed to the execution environment. Lambda might allocate more, depending on the accelerator instance types available. Valid values: 3, 6, 12, 16, 24, 48.",
+          "type": "integer",
+          "markdownDescription": "The minimum amount of memory (in GB) of each accelerator device exposed to the execution environment. Lambda might allocate more, depending on the accelerator instance types available. Valid values: 3, 6, 12, 16, 24, 48.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "AcceleratorMemorySize"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "S3FilesConfig": {
+      "description": "Setting controls how your function accesses data from an Amazon S3 file system.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "DirectS3Read": {
+          "description": "Specifies if a function reads from the file system for the lowest latency, or through Amazon S3 Files feature \"direct Amazon S3 bucket reads\" for the highest throughput. Valid values:\n  +  ``AUTO`` (default) \u2013 Direct reads are active for functions you configure with 512 MB or more of memory.\n  +  ``ENABLED`` \u2013 Enforces all reads are directly from the Amazon S3 bucket, regardless of available memory (less than 512 MB).\n  +  ``DISABLED`` \u2013 Routes all reads through the file system, regardless of memory configuration.\n  \n To use direct reads, you must grant the execution role the ``s3:GetObject`` and ``s3:GetObjectVersion`` permissions. If a direct read fails, Lambda automatically falls back to reading through the file system.",
+          "type": "string",
+          "enum": [
+            "ENABLED",
+            "DISABLED",
+            "AUTO"
+          ],
+          "markdownDescription": "Specifies if a function reads from the file system for the lowest latency, or through Amazon S3 Files feature \"direct Amazon S3 bucket reads\" for the highest throughput. Valid values:\n  +  ``AUTO`` (default) \u2013 Direct reads are active for functions you configure with 512 MB or more of memory.\n  +  ``ENABLED`` \u2013 Enforces all reads are directly from the Amazon S3 bucket, regardless of available memory (less than 512 MB).\n  +  ``DISABLED`` \u2013 Routes all reads through the file system, regardless of memory configuration.\n  \n To use direct reads, you must grant the execution role the ``s3:GetObject`` and ``s3:GetObjectVersion`` permissions. If a direct read fails, Lambda automatically falls back to reading through the file system.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED | AUTO  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Setting controls how your function accesses data from an Amazon S3 file system.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "LoggingConfig": {
       "description": "The function's Amazon CloudWatch Logs configuration settings.",
@@ -539,10 +581,15 @@
       "markdownDescription": "A function's environment variable settings. You can use environment variables to adjust your function's behavior without updating code. An environment variable is a pair of strings that are stored in a function's version-specific configuration.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "FileSystemConfig": {
-      "description": "Details about the connection between a Lambda function and an [Amazon EFS file system](https://docs.aws.amazon.com/lambda/latest/dg/configuration-filesystem.html) or an [Amazon S3 Files file system](https://docs.aws.amazon.com/lambda/latest/dg/configuration-filesystem.html).",
+      "description": "Details about the connection between a Lambda function and an [Amazon EFS file system](https://docs.aws.amazon.com/lambda/latest/dg/configuration-filesystem.html) or an [Amazon S3 file system](https://docs.aws.amazon.com/lambda/latest/dg/configuration-filesystem.html).",
       "additionalProperties": false,
       "type": "object",
       "properties": {
+        "S3FilesConfig": {
+          "description": "The configuration for how your function accesses data on an Amazon S3 file system. Valid only when the file system access point ARN is an Amazon S3 Files access point. If you specify a different access point type (for example, Amazon Elastic File System), the operation returns an ``InvalidParameterException``.",
+          "$ref": "#/definitions/S3FilesConfig",
+          "markdownDescription": "The configuration for how your function accesses data on an Amazon S3 file system. Valid only when the file system access point ARN is an Amazon S3 Files access point. If you specify a different access point type (for example, Amazon Elastic File System), the operation returns an ``InvalidParameterException``.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
         "Arn": {
           "description": "The Amazon Resource Name (ARN) of the Amazon EFS or Amazon S3 Files access point that provides access to the file system.",
           "type": "string",
@@ -560,7 +607,31 @@
         "Arn",
         "LocalMountPath"
       ],
-      "markdownDescription": "Details about the connection between a Lambda function and an [Amazon EFS file system](https://docs.aws.amazon.com/lambda/latest/dg/configuration-filesystem.html) or an [Amazon S3 Files file system](https://docs.aws.amazon.com/lambda/latest/dg/configuration-filesystem.html).\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Details about the connection between a Lambda function and an [Amazon EFS file system](https://docs.aws.amazon.com/lambda/latest/dg/configuration-filesystem.html) or an [Amazon S3 file system](https://docs.aws.amazon.com/lambda/latest/dg/configuration-filesystem.html).\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RuntimeConfig": {
+      "description": "",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "RuntimeAlias": {
+          "description": "The name of the runtime alias that controls the function's runtime update cadence (for example, stable or latest).",
+          "type": "string",
+          "maxLength": 128,
+          "markdownDescription": "The name of the runtime alias that controls the function's runtime update cadence (for example, stable or latest).\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 128  \nPattern: ^[A-Za-z0-9_]([A-Za-z0-9_.-]{0,126}[A-Za-z0-9_])?$  \nUpdate requires: No interruption\n"
+        },
+        "RuntimeArn": {
+          "description": "The Amazon Resource Name (ARN) of the runtime that the function uses.",
+          "type": "string",
+          "maxLength": 2048,
+          "markdownDescription": "The Amazon Resource Name (ARN) of the runtime that the function uses.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 2048  \nPattern: ^arn:[a-z-]+:lambda:[a-z0-9-]+:\\d{12}:runtime/.+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "RuntimeArn",
+        "RuntimeAlias"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Tag": {
       "description": "A [tag](https://docs.aws.amazon.com/lambda/latest/dg/tagging.html) to apply to the function.",
@@ -594,7 +665,7 @@
       "properties": {
         "Size": {
           "description": "The size of the function's ``/tmp`` directory.",
-          "maximum": 10240,
+          "maximum": 32768,
           "type": "integer",
           "minimum": 512,
           "markdownDescription": "The size of the function's ``/tmp`` directory.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
@@ -653,9 +724,9 @@
       "markdownDescription": "Sets the runtime management configuration for a function's version. For more information, see [Runtime updates](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-update.html).\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
     },
     "DurableConfig": {
-      "description": "Configuration settings for [durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html), including execution timeout and retention period for execution history.",
+      "description": "Configuration settings for [durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html), including execution timeout, retention period for execution history, and an optional ARN of the KMSlong (KMS) customer managed key that is used to encrypt your durable execution's payload data, including input, output, and error payloads.",
       "$ref": "#/definitions/DurableConfig",
-      "markdownDescription": "Configuration settings for [durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html), including execution timeout and retention period for execution history.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Some interruptions\n"
+      "markdownDescription": "Configuration settings for [durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html), including execution timeout, retention period for execution history, and an optional ARN of the KMSlong (KMS) customer managed key that is used to encrypt your durable execution's payload data, including input, output, and error payloads.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Some interruptions\n"
     },
     "ReservedConcurrentExecutions": {
       "description": "The number of simultaneous executions to reserve for the function.",
@@ -682,6 +753,11 @@
       "description": "The name of the Lambda function, up to 64 characters in length. If you don't specify a name, CFN generates one.\n If you specify a name, you cannot perform updates that require replacement of this resource. You can perform updates that require no or some interruption. If you must replace the resource, specify a new name.",
       "type": "string",
       "markdownDescription": "The name of the Lambda function, up to 64 characters in length. If you don't specify a name, CFN generates one.\n If you specify a name, you cannot perform updates that require replacement of this resource. You can perform updates that require no or some interruption. If you must replace the resource, specify a new name.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nUpdate requires: Replacement\n"
+    },
+    "AcceleratorConfig": {
+      "description": "",
+      "$ref": "#/definitions/AcceleratorConfig",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Some interruptions\n"
     },
     "Runtime": {
       "description": "The identifier of the function's [runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html). Runtime is required if the deployment package is a .zip file archive. Specifying a runtime results in an error if you're deploying a function using a container image.\n The following list includes deprecated runtimes. Lambda blocks creating new functions and updating existing functions shortly after each runtime is deprecated. For more information, see [Runtime use after deprecation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtime-deprecation-levels).\n For a list of all currently supported runtimes, see [Supported runtimes](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtimes-supported).",
@@ -753,10 +829,10 @@
       "markdownDescription": "A dead-letter queue configuration that specifies the queue or topic where Lambda sends asynchronous events when they fail processing. For more information, see [Dead-letter queues](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html#invocation-dlq).\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
     },
     "Timeout": {
-      "description": "The amount of time (in seconds) that Lambda allows a function to run before stopping it. The default is 3 seconds. The maximum allowed value is 900 seconds. For more information, see [Lambda execution environment](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html).",
+      "description": "The amount of time (in seconds) that Lambda allows a function to run before stopping it. The default is 3 seconds, and the maximum allowed value is 900 seconds. For functions using Lambda Managed Instances, asynchronous invocations and event source mapping invocations (except Amazon MQ and Amazon DocumentDB) support a maximum allowed value of 5,400 seconds (90 minutes). For more information, see [Lambda execution environment](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html).",
       "type": "integer",
       "minimum": 1,
-      "markdownDescription": "The amount of time (in seconds) that Lambda allows a function to run before stopping it. The default is 3 seconds. The maximum allowed value is 900 seconds. For more information, see [Lambda execution environment](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html).\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The amount of time (in seconds) that Lambda allows a function to run before stopping it. The default is 3 seconds, and the maximum allowed value is 900 seconds. For functions using Lambda Managed Instances, asynchronous invocations and event source mapping invocations (except Amazon MQ and Amazon DocumentDB) support a maximum allowed value of 5,400 seconds (90 minutes). For more information, see [Lambda execution environment](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html).\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
     },
     "CapacityProviderConfig": {
       "description": "Configuration for the capacity provider that manages compute resources for Lambda functions.",
@@ -798,6 +874,11 @@
       "description": "Environment variables that are accessible from function code during execution.",
       "$ref": "#/definitions/Environment",
       "markdownDescription": "Environment variables that are accessible from function code during execution.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "RuntimeConfig": {
+      "description": "",
+      "$ref": "#/definitions/RuntimeConfig",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
     },
     "Arn": {
       "description": "",

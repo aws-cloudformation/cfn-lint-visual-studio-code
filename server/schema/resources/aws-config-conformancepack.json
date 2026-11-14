@@ -1,33 +1,96 @@
 {
-  "typeName": "AWS::Config::ConformancePack",
-  "description": "A conformance pack is a collection of AWS Config rules and remediation actions that can be easily deployed as a single entity in an account and a region or across an entire AWS Organization.",
-  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-config.git",
   "documentationUrl": "https://docs.aws.amazon.com/config/latest/developerguide/conformance-packs.html",
+  "tagging": {
+    "permissions": [
+      "config:TagResource",
+      "config:UntagResource",
+      "config:ListTagsForResource"
+    ],
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "tagProperty": "/properties/Tags",
+    "cloudFormationSystemTags": true
+  },
+  "typeName": "AWS::Config::ConformancePack",
+  "readOnlyProperties": [
+    "/properties/ConformancePackArn"
+  ],
+  "description": "A conformance pack is a collection of AWS Config rules and remediation actions that can be easily deployed as a single entity in an account and a region or across an entire AWS Organization.",
+  "createOnlyProperties": [
+    "/properties/ConformancePackName"
+  ],
+  "primaryIdentifier": [
+    "/properties/ConformancePackName"
+  ],
+  "required": [
+    "ConformancePackName"
+  ],
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-config.git",
+  "handlers": {
+    "read": {
+      "permissions": [
+        "config:DescribeConformancePacks",
+        "config:ListTagsForResource"
+      ]
+    },
+    "create": {
+      "permissions": [
+        "config:PutConformancePack",
+        "config:DescribeConformancePackStatus",
+        "config:DescribeConformancePacks",
+        "config:TagResource",
+        "config:ListTagsForResource",
+        "s3:GetObject",
+        "s3:GetBucketAcl",
+        "iam:CreateServiceLinkedRole",
+        "iam:PassRole"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "config:PutConformancePack",
+        "config:DescribeConformancePackStatus",
+        "config:DescribeConformancePacks",
+        "config:TagResource",
+        "config:UntagResource",
+        "config:ListTagsForResource",
+        "s3:GetObject",
+        "s3:GetBucketAcl",
+        "iam:CreateServiceLinkedRole",
+        "iam:PassRole"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "config:DescribeConformancePacks"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "config:DeleteConformancePack",
+        "config:DescribeConformancePackStatus",
+        "config:UntagResource"
+      ]
+    }
+  },
+  "writeOnlyProperties": [
+    "/properties/TemplateBody",
+    "/properties/TemplateS3Uri",
+    "/properties/TemplateSSMDocumentDetails"
+  ],
+  "additionalProperties": false,
   "definitions": {
-    "ParameterName": {
-      "description": "Key part of key-value pair with value being parameter value",
-      "type": "string",
-      "minLength": 0,
-      "maxLength": 255,
-      "markdownDescription": "Key part of key-value pair with value being parameter value\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
-    },
-    "ParameterValue": {
-      "description": "Value part of key-value pair with key being parameter Name",
-      "type": "string",
-      "minLength": 0,
-      "maxLength": 4096,
-      "markdownDescription": "Value part of key-value pair with key being parameter Name\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 4096  \nUpdate requires: No interruption\n"
-    },
     "ConformancePackInputParameter": {
       "description": "Input parameters in the form of key-value pairs for the conformance pack.",
-      "type": "object",
       "additionalProperties": false,
+      "type": "object",
       "properties": {
-        "ParameterName": {
-          "$ref": "#/definitions/ParameterName"
-        },
         "ParameterValue": {
           "$ref": "#/definitions/ParameterValue"
+        },
+        "ParameterName": {
+          "$ref": "#/definitions/ParameterName"
         }
       },
       "required": [
@@ -35,135 +98,135 @@
         "ParameterValue"
       ],
       "markdownDescription": "Input parameters in the form of key-value pairs for the conformance pack.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    }
-  },
-  "tagging": {
-    "taggable": false,
-    "tagOnCreate": false,
-    "tagUpdatable": false,
-    "cloudFormationSystemTags": false,
-    "tagProperty": "/properties/Tags"
-  },
-  "properties": {
-    "ConformancePackName": {
-      "description": "Name of the conformance pack which will be assigned as the unique identifier.",
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 256,
-      "markdownDescription": "Name of the conformance pack which will be assigned as the unique identifier.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: [a-zA-Z][-a-zA-Z0-9]*  \nUpdate requires: Replacement\n"
     },
-    "DeliveryS3Bucket": {
-      "description": "AWS Config stores intermediate files while processing conformance pack template.",
-      "type": "string",
+    "ParameterValue": {
       "minLength": 0,
-      "maxLength": 63,
-      "markdownDescription": "AWS Config stores intermediate files while processing conformance pack template.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 63  \nUpdate requires: No interruption\n"
-    },
-    "DeliveryS3KeyPrefix": {
-      "description": "The prefix for delivery S3 bucket.",
+      "description": "Value part of key-value pair with key being parameter Name",
       "type": "string",
+      "maxLength": 4096,
+      "markdownDescription": "Value part of key-value pair with key being parameter Name\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 4096  \nUpdate requires: No interruption\n"
+    },
+    "ParameterName": {
       "minLength": 0,
-      "maxLength": 1024,
-      "markdownDescription": "The prefix for delivery S3 bucket.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
-    },
-    "TemplateBody": {
-      "description": "A string containing full conformance pack template body. You can only specify one of the template body or template S3Uri fields.",
+      "description": "Key part of key-value pair with value being parameter value",
       "type": "string",
-      "minLength": 1,
-      "maxLength": 51200,
-      "markdownDescription": "A string containing full conformance pack template body. You can only specify one of the template body or template S3Uri fields.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 51200  \nUpdate requires: No interruption\n"
+      "maxLength": 255,
+      "markdownDescription": "Key part of key-value pair with value being parameter value\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
     },
-    "TemplateS3Uri": {
-      "description": "Location of file containing the template body which points to the conformance pack template that is located in an Amazon S3 bucket. You can only specify one of the template body or template S3Uri fields.",
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 1024,
-      "markdownDescription": "Location of file containing the template body which points to the conformance pack template that is located in an Amazon S3 bucket. You can only specify one of the template body or template S3Uri fields.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nPattern: s3://.*  \nUpdate requires: No interruption\n"
-    },
-    "TemplateSSMDocumentDetails": {
-      "description": "The TemplateSSMDocumentDetails object contains the name of the SSM document and the version of the SSM document.",
-      "type": "object",
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
       "additionalProperties": false,
+      "type": "object",
       "properties": {
-        "DocumentName": {
+        "Value": {
+          "minLength": 0,
+          "description": "The value for the tag. You can specify a value that is 1 to 255 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
           "type": "string",
-          "minLength": 3,
-          "maxLength": 128,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+          "maxLength": 256,
+          "markdownDescription": "The value for the tag. You can specify a value that is 1 to 255 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. \n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
         },
-        "DocumentVersion": {
-          "type": "string",
+        "Key": {
           "minLength": 1,
+          "description": "The key name of the tag. You can specify a value that is 1 to 127 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "type": "string",
           "maxLength": 128,
-          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 127 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. \n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
         }
       },
-      "markdownDescription": "The TemplateSSMDocumentDetails object contains the name of the SSM document and the version of the SSM document.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
-    },
+      "required": [
+        "Value",
+        "Key"
+      ],
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
     "ConformancePackInputParameters": {
+      "minItems": 0,
+      "maxItems": 60,
       "description": "A list of ConformancePackInputParameter objects.",
       "type": "array",
       "items": {
         "$ref": "#/definitions/ConformancePackInputParameter"
       },
-      "minItems": 0,
-      "maxItems": 60,
       "markdownDescription": "A list of ConformancePackInputParameter objects.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "TemplateSSMDocumentDetails": {
+      "description": "The TemplateSSMDocumentDetails object contains the name of the SSM document and the version of the SSM document.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "DocumentVersion": {
+          "minLength": 1,
+          "type": "string",
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "DocumentName": {
+          "minLength": 3,
+          "type": "string",
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "The TemplateSSMDocumentDetails object contains the name of the SSM document and the version of the SSM document.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DeliveryS3Bucket": {
+      "minLength": 0,
+      "description": "AWS Config stores intermediate files while processing conformance pack template.",
+      "type": "string",
+      "maxLength": 63,
+      "markdownDescription": "AWS Config stores intermediate files while processing conformance pack template.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 63  \nUpdate requires: No interruption\n"
+    },
+    "ConformancePackArn": {
+      "description": "Amazon Resource Name (ARN) of the conformance pack.",
+      "type": "string",
+      "markdownDescription": "Amazon Resource Name (ARN) of the conformance pack.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ConformancePackName": {
+      "minLength": 1,
+      "description": "Name of the conformance pack which will be assigned as the unique identifier.",
+      "type": "string",
+      "maxLength": 256,
+      "markdownDescription": "Name of the conformance pack which will be assigned as the unique identifier.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: [a-zA-Z][-a-zA-Z0-9]*  \nUpdate requires: Replacement\n"
+    },
+    "DeliveryS3KeyPrefix": {
+      "minLength": 0,
+      "description": "The prefix for delivery S3 bucket.",
+      "type": "string",
+      "maxLength": 1024,
+      "markdownDescription": "The prefix for delivery S3 bucket.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+    },
+    "TemplateBody": {
+      "minLength": 1,
+      "description": "A string containing full conformance pack template body. You can only specify one of the template body or template S3Uri fields.",
+      "type": "string",
+      "maxLength": 51200,
+      "markdownDescription": "A string containing full conformance pack template body. You can only specify one of the template body or template S3Uri fields.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 51200  \nUpdate requires: No interruption\n"
+    },
+    "Tags": {
+      "maxItems": 50,
+      "uniqueItems": true,
+      "description": "The tags for the conformance pack.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "The tags for the conformance pack.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "TemplateS3Uri": {
+      "minLength": 1,
+      "description": "Location of file containing the template body which points to the conformance pack template that is located in an Amazon S3 bucket. You can only specify one of the template body or template S3Uri fields.",
+      "type": "string",
+      "maxLength": 1024,
+      "markdownDescription": "Location of file containing the template body which points to the conformance pack template that is located in an Amazon S3 bucket. You can only specify one of the template body or template S3Uri fields.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nPattern: s3://.*  \nUpdate requires: No interruption\n"
     }
   },
-  "additionalProperties": false,
-  "required": [
-    "ConformancePackName"
-  ],
-  "writeOnlyProperties": [
-    "/properties/TemplateBody",
-    "/properties/TemplateS3Uri",
-    "/properties/TemplateSSMDocumentDetails"
-  ],
-  "createOnlyProperties": [
-    "/properties/ConformancePackName"
-  ],
-  "primaryIdentifier": [
-    "/properties/ConformancePackName"
-  ],
-  "handlers": {
-    "create": {
-      "permissions": [
-        "config:PutConformancePack",
-        "config:DescribeConformancePackStatus",
-        "config:DescribeConformancePacks",
-        "s3:GetObject",
-        "s3:GetBucketAcl",
-        "iam:CreateServiceLinkedRole",
-        "iam:PassRole"
-      ]
-    },
-    "read": {
-      "permissions": [
-        "config:DescribeConformancePacks"
-      ]
-    },
-    "update": {
-      "permissions": [
-        "config:PutConformancePack",
-        "config:DescribeConformancePackStatus",
-        "s3:GetObject",
-        "s3:GetBucketAcl",
-        "iam:CreateServiceLinkedRole",
-        "iam:PassRole"
-      ]
-    },
-    "delete": {
-      "permissions": [
-        "config:DeleteConformancePack",
-        "config:DescribeConformancePackStatus"
-      ]
-    },
-    "list": {
-      "permissions": [
-        "config:DescribeConformancePacks"
-      ]
+  "attributes": {
+    "ConformancePackArn": {
+      "description": "Amazon Resource Name (ARN) of the conformance pack.",
+      "type": "string",
+      "markdownDescription": "Amazon Resource Name (ARN) of the conformance pack.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     }
-  },
-  "attributes": {}
+  }
 }

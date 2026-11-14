@@ -1,0 +1,432 @@
+{
+  "typeName": "AWS::StorageGateway::SMBFileShare",
+  "replacementStrategy": "delete_then_create",
+  "description": "Resource Type definition for AWS::StorageGateway::SMBFileShare. An SMB file share exposes an Amazon S3 bucket through a Storage Gateway file gateway, so clients read and write objects as files over SMB. The share's variant is fixed by its resource type rather than by a property: the service constructs the two variants with different APIs, and a property carrying the choice would belong to neither API's input.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-storagegateway",
+  "definitions": {
+    "NFSFileShareDefaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Default values for the file and directory permissions of an NFS share.",
+      "properties": {
+        "FileMode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4,
+          "description": "The Unix file mode in the form nnnn.",
+          "markdownDescription": "The Unix file mode in the form nnnn.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 4  \nPattern: ^[0-7]{4}$  \nUpdate requires: No interruption\n"
+        },
+        "DirectoryMode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4,
+          "description": "The Unix directory mode in the form nnnn.",
+          "markdownDescription": "The Unix directory mode in the form nnnn.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 4  \nPattern: ^[0-7]{4}$  \nUpdate requires: No interruption\n"
+        },
+        "GroupId": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967294,
+          "description": "The default group ID for files in the file share.",
+          "markdownDescription": "The default group ID for files in the file share.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "OwnerId": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967294,
+          "description": "The default owner ID for files in the file share.",
+          "markdownDescription": "The default owner ID for files in the file share.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Default values for the file and directory permissions of an NFS share.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CacheAttributes": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Refresh cache information for the file share. Removing this property from a template leaves the share's current value: the service documents no value that resets it.",
+      "properties": {
+        "CacheStaleTimeoutInSeconds": {
+          "type": "integer",
+          "description": "How long the directory contents cached by the gateway are considered valid.",
+          "markdownDescription": "How long the directory contents cached by the gateway are considered valid.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Refresh cache information for the file share. Removing this property from a template leaves the share's current value: the service documents no value that resets it.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "A key-value pair assigned to the file share.",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "A key-value pair assigned to the file share.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "GatewayARN": {
+      "type": "string",
+      "minLength": 50,
+      "maxLength": 500,
+      "description": "The ARN of the S3 File Gateway that hosts the share.",
+      "markdownDescription": "The ARN of the S3 File Gateway that hosts the share.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 50  \nMaximum Length: 500  \nPattern: ^arn:[a-z0-9-]+:storagegateway:[a-z0-9-]+:[0-9]{12}:gateway/.+$  \nUpdate requires: Replacement\n"
+    },
+    "Role": {
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 2048,
+      "description": "The ARN of the IAM role the gateway assumes when it accesses the S3 location.",
+      "markdownDescription": "The ARN of the IAM role the gateway assumes when it accesses the S3 location.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:(aws(|-cn|-us-gov|-iso[A-Za-z0-9_-]*|-eusc)):iam::([0-9]+):role/(\\S+)$  \nUpdate requires: Replacement\n"
+    },
+    "LocationARN": {
+      "type": "string",
+      "minLength": 16,
+      "maxLength": 1400,
+      "description": "The ARN of the S3 bucket, or bucket prefix, the share exposes.",
+      "markdownDescription": "The ARN of the S3 bucket, or bucket prefix, the share exposes.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 16  \nMaximum Length: 1400  \nPattern: ^(arn:[a-z0-9-]+:s3:[a-z0-9-]*:[0-9]*:.+|[0-9a-zA-Z][0-9a-zA-Z.\\-]{1,61}-s3alias)$  \nUpdate requires: Replacement\n"
+    },
+    "BucketRegion": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 25,
+      "description": "The Region of the S3 bucket, required when the bucket is reached through a VPC endpoint.",
+      "markdownDescription": "The Region of the S3 bucket, required when the bucket is reached through a VPC endpoint.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 25  \nUpdate requires: Replacement\n"
+    },
+    "VPCEndpointDNSName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "description": "The DNS name of the S3 VPC endpoint the gateway uses to reach the bucket.",
+      "markdownDescription": "The DNS name of the S3 VPC endpoint the gateway uses to reach the bucket.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^(([a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9\\-]*[A-Za-z0-9])$  \nUpdate requires: Replacement\n"
+    },
+    "EncryptionType": {
+      "type": "string",
+      "enum": [
+        "SseS3",
+        "SseKms",
+        "DsseKms"
+      ],
+      "description": "The server-side encryption the gateway applies to objects it writes.",
+      "markdownDescription": "The server-side encryption the gateway applies to objects it writes.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SseS3 | SseKms | DsseKms  \nUpdate requires: No interruption\n"
+    },
+    "KMSEncrypted": {
+      "type": "boolean",
+      "description": "Deprecated by the service in favour of EncryptionType; true selects KMS encryption. Retained because it remains readable and settable.",
+      "markdownDescription": "Deprecated by the service in favour of EncryptionType; true selects KMS encryption. Retained because it remains readable and settable.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+    },
+    "KMSKey": {
+      "type": "string",
+      "minLength": 7,
+      "maxLength": 2048,
+      "description": "The KMS key used for encryption, when EncryptionType selects KMS. Removing this property from a template leaves the share's current value: the service documents no value that resets it.",
+      "markdownDescription": "The KMS key used for encryption, when EncryptionType selects KMS. Removing this property from a template leaves the share's current value: the service documents no value that resets it.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 7  \nMaximum Length: 2048  \nPattern: ^(^arn:(aws(|-cn|-us-gov|-iso[A-Za-z0-9_-]*|-eusc)):kms:([a-zA-Z0-9-]+):([0-9]+):(key|alias)/(\\S+)$)|(^alias/(\\S+)$)$  \nUpdate requires: No interruption\n"
+    },
+    "DefaultStorageClass": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 50,
+      "description": "The S3 storage class for new objects. The service accepts S3_STANDARD, S3_INTELLIGENT_TIERING, S3_STANDARD_IA and S3_ONEZONE_IA; it is a length-bounded string in the API model rather than an enumeration.",
+      "markdownDescription": "The S3 storage class for new objects. The service accepts S3_STANDARD, S3_INTELLIGENT_TIERING, S3_STANDARD_IA and S3_ONEZONE_IA; it is a length-bounded string in the API model rather than an enumeration.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 5  \nMaximum Length: 50  \nUpdate requires: No interruption\n"
+    },
+    "ObjectACL": {
+      "type": "string",
+      "enum": [
+        "private",
+        "public-read",
+        "public-read-write",
+        "authenticated-read",
+        "bucket-owner-read",
+        "bucket-owner-full-control",
+        "aws-exec-read"
+      ],
+      "description": "The canned S3 ACL applied to objects the gateway writes.",
+      "markdownDescription": "The canned S3 ACL applied to objects the gateway writes.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: private | public-read | public-read-write | authenticated-read | bucket-owner-read | bucket-owner-full-control | aws-exec-read  \nUpdate requires: No interruption\n"
+    },
+    "ReadOnly": {
+      "type": "boolean",
+      "description": "Whether clients may write to the share.",
+      "markdownDescription": "Whether clients may write to the share.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+    },
+    "GuessMIMETypeEnabled": {
+      "type": "boolean",
+      "description": "Whether the gateway infers the MIME type of uploaded objects from their extension.",
+      "markdownDescription": "Whether the gateway infers the MIME type of uploaded objects from their extension.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+    },
+    "RequesterPays": {
+      "type": "boolean",
+      "description": "Whether the bucket is a Requester Pays bucket.",
+      "markdownDescription": "Whether the bucket is a Requester Pays bucket.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+    },
+    "FileShareName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "description": "The name of the file share, which defaults to the bucket name when omitted. Removing this property from a template leaves the share's current value: the service documents no value that resets it.",
+      "markdownDescription": "The name of the file share, which defaults to the bucket name when omitted. Removing this property from a template leaves the share's current value: the service documents no value that resets it.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+    },
+    "CacheAttributes": {
+      "$ref": "#/definitions/CacheAttributes"
+    },
+    "NotificationPolicy": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 100,
+      "description": "The upload-notification settling period, as a JSON document.",
+      "markdownDescription": "The upload-notification settling period, as a JSON document.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 2  \nMaximum Length: 100  \nPattern: ^\\{[\\w\\s:\\{\\}\\[\\]\\\"]*}$  \nUpdate requires: No interruption\n"
+    },
+    "AuditDestinationARN": {
+      "type": "string",
+      "minLength": 0,
+      "maxLength": 1024,
+      "description": "The ARN of the CloudWatch log group that receives the share's audit logs. Removing this property from a template detaches audit logging: the update sends the empty string, which the service treats as the reset.",
+      "markdownDescription": "The ARN of the CloudWatch log group that receives the share's audit logs. Removing this property from a template detaches audit logging: the update sends the empty string, which the service treats as the reset.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nPattern: ^$|^arn:[a-z0-9-]+:logs:[a-z0-9-]+:[0-9]{12}:log-group:.+$  \nUpdate requires: No interruption\n"
+    },
+    "Tags": {
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "description": "Tags assigned to the file share.",
+      "markdownDescription": "Tags assigned to the file share.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "SMBACLEnabled": {
+      "type": "boolean",
+      "description": "Whether the SMB share uses Windows ACLs rather than POSIX permissions.",
+      "markdownDescription": "Whether the SMB share uses Windows ACLs rather than POSIX permissions.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+    },
+    "AccessBasedEnumeration": {
+      "type": "boolean",
+      "description": "Whether clients see only the files and folders they may access.",
+      "markdownDescription": "Whether clients see only the files and folders they may access.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+    },
+    "AdminUserList": {
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "minItems": 0,
+      "maxItems": 100,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 64,
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nUpdate requires: No interruption\n"
+      },
+      "description": "Users and groups granted administrative privileges on the SMB share.",
+      "markdownDescription": "Users and groups granted administrative privileges on the SMB share.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "ValidUserList": {
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "minItems": 0,
+      "maxItems": 100,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 64,
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nUpdate requires: No interruption\n"
+      },
+      "description": "Users and groups permitted to access the SMB share.",
+      "markdownDescription": "Users and groups permitted to access the SMB share.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "InvalidUserList": {
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "minItems": 0,
+      "maxItems": 100,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 64,
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nUpdate requires: No interruption\n"
+      },
+      "description": "Users and groups denied access to the SMB share.",
+      "markdownDescription": "Users and groups denied access to the SMB share.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "Authentication": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 15,
+      "description": "The authentication the SMB share uses. The service accepts ActiveDirectory and GuestAccess; it is a length-bounded string in the API model rather than an enumeration.",
+      "markdownDescription": "The authentication the SMB share uses. The service accepts ActiveDirectory and GuestAccess; it is a length-bounded string in the API model rather than an enumeration.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 5  \nMaximum Length: 15  \nUpdate requires: Replacement\n"
+    },
+    "CaseSensitivity": {
+      "type": "string",
+      "enum": [
+        "ClientSpecified",
+        "CaseSensitive"
+      ],
+      "description": "Whether the SMB share is case sensitive or defers to the client.",
+      "markdownDescription": "Whether the SMB share is case sensitive or defers to the client.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ClientSpecified | CaseSensitive  \nUpdate requires: No interruption\n"
+    },
+    "OplocksEnabled": {
+      "type": "boolean",
+      "description": "Whether the SMB share grants opportunistic locks. Removing this property from a template leaves the live value unchanged rather than restoring the created default, because that default depends on the gateway's software version -- opportunistic locking is enabled by default only on appliances at 1.19.0.0 or above -- and the version is not part of this resource. Set the value explicitly rather than relying on removal.",
+      "markdownDescription": "Whether the SMB share grants opportunistic locks. Removing this property from a template leaves the live value unchanged rather than restoring the created default, because that default depends on the gateway's software version -- opportunistic locking is enabled by default only on appliances at 1.19.0.0 or above -- and the version is not part of this resource. Set the value explicitly rather than relying on removal.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+    },
+    "FileShareARN": {
+      "type": "string",
+      "minLength": 50,
+      "maxLength": 500,
+      "description": "The ARN of the file share.",
+      "markdownDescription": "The ARN of the file share.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 50  \nMaximum Length: 500  \nPattern: ^arn:[a-z0-9-]+:storagegateway:[a-z0-9-]+:[0-9]{12}:share/.+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "FileShareId": {
+      "type": "string",
+      "minLength": 12,
+      "maxLength": 30,
+      "description": "The ID of the file share.",
+      "markdownDescription": "The ID of the file share.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 12  \nMaximum Length: 30  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "FileShareStatus": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 50,
+      "description": "The status of the file share. The service reports CREATING, UPDATING, AVAILABLE, DELETING and FORCE_DELETING; it is a length-bounded string in the API model rather than an enumeration.",
+      "markdownDescription": "The status of the file share. The service reports CREATING, UPDATING, AVAILABLE, DELETING and FORCE_DELETING; it is a length-bounded string in the API model rather than an enumeration.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 50  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Path": {
+      "type": "string",
+      "description": "The export path the share is mounted or mapped at.",
+      "markdownDescription": "The export path the share is mounted or mapped at.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "GatewayARN",
+    "Role",
+    "LocationARN"
+  ],
+  "createOnlyProperties": [
+    "/properties/GatewayARN",
+    "/properties/Role",
+    "/properties/LocationARN",
+    "/properties/BucketRegion",
+    "/properties/VPCEndpointDNSName",
+    "/properties/Authentication"
+  ],
+  "readOnlyProperties": [
+    "/properties/FileShareARN",
+    "/properties/FileShareId",
+    "/properties/FileShareStatus",
+    "/properties/Path"
+  ],
+  "primaryIdentifier": [
+    "/properties/FileShareARN"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/FileShareId"
+    ]
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "storagegateway:AddTagsToResource",
+      "storagegateway:RemoveTagsFromResource",
+      "storagegateway:ListTagsForResource"
+    ]
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "iam:PassRole",
+        "logs:CreateLogDelivery",
+        "logs:DeleteLogDelivery",
+        "logs:GetLogDelivery",
+        "logs:ListLogDeliveries",
+        "logs:UpdateLogDelivery",
+        "storagegateway:AddTagsToResource",
+        "storagegateway:CreateSMBFileShare",
+        "storagegateway:DescribeSMBFileShares"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "storagegateway:DescribeSMBFileShares",
+        "storagegateway:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "logs:CreateLogDelivery",
+        "logs:DeleteLogDelivery",
+        "logs:GetLogDelivery",
+        "logs:ListLogDeliveries",
+        "logs:UpdateLogDelivery",
+        "storagegateway:AddTagsToResource",
+        "storagegateway:DescribeSMBFileShares",
+        "storagegateway:ListTagsForResource",
+        "storagegateway:RemoveTagsFromResource",
+        "storagegateway:UpdateSMBFileShare"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "logs:CreateLogDelivery",
+        "logs:DeleteLogDelivery",
+        "logs:GetLogDelivery",
+        "logs:ListLogDeliveries",
+        "logs:UpdateLogDelivery",
+        "storagegateway:DeleteFileShare",
+        "storagegateway:DescribeSMBFileShares",
+        "storagegateway:ListTagsForResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "storagegateway:ListFileShares"
+      ]
+    }
+  },
+  "attributes": {
+    "FileShareARN": {
+      "type": "string",
+      "minLength": 50,
+      "maxLength": 500,
+      "description": "The ARN of the file share.",
+      "markdownDescription": "The ARN of the file share.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 50  \nMaximum Length: 500  \nPattern: ^arn:[a-z0-9-]+:storagegateway:[a-z0-9-]+:[0-9]{12}:share/.+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "FileShareId": {
+      "type": "string",
+      "minLength": 12,
+      "maxLength": 30,
+      "description": "The ID of the file share.",
+      "markdownDescription": "The ID of the file share.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 12  \nMaximum Length: 30  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "FileShareStatus": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 50,
+      "description": "The status of the file share. The service reports CREATING, UPDATING, AVAILABLE, DELETING and FORCE_DELETING; it is a length-bounded string in the API model rather than an enumeration.",
+      "markdownDescription": "The status of the file share. The service reports CREATING, UPDATING, AVAILABLE, DELETING and FORCE_DELETING; it is a length-bounded string in the API model rather than an enumeration.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 50  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Path": {
+      "type": "string",
+      "description": "The export path the share is mounted or mapped at.",
+      "markdownDescription": "The export path the share is mounted or mapped at.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}
