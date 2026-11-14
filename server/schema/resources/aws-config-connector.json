@@ -39,17 +39,34 @@
   },
   "definitions": {
     "ConnectorConfiguration": {
-      "description": "The configuration for the connector. Specify the third-party cloud provider configuration.",
+      "description": "The configuration for the connector. Specify exactly one third-party cloud provider configuration: Azure or Gcp.",
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "Azure": {
           "description": "The configuration for connecting to Microsoft Azure.",
           "$ref": "#/definitions/AzureConnectorConfiguration",
-          "markdownDescription": "The configuration for connecting to Microsoft Azure.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+          "markdownDescription": "The configuration for connecting to Microsoft Azure.\n\n---\n\nRequired: Conditional  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "Gcp": {
+          "description": "The configuration for connecting to Google Cloud.",
+          "$ref": "#/definitions/GcpConnectorConfiguration",
+          "markdownDescription": "The configuration for connecting to Google Cloud.\n\n---\n\nRequired: Conditional  \nType:   \nUpdate requires: No interruption\n"
         }
       },
-      "markdownDescription": "The configuration for the connector. Specify the third-party cloud provider configuration.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "oneOf": [
+        {
+          "required": [
+            "Azure"
+          ]
+        },
+        {
+          "required": [
+            "Gcp"
+          ]
+        }
+      ],
+      "markdownDescription": "The configuration for the connector. Specify exactly one third-party cloud provider configuration: Azure or Gcp.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "AzureConnectorConfiguration": {
       "description": "Configuration for connecting to Microsoft Azure.",
@@ -76,6 +93,39 @@
         "ClientIdentifier"
       ],
       "markdownDescription": "Configuration for connecting to Microsoft Azure.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "GcpConnectorConfiguration": {
+      "description": "Configuration for connecting to Google Cloud.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "GcpOrganizationId": {
+          "description": "The ID of the Google Cloud organization that contains the connector's management project, which is the project of the service account in ServiceAccountEmail. Required if the management project belongs to an organization. A connector needs an organization ID to record an entire organization or more than one project. Omit it only if the management project doesn't belong to an organization. In that case, the connector can record only the management project.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20,
+          "markdownDescription": "The ID of the Google Cloud organization that contains the connector's management project, which is the project of the service account in ServiceAccountEmail. Required if the management project belongs to an organization. A connector needs an organization ID to record an entire organization or more than one project. Omit it only if the management project doesn't belong to an organization. In that case, the connector can record only the management project.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 20  \nUpdate requires: No interruption\n"
+        },
+        "ServiceAccountEmail": {
+          "description": "The email address of the Google Cloud service account that AWS Config uses.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "markdownDescription": "The email address of the Google Cloud service account that AWS Config uses.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^[a-z][a-z0-9\\-]*@[a-z][a-z0-9\\-]*[a-z0-9]\\.iam\\.gserviceaccount\\.com$  \nUpdate requires: No interruption\n"
+        },
+        "WorkloadIdentityPoolProvider": {
+          "description": "The full resource name of the workload identity pool provider that AWS Config uses to federate into Google Cloud.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "markdownDescription": "The full resource name of the workload identity pool provider that AWS Config uses to federate into Google Cloud.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^projects/[0-9]+/locations/global/workloadIdentityPools/[^/]+/providers/[^/]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ServiceAccountEmail",
+        "WorkloadIdentityPoolProvider"
+      ],
+      "markdownDescription": "Configuration for connecting to Google Cloud.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Tag": {
       "description": "A key-value pair to associate with a resource.",

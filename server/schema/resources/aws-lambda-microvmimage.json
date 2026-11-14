@@ -111,6 +111,13 @@
       "maxItems": 50,
       "markdownDescription": "Environment variables to set in the container during the snapshot build.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
     },
+    "KmsKeyIdentifier": {
+      "description": "The customer managed KMS key used to encrypt the MicroVM image configuration at rest. When omitted, a service owned key is used.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048,
+      "markdownDescription": "The customer managed KMS key used to encrypt the MicroVM image configuration at rest. When omitted, a service owned key is used.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^(arn:aws[a-z-]*:kms:[a-z0-9-]+:[0-9]{12}:(key|alias)/[a-zA-Z0-9:/_-]+|alias/[a-zA-Z0-9:/_-]+|[a-zA-Z0-9-]+)$  \nUpdate requires: No interruption\n"
+    },
     "Tags": {
       "description": "Key-value pairs to associate with the MicroVM image for organization and management.",
       "type": "array",
@@ -199,9 +206,10 @@
         "Architecture": {
           "type": "string",
           "enum": [
-            "ARM_64"
+            "ARM_64",
+            "X86_64"
           ],
-          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: ARM_64  \nUpdate requires: No interruption\n"
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: ARM_64 | X86_64  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
@@ -413,7 +421,8 @@
     "/properties/Resources",
     "/properties/AdditionalOsCapabilities",
     "/properties/Hooks",
-    "/properties/EnvironmentVariables"
+    "/properties/EnvironmentVariables",
+    "/properties/KmsKeyIdentifier"
   ],
   "required": [
     "Name",
@@ -464,7 +473,9 @@
         "lambda:UntagResource",
         "lambda:UntagResource20170331v2",
         "lambda:PassNetworkConnector",
-        "iam:PassRole"
+        "iam:PassRole",
+        "lambda:DeleteMicrovmImageVersion",
+        "lambda:GetMicrovmImageVersion"
       ]
     },
     "read": {

@@ -35,6 +35,26 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: TS | CMAF | ISM  \nUpdate requires: No interruption\n"
     },
+    "ContentKeyPeriodConfiguration": {
+      "type": "object",
+      "description": "<p>The configuration that controls the content key period timing information that MediaPackage signals to your DRM key provider.</p>",
+      "properties": {
+        "ContentKeyPeriodTiming": {
+          "$ref": "#/definitions/ContentKeyPeriodTiming"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "<p>The configuration that controls the content key period timing information that MediaPackage signals to your DRM key provider.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ContentKeyPeriodTiming": {
+      "type": "string",
+      "enum": [
+        "INDEX_ONLY",
+        "START_END_ONLY",
+        "INDEX_WITH_START_END"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: INDEX_ONLY | START_END_ONLY | INDEX_WITH_START_END  \nUpdate requires: No interruption\n"
+    },
     "CustomAdType": {
       "type": "string",
       "enum": [
@@ -46,7 +66,16 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PROGRAM | CHAPTER | UNSCHEDULED_EVENT | ALTERNATE_CONTENT_OPPORTUNITY | NETWORK  \nUpdate requires: No interruption\n"
     },
+    "DashAudioTimelinePattern": {
+      "type": "string",
+      "enum": [
+        "NONE",
+        "PATTERNED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: NONE | PATTERNED  \nUpdate requires: No interruption\n"
+    },
     "DashAvailabilityStartTimeConfiguration": {
+      "description": "<p>The configuration for the DASH <code>availabilityStartTime</code> attribute of the Media Presentation Description (MPD). Use this configuration to set a custom availability start time for your DASH manifest.</p>",
       "oneOf": [
         {
           "type": "object",
@@ -54,6 +83,7 @@
           "properties": {
             "FixedAvailabilityStartTime": {
               "type": "string",
+              "description": "<p>The fixed availability start time for the DASH manifest, in ISO 8601 date-time format. The value must have hourly granularity, meaning that the minutes, seconds, and fractional seconds must be zero. The value must be on or after <code>2024-01-01T00:00:00Z</code> and must be at least 14 days before the current time.</p>",
               "format": "date-time"
             }
           },
@@ -62,7 +92,8 @@
           ],
           "additionalProperties": false
         }
-      ]
+      ],
+      "markdownDescription": "<p>The configuration for the DASH <code>availabilityStartTime</code> attribute of the Media Presentation Description (MPD). Use this configuration to set a custom availability start time for your DASH manifest.</p>\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
     },
     "DashBaseUrl": {
       "type": "object",
@@ -110,14 +141,6 @@
         "NONE"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: STANDARD | NONE  \nUpdate requires: No interruption\n"
-    },
-    "DashAudioTimelinePattern": {
-      "type": "string",
-      "enum": [
-        "NONE",
-        "PATTERNED"
-      ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: NONE | PATTERNED  \nUpdate requires: No interruption\n"
     },
     "DashDrmSignaling": {
       "type": "string",
@@ -466,6 +489,9 @@
           "description": "<p>Optionally specify the clip start time for all of your manifest egress requests. When you include clip start time, note that you cannot use clip start time query parameters for this manifest's endpoint URL.</p>",
           "format": "date-time",
           "markdownDescription": "<p>Optionally specify the clip start time for all of your manifest egress requests. When you include clip start time, note that you cannot use clip start time query parameters for this manifest's endpoint URL.</p>\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Multiview": {
+          "$ref": "#/definitions/MultiviewFilterConfiguration"
         }
       },
       "additionalProperties": false,
@@ -685,7 +711,7 @@
           "$ref": "#/definitions/ScteHls"
         },
         "FilterConfiguration": {
-          "$ref": "#/definitions/FilterConfiguration"
+          "$ref": "#/definitions/LowLatencyHlsFilterConfiguration"
         },
         "StartTag": {
           "$ref": "#/definitions/StartTag"
@@ -717,7 +743,7 @@
           "markdownDescription": "<p>The name of the MSS manifest. This name is appended to the origin endpoint URL to create the unique path for accessing this specific MSS manifest.</p>\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^[a-zA-Z0-9-]+$  \nUpdate requires: No interruption\n"
         },
         "FilterConfiguration": {
-          "$ref": "#/definitions/FilterConfiguration"
+          "$ref": "#/definitions/MssFilterConfiguration"
         },
         "ManifestWindowSeconds": {
           "type": "integer",
@@ -748,6 +774,55 @@
         "COMPACT"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: FULL | COMPACT  \nUpdate requires: No interruption\n"
+    },
+    "MultiviewFilterConfiguration": {
+      "type": "object",
+      "description": "<p>The multiview combination for a pinned manifest. MediaPackage serves the manifest with this layout and these sources, so players request it without an <code>aws.multiview</code> query parameter.</p> <p>If a request for a pinned manifest also includes an <code>aws.multiview</code> query parameter, MediaPackage rejects the request, even when that parameter requests the same combination.</p>",
+      "properties": {
+        "Layout": {
+          "$ref": "#/definitions/MultiviewLayoutType"
+        },
+        "Sources": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^[a-zA-Z0-9_-]+$  \nUpdate requires: No interruption\n"
+          },
+          "maxItems": 50,
+          "minItems": 1,
+          "description": "<p>The source channels to composite, in tile order. Each channel must be one of the <code>AvailableSources</code> of the channel that this origin endpoint is on, and the number of channels must equal the number of tiles in <code>Layout</code>.</p>",
+          "markdownDescription": "<p>The source channels to composite, in tile order. Each channel must be one of the <code>AvailableSources</code> of the channel that this origin endpoint is on, and the number of channels must equal the number of tiles in <code>Layout</code>.</p>\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Layout",
+        "Sources"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "<p>The multiview combination for a pinned manifest. MediaPackage serves the manifest with this layout and these sources, so players request it without an <code>aws.multiview</code> query parameter.</p> <p>If a request for a pinned manifest also includes an <code>aws.multiview</code> query parameter, MediaPackage rejects the request, even when that parameter requests the same combination.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "MultiviewLayoutType": {
+      "type": "string",
+      "description": "<p>A tile layout for a multiview channel. Each layout determines how many source tiles are composited into the output and how those tiles are arranged.</p> <p>The allowed values are:</p> <ul> <li> <p> <code>LAYOUT_2EH</code> \u2013 Two tiles of equal size, arranged horizontally.</p> </li> <li> <p> <code>LAYOUT_2PL</code> \u2013 Two tiles, with one larger primary tile.</p> </li> <li> <p> <code>LAYOUT_3EL</code> \u2013 Three tiles of equal size, arranged in two columns.</p> </li> <li> <p> <code>LAYOUT_3PL</code> \u2013 Three tiles, with one larger primary tile on the left and two stacked on the right.</p> </li> <li> <p> <code>LAYOUT_4E</code> \u2013 Four tiles of equal size, arranged in a two-by-two grid.</p> </li> <li> <p> <code>LAYOUT_4PL</code> \u2013 Four tiles, with one larger primary tile on the left and three stacked on the right.</p> </li> </ul>",
+      "enum": [
+        "LAYOUT_2EH",
+        "LAYOUT_2PL",
+        "LAYOUT_3EL",
+        "LAYOUT_3PL",
+        "LAYOUT_4E",
+        "LAYOUT_4PL"
+      ],
+      "markdownDescription": "<p>A tile layout for a multiview channel. Each layout determines how many source tiles are composited into the output and how those tiles are arranged.</p> <p>The allowed values are:</p> <ul> <li> <p> <code>LAYOUT_2EH</code> \u2013 Two tiles of equal size, arranged horizontally.</p> </li> <li> <p> <code>LAYOUT_2PL</code> \u2013 Two tiles, with one larger primary tile.</p> </li> <li> <p> <code>LAYOUT_3EL</code> \u2013 Three tiles of equal size, arranged in two columns.</p> </li> <li> <p> <code>LAYOUT_3PL</code> \u2013 Three tiles, with one larger primary tile on the left and two stacked on the right.</p> </li> <li> <p> <code>LAYOUT_4E</code> \u2013 Four tiles of equal size, arranged in a two-by-two grid.</p> </li> <li> <p> <code>LAYOUT_4PL</code> \u2013 Four tiles, with one larger primary tile on the left and three stacked on the right.</p> </li> </ul>\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: LAYOUT_2EH | LAYOUT_2PL | LAYOUT_3EL | LAYOUT_3PL | LAYOUT_4E | LAYOUT_4PL  \nUpdate requires: No interruption\n"
+    },
+    "OutputTimestampMode": {
+      "type": "string",
+      "enum": [
+        "PASSTHROUGH",
+        "REBASED_TO_CHANNEL_START"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PASSTHROUGH | REBASED_TO_CHANNEL_START  \nUpdate requires: No interruption\n"
     },
     "PresetSpeke20Audio": {
       "type": "string",
@@ -915,6 +990,9 @@
         },
         "Encryption": {
           "$ref": "#/definitions/Encryption"
+        },
+        "OutputTimestampMode": {
+          "$ref": "#/definitions/OutputTimestampMode"
         }
       },
       "additionalProperties": false,
@@ -964,6 +1042,12 @@
           "minLength": 20,
           "description": "<p>The ARN for the certificate that you imported to Amazon Web Services Certificate Manager to add content key encryption to this endpoint. For this feature to work, your DRM key provider must support content key encryption.</p>",
           "markdownDescription": "<p>The ARN for the certificate that you imported to Amazon Web Services Certificate Manager to add content key encryption to this endpoint. For this feature to work, your DRM key provider must support content key encryption.</p>\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:([^:\\n]+):acm:([^:\\n]+):([0-9]+):certificate/[a-zA-Z0-9-_]+$  \nUpdate requires: No interruption\n"
+        },
+        "SpekeVersion": {
+          "$ref": "#/definitions/SpekeVersion"
+        },
+        "ContentKeyPeriodConfiguration": {
+          "$ref": "#/definitions/ContentKeyPeriodConfiguration"
         }
       },
       "required": [
@@ -975,6 +1059,14 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "<p>The parameters for the SPEKE key provider.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SpekeVersion": {
+      "type": "string",
+      "enum": [
+        "V2_0",
+        "V2_1"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: V2_0 | V2_1  \nUpdate requires: No interruption\n"
     },
     "StartTag": {
       "type": "object",
@@ -996,6 +1088,14 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "<p>To insert an EXT-X-START tag in your HLS playlist, specify a StartTag configuration object with a valid TimeOffset. When you do, you can also optionally specify whether to include a PRECISE value in the EXT-X-START tag.</p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "StreamNameOutputMode": {
+      "type": "string",
+      "enum": [
+        "INDEX",
+        "PASSTHROUGH_NAME"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: INDEX | PASSTHROUGH_NAME  \nUpdate requires: No interruption\n"
     },
     "TsEncryptionMethod": {
       "type": "string",
@@ -1035,6 +1135,100 @@
       },
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LowLatencyHlsFilterConfiguration": {
+      "type": "object",
+      "description": "<p>Filter configuration includes settings for manifest filtering, start and end times, and time delay that apply to all of your egress requests for this manifest. </p>",
+      "properties": {
+        "ManifestFilter": {
+          "type": "string",
+          "maxLength": 1024,
+          "minLength": 1,
+          "description": "<p>Optionally specify one or more manifest filters for all of your manifest egress requests. When you include a manifest filter, note that you cannot use an identical manifest filter query parameter for this manifest's endpoint URL.</p>",
+          "markdownDescription": "<p>Optionally specify one or more manifest filters for all of your manifest egress requests. When you include a manifest filter, note that you cannot use an identical manifest filter query parameter for this manifest's endpoint URL.</p>\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+        },
+        "DrmSettings": {
+          "type": "string",
+          "maxLength": 1024,
+          "minLength": 1,
+          "description": "<p>Optionally specify one or more DRM settings for all of your manifest egress requests. When you include a DRM setting, note that you cannot use an identical DRM setting query parameter for this manifest's endpoint URL.</p>",
+          "markdownDescription": "<p>Optionally specify one or more DRM settings for all of your manifest egress requests. When you include a DRM setting, note that you cannot use an identical DRM setting query parameter for this manifest's endpoint URL.</p>\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+        },
+        "Start": {
+          "type": "string",
+          "description": "<p>Optionally specify the start time for all of your manifest egress requests. When you include start time, note that you cannot use start time query parameters for this manifest's endpoint URL.</p>",
+          "format": "date-time",
+          "markdownDescription": "<p>Optionally specify the start time for all of your manifest egress requests. When you include start time, note that you cannot use start time query parameters for this manifest's endpoint URL.</p>\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "End": {
+          "type": "string",
+          "description": "<p>Optionally specify the end time for all of your manifest egress requests. When you include end time, note that you cannot use end time query parameters for this manifest's endpoint URL.</p>",
+          "format": "date-time",
+          "markdownDescription": "<p>Optionally specify the end time for all of your manifest egress requests. When you include end time, note that you cannot use end time query parameters for this manifest's endpoint URL.</p>\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "TimeDelaySeconds": {
+          "type": "integer",
+          "maximum": 1209600,
+          "minimum": 0,
+          "description": "<p>Optionally specify the time delay for all of your manifest egress requests. Enter a value that is smaller than your endpoint's startover window. When you include time delay, note that you cannot use time delay query parameters for this manifest's endpoint URL.</p>",
+          "markdownDescription": "<p>Optionally specify the time delay for all of your manifest egress requests. Enter a value that is smaller than your endpoint's startover window. When you include time delay, note that you cannot use time delay query parameters for this manifest's endpoint URL.</p>\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "ClipStartTime": {
+          "type": "string",
+          "description": "<p>Optionally specify the clip start time for all of your manifest egress requests. When you include clip start time, note that you cannot use clip start time query parameters for this manifest's endpoint URL.</p>",
+          "format": "date-time",
+          "markdownDescription": "<p>Optionally specify the clip start time for all of your manifest egress requests. When you include clip start time, note that you cannot use clip start time query parameters for this manifest's endpoint URL.</p>\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "<p>Filter configuration includes settings for manifest filtering, start and end times, and time delay that apply to all of your egress requests for this manifest. </p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "MssFilterConfiguration": {
+      "type": "object",
+      "description": "<p>Filter configuration includes settings for manifest filtering, start and end times, and time delay that apply to all of your egress requests for this manifest. </p>",
+      "properties": {
+        "ManifestFilter": {
+          "type": "string",
+          "maxLength": 1024,
+          "minLength": 1,
+          "description": "<p>Optionally specify one or more manifest filters for all of your manifest egress requests. When you include a manifest filter, note that you cannot use an identical manifest filter query parameter for this manifest's endpoint URL.</p>",
+          "markdownDescription": "<p>Optionally specify one or more manifest filters for all of your manifest egress requests. When you include a manifest filter, note that you cannot use an identical manifest filter query parameter for this manifest's endpoint URL.</p>\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+        },
+        "DrmSettings": {
+          "type": "string",
+          "maxLength": 1024,
+          "minLength": 1,
+          "description": "<p>Optionally specify one or more DRM settings for all of your manifest egress requests. When you include a DRM setting, note that you cannot use an identical DRM setting query parameter for this manifest's endpoint URL.</p>",
+          "markdownDescription": "<p>Optionally specify one or more DRM settings for all of your manifest egress requests. When you include a DRM setting, note that you cannot use an identical DRM setting query parameter for this manifest's endpoint URL.</p>\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+        },
+        "Start": {
+          "type": "string",
+          "description": "<p>Optionally specify the start time for all of your manifest egress requests. When you include start time, note that you cannot use start time query parameters for this manifest's endpoint URL.</p>",
+          "format": "date-time",
+          "markdownDescription": "<p>Optionally specify the start time for all of your manifest egress requests. When you include start time, note that you cannot use start time query parameters for this manifest's endpoint URL.</p>\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "End": {
+          "type": "string",
+          "description": "<p>Optionally specify the end time for all of your manifest egress requests. When you include end time, note that you cannot use end time query parameters for this manifest's endpoint URL.</p>",
+          "format": "date-time",
+          "markdownDescription": "<p>Optionally specify the end time for all of your manifest egress requests. When you include end time, note that you cannot use end time query parameters for this manifest's endpoint URL.</p>\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "TimeDelaySeconds": {
+          "type": "integer",
+          "maximum": 1209600,
+          "minimum": 0,
+          "description": "<p>Optionally specify the time delay for all of your manifest egress requests. Enter a value that is smaller than your endpoint's startover window. When you include time delay, note that you cannot use time delay query parameters for this manifest's endpoint URL.</p>",
+          "markdownDescription": "<p>Optionally specify the time delay for all of your manifest egress requests. Enter a value that is smaller than your endpoint's startover window. When you include time delay, note that you cannot use time delay query parameters for this manifest's endpoint URL.</p>\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "ClipStartTime": {
+          "type": "string",
+          "description": "<p>Optionally specify the clip start time for all of your manifest egress requests. When you include clip start time, note that you cannot use clip start time query parameters for this manifest's endpoint URL.</p>",
+          "format": "date-time",
+          "markdownDescription": "<p>Optionally specify the clip start time for all of your manifest egress requests. When you include clip start time, note that you cannot use clip start time query parameters for this manifest's endpoint URL.</p>\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "<p>Filter configuration includes settings for manifest filtering, start and end times, and time delay that apply to all of your egress requests for this manifest. </p>\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -1127,6 +1321,9 @@
       "minimum": 0,
       "description": "<p>The size of the window (in seconds) to create a window of the live stream that's available for on-demand viewing. Viewers can start-over or catch-up on content that falls within the window. The maximum startover window is 1,209,600 seconds (14 days).</p>",
       "markdownDescription": "<p>The size of the window (in seconds) to create a window of the live stream that's available for on-demand viewing. Viewers can start-over or catch-up on content that falls within the window. The maximum startover window is 1,209,600 seconds (14 days).</p>\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+    },
+    "StreamNameOutputMode": {
+      "$ref": "#/definitions/StreamNameOutputMode"
     },
     "UriSeparator": {
       "$ref": "#/definitions/UriSeparator"

@@ -203,9 +203,88 @@
             "MCPServerSigV4"
           ],
           "additionalProperties": false
+        },
+        {
+          "properties": {
+            "ReleaseManagement": {
+              "$ref": "#/definitions/ReleaseManagementConfiguration"
+            }
+          },
+          "required": [
+            "ReleaseManagement"
+          ],
+          "additionalProperties": false
         }
       ],
       "markdownDescription": "The configuration that directs how AgentSpace interacts with the given service\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ReleaseManagementConfiguration": {
+      "description": "Configuration for a release management environment. A release management environment defines how AWS DevOps Agent reaches your application, and other associations reference it to run automatic verification testing against that application.",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "The name for this release management environment",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The name for this release management environment\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[\\p{L}\\p{N}\\p{P}\\p{S}\\p{Z}]+$  \nUpdate requires: No interruption\n"
+        },
+        "NetworkAccess": {
+          "description": "Specifies how AWS DevOps Agent reaches your application using this release management environment",
+          "$ref": "#/definitions/NetworkAccessConfiguration",
+          "markdownDescription": "Specifies how AWS DevOps Agent reaches your application using this release management environment\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Name",
+        "NetworkAccess"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for a release management environment. A release management environment defines how AWS DevOps Agent reaches your application, and other associations reference it to run automatic verification testing against that application.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "NetworkAccessConfiguration": {
+      "description": "Specifies how AWS DevOps Agent reaches your application using a release management environment. Exactly one access type must be specified.",
+      "type": "object",
+      "oneOf": [
+        {
+          "properties": {
+            "PrivateAccess": {
+              "$ref": "#/definitions/PrivateNetworkAccess"
+            }
+          },
+          "required": [
+            "PrivateAccess"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "Specifies how AWS DevOps Agent reaches your application using a release management environment. Exactly one access type must be specified.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PrivateNetworkAccess": {
+      "description": "Private network access to your application inside a VPC, reached through a private connection",
+      "type": "object",
+      "properties": {
+        "PrivateConnectionName": {
+          "description": "Name of the private connection that supplies the VPC configuration for this release management environment",
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 30,
+          "markdownDescription": "Name of the private connection that supplies the VPC configuration for this release management environment\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 3  \nMaximum Length: 30  \nPattern: ^[a-z0-9]([a-z0-9-]*[a-z0-9])?$  \nUpdate requires: No interruption\n"
+        },
+        "RuntimeRoleArn": {
+          "description": "Role ARN that AWS DevOps Agent assumes at runtime to connect to your VPC",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "Role ARN that AWS DevOps Agent assumes at runtime to connect to your VPC\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^arn:(aws|aws-cn|aws-us-gov):iam::\\d{12}:role/[a-zA-Z0-9+=,.@_/-]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "PrivateConnectionName",
+        "RuntimeRoleArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Private network access to your application inside a VPC, reached through a private connection\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "SourceAwsConfiguration": {
       "description": "AWS association for 'source' account",
@@ -228,6 +307,11 @@
           "description": "Role ARN to be assumed by DevOpsAgent to operate on behalf of customer",
           "type": "string",
           "markdownDescription": "Role ARN to be assumed by DevOpsAgent to operate on behalf of customer\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "AgentElevatedRoleArn": {
+          "description": "The IAM role that AWS DevOps Agent assumes to perform elevated directed actions in this AWS account. Elevated actions also require ElevatedActionsEnabled to be set in the Preferences of the AgentSpace. When not provided, only non-elevated directed actions are available. Removing this property from the template clears the role on update. Setting this role is subject to the same iam:PassRole requirement as AssumableRoleArn.",
+          "type": "string",
+          "markdownDescription": "The IAM role that AWS DevOps Agent assumes to perform elevated directed actions in this AWS account. Elevated actions also require ElevatedActionsEnabled to be set in the Preferences of the AgentSpace. When not provided, only non-elevated directed actions are available. Removing this property from the template clears the role on update. Setting this role is subject to the same iam:PassRole requirement as AssumableRoleArn.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
         "Resources": {
           "$ref": "#/definitions/AWSResourceList"
@@ -265,6 +349,11 @@
           "description": "Role ARN to be assumed by DevOpsAgent to operate on behalf of customer",
           "type": "string",
           "markdownDescription": "Role ARN to be assumed by DevOpsAgent to operate on behalf of customer\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "AgentElevatedRoleArn": {
+          "description": "The IAM role that AWS DevOps Agent assumes to perform elevated directed actions in this AWS account. Elevated actions also require ElevatedActionsEnabled to be set in the Preferences of the AgentSpace. When not provided, only non-elevated directed actions are available. Removing this property from the template clears the role on update. Setting this role is subject to the same iam:PassRole requirement as AssumableRoleArn.",
+          "type": "string",
+          "markdownDescription": "The IAM role that AWS DevOps Agent assumes to perform elevated directed actions in this AWS account. Elevated actions also require ElevatedActionsEnabled to be set in the Preferences of the AgentSpace. When not provided, only non-elevated directed actions are available. Removing this property from the template clears the role on update. Setting this role is subject to the same iam:PassRole requirement as AssumableRoleArn.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
         "Resources": {
           "$ref": "#/definitions/AWSResourceList"
@@ -308,6 +397,13 @@
             "user"
           ],
           "markdownDescription": "Type of repository owner\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: organization | user  \nUpdate requires: No interruption\n"
+        },
+        "ReleaseManagementAssociationId": {
+          "description": "The ID of the release management association that this repository uses for automated testing",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "The ID of the release management association that this repository uses for automated testing\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
@@ -335,6 +431,9 @@
         },
         "TransmissionTarget": {
           "$ref": "#/definitions/SlackTransmissionTarget"
+        },
+        "Bidirectional": {
+          "$ref": "#/definitions/SlackBidirectionalConfiguration"
         }
       },
       "required": [
@@ -344,6 +443,29 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "Slack workspace integration configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SlackBidirectionalConfiguration": {
+      "description": "Optional bidirectional communication configuration. Supply this configuration and set Enabled to true so you can interact with the agent directly from Slack",
+      "type": "object",
+      "properties": {
+        "RoleArn": {
+          "description": "IAM role ARN that AWS DevOps Agent assumes to exchange messages with your Slack workspace on behalf of this association",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "IAM role ARN that AWS DevOps Agent assumes to exchange messages with your Slack workspace on behalf of this association\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^arn:(aws|aws-cn|aws-us-gov):iam::\\d{12}:role/[a-zA-Z0-9+=,.@_/-]+$  \nUpdate requires: No interruption\n"
+        },
+        "Enabled": {
+          "description": "Whether bidirectional communication is enabled for this association. When set to true, you can mention the agent in a configured Slack channel and it responds in that channel. When omitted or set to false, the agent ignores mentions and only sends notifications",
+          "type": "boolean",
+          "markdownDescription": "Whether bidirectional communication is enabled for this association. When set to true, you can mention the agent in a configured Slack channel and it responds in that channel. When omitted or set to false, the agent ignores mentions and only sends notifications\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "RoleArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Optional bidirectional communication configuration. Supply this configuration and set Enabled to true so you can interact with the agent directly from Slack\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "SlackTransmissionTarget": {
       "description": "Transmission targets for agent notifications",
@@ -491,6 +613,18 @@
           "type": "string",
           "markdownDescription": "The description of the MCP server\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
+        "EnabledElevatedTools": {
+          "description": "The mutative MCP tools enabled for this integration, by tool name. Only tools the service classifies as MUTATIVE may be listed; other names are rejected. Tool names can be found in the console or from the association's current configuration. The list fully replaces the stored value on update: removing a name disables that tool, and removing the property disables all elevated tools.",
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9_-]+$  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "The mutative MCP tools enabled for this integration, by tool name. Only tools the service classifies as MUTATIVE may be listed; other names are rejected. Tool names can be found in the console or from the association's current configuration. The list fully replaces the stored value on update: removing a name disables that tool, and removing the property disables all elevated tools.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
         "EnableWebhookUpdates": {
           "description": "When set to true, enables the Agent Space to create and update webhooks for receiving notifications and events from the service",
           "type": "boolean",
@@ -566,6 +700,18 @@
             "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: alerting | annotations | asserts | cloudwatch | dashboard | datasource | elasticsearch | examples | incident | loki | navigation | oncall | prometheus | pyroscope | rendering | runpanelquery | search | searchlogs | sift  \nUpdate requires: No interruption\n"
           },
           "markdownDescription": "List of tool categories to enable for the Grafana MCP server\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "EnabledElevatedTools": {
+          "description": "The mutative MCP tools enabled for this integration, by tool name. Only tools the service classifies as MUTATIVE may be listed; other names are rejected. Tool names can be found in the console or from the association's current configuration. The list fully replaces the stored value on update: removing a name disables that tool, and removing the property disables all elevated tools. Independent of Tools, which selects the toolsets available to the agent.",
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9_-]+$  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "The mutative MCP tools enabled for this integration, by tool name. Only tools the service classifies as MUTATIVE may be listed; other names are rejected. Tool names can be found in the console or from the association's current configuration. The list fully replaces the stored value on update: removing a name disables that tool, and removing the property disables all elevated tools. Independent of Tools, which selects the toolsets available to the agent.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         },
         "EnableWebhookUpdates": {
           "description": "When set to true, enables the Agent Space to create and update webhooks for receiving notifications and events from the service",
@@ -674,6 +820,13 @@
           "description": "When set to true, enables the Agent Space to create and update webhooks for receiving notifications and events from the service",
           "type": "boolean",
           "markdownDescription": "When set to true, enables the Agent Space to create and update webhooks for receiving notifications and events from the service\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "ReleaseManagementAssociationId": {
+          "description": "The ID of the release management association that this project uses for automated testing",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "The ID of the release management association that this project uses for automated testing\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
         }
       },
       "required": [
@@ -785,6 +938,118 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "SigV4-authenticated MCP server configuration\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Capabilities": {
+      "description": "Automated AWS DevOps Agent capabilities for the repository in this association. Code change risk analysis analyzes pull requests and merge requests for deployment risk, and automated testing extends that analysis by running tests against the change. Capabilities are supported for GitHub and GitLab associations. When this property is set, it fully defines both capabilities below: a capability omitted here is removed from the association. Removing this property from a template that previously set it disables both capabilities. Capabilities configured outside CloudFormation are left unchanged only while this property has never been set. On rollback, both capabilities are restored to the previous template's values, not to settings made outside CloudFormation. Other capabilities on the association are not affected. Updates read and rewrite the association's full capability set, so a capability change made outside CloudFormation while a stack update is in progress may be overwritten.",
+      "type": "object",
+      "properties": {
+        "CodeChangeRiskAnalysis": {
+          "description": "Configuration for code change risk analysis, in which AWS DevOps Agent automatically analyzes pull requests and merge requests for deployment risk.",
+          "$ref": "#/definitions/CapabilityConfiguration",
+          "markdownDescription": "Configuration for code change risk analysis, in which AWS DevOps Agent automatically analyzes pull requests and merge requests for deployment risk.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "CodeChangeRiskAnalysisAutomatedTesting": {
+          "description": "Configuration for code change risk analysis automated testing, in which AWS DevOps Agent also runs tests against the change during the analysis.",
+          "$ref": "#/definitions/AutomatedTestingCapabilityConfiguration",
+          "markdownDescription": "Configuration for code change risk analysis automated testing, in which AWS DevOps Agent also runs tests against the change during the analysis.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "minProperties": 1,
+      "additionalProperties": false,
+      "markdownDescription": "Automated AWS DevOps Agent capabilities for the repository in this association. Code change risk analysis analyzes pull requests and merge requests for deployment risk, and automated testing extends that analysis by running tests against the change. Capabilities are supported for GitHub and GitLab associations. When this property is set, it fully defines both capabilities below: a capability omitted here is removed from the association. Removing this property from a template that previously set it disables both capabilities. Capabilities configured outside CloudFormation are left unchanged only while this property has never been set. On rollback, both capabilities are restored to the previous template's values, not to settings made outside CloudFormation. Other capabilities on the association are not affected. Updates read and rewrite the association's full capability set, so a capability change made outside CloudFormation while a stack update is in progress may be overwritten.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AutomatedTestingCapabilityConfiguration": {
+      "description": "Configuration of the code change risk analysis automated testing capability. This capability does not support trigger filter groups.",
+      "type": "object",
+      "properties": {
+        "Enabled": {
+          "description": "Whether the capability is enabled for this association",
+          "type": "boolean",
+          "markdownDescription": "Whether the capability is enabled for this association\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Configuration of the code change risk analysis automated testing capability. This capability does not support trigger filter groups.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CapabilityConfiguration": {
+      "description": "Configuration of a single capability",
+      "type": "object",
+      "properties": {
+        "Enabled": {
+          "description": "Whether the capability is enabled for this association",
+          "type": "boolean",
+          "markdownDescription": "Whether the capability is enabled for this association\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "TriggerFilterGroups": {
+          "description": "Filter groups controlling when the capability triggers automatically. The capability triggers when any group matches. When omitted, all applicable events trigger the capability. Retained while the capability is disabled.",
+          "type": "array",
+          "insertionOrder": false,
+          "minItems": 1,
+          "maxItems": 5,
+          "items": {
+            "$ref": "#/definitions/TriggerFilterGroup"
+          },
+          "markdownDescription": "Filter groups controlling when the capability triggers automatically. The capability triggers when any group matches. When omitted, all applicable events trigger the capability. Retained while the capability is disabled.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Configuration of a single capability\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "TriggerFilterGroup": {
+      "description": "A group of trigger conditions. The group matches when all present conditions pass. At least one condition must be present.",
+      "type": "object",
+      "properties": {
+        "Events": {
+          "description": "Passes when the webhook event is one of the listed events",
+          "type": "array",
+          "insertionOrder": false,
+          "uniqueItems": true,
+          "minItems": 1,
+          "maxItems": 10,
+          "items": {
+            "type": "string",
+            "enum": [
+              "PULL_REQUEST_READY_FOR_REVIEW",
+              "PULL_REQUEST_DRAFT"
+            ],
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PULL_REQUEST_READY_FOR_REVIEW | PULL_REQUEST_DRAFT  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "Passes when the webhook event is one of the listed events\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "TargetBranches": {
+          "description": "Passes when the change request target branch matches",
+          "$ref": "#/definitions/PatternFilter",
+          "markdownDescription": "Passes when the change request target branch matches\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "minProperties": 1,
+      "additionalProperties": false,
+      "markdownDescription": "A group of trigger conditions. The group matches when all present conditions pass. At least one condition must be present.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PatternFilter": {
+      "description": "A regex-based match condition. Passes when the value matches any pattern.",
+      "type": "object",
+      "properties": {
+        "Patterns": {
+          "description": "Anchored full-match regex patterns, for example 'main' or 'release/.*'",
+          "type": "array",
+          "insertionOrder": false,
+          "minItems": 1,
+          "maxItems": 20,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^[^\\x00-\\x1F\\x7F-\\x9F]+$  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "Anchored full-match regex patterns, for example 'main' or 'release/.*'\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Patterns"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A regex-based match condition. Passes when the value matches any pattern.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -807,6 +1072,11 @@
       "description": "The configuration that directs how AgentSpace interacts with the given service",
       "$ref": "#/definitions/ServiceConfiguration",
       "markdownDescription": "The configuration that directs how AgentSpace interacts with the given service\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "Capabilities": {
+      "description": "Automated AWS DevOps Agent capabilities enabled for this association, such as code change risk analysis",
+      "$ref": "#/definitions/Capabilities",
+      "markdownDescription": "Automated AWS DevOps Agent capabilities enabled for this association, such as code change risk analysis\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
     },
     "CreatedAt": {
       "description": "The timestamp when the association was created",

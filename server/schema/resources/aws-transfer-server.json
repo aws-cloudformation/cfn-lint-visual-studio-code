@@ -9,6 +9,14 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: HTTP  \nUpdate requires: No interruption\n"
     },
+    "CommunicationMode": {
+      "type": "string",
+      "enum": [
+        "CLIENT_TALK_FIRST",
+        "SERVER_TALK_FIRST"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CLIENT_TALK_FIRST | SERVER_TALK_FIRST  \nUpdate requires: No interruption\n"
+    },
     "DirectoryListingOptimization": {
       "type": "string",
       "description": "Indicates whether optimization to directory listing on S3 servers is used. Disabled by default for compatibility.",
@@ -143,6 +151,24 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SFTP | FTP | FTPS | AS2  \nUpdate requires: No interruption\n"
     },
+    "ProxyMode": {
+      "type": "string",
+      "enum": [
+        "PROXY_PROTOCOL_V2_ENFORCED",
+        "NONE"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PROXY_PROTOCOL_V2_ENFORCED | NONE  \nUpdate requires: No interruption\n"
+    },
+    "ProxyConfig": {
+      "type": "object",
+      "properties": {
+        "SftpMode": {
+          "$ref": "#/definitions/ProxyMode"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "ProtocolDetails": {
       "type": "object",
       "properties": {
@@ -167,10 +193,23 @@
           "maxItems": 1,
           "minItems": 1,
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "ProxyConfig": {
+          "$ref": "#/definitions/ProxyConfig"
+        },
+        "SftpPorts": {
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/SftpPortWithOptions"
+          },
+          "maxItems": 3,
+          "minItems": 1,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         }
       },
       "additionalProperties": false,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: Some interruptions\n"
     },
     "S3StorageOptions": {
       "type": "object",
@@ -199,6 +238,25 @@
         "PUBLIC_KEY_AND_PASSWORD"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PASSWORD | PUBLIC_KEY | PUBLIC_KEY_OR_PASSWORD | PUBLIC_KEY_AND_PASSWORD  \nUpdate requires: No interruption\n"
+    },
+    "SftpPortWithOptions": {
+      "type": "object",
+      "properties": {
+        "SftpPort": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "CommunicationMode": {
+          "$ref": "#/definitions/CommunicationMode"
+        }
+      },
+      "required": [
+        "SftpPort"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "State": {
       "type": "string",
@@ -318,6 +376,11 @@
       "minLength": 0,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1600  \nUpdate requires: No interruption\n"
     },
+    "CreateWithHostKey": {
+      "type": "boolean",
+      "description": "When this property is `true`, AWS Transfer Family will generate an initial host key for your server, making it immediately available to SFTP clients. When set to `false`, clients will not be able to establish an SFTP session until you import one or more host keys (see AWS::Transfer::HostKey). This property cannot be changed after resource creation. Default: `true`.",
+      "markdownDescription": "When this property is `true`, AWS Transfer Family will generate an initial host key for your server, making it immediately available to SFTP clients. When set to `false`, clients will not be able to establish an SFTP session until you import one or more host keys (see AWS::Transfer::HostKey). This property cannot be changed after resource creation. Default: `true`.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+    },
     "Domain": {
       "$ref": "#/definitions/Domain"
     },
@@ -417,6 +480,9 @@
     "/properties/As2ServiceManagedEgressIpAddresses",
     "/properties/ServerId",
     "/properties/State"
+  ],
+  "writeOnlyProperties": [
+    "/properties/CreateWithHostKey"
   ],
   "createOnlyProperties": [
     "/properties/Domain"
@@ -531,7 +597,8 @@
   "conditionalCreateOnlyProperties": [
     "/properties/EndpointDetails",
     "/properties/EndpointDetails/AddressAllocationIds",
-    "/properties/IpAddressType"
+    "/properties/IpAddressType",
+    "/properties/ProtocolDetails/SftpPorts"
   ],
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-transfer",
   "attributes": {
