@@ -1,22 +1,84 @@
 {
+  "tagging": {
+    "taggable": false
+  },
+  "deprecatedProperties": [
+    "/properties/Principal",
+    "/properties/Condition",
+    "/properties/Action"
+  ],
   "typeName": "AWS::Events::EventBusPolicy",
   "description": "Resource Type definition for AWS::Events::EventBusPolicy",
+  "createOnlyProperties": [
+    "/properties/EventBusName",
+    "/properties/StatementId"
+  ],
+  "primaryIdentifier": [
+    "/properties/EventBusName",
+    "/properties/StatementId"
+  ],
+  "required": [
+    "StatementId"
+  ],
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-events-eventbuspolicy",
+  "handlers": {
+    "read": {
+      "permissions": [
+        "events:DescribeEventBus"
+      ]
+    },
+    "create": {
+      "permissions": [
+        "events:DescribeEventBus",
+        "events:PutPermission"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "events:DescribeEventBus",
+        "events:PutPermission"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "events:DescribeEventBus"
+      ],
+      "handlerSchema": {
+        "properties": {
+          "EventBusName": {
+            "$ref": "resource-schema.json#/properties/EventBusName"
+          }
+        }
+      }
+    },
+    "delete": {
+      "permissions": [
+        "events:DescribeEventBus",
+        "events:RemovePermission"
+      ]
+    }
+  },
+  "writeOnlyProperties": [
+    "/properties/Principal",
+    "/properties/Condition",
+    "/properties/Action"
+  ],
+  "additionalProperties": false,
   "definitions": {
     "Condition": {
-      "type": "object",
       "description": "This parameter enables you to limit the permission to accounts that fulfill a certain condition, such as being a member of a certain AWS organization.",
       "additionalProperties": false,
+      "type": "object",
       "properties": {
-        "Value": {
-          "description": "Specifies the key for the condition. Currently the only supported key is aws:PrincipalOrgID.",
-          "type": "string",
-          "markdownDescription": "Specifies the key for the condition. Currently the only supported key is aws:PrincipalOrgID.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-        },
         "Type": {
           "description": "Specifies the type of condition. Currently the only supported value is StringEquals.",
           "type": "string",
           "markdownDescription": "Specifies the type of condition. Currently the only supported value is StringEquals.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "description": "Specifies the key for the condition. Currently the only supported key is aws:PrincipalOrgID.",
+          "type": "string",
+          "markdownDescription": "Specifies the key for the condition. Currently the only supported key is aws:PrincipalOrgID.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
         },
         "Key": {
           "description": "Specifies the value for the key. Currently, this must be the ID of the organization.",
@@ -29,9 +91,9 @@
   },
   "properties": {
     "EventBusName": {
+      "minLength": 1,
       "description": "The name of the event bus associated with the rule. If you omit this, the default event bus is used.",
       "type": "string",
-      "minLength": 1,
       "maxLength": 256,
       "markdownDescription": "The name of the event bus associated with the rule. If you omit this, the default event bus is used.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: [\\.\\-_A-Za-z0-9]+  \nUpdate requires: Replacement\n"
     },
@@ -39,16 +101,16 @@
       "$ref": "#/definitions/Condition"
     },
     "Action": {
+      "minLength": 1,
       "description": "The action that you are enabling the other account to perform.",
       "type": "string",
-      "minLength": 1,
       "maxLength": 64,
       "markdownDescription": "The action that you are enabling the other account to perform.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: events:[a-zA-Z]+  \nUpdate requires: No interruption\n"
     },
     "StatementId": {
+      "minLength": 1,
       "description": "An identifier string for the external account that you are granting permissions to",
       "type": "string",
-      "minLength": 1,
       "maxLength": 64,
       "markdownDescription": "An identifier string for the external account that you are granting permissions to\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: [a-zA-Z0-9-_]+  \nUpdate requires: Replacement\n"
     },
@@ -58,77 +120,12 @@
       "markdownDescription": "A JSON string that describes the permission policy statement. You can include a Policy parameter in the request instead of using the StatementId, Action, Principal, or Condition parameters.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Principal": {
+      "minLength": 1,
       "description": "The 12-digit AWS account ID that you are permitting to put events to your default event bus. Specify \"*\" to permit any account to put events to your default event bus.",
       "type": "string",
-      "minLength": 1,
       "maxLength": 12,
       "markdownDescription": "The 12-digit AWS account ID that you are permitting to put events to your default event bus. Specify \"*\" to permit any account to put events to your default event bus.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 12  \nPattern: (\\d{12}|\\*)  \nUpdate requires: No interruption\n"
     }
-  },
-  "additionalProperties": false,
-  "tagging": {
-    "taggable": false
-  },
-  "required": [
-    "StatementId"
-  ],
-  "createOnlyProperties": [
-    "/properties/EventBusName",
-    "/properties/StatementId"
-  ],
-  "primaryIdentifier": [
-    "/properties/EventBusName",
-    "/properties/StatementId"
-  ],
-  "writeOnlyProperties": [
-    "/properties/Principal",
-    "/properties/Condition",
-    "/properties/Action"
-  ],
-  "deprecatedProperties": [
-    "/properties/Principal",
-    "/properties/Condition",
-    "/properties/Action"
-  ],
-  "handlers": {
-    "create": {
-      "permissions": [
-        "events:DescribeEventBus",
-        "events:PutPermission"
-      ]
-    },
-    "read": {
-      "permissions": [
-        "events:DescribeEventBus"
-      ]
-    },
-    "update": {
-      "permissions": [
-        "events:DescribeEventBus",
-        "events:PutPermission"
-      ]
-    },
-    "delete": {
-      "permissions": [
-        "events:DescribeEventBus",
-        "events:RemovePermission"
-      ]
-    },
-    "list": {
-      "handlerSchema": {
-        "properties": {
-          "EventBusName": {
-            "$ref": "resource-schema.json#/properties/EventBusName"
-          }
-        }
-      },
-      "permissions": [
-        "events:DescribeEventBus"
-      ]
-    }
-  },
-  "propertyTransform": {
-    "/properties/Statement": "$merge([{\"Sid\": StatementId}, Statement])"
   },
   "attributes": {}
 }

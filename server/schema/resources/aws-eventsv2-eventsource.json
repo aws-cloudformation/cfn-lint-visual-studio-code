@@ -1,0 +1,360 @@
+{
+  "typeName": "AWS::EventsV2::EventSource",
+  "description": "Resource schema for AWS::EventsV2::EventSource. A managed event source that forwards AWS service events or partner events onto a custom event bus.",
+  "definitions": {
+    "OnFailureConfiguration": {
+      "description": "The destination for events that could not be forwarded by the managed forwarding target or, for partner event sources, the managed partner event bus. Arn is optional. An empty object removes a configured destination on update.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Arn": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1600,
+          "description": "The ARN of the Amazon SQS standard queue that receives events that could not be forwarded. FIFO queues are not supported.",
+          "markdownDescription": "The ARN of the Amazon SQS standard queue that receives events that could not be forwarded. FIFO queues are not supported.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1600  \nPattern: ^arn:aws(-[a-z0-9]+)*:sqs:[a-z][a-z0-9]*(-[a-z0-9]+)*:[0-9]{12}:[A-Za-z0-9_-]{1,80}$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "The destination for events that could not be forwarded by the managed forwarding target or, for partner event sources, the managed partner event bus. Arn is optional. An empty object removes a configured destination on update.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AwsServiceEventsConfiguration": {
+      "description": "Forward a single AWS service's events from the account's default event bus.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "AwsService": {
+          "type": "string",
+          "description": "A single AWS service source identifier, for example aws.s3. Wildcards and lists are not allowed.",
+          "minLength": 1,
+          "maxLength": 256,
+          "markdownDescription": "A single AWS service source identifier, for example aws.s3. Wildcards and lists are not allowed.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^aws\\.[a-z0-9\\-]+$  \nUpdate requires: No interruption\n"
+        },
+        "Pattern": {
+          "type": "string",
+          "maxLength": 3753,
+          "description": "A filter pattern, as a JSON string, that defines which events from the specified AWS service are forwarded to the event bus. Do not include source, account, or region as top-level fields. If you do not specify a pattern, all events from the service are forwarded.",
+          "markdownDescription": "A filter pattern, as a JSON string, that defines which events from the specified AWS service are forwarded to the event bus. Do not include source, account, or region as top-level fields. If you do not specify a pattern, all events from the service are forwarded.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 3753  \nUpdate requires: No interruption\n"
+        },
+        "OnFailureConfiguration": {
+          "$ref": "#/definitions/OnFailureConfiguration",
+          "description": "The destination for events that could not be forwarded.",
+          "markdownDescription": "The destination for events that could not be forwarded.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "AwsService"
+      ],
+      "markdownDescription": "Forward a single AWS service's events from the account's default event bus.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PartnerEventsConfiguration": {
+      "description": "Forward a partner event source's events through a managed partner event bus.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "PartnerEventSourceArn": {
+          "type": "string",
+          "description": "The ARN of the partner event source to forward. The partner owns the event source, so the ARN's account segment is empty. Changing this property replaces the event source. Because Name and EventBusArn together identify an event source, and the replacement is created before the old resource is deleted, change Name in the same update.",
+          "minLength": 1,
+          "maxLength": 1600,
+          "markdownDescription": "The ARN of the partner event source to forward. The partner owns the event source, so the ARN's account segment is empty. Changing this property replaces the event source. Because Name and EventBusArn together identify an event source, and the replacement is created before the old resource is deleted, change Name in the same update.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1600  \nPattern: ^arn:aws(-[a-z0-9]+)*:events:[a-z][a-z0-9]*(-[a-z0-9]+)*:([0-9]{12})?:event-source\\/aws\\.partner(\\/[\\.\\-_A-Za-z0-9]+){2,}$  \nUpdate requires: No interruption\n"
+        },
+        "Pattern": {
+          "type": "string",
+          "maxLength": 3753,
+          "description": "A filter pattern, as a JSON string, that defines which events from the specified partner event source are forwarded to the event bus. If you do not specify a pattern, all events from the partner event source are forwarded.",
+          "markdownDescription": "A filter pattern, as a JSON string, that defines which events from the specified partner event source are forwarded to the event bus. If you do not specify a pattern, all events from the partner event source are forwarded.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 3753  \nUpdate requires: No interruption\n"
+        },
+        "PartnerBusKmsKeyIdentifier": {
+          "type": "string",
+          "maxLength": 2048,
+          "description": "The identifier of the AWS KMS customer managed key for EventBridge to use, if you choose to use a customer managed key to encrypt events on the managed partner event bus. The identifier can be the key Amazon Resource Name (ARN), KeyId, key alias, or key alias ARN. If you do not specify a customer managed key identifier, EventBridge uses an AWS owned key to encrypt events on the event bus.",
+          "markdownDescription": "The identifier of the AWS KMS customer managed key for EventBridge to use, if you choose to use a customer managed key to encrypt events on the managed partner event bus. The identifier can be the key Amazon Resource Name (ARN), KeyId, key alias, or key alias ARN. If you do not specify a customer managed key identifier, EventBridge uses an AWS owned key to encrypt events on the event bus.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nPattern: ^[a-zA-Z0-9_\\-/:]*$  \nUpdate requires: No interruption\n"
+        },
+        "OnFailureConfiguration": {
+          "$ref": "#/definitions/OnFailureConfiguration",
+          "description": "The destination for events that could not be forwarded, covering both the forwarding target and the managed partner event bus.",
+          "markdownDescription": "The destination for events that could not be forwarded, covering both the forwarding target and the managed partner event bus.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "PartnerEventSourceArn"
+      ],
+      "markdownDescription": "Forward a partner event source's events through a managed partner event bus.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EventSourceConfiguration": {
+      "description": "Event source configuration. Exactly one of the two variants must be set.",
+      "type": "object",
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "required": [
+            "AwsServiceEventsConfiguration"
+          ]
+        },
+        {
+          "required": [
+            "PartnerEventsConfiguration"
+          ]
+        }
+      ],
+      "properties": {
+        "AwsServiceEventsConfiguration": {
+          "$ref": "#/definitions/AwsServiceEventsConfiguration",
+          "description": "Configuration for forwarding a single AWS service's events.",
+          "markdownDescription": "Configuration for forwarding a single AWS service's events.\n\n---\n\nRequired: Conditional  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "PartnerEventsConfiguration": {
+          "$ref": "#/definitions/PartnerEventsConfiguration",
+          "description": "Configuration for forwarding a partner event source's events.",
+          "markdownDescription": "Configuration for forwarding a partner event source's events.\n\n---\n\nRequired: Conditional  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Event source configuration. Exactly one of the two variants must be set.\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with the resource.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The tag key. Unique per resource; keys are case sensitive. No leading or trailing whitespace (interior whitespace is allowed).",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The tag key. Unique per resource; keys are case sensitive. No leading or trailing whitespace (interior whitespace is allowed).\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^\\S([\\s\\S]*\\S)?(?![\\s\\S])  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The tag value. May be empty. No leading or trailing whitespace (interior whitespace is allowed).",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The tag value. May be empty. No leading or trailing whitespace (interior whitespace is allowed).\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: ^(\\S([\\s\\S]*\\S)?)?(?![\\s\\S])  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "A key-value pair to associate with the resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "EventSourceArn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the event source. Its resource segment has the form event-sourcev2/<type>/<name>/<id>. The type segment is set by the service (aws.service for AWS service events, aws.partner for partner events) and is not part of the event source name. The id segment is a 25-character identifier generated by the service.",
+      "minLength": 1,
+      "maxLength": 1011,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the event source. Its resource segment has the form event-sourcev2/<type>/<name>/<id>. The type segment is set by the service (aws.service for AWS service events, aws.partner for partner events) and is not part of the event source name. The id segment is a 25-character identifier generated by the service.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1011  \nPattern: ^arn:aws(-[a-z0-9]+)*:events:[a-z][a-z0-9]*(-[a-z0-9]+)*:([0-9]{12}):event-sourcev2\\/(aws\\.service|aws\\.partner)\\/[A-Za-z0-9][\\.\\-_A-Za-z0-9]{0,255}\\/[a-z0-9]{25}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Name": {
+      "type": "string",
+      "description": "The name of the event source. The first character must be alphanumeric; the remaining characters may also include '.', '-', and '_'. Names cannot begin with the reserved aws. prefix.",
+      "minLength": 1,
+      "maxLength": 256,
+      "markdownDescription": "The name of the event source. The first character must be alphanumeric; the remaining characters may also include '.', '-', and '_'. Names cannot begin with the reserved aws. prefix.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^(?!aws\\.)[A-Za-z0-9][\\.\\-_A-Za-z0-9]*$  \nUpdate requires: Replacement\n"
+    },
+    "EventBusArn": {
+      "type": "string",
+      "description": "The ARN of the custom event bus the event source forwards onto.",
+      "minLength": 1,
+      "maxLength": 1011,
+      "markdownDescription": "The ARN of the custom event bus the event source forwards onto.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1011  \nPattern: ^arn:aws(-[a-z0-9]+)*:events:[a-z][a-z0-9]*(-[a-z0-9]+)*:([0-9]{12}):event-busv2\\/[A-Za-z0-9][\\.\\-_A-Za-z0-9]{0,255}\\/[a-z0-9]{25}$  \nUpdate requires: Replacement\n"
+    },
+    "Configuration": {
+      "$ref": "#/definitions/EventSourceConfiguration",
+      "description": "The event source configuration. Specify exactly one of AwsServiceEventsConfiguration or PartnerEventsConfiguration.",
+      "markdownDescription": "The event source configuration. Specify exactly one of AwsServiceEventsConfiguration or PartnerEventsConfiguration.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: Replacement\n"
+    },
+    "Description": {
+      "type": "string",
+      "description": "A description of the event source. Control characters and Unicode line separators are not allowed.",
+      "maxLength": 512,
+      "markdownDescription": "A description of the event source. Control characters and Unicode line separators are not allowed.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 512  \nPattern: ^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029]*(?![\\s\\S])  \nUpdate requires: No interruption\n"
+    },
+    "State": {
+      "type": "string",
+      "description": "The lifecycle state of the event source: CREATING, ACTIVE, UPDATING, CREATE_FAILED, UPDATE_FAILED, DELETING, or DELETE_FAILED. Revocation by the event bus owner is reported by the Revoked property, not by the state.",
+      "enum": [
+        "CREATING",
+        "ACTIVE",
+        "UPDATING",
+        "CREATE_FAILED",
+        "UPDATE_FAILED",
+        "DELETING",
+        "DELETE_FAILED"
+      ],
+      "markdownDescription": "The lifecycle state of the event source: CREATING, ACTIVE, UPDATING, CREATE_FAILED, UPDATE_FAILED, DELETING, or DELETE_FAILED. Revocation by the event bus owner is reported by the Revoked property, not by the state.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | ACTIVE | UPDATING | CREATE_FAILED | UPDATE_FAILED | DELETING | DELETE_FAILED  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Revoked": {
+      "type": "boolean",
+      "description": "Whether the event bus owner has revoked this event source. Revocation is permanent: a revoked event source cannot be updated, but it can be deleted.",
+      "markdownDescription": "Whether the event bus owner has revoked this event source. Revocation is permanent: a revoked event source cannot be updated, but it can be deleted.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreationTime": {
+      "type": "string",
+      "description": "The time the event source was created, as an ISO 8601 timestamp.",
+      "markdownDescription": "The time the event source was created, as an ISO 8601 timestamp.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "LastModifiedTime": {
+      "type": "string",
+      "description": "The time the event source was last modified, as an ISO 8601 timestamp.",
+      "markdownDescription": "The time the event source was last modified, as an ISO 8601 timestamp.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Tags": {
+      "description": "The tags assigned to the event source.",
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "maxItems": 50,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "The tags assigned to the event source.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "Name",
+    "EventBusArn",
+    "Configuration"
+  ],
+  "createOnlyProperties": [
+    "/properties/Name",
+    "/properties/EventBusArn",
+    "/properties/Configuration/PartnerEventsConfiguration/PartnerEventSourceArn"
+  ],
+  "readOnlyProperties": [
+    "/properties/EventSourceArn",
+    "/properties/State",
+    "/properties/Revoked",
+    "/properties/CreationTime",
+    "/properties/LastModifiedTime"
+  ],
+  "primaryIdentifier": [
+    "/properties/EventSourceArn"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/Name",
+      "/properties/EventBusArn"
+    ]
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "events:TagResource",
+      "events:UntagResource",
+      "events:ListTagsForResource"
+    ]
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "events:CreateEventSource",
+        "events:DescribeEventSource",
+        "events:ListEventSources",
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:GenerateDataKeyWithoutPlaintext",
+        "kms:ReEncryptFrom",
+        "kms:ReEncryptTo",
+        "events:ListTagsForResource",
+        "events:TagResource"
+      ],
+      "timeoutInMinutes": 30
+    },
+    "read": {
+      "permissions": [
+        "events:DescribeEventSource",
+        "kms:Decrypt",
+        "events:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "events:UpdateEventSource",
+        "events:DescribeEventSource",
+        "events:CreateEventSource",
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:GenerateDataKeyWithoutPlaintext",
+        "kms:ReEncryptFrom",
+        "kms:ReEncryptTo",
+        "events:TagResource",
+        "events:UntagResource"
+      ],
+      "timeoutInMinutes": 30
+    },
+    "delete": {
+      "permissions": [
+        "events:DeleteEventSource",
+        "events:DescribeEventSource"
+      ],
+      "timeoutInMinutes": 30
+    },
+    "list": {
+      "permissions": [
+        "events:ListEventSources"
+      ]
+    }
+  },
+  "typeConfiguration": {
+    "properties": {
+      "DeploymentStage": {
+        "description": "Which deployment of the EventsV2 service this registration targets. Prod resolves the production endpoint for the handler's AWS Region. When the property is absent, the handler uses a non-empty EVENTSV2_ENDPOINT override if one is configured and otherwise Prod. The handler accepts Beta and Gamma only in us-east-1; setting either in another Region fails the operation with InvalidRequest.",
+        "type": "string",
+        "enum": [
+          "Beta",
+          "Gamma",
+          "Prod"
+        ],
+        "markdownDescription": "Which deployment of the EventsV2 service this registration targets. Prod resolves the production endpoint for the handler's AWS Region. When the property is absent, the handler uses a non-empty EVENTSV2_ENDPOINT override if one is configured and otherwise Prod. The handler accepts Beta and Gamma only in us-east-1; setting either in another Region fails the operation with InvalidRequest.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Beta | Gamma | Prod  \nUpdate requires: No interruption\n"
+      }
+    },
+    "additionalProperties": false
+  },
+  "attributes": {
+    "EventSourceArn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the event source. Its resource segment has the form event-sourcev2/<type>/<name>/<id>. The type segment is set by the service (aws.service for AWS service events, aws.partner for partner events) and is not part of the event source name. The id segment is a 25-character identifier generated by the service.",
+      "minLength": 1,
+      "maxLength": 1011,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the event source. Its resource segment has the form event-sourcev2/<type>/<name>/<id>. The type segment is set by the service (aws.service for AWS service events, aws.partner for partner events) and is not part of the event source name. The id segment is a 25-character identifier generated by the service.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1011  \nPattern: ^arn:aws(-[a-z0-9]+)*:events:[a-z][a-z0-9]*(-[a-z0-9]+)*:([0-9]{12}):event-sourcev2\\/(aws\\.service|aws\\.partner)\\/[A-Za-z0-9][\\.\\-_A-Za-z0-9]{0,255}\\/[a-z0-9]{25}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "State": {
+      "type": "string",
+      "description": "The lifecycle state of the event source: CREATING, ACTIVE, UPDATING, CREATE_FAILED, UPDATE_FAILED, DELETING, or DELETE_FAILED. Revocation by the event bus owner is reported by the Revoked property, not by the state.",
+      "enum": [
+        "CREATING",
+        "ACTIVE",
+        "UPDATING",
+        "CREATE_FAILED",
+        "UPDATE_FAILED",
+        "DELETING",
+        "DELETE_FAILED"
+      ],
+      "markdownDescription": "The lifecycle state of the event source: CREATING, ACTIVE, UPDATING, CREATE_FAILED, UPDATE_FAILED, DELETING, or DELETE_FAILED. Revocation by the event bus owner is reported by the Revoked property, not by the state.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | ACTIVE | UPDATING | CREATE_FAILED | UPDATE_FAILED | DELETING | DELETE_FAILED  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Revoked": {
+      "type": "boolean",
+      "description": "Whether the event bus owner has revoked this event source. Revocation is permanent: a revoked event source cannot be updated, but it can be deleted.",
+      "markdownDescription": "Whether the event bus owner has revoked this event source. Revocation is permanent: a revoked event source cannot be updated, but it can be deleted.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreationTime": {
+      "type": "string",
+      "description": "The time the event source was created, as an ISO 8601 timestamp.",
+      "markdownDescription": "The time the event source was created, as an ISO 8601 timestamp.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "LastModifiedTime": {
+      "type": "string",
+      "description": "The time the event source was last modified, as an ISO 8601 timestamp.",
+      "markdownDescription": "The time the event source was last modified, as an ISO 8601 timestamp.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

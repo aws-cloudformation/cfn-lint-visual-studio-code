@@ -1,0 +1,461 @@
+{
+  "typeName": "AWS::ApplicationSignals::InstrumentationConfig",
+  "description": "Creates a dynamic instrumentation configuration for a specific code or endpoint location within a service and environment.",
+  "properties": {
+    "Arn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the instrumentation configuration.",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the instrumentation configuration.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:[^:]+:application-signals:[^:]+:[0-9]{12}:instrumentationConfig/.+/[0-9a-f]{16}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "InstrumentationType": {
+      "type": "string",
+      "description": "Type of instrumentation: BREAKPOINT (temporary, expires after 24 hours) or PROBE (permanent, persists until deleted).",
+      "enum": [
+        "BREAKPOINT",
+        "PROBE"
+      ],
+      "markdownDescription": "Type of instrumentation: BREAKPOINT (temporary, expires after 24 hours) or PROBE (permanent, persists until deleted).\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: BREAKPOINT | PROBE  \nUpdate requires: Replacement\n"
+    },
+    "Service": {
+      "type": "string",
+      "description": "The name of the service to instrument. This should match the service.name resource attribute reported by the application.",
+      "minLength": 1,
+      "maxLength": 255,
+      "markdownDescription": "The name of the service to instrument. This should match the service.name resource attribute reported by the application.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[A-Za-z0-9:/+=,.@_-]+$  \nUpdate requires: Replacement\n"
+    },
+    "Environment": {
+      "type": "string",
+      "description": "The environment that the service is running in.",
+      "minLength": 1,
+      "maxLength": 255,
+      "markdownDescription": "The environment that the service is running in.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[A-Za-z0-9:/+=,.@_-]+$  \nUpdate requires: Replacement\n"
+    },
+    "SignalType": {
+      "type": "string",
+      "description": "The telemetry signal type to emit for this instrumentation. The supported value is SNAPSHOT.",
+      "enum": [
+        "SNAPSHOT"
+      ],
+      "markdownDescription": "The telemetry signal type to emit for this instrumentation. The supported value is SNAPSHOT.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: SNAPSHOT  \nUpdate requires: Replacement\n"
+    },
+    "Location": {
+      "type": "object",
+      "description": "The location where instrumentation should be applied.",
+      "properties": {
+        "CodeLocation": {
+          "$ref": "#/definitions/CodeLocation"
+        }
+      },
+      "required": [
+        "CodeLocation"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The location where instrumentation should be applied.\n\n---\n\nRequired: Yes  \nUpdate requires: Replacement\n"
+    },
+    "LocationHash": {
+      "type": "string",
+      "description": "A stable hash computed from the location that uniquely identifies this instrumentation point.",
+      "minLength": 16,
+      "maxLength": 16,
+      "markdownDescription": "A stable hash computed from the location that uniquely identifies this instrumentation point.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 16  \nMaximum Length: 16  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Description": {
+      "type": "string",
+      "description": "An optional short description that explains the purpose of this instrumentation.",
+      "minLength": 1,
+      "maxLength": 50,
+      "markdownDescription": "An optional short description that explains the purpose of this instrumentation.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 50  \nUpdate requires: Replacement\n"
+    },
+    "ExpiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The timestamp after which this configuration is no longer served. For BREAKPOINT only; defaults to 24 hours.",
+      "markdownDescription": "The timestamp after which this configuration is no longer served. For BREAKPOINT only; defaults to 24 hours.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "AttributeFilters": {
+      "type": "array",
+      "description": "Client-side filters that target specific instances. Each object is AND-matched on keys, multiple objects are OR-matched.",
+      "items": {
+        "$ref": "#/definitions/AttributeFilterGroup"
+      },
+      "minItems": 1,
+      "maxItems": 10,
+      "markdownDescription": "Client-side filters that target specific instances. Each object is AND-matched on keys, multiple objects are OR-matched.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement\n"
+    },
+    "CaptureConfiguration": {
+      "type": "object",
+      "description": "Specifies what to capture when the instrumentation point is hit.",
+      "properties": {
+        "CodeCapture": {
+          "$ref": "#/definitions/CodeCaptureConfiguration"
+        }
+      },
+      "required": [
+        "CodeCapture"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Specifies what to capture when the instrumentation point is hit.\n\n---\n\nRequired: Yes  \nUpdate requires: Replacement\n"
+    },
+    "CreatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The server-generated creation timestamp for this instrumentation configuration.",
+      "markdownDescription": "The server-generated creation timestamp for this instrumentation configuration.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Tags": {
+      "type": "array",
+      "description": "An optional list of key-value pairs to associate with the instrumentation configuration.",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "insertionOrder": false,
+      "maxItems": 200,
+      "markdownDescription": "An optional list of key-value pairs to associate with the instrumentation configuration.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "definitions": {
+    "Tag": {
+      "type": "object",
+      "description": "A key-value pair to associate with the resource.",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The tag key.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The tag key.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The tag value.",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The tag value.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A key-value pair to associate with the resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CodeLocation": {
+      "type": "object",
+      "description": "Identifies a code location to instrument.",
+      "properties": {
+        "Language": {
+          "type": "string",
+          "description": "The programming language for this instrumentation point.",
+          "enum": [
+            "Java",
+            "Python",
+            "Javascript"
+          ],
+          "markdownDescription": "The programming language for this instrumentation point.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: Java | Python | Javascript  \nUpdate requires: No interruption\n"
+        },
+        "CodeUnit": {
+          "type": "string",
+          "description": "The package, module, or namespace that contains the target code.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The package, module, or namespace that contains the target code.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "ClassName": {
+          "type": "string",
+          "description": "The class or type name that contains the method.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The class or type name that contains the method.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "MethodName": {
+          "type": "string",
+          "description": "The method or function name to instrument.",
+          "minLength": 1,
+          "maxLength": 80,
+          "markdownDescription": "The method or function name to instrument.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 80  \nUpdate requires: No interruption\n"
+        },
+        "FilePath": {
+          "type": "string",
+          "description": "The source file path relative to the project or source root.",
+          "minLength": 1,
+          "maxLength": 1024,
+          "markdownDescription": "The source file path relative to the project or source root.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+        },
+        "LineNumber": {
+          "type": "integer",
+          "description": "The line number to instrument.",
+          "minimum": 1,
+          "markdownDescription": "The line number to instrument.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Language",
+        "FilePath"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Identifies a code location to instrument.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AttributeFilterGroup": {
+      "type": "object",
+      "description": "A string-to-string map of OpenTelemetry resource attributes that must all match.",
+      "patternProperties": {
+        "^.{1,50}$": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "A string-to-string map of OpenTelemetry resource attributes that must all match.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CodeCaptureConfiguration": {
+      "type": "object",
+      "description": "Defines what data to capture for code-level instrumentation.",
+      "properties": {
+        "CaptureArguments": {
+          "type": "array",
+          "description": "The function arguments to capture.",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 80  \nUpdate requires: No interruption\n"
+          },
+          "maxItems": 10,
+          "markdownDescription": "The function arguments to capture.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "CaptureReturn": {
+          "type": "boolean",
+          "description": "Whether to capture the return value. Defaults to false.",
+          "markdownDescription": "Whether to capture the return value. Defaults to false.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "CaptureStackTrace": {
+          "type": "boolean",
+          "description": "Whether to capture a stack trace. Defaults to true.",
+          "markdownDescription": "Whether to capture a stack trace. Defaults to true.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "CaptureLocals": {
+          "type": "array",
+          "description": "The local variables to capture by name.",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 80  \nUpdate requires: No interruption\n"
+          },
+          "maxItems": 20,
+          "markdownDescription": "The local variables to capture by name.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "CaptureLimits": {
+          "$ref": "#/definitions/CaptureLimitsConfig"
+        }
+      },
+      "required": [
+        "CaptureLimits"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Defines what data to capture for code-level instrumentation.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CaptureLimitsConfig": {
+      "type": "object",
+      "description": "Safety limits that bound what is captured.",
+      "properties": {
+        "MaxHits": {
+          "type": "integer",
+          "description": "Maximum number of times the instrumentation point can be hit before disabled.",
+          "minimum": 1,
+          "maximum": 1000,
+          "markdownDescription": "Maximum number of times the instrumentation point can be hit before disabled.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "MaxStringLength": {
+          "type": "integer",
+          "description": "Maximum length of captured string values in characters.",
+          "minimum": 1,
+          "maximum": 255,
+          "markdownDescription": "Maximum length of captured string values in characters.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "MaxCollectionWidth": {
+          "type": "integer",
+          "description": "Maximum number of items to capture from any collection.",
+          "minimum": 1,
+          "maximum": 20,
+          "markdownDescription": "Maximum number of items to capture from any collection.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "MaxCollectionDepth": {
+          "type": "integer",
+          "description": "Maximum nesting depth to traverse inside collections.",
+          "minimum": 1,
+          "maximum": 5,
+          "markdownDescription": "Maximum nesting depth to traverse inside collections.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "MaxStackFrames": {
+          "type": "integer",
+          "description": "Maximum number of stack frames to capture.",
+          "minimum": 1,
+          "maximum": 20,
+          "markdownDescription": "Maximum number of stack frames to capture.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "MaxStackTraceSize": {
+          "type": "integer",
+          "description": "Maximum total size in bytes of a captured stack trace.",
+          "minimum": 1,
+          "maximum": 1000,
+          "markdownDescription": "Maximum total size in bytes of a captured stack trace.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "MaxObjectDepth": {
+          "type": "integer",
+          "description": "Maximum depth for nested object traversal.",
+          "minimum": 1,
+          "maximum": 5,
+          "markdownDescription": "Maximum depth for nested object traversal.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "MaxFieldsPerObject": {
+          "type": "integer",
+          "description": "Maximum number of fields to capture for any object.",
+          "minimum": 1,
+          "maximum": 20,
+          "markdownDescription": "Maximum number of fields to capture for any object.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Safety limits that bound what is captured.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "required": [
+    "InstrumentationType",
+    "Service",
+    "Environment",
+    "SignalType",
+    "Location",
+    "CaptureConfiguration"
+  ],
+  "additionalProperties": false,
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/LocationHash",
+    "/properties/CreatedAt"
+  ],
+  "createOnlyProperties": [
+    "/properties/InstrumentationType",
+    "/properties/Service",
+    "/properties/Environment",
+    "/properties/SignalType",
+    "/properties/Location",
+    "/properties/Description",
+    "/properties/ExpiresAt",
+    "/properties/AttributeFilters",
+    "/properties/CaptureConfiguration"
+  ],
+  "primaryIdentifier": [
+    "/properties/InstrumentationType",
+    "/properties/Service",
+    "/properties/Environment",
+    "/properties/SignalType",
+    "/properties/LocationHash"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/Arn"
+    ]
+  ],
+  "replacementStrategy": "delete_then_create",
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "application-signals:TagResource",
+      "application-signals:UntagResource",
+      "application-signals:ListTagsForResource"
+    ]
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "application-signals:CreateInstrumentationConfiguration",
+        "application-signals:GetInstrumentationConfiguration",
+        "application-signals:TagResource",
+        "application-signals:ListTagsForResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "application-signals:GetInstrumentationConfiguration",
+        "application-signals:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "application-signals:GetInstrumentationConfiguration",
+        "application-signals:TagResource",
+        "application-signals:UntagResource",
+        "application-signals:ListTagsForResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "application-signals:DeleteInstrumentationConfiguration",
+        "application-signals:GetInstrumentationConfiguration",
+        "application-signals:ListTagsForResource"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "Service": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[A-Za-z0-9:/+=,.@_-]+$  \nUpdate requires: No interruption\n"
+          },
+          "Environment": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[A-Za-z0-9:/+=,.@_-]+$  \nUpdate requires: No interruption\n"
+          },
+          "InstrumentationType": {
+            "type": "string",
+            "enum": [
+              "BREAKPOINT",
+              "PROBE"
+            ],
+            "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: BREAKPOINT | PROBE  \nUpdate requires: No interruption\n"
+          }
+        },
+        "required": [
+          "Service",
+          "Environment",
+          "InstrumentationType"
+        ]
+      },
+      "permissions": [
+        "application-signals:ListInstrumentationConfigurations"
+      ]
+    }
+  },
+  "attributes": {
+    "Arn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the instrumentation configuration.",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the instrumentation configuration.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:[^:]+:application-signals:[^:]+:[0-9]{12}:instrumentationConfig/.+/[0-9a-f]{16}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "LocationHash": {
+      "type": "string",
+      "description": "A stable hash computed from the location that uniquely identifies this instrumentation point.",
+      "minLength": 16,
+      "maxLength": 16,
+      "markdownDescription": "A stable hash computed from the location that uniquely identifies this instrumentation point.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 16  \nMaximum Length: 16  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The server-generated creation timestamp for this instrumentation configuration.",
+      "markdownDescription": "The server-generated creation timestamp for this instrumentation configuration.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

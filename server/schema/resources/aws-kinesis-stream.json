@@ -201,6 +201,15 @@
       "description": "Warm throughput configuration details for the stream. Only present for ON_DEMAND streams.",
       "$ref": "#/definitions/WarmThroughputObject",
       "markdownDescription": "Warm throughput configuration details for the stream. Only present for ON_DEMAND streams.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "RecordDistributionStrategy": {
+      "description": "The record distribution strategy for the stream. This property can ONLY be set when StreamMode is ON_DEMAND",
+      "type": "string",
+      "enum": [
+        "AUTO",
+        "USER_PARTITION_KEY"
+      ],
+      "markdownDescription": "The record distribution strategy for the stream. This property can ONLY be set when StreamMode is ON_DEMAND\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AUTO | USER_PARTITION_KEY  \nUpdate requires: No interruption\n"
     }
   },
   "additionalProperties": false,
@@ -217,12 +226,12 @@
   "writeOnlyProperties": [
     "/properties/WarmThroughputMiBps"
   ],
-  "$comment": "Do not set SystemTags to true without implementing a fail-open mechanism. It should not fail when adding systemTags for customers without AddTagsToStream Permission. Cloudformation will automatically add system tags even if customer does not have the AddTagsToStream permission. COE: https://www.coe.a2z.com/coe/236297/content",
+  "$comment": "Fail-open for system tags (aws:* prefix) is implemented in BaseHandlerStd.modifyTags() - AccessDeniedException on system tag operations is caught and silently continued. Customer tags still fail-hard. COE: https://www.coe.a2z.com/coe/236297/content",
   "tagging": {
     "taggable": true,
     "tagOnCreate": true,
     "tagUpdatable": true,
-    "cloudFormationSystemTags": false,
+    "cloudFormationSystemTags": true,
     "tagProperty": "/properties/Tags",
     "permissions": [
       "kinesis:AddTagsToStream",
@@ -273,7 +282,8 @@
         "kinesis:ListTagsForStream",
         "kinesis:ListTagsForResource",
         "kinesis:UpdateMaxRecordSize",
-        "kinesis:UpdateStreamWarmThroughput"
+        "kinesis:UpdateStreamWarmThroughput",
+        "kinesis:UpdateStreamRecordDistributionStrategy"
       ],
       "timeoutInMinutes": 240
     },
