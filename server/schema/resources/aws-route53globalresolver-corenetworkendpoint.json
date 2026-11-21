@@ -1,0 +1,311 @@
+{
+  "typeName": "AWS::Route53GlobalResolver::CoreNetworkEndpoint",
+  "description": "Resource schema for AWS::Route53GlobalResolver::CoreNetworkEndpoint. A core network endpoint connects a Route 53 Global Resolver to an AWS Cloud WAN core network and defines the private DNS IP addresses that Cloud WAN traffic uses to reach the resolver.",
+  "sourceUrl": "https://code.amazon.com/packages/AWSCloudFormationResourceProvidersRoute53GlobalResolver",
+  "primaryIdentifier": [
+    "/properties/CoreNetworkEndpointId"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/Arn"
+    ]
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/CoreNetworkEndpointId",
+    "/properties/AvailableRegions",
+    "/properties/Status",
+    "/properties/CreatedAt",
+    "/properties/UpdatedAt"
+  ],
+  "createOnlyProperties": [
+    "/properties/GlobalResolverId",
+    "/properties/CoreNetworkArn",
+    "/properties/ClientToken"
+  ],
+  "writeOnlyProperties": [
+    "/properties/ClientToken"
+  ],
+  "required": [
+    "GlobalResolverId",
+    "CoreNetworkArn",
+    "IpAddresses"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "Region": {
+      "type": "string",
+      "maxLength": 32,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 32  \nUpdate requires: No interruption\n"
+    },
+    "ResourceName": {
+      "type": "string",
+      "maxLength": 64,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^(?!^[0-9]+$)([a-zA-Z0-9-_/' ']+)$  \nUpdate requires: No interruption\n"
+    },
+    "RegionScope": {
+      "type": "string",
+      "enum": [
+        "ALL",
+        "REGIONAL"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ALL | REGIONAL  \nUpdate requires: No interruption\n"
+    },
+    "IpAddress": {
+      "type": "object",
+      "description": "A private DNS IP address of the core network endpoint. Specify exactly one of Ipv4Address or Ipv6Address. The IP address is the key of the entry: changing it adds the new address and then removes the old one.",
+      "properties": {
+        "Ipv4Address": {
+          "type": "string",
+          "maxLength": 15,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: String  \nMinimum Length: 1  \nMaximum Length: 15  \nPattern: ^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}$  \nUpdate requires: No interruption\n"
+        },
+        "Ipv6Address": {
+          "type": "string",
+          "maxLength": 39,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Conditional  \nType: String  \nMinimum Length: 1  \nMaximum Length: 39  \nPattern: ^(?:[A-Fa-f0-9]{0,4}:){2,7}[A-Fa-f0-9]{1,4}$  \nUpdate requires: No interruption\n"
+        },
+        "DnsLabel": {
+          "type": "string",
+          "description": "Lowercase DNS label for the IP address. The service appends the endpoint ID to build the DNS name. The label of an existing IP address cannot be changed; to use a new label, change the IP address too.",
+          "maxLength": 32,
+          "minLength": 1,
+          "markdownDescription": "Lowercase DNS label for the IP address. The service appends the endpoint ID to build the DNS name. The label of an existing IP address cannot be changed; to use a new label, change the IP address too.\n\n---\n\nRequired: Conditional  \nType: String  \nMinimum Length: 1  \nMaximum Length: 32  \nPattern: ^(?!-)[a-z0-9](?:[a-z0-9-]{0,30}[a-z0-9])?$  \nUpdate requires: No interruption\n"
+        },
+        "RegionScope": {
+          "$ref": "#/definitions/RegionScope",
+          "description": "ALL to serve the IP address in every available region of the endpoint, or REGIONAL to serve it only in Regions.",
+          "markdownDescription": "ALL to serve the IP address in every available region of the endpoint, or REGIONAL to serve it only in Regions.\n\n---\n\nRequired: Conditional  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "Regions": {
+          "type": "array",
+          "description": "Regions that serve the IP address. Required when RegionScope is REGIONAL and not allowed when it is ALL. Must be a subset of AvailableRegions.",
+          "insertionOrder": false,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/Region"
+          },
+          "markdownDescription": "Regions that serve the IP address. Required when RegionScope is REGIONAL and not allowed when it is ALL. Must be a subset of AvailableRegions.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "DnsLabel",
+        "RegionScope"
+      ],
+      "oneOf": [
+        {
+          "required": [
+            "Ipv4Address"
+          ]
+        },
+        {
+          "required": [
+            "Ipv6Address"
+          ]
+        }
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A private DNS IP address of the core network endpoint. Specify exactly one of Ipv4Address or Ipv6Address. The IP address is the key of the entry: changing it adds the new address and then removes the old one.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 1,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 0,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "CoreNetworkEndpointId": {
+      "type": "string",
+      "description": "The ID of the core network endpoint.",
+      "maxLength": 64,
+      "minLength": 1,
+      "markdownDescription": "The ID of the core network endpoint.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Arn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the core network endpoint.",
+      "maxLength": 2048,
+      "minLength": 1,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the core network endpoint.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "GlobalResolverId": {
+      "type": "string",
+      "description": "The ID of the Global Resolver to connect. A Global Resolver can have one core network endpoint.",
+      "maxLength": 64,
+      "minLength": 1,
+      "markdownDescription": "The ID of the Global Resolver to connect. A Global Resolver can have one core network endpoint.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[-.a-zA-Z0-9]+$  \nUpdate requires: Replacement\n"
+    },
+    "CoreNetworkArn": {
+      "type": "string",
+      "description": "The ARN of the AWS Cloud WAN core network to connect. The core network must be in the same account and AVAILABLE. A core network can have one core network endpoint.",
+      "maxLength": 2048,
+      "minLength": 1,
+      "markdownDescription": "The ARN of the AWS Cloud WAN core network to connect. The core network must be in the same account and AVAILABLE. A core network can have one core network endpoint.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:[-.a-z0-9]{1,63}:[-.a-z0-9]{1,63}:[-.a-z0-9]{0,63}:[-.a-z0-9]{0,63}:[^/].{0,1023}$  \nUpdate requires: Replacement\n"
+    },
+    "Name": {
+      "$ref": "#/definitions/ResourceName",
+      "description": "A name for the core network endpoint.",
+      "markdownDescription": "A name for the core network endpoint.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "IpAddresses": {
+      "type": "array",
+      "description": "The private DNS IP addresses of the endpoint (1 to 5). Each IP address can appear once.",
+      "insertionOrder": false,
+      "minItems": 1,
+      "maxItems": 5,
+      "items": {
+        "$ref": "#/definitions/IpAddress"
+      },
+      "markdownDescription": "The private DNS IP addresses of the endpoint (1 to 5). Each IP address can appear once.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "AvailableRegions": {
+      "type": "array",
+      "description": "Regions where the endpoint can serve DNS: the Global Resolver regions that are also core network edge locations.",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Region"
+      },
+      "markdownDescription": "Regions where the endpoint can serve DNS: the Global Resolver regions that are also core network edge locations.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Status": {
+      "type": "string",
+      "description": "CREATING, OPERATIONAL, UPDATING or DELETING. The service can also report FAILURE or ACTION_NEEDED, so this is not an enum.",
+      "markdownDescription": "CREATING, OPERATIONAL, UPDATING or DELETING. The service can also report FAILURE or ACTION_NEEDED, so this is not an enum.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreatedAt": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "UpdatedAt": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ClientToken": {
+      "type": "string",
+      "maxLength": 256,
+      "minLength": 1,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: Replacement\n"
+    },
+    "Tags": {
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "maxItems": 50,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "route53globalresolver:CreateCoreNetworkEndpoint",
+        "route53globalresolver:GetCoreNetworkEndpoint",
+        "route53globalresolver:TagResource",
+        "route53globalresolver:ListTagsForResource",
+        "networkmanager:GetCoreNetwork"
+      ],
+      "timeoutInMinutes": 60
+    },
+    "read": {
+      "permissions": [
+        "route53globalresolver:GetCoreNetworkEndpoint",
+        "route53globalresolver:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "route53globalresolver:UpdateCoreNetworkEndpoint",
+        "route53globalresolver:GetCoreNetworkEndpoint",
+        "route53globalresolver:TagResource",
+        "route53globalresolver:UntagResource",
+        "route53globalresolver:ListTagsForResource"
+      ],
+      "timeoutInMinutes": 120
+    },
+    "delete": {
+      "permissions": [
+        "route53globalresolver:DeleteCoreNetworkEndpoint",
+        "route53globalresolver:GetCoreNetworkEndpoint"
+      ],
+      "timeoutInMinutes": 70
+    },
+    "list": {
+      "permissions": [
+        "route53globalresolver:ListCoreNetworkEndpoints"
+      ]
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "route53globalresolver:TagResource",
+      "route53globalresolver:UntagResource",
+      "route53globalresolver:ListTagsForResource"
+    ]
+  },
+  "attributes": {
+    "CoreNetworkEndpointId": {
+      "type": "string",
+      "description": "The ID of the core network endpoint.",
+      "maxLength": 64,
+      "minLength": 1,
+      "markdownDescription": "The ID of the core network endpoint.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Arn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the core network endpoint.",
+      "maxLength": 2048,
+      "minLength": 1,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the core network endpoint.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "AvailableRegions": {
+      "type": "array",
+      "description": "Regions where the endpoint can serve DNS: the Global Resolver regions that are also core network edge locations.",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Region"
+      },
+      "markdownDescription": "Regions where the endpoint can serve DNS: the Global Resolver regions that are also core network edge locations.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Status": {
+      "type": "string",
+      "description": "CREATING, OPERATIONAL, UPDATING or DELETING. The service can also report FAILURE or ACTION_NEEDED, so this is not an enum.",
+      "markdownDescription": "CREATING, OPERATIONAL, UPDATING or DELETING. The service can also report FAILURE or ACTION_NEEDED, so this is not an enum.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreatedAt": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "UpdatedAt": {
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

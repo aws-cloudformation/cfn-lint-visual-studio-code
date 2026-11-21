@@ -15,7 +15,11 @@
     "/properties/TransitGatewayAttachmentId",
     "/properties/Status",
     "/properties/State",
-    "/properties/CreationTime"
+    "/properties/CreationTime",
+    "/properties/RequesterAllowMultipathResilience",
+    "/properties/RequesterMultipathResilienceMode",
+    "/properties/AccepterAllowMultipathResilience",
+    "/properties/MultipathResilienceStatus"
   ],
   "description": "The AWS::EC2::TransitGatewayPeeringAttachment type",
   "createOnlyProperties": [
@@ -52,6 +56,7 @@
     "update": {
       "permissions": [
         "ec2:DescribeTransitGatewayPeeringAttachments",
+        "ec2:ModifyTransitGatewayPeeringAttachment",
         "ec2:CreateTags",
         "ec2:DeleteTags",
         "ec2:DescribeTags"
@@ -72,8 +77,31 @@
       ]
     }
   },
+  "writeOnlyProperties": [
+    "/properties/Options"
+  ],
   "additionalProperties": false,
   "definitions": {
+    "TransitGatewayPeeringAttachmentOptions": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "MultipathResilienceMode": {
+          "description": "The MultipathResilience mode. Only valid when AllowMultipathResilience is true.",
+          "type": "string",
+          "enum": [
+            "always-on"
+          ],
+          "markdownDescription": "The MultipathResilience mode. Only valid when AllowMultipathResilience is true.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: always-on  \nUpdate requires: No interruption\n"
+        },
+        "AllowMultipathResilience": {
+          "description": "Whether to enable MultipathResilience on this side of the peering attachment.",
+          "type": "boolean",
+          "markdownDescription": "Whether to enable MultipathResilience on this side of the peering attachment.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "Tag": {
       "additionalProperties": false,
       "type": "object",
@@ -115,6 +143,21 @@
       "$ref": "#/definitions/PeeringAttachmentStatus",
       "markdownDescription": "The status of the transit gateway peering attachment.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
     },
+    "Options": {
+      "description": "Options for transit gateway peering attachment",
+      "$ref": "#/definitions/TransitGatewayPeeringAttachmentOptions",
+      "markdownDescription": "Options for transit gateway peering attachment\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "PeerAccountId": {
+      "description": "The ID of the peer account",
+      "type": "string",
+      "markdownDescription": "The ID of the peer account\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "PeerRegion": {
+      "description": "Peer Region",
+      "type": "string",
+      "markdownDescription": "Peer Region\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
+    },
     "TransitGatewayId": {
       "description": "The ID of the transit gateway.",
       "type": "string",
@@ -125,10 +168,15 @@
       "type": "string",
       "markdownDescription": "The ID of the peer transit gateway.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
     },
-    "PeerAccountId": {
-      "description": "The ID of the peer account",
+    "AccepterAllowMultipathResilience": {
+      "description": "Whether the accepter side of the peering attachment has opted in to MultipathResilience.",
+      "type": "boolean",
+      "markdownDescription": "Whether the accepter side of the peering attachment has opted in to MultipathResilience.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "RequesterMultipathResilienceMode": {
+      "description": "The MultipathResilience mode chosen by the requester side of the peering attachment.",
       "type": "string",
-      "markdownDescription": "The ID of the peer account\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
+      "markdownDescription": "The MultipathResilience mode chosen by the requester side of the peering attachment.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "State": {
       "description": "The state of the transit gateway peering attachment. Note that the initiating state has been deprecated.",
@@ -141,10 +189,10 @@
       "type": "string",
       "markdownDescription": "The time the transit gateway peering attachment was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
-    "PeerRegion": {
-      "description": "Peer Region",
-      "type": "string",
-      "markdownDescription": "Peer Region\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
+    "RequesterAllowMultipathResilience": {
+      "description": "Whether the requester side of the peering attachment has opted in to MultipathResilience.",
+      "type": "boolean",
+      "markdownDescription": "Whether the requester side of the peering attachment has opted in to MultipathResilience.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "Tags": {
       "description": "The tags for the transit gateway peering attachment.",
@@ -158,6 +206,11 @@
       "description": "The ID of the transit gateway peering attachment.",
       "type": "string",
       "markdownDescription": "The ID of the transit gateway peering attachment.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "MultipathResilienceStatus": {
+      "description": "The connection-level MultipathResilience status, computed from both sides of the peering attachment. (enabled/pending/disabled)",
+      "type": "string",
+      "markdownDescription": "The connection-level MultipathResilience status, computed from both sides of the peering attachment. (enabled/pending/disabled)\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   },
   "attributes": {
@@ -165,6 +218,16 @@
       "description": "The status of the transit gateway peering attachment.",
       "$ref": "#/definitions/PeeringAttachmentStatus",
       "markdownDescription": "The status of the transit gateway peering attachment.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "AccepterAllowMultipathResilience": {
+      "description": "Whether the accepter side of the peering attachment has opted in to MultipathResilience.",
+      "type": "boolean",
+      "markdownDescription": "Whether the accepter side of the peering attachment has opted in to MultipathResilience.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "RequesterMultipathResilienceMode": {
+      "description": "The MultipathResilience mode chosen by the requester side of the peering attachment.",
+      "type": "string",
+      "markdownDescription": "The MultipathResilience mode chosen by the requester side of the peering attachment.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "State": {
       "description": "The state of the transit gateway peering attachment. Note that the initiating state has been deprecated.",
@@ -177,10 +240,20 @@
       "type": "string",
       "markdownDescription": "The time the transit gateway peering attachment was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
+    "RequesterAllowMultipathResilience": {
+      "description": "Whether the requester side of the peering attachment has opted in to MultipathResilience.",
+      "type": "boolean",
+      "markdownDescription": "Whether the requester side of the peering attachment has opted in to MultipathResilience.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
     "TransitGatewayAttachmentId": {
       "description": "The ID of the transit gateway peering attachment.",
       "type": "string",
       "markdownDescription": "The ID of the transit gateway peering attachment.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "MultipathResilienceStatus": {
+      "description": "The connection-level MultipathResilience status, computed from both sides of the peering attachment. (enabled/pending/disabled)",
+      "type": "string",
+      "markdownDescription": "The connection-level MultipathResilience status, computed from both sides of the peering attachment. (enabled/pending/disabled)\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

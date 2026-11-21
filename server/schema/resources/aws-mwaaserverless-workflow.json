@@ -7,7 +7,7 @@
       "type": "string",
       "maxLength": 2048,
       "minLength": 1,
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws(?:-(?:cn|us-gov|iso|iso-b|iso-e|iso-f))?:airflow-serverless:([a-z]{2}-[a-z]+-[0-9]{1}):([0-9]{12}):workflow/([a-zA-Z0-9][a-zA-Z0-9\\.\\-_]{0,254}-[a-zA-z0-9]{10})$  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws(?:-(?:cn|us-gov|iso|iso-b|iso-e|iso-f))?:airflow-serverless:([a-z]{2}-(?:[a-z]+-)+[0-9]{1}):([0-9]{12}):workflow/([a-zA-Z0-9][a-zA-Z0-9\\.\\-_]{0,254}-[a-zA-Z0-9]{10})$  \nUpdate requires: No interruption\n"
     },
     "RoleArn": {
       "type": "string",
@@ -51,6 +51,46 @@
       },
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CodeS3Location": {
+      "type": "object",
+      "required": [
+        "Bucket",
+        "ObjectKey"
+      ],
+      "properties": {
+        "Bucket": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 63,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 3  \nMaximum Length: 63  \nUpdate requires: No interruption\n"
+        },
+        "ObjectKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+        },
+        "VersionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Code": {
+      "type": "object",
+      "description": "The location of code artifacts in Amazon S3 for the workflow. Modeled as a single-member container so it stays extensible to future artifact types (e.g. OCI images).",
+      "properties": {
+        "S3Location": {
+          "$ref": "#/definitions/CodeS3Location"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The location of code artifacts in Amazon S3 for the workflow. Modeled as a single-member container so it stays extensible to future artifact types (e.g. OCI images).\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "EncryptionConfiguration": {
       "type": "object",
@@ -111,6 +151,35 @@
       },
       "additionalProperties": false,
       "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Environment": {
+      "type": "object",
+      "description": "Contains the environment variables that tasks in a workflow use during execution.",
+      "required": [
+        "Variables"
+      ],
+      "properties": {
+        "Variables": {
+          "$ref": "#/definitions/EnvironmentVariables"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Contains the environment variables that tasks in a workflow use during execution.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EnvironmentVariables": {
+      "type": "object",
+      "description": "A map of environment variable names to values. Up to 50 variables. Names must start with a letter and contain only letters, numbers, and underscores. Names starting with AWS_ or AIRFLOW__ are reserved, except AIRFLOW__WORKERS__SECRETS_BACKEND, AIRFLOW__WORKERS__SECRETS_BACKEND_KWARGS, and names prefixed with AIRFLOW__WORKERS__SECRETS_BACKEND_KWARG__.",
+      "patternProperties": {
+        "^[a-zA-Z][a-zA-Z0-9_]{0,127}$": {
+          "type": "string",
+          "maxLength": 255,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+        }
+      },
+      "minProperties": 1,
+      "maxProperties": 50,
+      "additionalProperties": false,
+      "markdownDescription": "A map of environment variable names to values. Up to 50 variables. Names must start with a letter and contain only letters, numbers, and underscores. Names starting with AWS_ or AIRFLOW__ are reserved, except AIRFLOW__WORKERS__SECRETS_BACKEND, AIRFLOW__WORKERS__SECRETS_BACKEND_KWARGS, and names prefixed with AIRFLOW__WORKERS__SECRETS_BACKEND_KWARG__.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "WorkflowVersion": {
       "type": "string",
@@ -178,6 +247,12 @@
     "DefinitionS3Location": {
       "$ref": "#/definitions/S3Location"
     },
+    "Code": {
+      "$ref": "#/definitions/Code"
+    },
+    "CodeSnapshottedAt": {
+      "$ref": "#/definitions/Timestamp"
+    },
     "RoleArn": {
       "$ref": "#/definitions/RoleArn"
     },
@@ -189,6 +264,9 @@
     },
     "NetworkConfiguration": {
       "$ref": "#/definitions/NetworkConfiguration"
+    },
+    "Environment": {
+      "$ref": "#/definitions/Environment"
     },
     "WorkflowVersion": {
       "$ref": "#/definitions/WorkflowVersion"
@@ -226,7 +304,8 @@
     "/properties/CreatedAt",
     "/properties/ModifiedAt",
     "/properties/WorkflowStatus",
-    "/properties/ScheduleConfiguration"
+    "/properties/ScheduleConfiguration",
+    "/properties/CodeSnapshottedAt"
   ],
   "createOnlyProperties": [
     "/properties/Name",
@@ -304,6 +383,9 @@
   "attributes": {
     "WorkflowArn": {
       "$ref": "#/definitions/Arn"
+    },
+    "CodeSnapshottedAt": {
+      "$ref": "#/definitions/Timestamp"
     },
     "WorkflowVersion": {
       "$ref": "#/definitions/WorkflowVersion"

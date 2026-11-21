@@ -28,6 +28,42 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "WorkloadIdentityConfig": {
+      "description": "The workload identity configuration of the pod identity association. When enabled, the association also provisions a SPIFFE identity for the workload. Setting Enabled to false disables workload identity and keeps the ARNs. Removing the property from the template leaves the association unchanged; set Enabled to false to disable workload identity.",
+      "type": "object",
+      "properties": {
+        "Enabled": {
+          "description": "Whether workload identity is enabled for the association. Enabling it requires TemplateArn and ProviderArn, and cannot be combined with TargetRoleArn.",
+          "type": "boolean",
+          "markdownDescription": "Whether workload identity is enabled for the association. Enabling it requires TemplateArn and ProviderArn, and cannot be combined with TargetRoleArn.\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "TemplateArn": {
+          "description": "The ARN of the customer-owned IAM workload identity template that renders the workload's SPIFFE identity.",
+          "type": "string",
+          "minLength": 1,
+          "markdownDescription": "The ARN of the customer-owned IAM workload identity template that renders the workload's SPIFFE identity.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nPattern: ^arn:aws[a-zA-Z-]*:iam::[0-9]{12}:workload-identity-template/[^/]+$  \nUpdate requires: No interruption\n"
+        },
+        "ProviderArn": {
+          "description": "The ARN of the customer-owned IAM workload identity provider that produces the trusted context assertion for the workload.",
+          "type": "string",
+          "minLength": 1,
+          "markdownDescription": "The ARN of the customer-owned IAM workload identity provider that produces the trusted context assertion for the workload.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nPattern: ^arn:aws[a-zA-Z-]*:iam::([0-9]{12}|o-[a-z0-9]{10,32}):workload-identity-provider/[^/]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Enabled"
+      ],
+      "dependencies": {
+        "TemplateArn": [
+          "ProviderArn"
+        ],
+        "ProviderArn": [
+          "TemplateArn"
+        ]
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The workload identity configuration of the pod identity association. When enabled, the association also provisions a SPIFFE identity for the workload. Setting Enabled to false disables workload identity and keeps the ARNs. Removing the property from the template leaves the association unchanged; set Enabled to false to disable workload identity.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "properties": {
@@ -87,6 +123,9 @@
       "minLength": 1,
       "markdownDescription": "The Disable Session Tags of the pod identity association.\n\n---\n\nRequired: No  \nType: Boolean  \nMinimum Length: 1  \nUpdate requires: No interruption\n"
     },
+    "WorkloadIdentityConfig": {
+      "$ref": "#/definitions/WorkloadIdentityConfig"
+    },
     "Tags": {
       "description": "An array of key-value pairs to apply to this resource.",
       "type": "array",
@@ -137,7 +176,11 @@
         "eks:DescribePodIdentityAssociation",
         "eks:TagResource",
         "iam:PassRole",
-        "iam:GetRole"
+        "iam:GetRole",
+        "iam:PassWorkloadIdentityTemplate",
+        "iam:GetWorkloadIdentityTemplate",
+        "iam:GetWorkloadIdentityTemplateAttestationPolicy",
+        "iam:GetWorkloadIdentityProvider"
       ]
     },
     "read": {
@@ -152,7 +195,11 @@
         "eks:TagResource",
         "eks:UntagResource",
         "iam:PassRole",
-        "iam:GetRole"
+        "iam:GetRole",
+        "iam:PassWorkloadIdentityTemplate",
+        "iam:GetWorkloadIdentityTemplate",
+        "iam:GetWorkloadIdentityTemplateAttestationPolicy",
+        "iam:GetWorkloadIdentityProvider"
       ]
     },
     "delete": {

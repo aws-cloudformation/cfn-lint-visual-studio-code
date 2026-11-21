@@ -1,0 +1,350 @@
+{
+  "typeName": "AWS::SageMaker::InferenceRouter",
+  "description": "Resource Type definition for AWS::SageMaker::InferenceRouter. Creates a SageMaker Inference Router, a named entry point that routes inference requests for each routing target to one of its destination endpoints or inference components, which can be in other AWS Regions and accounts.",
+  "sourceUrl": "https://code.amazon.com/packages/UluruResourceStaging/trees/mainline/--/aws/sagemaker/inferencerouter",
+  "definitions": {
+    "Destination": {
+      "type": "object",
+      "description": "One placement of a routing target's model. ResourceArn is the destination's identity: changing it is a removal plus an addition.",
+      "properties": {
+        "ResourceArn": {
+          "type": "string",
+          "description": "The ARN of a SageMaker endpoint or inference component that serves the routing target. It can be in any Region and account within the Inference Router's partition.",
+          "minLength": 20,
+          "maxLength": 2048,
+          "markdownDescription": "The ARN of a SageMaker endpoint or inference component that serves the routing target. It can be in any Region and account within the Inference Router's partition.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:aws[a-z-]*:sagemaker:[a-z0-9-]+:[0-9]{12}:(endpoint|inference-component)/[a-zA-Z0-9](-*[a-zA-Z0-9]){0,62}$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ResourceArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "One placement of a routing target's model. ResourceArn is the destination's identity: changing it is a removal plus an addition.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AsyncInferenceNotificationConfig": {
+      "type": "object",
+      "description": "The SNS topics the Inference Router publishes a completion to. The notification carries the location of the result, not the result.",
+      "properties": {
+        "SuccessTopic": {
+          "type": "string",
+          "description": "The ARN of a standard (not FIFO) SNS topic to notify when a request succeeds. It can be in any Region.",
+          "minLength": 20,
+          "maxLength": 2048,
+          "markdownDescription": "The ARN of a standard (not FIFO) SNS topic to notify when a request succeeds. It can be in any Region.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:aws[a-z-]*:sns:[a-z0-9-]*:[0-9]{12}:[a-zA-Z0-9_.-]+$  \nUpdate requires: No interruption\n"
+        },
+        "ErrorTopic": {
+          "type": "string",
+          "description": "The ARN of a standard (not FIFO) SNS topic to notify when a request fails. It can be in any Region.",
+          "minLength": 20,
+          "maxLength": 2048,
+          "markdownDescription": "The ARN of a standard (not FIFO) SNS topic to notify when a request fails. It can be in any Region.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:aws[a-z-]*:sns:[a-z0-9-]*:[0-9]{12}:[a-zA-Z0-9_.-]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The SNS topics the Inference Router publishes a completion to. The notification carries the location of the result, not the result.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AsyncInferenceOutputConfig": {
+      "type": "object",
+      "description": "Where the results of asynchronous requests are written. Every destination of the routing target writes to these paths.",
+      "properties": {
+        "S3OutputPath": {
+          "type": "string",
+          "description": "The Amazon S3 location for successful results. It can be in any Region and account.",
+          "minLength": 1,
+          "maxLength": 512,
+          "markdownDescription": "The Amazon S3 location for successful results. It can be in any Region and account.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^(https|s3)://([^/])/?(.*)$  \nUpdate requires: No interruption\n"
+        },
+        "S3FailurePath": {
+          "type": "string",
+          "description": "The Amazon S3 location for failed requests. It can be in any Region and account.",
+          "minLength": 1,
+          "maxLength": 512,
+          "markdownDescription": "The Amazon S3 location for failed requests. It can be in any Region and account.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^(https|s3)://([^/])/?(.*)$  \nUpdate requires: No interruption\n"
+        },
+        "KmsKeyId": {
+          "type": "string",
+          "description": "The AWS KMS key that encrypts the results. If any destination is in a different account or Region from the Inference Router, use a key ARN or an alias ARN.",
+          "minLength": 0,
+          "maxLength": 2048,
+          "markdownDescription": "The AWS KMS key that encrypts the results. If any destination is in a different account or Region from the Inference Router, use a key ARN or an alias ARN.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 2048  \nPattern: ^[a-zA-Z0-9:/_-]*$  \nUpdate requires: No interruption\n"
+        },
+        "NotificationConfig": {
+          "$ref": "#/definitions/AsyncInferenceNotificationConfig"
+        }
+      },
+      "required": [
+        "S3OutputPath",
+        "S3FailurePath"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Where the results of asynchronous requests are written. Every destination of the routing target writes to these paths.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AsyncInferenceClientConfig": {
+      "type": "object",
+      "description": "How the Inference Router submits a request to a destination.",
+      "properties": {
+        "MaxTimeInBacklogSeconds": {
+          "type": "integer",
+          "description": "How long, in seconds, a request can wait for a destination to pick it up before it expires. The default is 900.",
+          "minimum": 60,
+          "maximum": 21600,
+          "markdownDescription": "How long, in seconds, a request can wait for a destination to pick it up before it expires. The default is 900.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "How the Inference Router submits a request to a destination.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AsyncInferenceConfig": {
+      "type": "object",
+      "description": "Set this when the routing target's destinations are asynchronous inference endpoints. A routing target without it serves real-time requests.",
+      "properties": {
+        "OutputConfig": {
+          "$ref": "#/definitions/AsyncInferenceOutputConfig"
+        },
+        "ClientConfig": {
+          "$ref": "#/definitions/AsyncInferenceClientConfig"
+        }
+      },
+      "required": [
+        "OutputConfig"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Set this when the routing target's destinations are asynchronous inference endpoints. A routing target without it serves real-time requests.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RoutingTarget": {
+      "type": "object",
+      "description": "A named logical model within the Inference Router. Callers pass Name on the inference request to select which model serves it.",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "description": "The logical model name a caller passes at invoke time. Unique within an Inference Router.",
+          "minLength": 1,
+          "maxLength": 63,
+          "markdownDescription": "The logical model name a caller passes at invoke time. Unique within an Inference Router.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 63  \nPattern: ^[a-zA-Z0-9](-*[a-zA-Z0-9]){0,62}$  \nUpdate requires: No interruption\n"
+        },
+        "Destinations": {
+          "type": "array",
+          "description": "The endpoints and inference components that serve this routing target.",
+          "minItems": 1,
+          "maxItems": 10,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/Destination"
+          },
+          "markdownDescription": "The endpoints and inference components that serve this routing target.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "AsyncInferenceConfig": {
+          "$ref": "#/definitions/AsyncInferenceConfig"
+        },
+        "RoutingPreference": {
+          "type": "string",
+          "description": "How the router prefers this routing target's destinations. LocalRegionFirst (the default) uses destinations in the router's Region first, then the others, each group in the order listed. InstancePoolOrder, for asynchronous routing targets only, tries destinations in order of the best instance pool they can serve from now. In both, degraded destinations are used after the others. If omitted, LocalRegionFirst is used and returned.",
+          "enum": [
+            "LocalRegionFirst",
+            "InstancePoolOrder"
+          ],
+          "markdownDescription": "How the router prefers this routing target's destinations. LocalRegionFirst (the default) uses destinations in the router's Region first, then the others, each group in the order listed. InstancePoolOrder, for asynchronous routing targets only, tries destinations in order of the best instance pool they can serve from now. In both, degraded destinations are used after the others. If omitted, LocalRegionFirst is used and returned.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: LocalRegionFirst | InstancePoolOrder  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Name",
+        "Destinations"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A named logical model within the Inference Router. Callers pass Name on the inference request to select which model serves it.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "type": "object",
+      "description": "A key-value pair to associate with the Inference Router.",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The tag key. Tag keys must be unique per resource.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The tag key. Tag keys must be unique per resource.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The tag value.",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The tag value.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: ^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A key-value pair to associate with the Inference Router.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "InferenceRouterArn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the Inference Router.",
+      "minLength": 20,
+      "maxLength": 2048,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the Inference Router.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:aws[a-z-]*:sagemaker:[a-z0-9-]+:[0-9]{12}:inference-router/[a-zA-Z0-9](-*[a-zA-Z0-9]){0,62}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "InferenceRouterName": {
+      "type": "string",
+      "description": "The name of the Inference Router. Unique per account per Region, case-sensitive. If you don't specify a name, CloudFormation generates one.",
+      "minLength": 1,
+      "maxLength": 63,
+      "markdownDescription": "The name of the Inference Router. Unique per account per Region, case-sensitive. If you don't specify a name, CloudFormation generates one.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 63  \nPattern: ^[a-zA-Z0-9](-*[a-zA-Z0-9]){0,62}$  \nUpdate requires: Replacement\n"
+    },
+    "RoutingTargets": {
+      "type": "array",
+      "description": "The routing targets of the Inference Router. An update replaces the full list.",
+      "minItems": 1,
+      "maxItems": 20,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/RoutingTarget"
+      },
+      "markdownDescription": "The routing targets of the Inference Router. An update replaces the full list.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "Status": {
+      "type": "string",
+      "description": "Where the Inference Router's most recent configuration write has got to. Writes commit synchronously; propagation to the data plane is asynchronous.",
+      "enum": [
+        "InService",
+        "Creating",
+        "Updating",
+        "Failed",
+        "Deleting"
+      ],
+      "markdownDescription": "Where the Inference Router's most recent configuration write has got to. Writes commit synchronously; propagation to the data plane is asynchronous.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: InService | Creating | Updating | Failed | Deleting  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreationTime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The time when the Inference Router was created.",
+      "markdownDescription": "The time when the Inference Router was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "LastModifiedTime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The time when the Inference Router was last modified.",
+      "markdownDescription": "The time when the Inference Router was last modified.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Tags": {
+      "type": "array",
+      "description": "Tags to associate with the Inference Router.",
+      "minItems": 0,
+      "maxItems": 50,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "Tags to associate with the Inference Router.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "required": [
+    "RoutingTargets"
+  ],
+  "readOnlyProperties": [
+    "/properties/InferenceRouterArn",
+    "/properties/Status",
+    "/properties/CreationTime",
+    "/properties/LastModifiedTime"
+  ],
+  "createOnlyProperties": [
+    "/properties/InferenceRouterName"
+  ],
+  "primaryIdentifier": [
+    "/properties/InferenceRouterArn"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/InferenceRouterName"
+    ]
+  ],
+  "additionalProperties": false,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "sagemaker:AddTags",
+      "sagemaker:DeleteTags",
+      "sagemaker:ListTags"
+    ]
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "sagemaker:CreateInferenceRouter",
+        "sagemaker:DescribeInferenceRouter",
+        "sagemaker:AddTags",
+        "sagemaker:ListTags"
+      ],
+      "timeoutInMinutes": 60
+    },
+    "read": {
+      "permissions": [
+        "sagemaker:DescribeInferenceRouter",
+        "sagemaker:ListTags"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "sagemaker:UpdateInferenceRouter",
+        "sagemaker:DescribeInferenceRouter",
+        "sagemaker:AddTags",
+        "sagemaker:DeleteTags",
+        "sagemaker:ListTags"
+      ],
+      "timeoutInMinutes": 60
+    },
+    "delete": {
+      "permissions": [
+        "sagemaker:DeleteInferenceRouter",
+        "sagemaker:DescribeInferenceRouter"
+      ],
+      "timeoutInMinutes": 60
+    },
+    "list": {
+      "permissions": [
+        "sagemaker:ListInferenceRouters"
+      ]
+    }
+  },
+  "attributes": {
+    "InferenceRouterArn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the Inference Router.",
+      "minLength": 20,
+      "maxLength": 2048,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the Inference Router.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 20  \nMaximum Length: 2048  \nPattern: ^arn:aws[a-z-]*:sagemaker:[a-z0-9-]+:[0-9]{12}:inference-router/[a-zA-Z0-9](-*[a-zA-Z0-9]){0,62}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Status": {
+      "type": "string",
+      "description": "Where the Inference Router's most recent configuration write has got to. Writes commit synchronously; propagation to the data plane is asynchronous.",
+      "enum": [
+        "InService",
+        "Creating",
+        "Updating",
+        "Failed",
+        "Deleting"
+      ],
+      "markdownDescription": "Where the Inference Router's most recent configuration write has got to. Writes commit synchronously; propagation to the data plane is asynchronous.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: InService | Creating | Updating | Failed | Deleting  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreationTime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The time when the Inference Router was created.",
+      "markdownDescription": "The time when the Inference Router was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "LastModifiedTime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The time when the Inference Router was last modified.",
+      "markdownDescription": "The time when the Inference Router was last modified.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

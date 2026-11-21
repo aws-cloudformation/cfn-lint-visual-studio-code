@@ -72,6 +72,38 @@
       "maxLength": 63,
       "markdownDescription": "The name of the vector index to create.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 63  \nUpdate requires: No interruption\n"
     },
+    "TextSearchConfiguration": {
+      "type": "object",
+      "properties": {
+        "MetadataKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 63  \nUpdate requires: No interruption\n"
+        },
+        "Language": {
+          "type": "string",
+          "enum": [
+            "en",
+            "fr",
+            "es",
+            "pt",
+            "it",
+            "de",
+            "nl",
+            "zh",
+            "ja",
+            "ko"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: en | fr | es | pt | it | de | nl | zh | ja | ko  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "MetadataKey"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "MetadataConfiguration": {
       "description": "The metadata configuration for the vector index.",
       "type": "object",
@@ -90,10 +122,21 @@
           "insertionOrder": false,
           "uniqueItems": true,
           "markdownDescription": "Non-filterable metadata keys allow you to enrich vectors with additional context during storage and retrieval. Unlike default metadata keys, these keys cannot be used as query filters. Non-filterable metadata keys can be retrieved but cannot be searched, queried, or filtered. You can access non-filterable metadata keys of your vectors after finding the vectors.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "TextSearchConfigurations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TextSearchConfiguration"
+          },
+          "minItems": 1,
+          "maxItems": 10,
+          "insertionOrder": false,
+          "uniqueItems": true,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         }
       },
       "additionalProperties": false,
-      "markdownDescription": "The metadata configuration for the vector index.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The metadata configuration for the vector index.\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
     },
     "VectorBucketArn": {
       "description": "The Amazon Resource Name (ARN) of the vector bucket.",
@@ -193,7 +236,7 @@
     "/properties/DistanceMetric",
     "/properties/EncryptionConfiguration",
     "/properties/IndexName",
-    "/properties/MetadataConfiguration",
+    "/properties/MetadataConfiguration/NonFilterableMetadataKeys",
     "/properties/VectorBucketArn",
     "/properties/VectorBucketName"
   ],
@@ -226,7 +269,8 @@
         "s3vectors:TagResource",
         "kms:GenerateDataKey",
         "kms:Decrypt"
-      ]
+      ],
+      "timeoutInMinutes": 2160
     },
     "read": {
       "permissions": [
@@ -237,10 +281,12 @@
     "update": {
       "permissions": [
         "s3vectors:GetIndex",
+        "s3vectors:UpdateMetadataConfiguration",
         "s3vectors:TagResource",
         "s3vectors:UntagResource",
         "s3vectors:ListTagsForResource"
-      ]
+      ],
+      "timeoutInMinutes": 2160
     },
     "delete": {
       "permissions": [

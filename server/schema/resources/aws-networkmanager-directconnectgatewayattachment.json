@@ -66,7 +66,7 @@
     "ProposedSegmentChange": {
       "description": "The attachment to move from one segment to another.",
       "$ref": "#/definitions/ProposedSegmentChange",
-      "markdownDescription": "The attachment to move from one segment to another.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+      "markdownDescription": "The attachment to move from one segment to another.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "NetworkFunctionGroupName": {
       "description": "The name of the network function group attachment.",
@@ -76,12 +76,37 @@
     "ProposedNetworkFunctionGroupChange": {
       "description": "The attachment to move from one network function group to another.",
       "$ref": "#/definitions/ProposedNetworkFunctionGroupChange",
-      "markdownDescription": "The attachment to move from one network function group to another.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+      "markdownDescription": "The attachment to move from one network function group to another.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "RoutingPolicyLabel": {
       "description": "Routing policy label",
       "type": "string",
-      "markdownDescription": "Routing policy label\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+      "markdownDescription": "Routing policy label\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+    },
+    "NatGatewaySupport": {
+      "description": "Whether NAT gateway support is enabled on the attachment. Required when NatGatewayRules lists rules. Set to DISABLE with NatGatewayRules to keep the rules on the attachment without translating traffic, and set it to ENABLE to activate them again. An attachment that is pending acceptance applies this setting once it is accepted. Only the core network owner can configure or read NAT gateway settings. Not available in AWS GovCloud (US).",
+      "type": "string",
+      "enum": [
+        "ENABLE",
+        "DISABLE"
+      ],
+      "markdownDescription": "Whether NAT gateway support is enabled on the attachment. Required when NatGatewayRules lists rules. Set to DISABLE with NatGatewayRules to keep the rules on the attachment without translating traffic, and set it to ENABLE to activate them again. An attachment that is pending acceptance applies this setting once it is accepted. Only the core network owner can configure or read NAT gateway settings. Not available in AWS GovCloud (US).\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLE | DISABLE  \nUpdate requires: No interruption\n"
+    },
+    "NatSystemRouteSupport": {
+      "description": "Whether system routes are installed for the NAT CIDRs of the attachment's NAT gateway rules. If omitted, a new NAT gateway configuration uses the service default of true and an existing configuration keeps its current value, so removing this property from a template doesn't reset the setting. Only the core network owner can configure this setting. Not available in AWS GovCloud (US).",
+      "type": "boolean",
+      "markdownDescription": "Whether system routes are installed for the NAT CIDRs of the attachment's NAT gateway rules. If omitted, a new NAT gateway configuration uses the service default of true and an existing configuration keeps its current value, so removing this property from a template doesn't reset the setting. Only the core network owner can configure this setting. Not available in AWS GovCloud (US).\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+    },
+    "NatGatewayRules": {
+      "description": "The complete set of NAT gateway rules on the attachment. Updating this property replaces the entire rule set, and rules left out of the new value are removed. To remove all rules, specify an empty list or remove this property. NAT gateway support can't be enabled without rules, so it is then disabled unless NatGatewaySupport is specified. Only the core network owner can configure NAT gateway rules. The rules aren't returned when the attachment is read, so drift detection doesn't check them. Not available in AWS GovCloud (US).",
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "maxItems": 50,
+      "items": {
+        "$ref": "#/definitions/NatRule"
+      },
+      "markdownDescription": "The complete set of NAT gateway rules on the attachment. Updating this property replaces the entire rule set, and rules left out of the new value are removed. To remove all rules, specify an empty list or remove this property. NAT gateway support can't be enabled without rules, so it is then disabled unless NatGatewaySupport is specified. Only the core network owner can configure NAT gateway rules. The rules aren't returned when the attachment is read, so drift detection doesn't check them. Not available in AWS GovCloud (US).\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     },
     "Tags": {
       "description": "Tags for the attachment.",
@@ -114,6 +139,40 @@
     }
   },
   "definitions": {
+    "NatRule": {
+      "description": "A NAT gateway rule on the attachment.",
+      "type": "object",
+      "properties": {
+        "RuleNumber": {
+          "description": "The rule number that uniquely identifies the NAT rule on the attachment.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32766,
+          "markdownDescription": "The rule number that uniquely identifies the NAT rule on the attachment.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "MatchSourceCidr": {
+          "description": "The IPv4 CIDR that source traffic is matched against for translation.",
+          "type": "string",
+          "minLength": 9,
+          "maxLength": 18,
+          "markdownDescription": "The IPv4 CIDR that source traffic is matched against for translation.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 9  \nMaximum Length: 18  \nPattern: ^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/([0-9]|[1-2][0-9]|3[0-2])$  \nUpdate requires: No interruption\n"
+        },
+        "NatCidr": {
+          "description": "The IPv4 CIDR that matched source traffic is translated into. Must have the same prefix length as MatchSourceCidr.",
+          "type": "string",
+          "minLength": 9,
+          "maxLength": 18,
+          "markdownDescription": "The IPv4 CIDR that matched source traffic is translated into. Must have the same prefix length as MatchSourceCidr.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 9  \nMaximum Length: 18  \nPattern: ^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/([0-9]|[1-2][0-9]|3[0-2])$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "RuleNumber",
+        "MatchSourceCidr",
+        "NatCidr"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A NAT gateway rule on the attachment.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "Tag": {
       "description": "A key-value pair to associate with a resource.",
       "type": "object",
@@ -197,7 +256,7 @@
     "taggable": true,
     "tagOnCreate": true,
     "tagUpdatable": true,
-    "cloudFormationSystemTags": false,
+    "cloudFormationSystemTags": true,
     "tagProperty": "/properties/Tags",
     "permissions": [
       "networkmanager:TagResource",
@@ -213,11 +272,11 @@
   ],
   "createOnlyProperties": [
     "/properties/CoreNetworkId",
-    "/properties/DirectConnectGatewayArn",
-    "/properties/RoutingPolicyLabel"
+    "/properties/DirectConnectGatewayArn"
   ],
   "writeOnlyProperties": [
-    "/properties/RoutingPolicyLabel"
+    "/properties/RoutingPolicyLabel",
+    "/properties/NatGatewayRules"
   ],
   "readOnlyProperties": [
     "/properties/CoreNetworkArn",
@@ -231,7 +290,9 @@
     "/properties/SegmentName",
     "/properties/NetworkFunctionGroupName",
     "/properties/ResourceArn",
-    "/properties/LastModificationErrors"
+    "/properties/LastModificationErrors",
+    "/properties/ProposedSegmentChange",
+    "/properties/ProposedNetworkFunctionGroupChange"
   ],
   "primaryIdentifier": [
     "/properties/AttachmentId"
@@ -249,7 +310,9 @@
         "networkmanager:GetDirectConnectGatewayAttachment",
         "networkmanager:TagResource",
         "ec2:DescribeRegions",
-        "iam:CreateServiceLinkedRole"
+        "iam:CreateServiceLinkedRole",
+        "networkmanager:UpdateAttachmentNatConfiguration",
+        "networkmanager:ListAttachmentNatConfigurations"
       ],
       "timeoutInMinutes": 60
     },
@@ -265,7 +328,12 @@
         "networkmanager:ListTagsForResource",
         "networkmanager:TagResource",
         "networkmanager:UntagResource",
-        "ec2:DescribeRegions"
+        "networkmanager:PutAttachmentRoutingPolicyLabel",
+        "networkmanager:RemoveAttachmentRoutingPolicyLabel",
+        "networkmanager:ListAttachmentRoutingPolicyAssociations",
+        "ec2:DescribeRegions",
+        "networkmanager:UpdateAttachmentNatConfiguration",
+        "networkmanager:ListAttachmentNatConfigurations"
       ],
       "timeoutInMinutes": 60
     },
@@ -325,10 +393,20 @@
       "type": "string",
       "markdownDescription": "The name of the segment attachment..\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
     },
+    "ProposedSegmentChange": {
+      "description": "The attachment to move from one segment to another.",
+      "$ref": "#/definitions/ProposedSegmentChange",
+      "markdownDescription": "The attachment to move from one segment to another.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
     "NetworkFunctionGroupName": {
       "description": "The name of the network function group attachment.",
       "type": "string",
       "markdownDescription": "The name of the network function group attachment.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ProposedNetworkFunctionGroupChange": {
+      "description": "The attachment to move from one network function group to another.",
+      "$ref": "#/definitions/ProposedNetworkFunctionGroupChange",
+      "markdownDescription": "The attachment to move from one network function group to another.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "CreatedAt": {
       "description": "Creation time of the attachment.",
