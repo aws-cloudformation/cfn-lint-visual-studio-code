@@ -127,6 +127,31 @@
       "maxLength": 1224,
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1224  \nPattern: ^arn.*  \nUpdate requires: No interruption\n"
     },
+    "CidrResource": {
+      "description": "The CIDR ranges that make up a CIDR resource configuration. Only valid when ResourceConfigurationType is CIDR, and the resource gateway must have ResourceConfigDnsResolution set to IN_VPC.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "CidrRanges": {
+          "minItems": 1,
+          "maxItems": 10,
+          "description": "The IPv4 CIDR ranges reachable through this resource configuration, in CIDR notation (for example, 10.0.0.0/24).",
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "minLength": 1,
+            "type": "string",
+            "maxLength": 50,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 50  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "The IPv4 CIDR ranges reachable through this resource configuration, in CIDR notation (for example, 10.0.0.0/24).\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "CidrRanges"
+      ],
+      "markdownDescription": "The CIDR ranges that make up a CIDR resource configuration. Only valid when ResourceConfigurationType is CIDR, and the resource gateway must have ResourceConfigDnsResolution set to IN_VPC.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "Tag": {
       "additionalProperties": false,
       "type": "object",
@@ -164,12 +189,13 @@
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 255  \nUpdate requires: Replacement\n"
     },
     "PortRanges": {
+      "description": "The port ranges the resource configuration listens on, as single ports or ranges (for example, 80 or 1001-2000). Applies to SINGLE, GROUP, CHILD, and CIDR resource configurations. For a CIDR resource configuration with ProtocolType TCP_UDP, these ranges cover both TCP and UDP traffic, so include port 53 to carry DNS to the network segment.",
       "insertionOrder": false,
       "type": "array",
       "items": {
         "$ref": "#/definitions/PortRange"
       },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+      "markdownDescription": "The port ranges the resource configuration listens on, as single ports or ranges (for example, 80 or 1001-2000). Applies to SINGLE, GROUP, CHILD, and CIDR resource configurations. For a CIDR resource configuration with ProtocolType TCP_UDP, these ranges cover both TCP and UDP traffic, so include port 53 to carry DNS to the network segment.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     },
     "ResourceConfigurationDefinition": {
       "oneOf": [
@@ -211,6 +237,19 @@
           "required": [
             "DnsResource"
           ]
+        },
+        {
+          "additionalProperties": false,
+          "type": "object",
+          "title": "CidrResource",
+          "properties": {
+            "CidrResource": {
+              "$ref": "#/definitions/CidrResource"
+            }
+          },
+          "required": [
+            "CidrResource"
+          ]
         }
       ],
       "type": "object",
@@ -244,11 +283,13 @@
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
     },
     "ProtocolType": {
+      "description": "The protocol the resource configuration accepts. SINGLE and GROUP resource configurations support TCP. CIDR resource configurations support TCP and TCP_UDP; use TCP_UDP to carry UDP traffic such as DNS on port 53.",
       "type": "string",
       "enum": [
-        "TCP"
+        "TCP",
+        "TCP_UDP"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: TCP  \nUpdate requires: Replacement\n"
+      "markdownDescription": "The protocol the resource configuration accepts. SINGLE and GROUP resource configurations support TCP. CIDR resource configurations support TCP and TCP_UDP; use TCP_UDP to carry UDP traffic such as DNS on port 53.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: TCP | TCP_UDP  \nUpdate requires: Replacement\n"
     },
     "ResourceConfigurationType": {
       "type": "string",
@@ -256,9 +297,10 @@
         "GROUP",
         "CHILD",
         "SINGLE",
-        "ARN"
+        "ARN",
+        "CIDR"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: GROUP | CHILD | SINGLE | ARN  \nUpdate requires: Replacement\n"
+      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: GROUP | CHILD | SINGLE | ARN | CIDR  \nUpdate requires: Replacement\n"
     },
     "DomainVerificationId": {
       "minLength": 20,

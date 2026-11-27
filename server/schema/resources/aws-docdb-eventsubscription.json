@@ -2,63 +2,97 @@
   "typeName": "AWS::DocDB::EventSubscription",
   "description": "Resource Type definition for AWS::DocDB::EventSubscription",
   "additionalProperties": false,
-  "properties": {
-    "SourceType": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-    },
-    "Enabled": {
-      "type": "boolean",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
-    },
-    "EventCategories": {
-      "type": "array",
-      "uniqueItems": false,
-      "items": {
-        "type": "string",
-        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-    },
-    "SubscriptionName": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
-    },
-    "SnsTopicArn": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
-    },
-    "SourceIds": {
-      "type": "array",
-      "uniqueItems": false,
-      "items": {
-        "type": "string",
-        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
-      },
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
-    },
-    "Id": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
-    }
-  },
   "required": [
     "SnsTopicArn"
   ],
+  "properties": {
+    "Enabled": {
+      "description": "A Boolean value; set to true to activate the subscription, set to false to create the subscription but not active it.",
+      "type": "boolean",
+      "markdownDescription": "A Boolean value; set to true to activate the subscription, set to false to create the subscription but not active it.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+    },
+    "EventCategories": {
+      "description": "A list of event categories for a SourceType that you want to subscribe to.",
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+      },
+      "markdownDescription": "A list of event categories for a SourceType that you want to subscribe to.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "SnsTopicArn": {
+      "description": "The Amazon Resource Name (ARN) of the SNS topic created for event notification. Amazon SNS creates the ARN when you create a topic and subscribe to it.",
+      "type": "string",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the SNS topic created for event notification. Amazon SNS creates the ARN when you create a topic and subscribe to it.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "SubscriptionName": {
+      "description": "The name of the subscription.",
+      "maxLength": 255,
+      "type": "string",
+      "markdownDescription": "The name of the subscription.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 255  \nUpdate requires: Replacement\n"
+    },
+    "SourceIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]$|^[a-zA-Z]$  \nUpdate requires: No interruption\n"
+      },
+      "description": "The list of identifiers of the event sources for which events are returned",
+      "markdownDescription": "The list of identifiers of the event sources for which events are returned\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "SourceType": {
+      "type": "string",
+      "enum": [
+        "db-instance",
+        "db-cluster",
+        "db-parameter-group",
+        "db-security-group",
+        "db-cluster-snapshot"
+      ],
+      "description": "The type of source that is generating the events.",
+      "markdownDescription": "The type of source that is generating the events.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: db-instance | db-cluster | db-parameter-group | db-security-group | db-cluster-snapshot  \nUpdate requires: No interruption\n"
+    }
+  },
   "createOnlyProperties": [
-    "/properties/SubscriptionName",
-    "/properties/SnsTopicArn"
+    "/properties/SnsTopicArn",
+    "/properties/SubscriptionName"
   ],
   "primaryIdentifier": [
-    "/properties/Id"
+    "/properties/SubscriptionName"
   ],
-  "readOnlyProperties": [
-    "/properties/Id"
-  ],
-  "attributes": {
-    "Id": {
-      "type": "string",
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+  "tagging": {
+    "taggable": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "rds:CreateEventSubscription"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "rds:DeleteEventSubscription"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "rds:DescribeEventSubscriptions"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "rds:DescribeEventSubscriptions"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "rds:ModifyEventSubscription",
+        "rds:DescribeEventSubscriptions",
+        "rds:AddSourceIdentifierToSubscription",
+        "rds:RemoveSourceIdentifierFromSubscription"
+      ]
     }
-  }
+  },
+  "attributes": {}
 }

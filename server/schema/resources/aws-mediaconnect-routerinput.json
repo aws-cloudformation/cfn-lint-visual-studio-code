@@ -8,6 +8,18 @@
       "additionalProperties": false,
       "markdownDescription": "Configuration settings for automatic encryption key management, where MediaConnect handles key creation and rotation.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "AutomaticEndpointEncryptionConfiguration": {
+      "type": "object",
+      "description": "The configuration for automatic endpoint encryption. In this mode, MediaConnect determines the encryption key when the endpoint connects. This type does not require any additional settings.",
+      "additionalProperties": false,
+      "markdownDescription": "The configuration for automatic endpoint encryption. In this mode, MediaConnect determines the encryption key when the endpoint connects. This type does not require any additional settings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "AutomaticRtmpPushNamingConfiguration": {
+      "type": "object",
+      "description": "The automatic RTMP naming configuration, where MediaConnect generates the application and stream names. This type does not require any additional settings.",
+      "additionalProperties": false,
+      "markdownDescription": "The automatic RTMP naming configuration, where MediaConnect generates the application and stream names. This type does not require any additional settings.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "BlackFramesConfiguration": {
       "type": "object",
       "description": "Detects black frames in the router input's source content and reports them through a CloudWatch metric, an EventBridge event, and a router input message.",
@@ -74,6 +86,107 @@
       "additionalProperties": false,
       "markdownDescription": "Configuration settings for default maintenance scheduling.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "DestinationEndpointRouterInputConfiguration": {
+      "type": "object",
+      "description": "Configuration settings for a router input that is represented by a destination endpoint.",
+      "properties": {
+        "EndpointLifecycleManagement": {
+          "$ref": "#/definitions/EndpointLifecycle"
+        },
+        "SourceTransitDecryptionType": {
+          "$ref": "#/definitions/EndpointEncryptionType"
+        },
+        "SourceTransitDecryption": {
+          "$ref": "#/definitions/EndpointEncryptionConfiguration"
+        }
+      },
+      "required": [
+        "EndpointLifecycleManagement",
+        "SourceTransitDecryption"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration settings for a router input that is represented by a destination endpoint.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "DestinationEndpointRouterInputStreamDetails": {
+      "type": "object",
+      "description": "Configuration details for a router input stream that is represented by a destination endpoint.",
+      "additionalProperties": false,
+      "markdownDescription": "Configuration details for a router input stream that is represented by a destination endpoint.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EndpointEncryptionConfiguration": {
+      "description": "The encryption settings for an endpoint connection. This is a union type, so exactly one of its members is set: secretsManager when you store the encryption key or passphrase in Secrets Manager, or automatic when you let MediaConnect determine the encryption key when the endpoint connects.",
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "SecretsManager",
+          "properties": {
+            "SecretsManager": {
+              "$ref": "#/definitions/SecretsManagerEndpointEncryptionConfiguration"
+            }
+          },
+          "required": [
+            "SecretsManager"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Automatic",
+          "properties": {
+            "Automatic": {
+              "$ref": "#/definitions/AutomaticEndpointEncryptionConfiguration"
+            }
+          },
+          "required": [
+            "Automatic"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "The encryption settings for an endpoint connection. This is a union type, so exactly one of its members is set: secretsManager when you store the encryption key or passphrase in Secrets Manager, or automatic when you let MediaConnect determine the encryption key when the endpoint connects.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "EndpointEncryptionSecretConfiguration": {
+      "type": "object",
+      "description": "The configuration for the Secrets Manager secret that holds the key or passphrase used to encrypt an endpoint connection.",
+      "properties": {
+        "SecretArn": {
+          "type": "string",
+          "description": "The ARN of the Secrets Manager secret that holds the key or passphrase. The secret must be encrypted with a customer managed Amazon Web Services KMS key that is enabled and symmetric; it cannot use the Amazon Web Services managed key aws/secretsmanager. The secret must be in the same Amazon Web Services account and Region as the endpoint.",
+          "markdownDescription": "The ARN of the Secrets Manager secret that holds the key or passphrase. The secret must be encrypted with a customer managed Amazon Web Services KMS key that is enabled and symmetric; it cannot use the Amazon Web Services managed key aws/secretsmanager. The secret must be in the same Amazon Web Services account and Region as the endpoint.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^arn:(aws[a-zA-Z-]*):secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:[a-zA-Z0-9/_+=.@-]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "SecretArn"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The configuration for the Secrets Manager secret that holds the key or passphrase used to encrypt an endpoint connection.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "EndpointEncryptionSecretType": {
+      "type": "string",
+      "enum": [
+        "AES_128_KEY",
+        "AES_192_KEY",
+        "AES_256_KEY",
+        "SRT_PASSPHRASE"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AES_128_KEY | AES_192_KEY | AES_256_KEY | SRT_PASSPHRASE  \nUpdate requires: No interruption\n"
+    },
+    "EndpointEncryptionType": {
+      "type": "string",
+      "enum": [
+        "SECRETS_MANAGER",
+        "AUTOMATIC"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SECRETS_MANAGER | AUTOMATIC  \nUpdate requires: No interruption\n"
+    },
+    "EndpointLifecycle": {
+      "type": "string",
+      "enum": [
+        "MANAGED",
+        "UNMANAGED"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MANAGED | UNMANAGED  \nUpdate requires: No interruption\n"
+    },
     "FailoverInputSourcePriorityMode": {
       "type": "string",
       "enum": [
@@ -118,22 +231,28 @@
       "additionalProperties": false,
       "markdownDescription": "Configuration settings for a failover router input that allows switching between two input sources.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "FailoverRouterInputIndexedStreamDetails": {
+      "type": "object",
+      "description": "Configuration details for an indexed stream in a failover router input setup.",
+      "properties": {
+        "SourceIndex": {
+          "type": "integer",
+          "description": "The index number (0 or 1) assigned to this source in the failover configuration.",
+          "markdownDescription": "The index number (0 or 1) assigned to this source in the failover configuration.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "RtmpPush": {
+          "$ref": "#/definitions/RtmpPushStreamDetails"
+        }
+      },
+      "required": [
+        "SourceIndex"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration details for an indexed stream in a failover router input setup.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "FailoverRouterInputProtocolConfiguration": {
       "description": "Protocol configuration settings for failover router inputs.",
       "oneOf": [
-        {
-          "type": "object",
-          "title": "Rtp",
-          "properties": {
-            "Rtp": {
-              "$ref": "#/definitions/RtpRouterInputConfiguration"
-            }
-          },
-          "required": [
-            "Rtp"
-          ],
-          "additionalProperties": false
-        },
         {
           "type": "object",
           "title": "Rist",
@@ -162,6 +281,19 @@
         },
         {
           "type": "object",
+          "title": "RtmpPush",
+          "properties": {
+            "RtmpPush": {
+              "$ref": "#/definitions/RtmpPushRouterInputConfiguration"
+            }
+          },
+          "required": [
+            "RtmpPush"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
           "title": "SrtCaller",
           "properties": {
             "SrtCaller": {
@@ -172,9 +304,40 @@
             "SrtCaller"
           ],
           "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Rtp",
+          "properties": {
+            "Rtp": {
+              "$ref": "#/definitions/RtpRouterInputConfiguration"
+            }
+          },
+          "required": [
+            "Rtp"
+          ],
+          "additionalProperties": false
         }
       ],
       "markdownDescription": "Protocol configuration settings for failover router inputs.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "FailoverRouterInputStreamDetails": {
+      "type": "object",
+      "description": "Configuration details for a failover router input that can automatically switch between two sources.",
+      "properties": {
+        "SourceIndexZeroStreamDetails": {
+          "$ref": "#/definitions/FailoverRouterInputIndexedStreamDetails"
+        },
+        "SourceIndexOneStreamDetails": {
+          "$ref": "#/definitions/FailoverRouterInputIndexedStreamDetails"
+        }
+      },
+      "required": [
+        "SourceIndexOneStreamDetails",
+        "SourceIndexZeroStreamDetails"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration details for a failover router input that can automatically switch between two sources.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "FlowTransitEncryption": {
       "type": "object",
@@ -303,9 +466,31 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: PREFERRED_DAY_TIME | DEFAULT  \nUpdate requires: No interruption\n"
     },
+    "ManualRtmpPushNamingConfiguration": {
+      "type": "object",
+      "description": "The manual RTMP naming configuration, where you specify the application and stream names.",
+      "properties": {
+        "ApplicationName": {
+          "type": "string",
+          "description": "The name of the RTMP application. Together with the stream name, the application name forms the RTMP URL path, in the pattern rtmp://ingestAddress/applicationName/streamName.",
+          "markdownDescription": "The name of the RTMP application. Together with the stream name, the application name forms the RTMP URL path, in the pattern rtmp://ingestAddress/applicationName/streamName.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "StreamName": {
+          "type": "string",
+          "description": "The name of the RTMP stream. The stream name forms the final segment of the RTMP URL path.",
+          "markdownDescription": "The name of the RTMP stream. The stream name forms the final segment of the RTMP URL path.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ApplicationName",
+        "StreamName"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The manual RTMP naming configuration, where you specify the application and stream names.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "MediaConnectFlowRouterInputConfiguration": {
       "type": "object",
-      "description": "Configuration settings for connecting a router input to a flow output.",
+      "description": "Configuration settings for connecting a router input to a flow output. To connect the router input to the flow output, provide both flowArn and flowOutputArn. To disconnect it, call the update operation and omit both fields while keeping this configuration object. You can't change sourceTransitDecryption while the router input is connected to a flow output. To change it, first disconnect the router input, then update the decryption.",
       "properties": {
         "FlowArn": {
           "type": "string",
@@ -325,7 +510,13 @@
         "SourceTransitDecryption"
       ],
       "additionalProperties": false,
-      "markdownDescription": "Configuration settings for connecting a router input to a flow output.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Configuration settings for connecting a router input to a flow output. To connect the router input to the flow output, provide both flowArn and flowOutputArn. To disconnect it, call the update operation and omit both fields while keeping this configuration object. You can't change sourceTransitDecryption while the router input is connected to a flow output. To change it, first disconnect the router input, then update the decryption.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "MediaConnectFlowRouterInputStreamDetails": {
+      "type": "object",
+      "description": "Configuration details for a MediaConnect flow when used as a router input source.",
+      "additionalProperties": false,
+      "markdownDescription": "Configuration details for a MediaConnect flow when used as a router input source.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "MediaLiveChannelPipelineId": {
       "type": "string",
@@ -337,7 +528,7 @@
     },
     "MediaLiveChannelRouterInputConfiguration": {
       "type": "object",
-      "description": "Configuration settings for connecting a router input to a MediaLive channel output.",
+      "description": "Configuration settings for connecting a router input to a MediaLive channel output. To connect the router input to the MediaLive channel output, provide all three of mediaLiveChannelArn, mediaLivePipelineId, and mediaLiveChannelOutputName. To disconnect it, call the update operation and omit all three fields while keeping this configuration object. You can't change sourceTransitDecryption while the router input is connected to a MediaLive channel output. To change it, first disconnect the router input, then update the decryption.",
       "properties": {
         "MediaLiveChannelArn": {
           "type": "string",
@@ -360,7 +551,13 @@
         "SourceTransitDecryption"
       ],
       "additionalProperties": false,
-      "markdownDescription": "Configuration settings for connecting a router input to a MediaLive channel output.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Configuration settings for connecting a router input to a MediaLive channel output. To connect the router input to the MediaLive channel output, provide all three of mediaLiveChannelArn, mediaLivePipelineId, and mediaLiveChannelOutputName. To disconnect it, call the update operation and omit all three fields while keeping this configuration object. You can't change sourceTransitDecryption while the router input is connected to a MediaLive channel output. To change it, first disconnect the router input, then update the decryption.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "MediaLiveChannelRouterInputStreamDetails": {
+      "type": "object",
+      "description": "Configuration details for a MediaLive channel when used as a router input source.",
+      "additionalProperties": false,
+      "markdownDescription": "Configuration details for a MediaLive channel when used as a router input source.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "MediaLiveTransitEncryption": {
       "type": "object",
@@ -450,6 +647,22 @@
       "additionalProperties": false,
       "markdownDescription": "Configuration settings for a merge router input that combines two input sources.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "MergeRouterInputIndexedStreamDetails": {
+      "type": "object",
+      "description": "Configuration details for an indexed stream in a merge router input setup.",
+      "properties": {
+        "SourceIndex": {
+          "type": "integer",
+          "description": "The index number (0 or 1) assigned to this source in the merge configuration.",
+          "markdownDescription": "The index number (0 or 1) assigned to this source in the merge configuration.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "SourceIndex"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration details for an indexed stream in a merge router input setup.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "MergeRouterInputProtocolConfiguration": {
       "description": "Protocol configuration settings for merge router inputs.",
       "oneOf": [
@@ -478,9 +691,53 @@
             "Rist"
           ],
           "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "SrtListener",
+          "properties": {
+            "SrtListener": {
+              "$ref": "#/definitions/SrtListenerRouterInputConfiguration"
+            }
+          },
+          "required": [
+            "SrtListener"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "SrtCaller",
+          "properties": {
+            "SrtCaller": {
+              "$ref": "#/definitions/SrtCallerRouterInputConfiguration"
+            }
+          },
+          "required": [
+            "SrtCaller"
+          ],
+          "additionalProperties": false
         }
       ],
       "markdownDescription": "Protocol configuration settings for merge router inputs.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "MergeRouterInputStreamDetails": {
+      "type": "object",
+      "description": "Configuration details for a merge router input that combines two input sources.",
+      "properties": {
+        "SourceIndexZeroStreamDetails": {
+          "$ref": "#/definitions/MergeRouterInputIndexedStreamDetails"
+        },
+        "SourceIndexOneStreamDetails": {
+          "$ref": "#/definitions/MergeRouterInputIndexedStreamDetails"
+        }
+      },
+      "required": [
+        "SourceIndexOneStreamDetails",
+        "SourceIndexZeroStreamDetails"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration details for a merge router input that combines two input sources.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "PreferredDayTimeMaintenanceConfiguration": {
       "type": "object",
@@ -559,6 +816,19 @@
       "oneOf": [
         {
           "type": "object",
+          "title": "DestinationEndpoint",
+          "properties": {
+            "DestinationEndpoint": {
+              "$ref": "#/definitions/DestinationEndpointRouterInputConfiguration"
+            }
+          },
+          "required": [
+            "DestinationEndpoint"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
           "title": "Standard",
           "properties": {
             "Standard": {
@@ -567,6 +837,19 @@
           },
           "required": [
             "Standard"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "MediaLiveChannel",
+          "properties": {
+            "MediaLiveChannel": {
+              "$ref": "#/definitions/MediaLiveChannelRouterInputConfiguration"
+            }
+          },
+          "required": [
+            "MediaLiveChannel"
           ],
           "additionalProperties": false
         },
@@ -585,19 +868,6 @@
         },
         {
           "type": "object",
-          "title": "Merge",
-          "properties": {
-            "Merge": {
-              "$ref": "#/definitions/MergeRouterInputConfiguration"
-            }
-          },
-          "required": [
-            "Merge"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
           "title": "MediaConnectFlow",
           "properties": {
             "MediaConnectFlow": {
@@ -611,14 +881,14 @@
         },
         {
           "type": "object",
-          "title": "MediaLiveChannel",
+          "title": "Merge",
           "properties": {
-            "MediaLiveChannel": {
-              "$ref": "#/definitions/MediaLiveChannelRouterInputConfiguration"
+            "Merge": {
+              "$ref": "#/definitions/MergeRouterInputConfiguration"
             }
           },
           "required": [
-            "MediaLiveChannel"
+            "Merge"
           ],
           "additionalProperties": false
         }
@@ -631,26 +901,14 @@
         "RTP",
         "RIST",
         "SRT_CALLER",
-        "SRT_LISTENER"
+        "SRT_LISTENER",
+        "RTMP_PUSH"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: RTP | RIST | SRT_CALLER | SRT_LISTENER  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: RTP | RIST | SRT_CALLER | SRT_LISTENER | RTMP_PUSH  \nUpdate requires: No interruption\n"
     },
     "RouterInputProtocolConfiguration": {
       "description": "The protocol configuration settings for a router input.",
       "oneOf": [
-        {
-          "type": "object",
-          "title": "Rtp",
-          "properties": {
-            "Rtp": {
-              "$ref": "#/definitions/RtpRouterInputConfiguration"
-            }
-          },
-          "required": [
-            "Rtp"
-          ],
-          "additionalProperties": false
-        },
         {
           "type": "object",
           "title": "Rist",
@@ -679,6 +937,19 @@
         },
         {
           "type": "object",
+          "title": "RtmpPush",
+          "properties": {
+            "RtmpPush": {
+              "$ref": "#/definitions/RtmpPushRouterInputConfiguration"
+            }
+          },
+          "required": [
+            "RtmpPush"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
           "title": "SrtCaller",
           "properties": {
             "SrtCaller": {
@@ -687,6 +958,19 @@
           },
           "required": [
             "SrtCaller"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Rtp",
+          "properties": {
+            "Rtp": {
+              "$ref": "#/definitions/RtpRouterInputConfiguration"
+            }
+          },
+          "required": [
+            "Rtp"
           ],
           "additionalProperties": false
         }
@@ -709,14 +993,100 @@
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | STANDBY | STARTING | ACTIVE | STOPPING | DELETING | UPDATING | ERROR | RECOVERING | MIGRATING  \nUpdate requires: No interruption\n"
     },
+    "RouterInputStreamDetails": {
+      "description": "Configuration details for the router input stream.",
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "DestinationEndpoint",
+          "properties": {
+            "DestinationEndpoint": {
+              "$ref": "#/definitions/DestinationEndpointRouterInputStreamDetails"
+            }
+          },
+          "required": [
+            "DestinationEndpoint"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Standard",
+          "properties": {
+            "Standard": {
+              "$ref": "#/definitions/StandardRouterInputStreamDetails"
+            }
+          },
+          "required": [
+            "Standard"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "MediaLiveChannel",
+          "properties": {
+            "MediaLiveChannel": {
+              "$ref": "#/definitions/MediaLiveChannelRouterInputStreamDetails"
+            }
+          },
+          "required": [
+            "MediaLiveChannel"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Failover",
+          "properties": {
+            "Failover": {
+              "$ref": "#/definitions/FailoverRouterInputStreamDetails"
+            }
+          },
+          "required": [
+            "Failover"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "MediaConnectFlow",
+          "properties": {
+            "MediaConnectFlow": {
+              "$ref": "#/definitions/MediaConnectFlowRouterInputStreamDetails"
+            }
+          },
+          "required": [
+            "MediaConnectFlow"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Merge",
+          "properties": {
+            "Merge": {
+              "$ref": "#/definitions/MergeRouterInputStreamDetails"
+            }
+          },
+          "required": [
+            "Merge"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "Configuration details for the router input stream.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
     "RouterInputTier": {
       "type": "string",
       "enum": [
         "INPUT_100",
         "INPUT_50",
-        "INPUT_20"
+        "INPUT_20",
+        "INPUT_500",
+        "INPUT_250"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: INPUT_100 | INPUT_50 | INPUT_20  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: INPUT_100 | INPUT_50 | INPUT_20 | INPUT_500 | INPUT_250  \nUpdate requires: No interruption\n"
     },
     "RouterInputTransitEncryption": {
       "type": "object",
@@ -782,9 +1152,10 @@
         "FAILOVER",
         "MERGE",
         "MEDIACONNECT_FLOW",
-        "MEDIALIVE_CHANNEL"
+        "MEDIALIVE_CHANNEL",
+        "DESTINATION_ENDPOINT"
       ],
-      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: STANDARD | FAILOVER | MERGE | MEDIACONNECT_FLOW | MEDIALIVE_CHANNEL  \nUpdate requires: No interruption\n"
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: STANDARD | FAILOVER | MERGE | MEDIACONNECT_FLOW | MEDIALIVE_CHANNEL | DESTINATION_ENDPOINT  \nUpdate requires: No interruption\n"
     },
     "RoutingScope": {
       "type": "string",
@@ -793,6 +1164,93 @@
         "GLOBAL"
       ],
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: REGIONAL | GLOBAL  \nUpdate requires: No interruption\n"
+    },
+    "RtmpPushNamingConfiguration": {
+      "description": "The configuration settings for the RTMP (Real-Time Messaging Protocol) application and stream names.",
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "Manual",
+          "properties": {
+            "Manual": {
+              "$ref": "#/definitions/ManualRtmpPushNamingConfiguration"
+            }
+          },
+          "required": [
+            "Manual"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Automatic",
+          "properties": {
+            "Automatic": {
+              "$ref": "#/definitions/AutomaticRtmpPushNamingConfiguration"
+            }
+          },
+          "required": [
+            "Automatic"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "markdownDescription": "The configuration settings for the RTMP (Real-Time Messaging Protocol) application and stream names.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "RtmpPushNamingType": {
+      "type": "string",
+      "enum": [
+        "MANUAL",
+        "AUTOMATIC"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: MANUAL | AUTOMATIC  \nUpdate requires: No interruption\n"
+    },
+    "RtmpPushRouterInputConfiguration": {
+      "type": "object",
+      "description": "The configuration settings for a router input using the RTMP (Real-Time Messaging Protocol) protocol.",
+      "properties": {
+        "Port": {
+          "type": "integer",
+          "maximum": 1935,
+          "minimum": 1935,
+          "description": "The port number for the RTMP protocol. The only valid value is 1935.",
+          "markdownDescription": "The port number for the RTMP protocol. The only valid value is 1935.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "NamingType": {
+          "$ref": "#/definitions/RtmpPushNamingType"
+        },
+        "NamingConfiguration": {
+          "$ref": "#/definitions/RtmpPushNamingConfiguration"
+        }
+      },
+      "required": [
+        "NamingConfiguration",
+        "Port"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The configuration settings for a router input using the RTMP (Real-Time Messaging Protocol) protocol.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RtmpPushStreamDetails": {
+      "type": "object",
+      "description": "Configuration details for an RTMP (Real-Time Messaging Protocol) router input stream, including the application and stream names.",
+      "properties": {
+        "ApplicationName": {
+          "type": "string",
+          "description": "The name of the RTMP application.",
+          "markdownDescription": "The name of the RTMP application.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "StreamName": {
+          "type": "string",
+          "description": "The name of the RTMP stream.",
+          "markdownDescription": "The name of the RTMP stream.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ApplicationName",
+        "StreamName"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration details for an RTMP (Real-Time Messaging Protocol) router input stream, including the application and stream names.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "RtpRouterInputConfiguration": {
       "type": "object",
@@ -836,6 +1294,23 @@
       ],
       "additionalProperties": false,
       "markdownDescription": "The configuration settings for transit encryption using Secrets Manager, including the secret ARN and role ARN.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SecretsManagerEndpointEncryptionConfiguration": {
+      "type": "object",
+      "description": "The endpoint encryption configuration for connections that use a key or passphrase that you store in Secrets Manager.",
+      "properties": {
+        "EncryptionSecretType": {
+          "$ref": "#/definitions/EndpointEncryptionSecretType"
+        },
+        "EncryptionSecret": {
+          "$ref": "#/definitions/EndpointEncryptionSecretConfiguration"
+        }
+      },
+      "required": [
+        "EncryptionSecret"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The endpoint encryption configuration for connections that use a key or passphrase that you store in Secrets Manager.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "SilentAudioConfiguration": {
       "type": "object",
@@ -965,6 +1440,17 @@
       "additionalProperties": false,
       "markdownDescription": "The configuration settings for a standard router input, including the protocol, protocol-specific configuration, network interface, and availability zone.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "StandardRouterInputStreamDetails": {
+      "type": "object",
+      "description": "Configuration details for a standard router input stream type.",
+      "properties": {
+        "RtmpPush": {
+          "$ref": "#/definitions/RtmpPushStreamDetails"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Configuration details for a standard router input stream type.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "Tag": {
       "type": "object",
       "properties": {
@@ -989,6 +1475,17 @@
     "Arn": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws[a-zA-Z-]*):mediaconnect:[a-z0-9-]+:[0-9]{12}:routerInput:[a-z0-9]{12}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "AssociatedDestinationEndpointArns": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 128,
+        "minLength": 64,
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 64  \nMaximum Length: 128  \nPattern: ^arn:(aws[a-zA-Z-]*):mediaconnect:[a-z0-9-]+:[0-9]{12}:destinationEndpoint:[a-z0-9]{12}$  \nUpdate requires: No interruption\n"
+      },
+      "description": "The Amazon Resource Names (ARNs) of one or more destination endpoints that are associated with this router input.",
+      "markdownDescription": "The Amazon Resource Names (ARNs) of one or more destination endpoints that are associated with this router input.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "AvailabilityZone": {
       "type": "string",
@@ -1057,6 +1554,9 @@
     "State": {
       "$ref": "#/definitions/RouterInputState"
     },
+    "StreamDetails": {
+      "$ref": "#/definitions/RouterInputStreamDetails"
+    },
     "Tags": {
       "type": "array",
       "items": {
@@ -1087,7 +1587,14 @@
     "Tier"
   ],
   "readOnlyProperties": [
+    "/properties/StreamDetails/Standard/RtmpPush/ApplicationName",
+    "/properties/StreamDetails/Standard/RtmpPush/StreamName",
+    "/properties/StreamDetails/Failover/SourceIndexZeroStreamDetails/RtmpPush/ApplicationName",
+    "/properties/StreamDetails/Failover/SourceIndexZeroStreamDetails/RtmpPush/StreamName",
+    "/properties/StreamDetails/Failover/SourceIndexOneStreamDetails/RtmpPush/ApplicationName",
+    "/properties/StreamDetails/Failover/SourceIndexOneStreamDetails/RtmpPush/StreamName",
     "/properties/Arn",
+    "/properties/AssociatedDestinationEndpointArns",
     "/properties/ContentQualityAnalysisType",
     "/properties/CreatedAt",
     "/properties/Id",
@@ -1096,6 +1603,7 @@
     "/properties/MaintenanceType",
     "/properties/RoutedOutputs",
     "/properties/State",
+    "/properties/StreamDetails",
     "/properties/UpdatedAt"
   ],
   "createOnlyProperties": [
@@ -1116,8 +1624,10 @@
         "ec2:CreateNetworkInterface",
         "ec2:CreateTags",
         "iam:PassRole",
+        "mediaconnect:AssociateDestination",
         "mediaconnect:AssociateRouterNetworkInterface",
         "mediaconnect:CreateRouterInput",
+        "mediaconnect:RegisterDestinationEndpoint",
         "mediaconnect:TagResource",
         "mediaconnect:UpdateFlowOutput",
         "medialive:UpdateChannel"
@@ -1130,7 +1640,9 @@
         "mediaconnect:UpdateFlowOutput",
         "medialive:UpdateChannel",
         "mediaconnect:ListRouterInputs",
-        "mediaconnect:DeleteRouterInput"
+        "mediaconnect:DeleteRouterInput",
+        "mediaconnect:DeregisterDestinationEndpoint",
+        "mediaconnect:DisassociateDestination"
       ]
     },
     "list": {
@@ -1180,6 +1692,17 @@
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:(aws[a-zA-Z-]*):mediaconnect:[a-z0-9-]+:[0-9]{12}:routerInput:[a-z0-9]{12}$  \nUpdate requires: No interruption\nRead only property: Yes"
     },
+    "AssociatedDestinationEndpointArns": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 128,
+        "minLength": 64,
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 64  \nMaximum Length: 128  \nPattern: ^arn:(aws[a-zA-Z-]*):mediaconnect:[a-z0-9-]+:[0-9]{12}:destinationEndpoint:[a-z0-9]{12}$  \nUpdate requires: No interruption\n"
+      },
+      "description": "The Amazon Resource Names (ARNs) of one or more destination endpoints that are associated with this router input.",
+      "markdownDescription": "The Amazon Resource Names (ARNs) of one or more destination endpoints that are associated with this router input.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
     "ContentQualityAnalysisType": {
       "$ref": "#/definitions/RouterContentQualityAnalysisType"
     },
@@ -1212,6 +1735,9 @@
     },
     "State": {
       "$ref": "#/definitions/RouterInputState"
+    },
+    "StreamDetails": {
+      "$ref": "#/definitions/RouterInputStreamDetails"
     },
     "UpdatedAt": {
       "type": "string",

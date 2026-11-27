@@ -1,0 +1,625 @@
+{
+  "tagging": {
+    "permissions": [
+      "kinesis:TagResource",
+      "kinesis:UntagResource",
+      "kinesis:ListTagsForResource"
+    ],
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "tagProperty": "/properties/Tags",
+    "cloudFormationSystemTags": true
+  },
+  "typeName": "AWS::Kinesis::Channel",
+  "readOnlyProperties": [
+    "/properties/ChannelARN",
+    "/properties/ChannelId",
+    "/properties/ChannelStatus",
+    "/properties/ChannelCreationTimestamp"
+  ],
+  "description": "Resource Type definition for AWS::Kinesis::Channel",
+  "createOnlyProperties": [
+    "/properties/ChannelName",
+    "/properties/ServiceExecutionRoleARN",
+    "/properties/StreamConfigurationList",
+    "/properties/EncryptionConfiguration",
+    "/properties/S3DestinationConfiguration/StorageConfiguration",
+    "/properties/S3DestinationConfiguration/DeadLetterQueueS3Configuration",
+    "/properties/S3TablesDestinationConfiguration/S3TablesConfigurationList",
+    "/properties/S3TablesDestinationConfiguration/DeadLetterQueueS3Configuration"
+  ],
+  "$comment": "Fail-open for system tags (aws:* prefix) is implemented in BaseHandlerStd.modifyTags() - AccessDeniedException on system tag operations is caught and silently continued. Customer tags still fail-hard. COE: https://www.coe.a2z.com/coe/236297/content",
+  "primaryIdentifier": [
+    "/properties/ChannelARN"
+  ],
+  "required": [
+    "ChannelName",
+    "ServiceExecutionRoleARN",
+    "StreamConfigurationList"
+  ],
+  "oneOf": [
+    {
+      "required": [
+        "S3DestinationConfiguration"
+      ]
+    },
+    {
+      "required": [
+        "S3TablesDestinationConfiguration"
+      ]
+    }
+  ],
+  "handlers": {
+    "read": {
+      "permissions": [
+        "kinesis:DescribeChannel",
+        "kinesis:ListTagsForResource"
+      ]
+    },
+    "create": {
+      "permissions": [
+        "kinesis:CreateChannel",
+        "kinesis:DescribeChannel",
+        "kinesis:AssociateStreamsWithChannel",
+        "kinesis:TagResource",
+        "kinesis:ListTagsForResource",
+        "iam:PassRole"
+      ],
+      "timeoutInMinutes": 60
+    },
+    "update": {
+      "permissions": [
+        "kinesis:UpdateChannel",
+        "kinesis:DescribeChannel",
+        "kinesis:TagResource",
+        "kinesis:UntagResource",
+        "kinesis:ListTagsForResource"
+      ],
+      "timeoutInMinutes": 60
+    },
+    "list": {
+      "permissions": [
+        "kinesis:ListChannels"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "kinesis:DeleteChannel",
+        "kinesis:DescribeChannel"
+      ],
+      "timeoutInMinutes": 60
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "EncryptionConfiguration": {
+      "description": "Server-side encryption configuration for data at rest in the destination. Data delivered to S3 / S3 Tables is encrypted with the same key.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "EncryptionType": {
+          "description": "The encryption type. KMS is the only supported value.",
+          "type": "string",
+          "enum": [
+            "KMS"
+          ],
+          "markdownDescription": "The encryption type. KMS is the only supported value.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: KMS  \nUpdate requires: No interruption\n"
+        },
+        "KeyId": {
+          "minLength": 1,
+          "description": "The customer-managed AWS KMS key. Accepts a key GUID, key ARN, alias ARN, or alias name prefixed by 'alias/'. The Kinesis Data Streams managed alias 'aws/kinesis' is not accepted - the key must be customer-owned so it can also be used by readers of the destination.",
+          "type": "string",
+          "maxLength": 2048,
+          "markdownDescription": "The customer-managed AWS KMS key. Accepts a key GUID, key ARN, alias ARN, or alias name prefixed by 'alias/'. The Kinesis Data Streams managed alias 'aws/kinesis' is not accepted - the key must be customer-owned so it can also be used by readers of the destination.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "EncryptionType",
+        "KeyId"
+      ],
+      "markdownDescription": "Server-side encryption configuration for data at rest in the destination. Data delivered to S3 / S3 Tables is encrypted with the same key.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "S3TableConfiguration": {
+      "description": "An S3 Tables destination including its table bucket, namespace, table name, and partition spec.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "TableBucketARN": {
+          "minLength": 1,
+          "description": "The ARN of the S3 Tables table bucket for record delivery. Buckets can be cross-account but must be in the same region as the channel.",
+          "type": "string",
+          "maxLength": 2048,
+          "markdownDescription": "The ARN of the S3 Tables table bucket for record delivery. Buckets can be cross-account but must be in the same region as the channel.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws[-a-z0-9]*:s3tables:[-a-z0-9]+:[0-9]{12}:bucket/[a-z0-9_-]{3,63}$  \nUpdate requires: No interruption\n"
+        },
+        "TableName": {
+          "minLength": 1,
+          "description": "The name of the destination S3 Tables table. The table is created for the customer if it does not yet exist.",
+          "type": "string",
+          "maxLength": 255,
+          "markdownDescription": "The name of the destination S3 Tables table. The table is created for the customer if it does not yet exist.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[0-9a-z_]+$  \nUpdate requires: No interruption\n"
+        },
+        "CompressionType": {
+          "description": "The compression algorithm applied to objects delivered to the S3 Tables destination.",
+          "type": "string",
+          "enum": [
+            "NONE",
+            "ZSTD",
+            "SNAPPY"
+          ],
+          "markdownDescription": "The compression algorithm applied to objects delivered to the S3 Tables destination.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: NONE | ZSTD | SNAPPY  \nUpdate requires: No interruption\n"
+        },
+        "PartitionSpec": {
+          "description": "The partition specification used by the destination Iceberg table.",
+          "$ref": "#/definitions/PartitionSpec",
+          "markdownDescription": "The partition specification used by the destination Iceberg table.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "Namespace": {
+          "minLength": 1,
+          "description": "The name of the S3 Tables namespace that contains the destination table.",
+          "type": "string",
+          "maxLength": 255,
+          "markdownDescription": "The name of the S3 Tables namespace that contains the destination table.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[0-9a-z_]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "TableBucketARN",
+        "Namespace",
+        "TableName",
+        "CompressionType"
+      ],
+      "markdownDescription": "An S3 Tables destination including its table bucket, namespace, table name, and partition spec.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "S3TablesDestinationConfiguration": {
+      "description": "Configuration for delivery to S3 Tables destinations. Exactly one of S3DestinationConfiguration and S3TablesDestinationConfiguration must be specified on the channel.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "S3TablesConfigurationList": {
+          "minItems": 1,
+          "maxItems": 10000,
+          "description": "The list of S3 Tables destinations. v1 supports a single element; the list shape allows future extensibility to fan out to multiple tables.",
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/S3TableConfiguration"
+          },
+          "markdownDescription": "The list of S3 Tables destinations. v1 supports a single element; the list shape allows future extensibility to fan out to multiple tables.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        },
+        "DeadLetterQueueS3Configuration": {
+          "description": "The dead-letter queue (DLQ) configuration for records that cannot be delivered to the S3 Tables destination. Required for S3 Tables: there is no safe fallback because S3 Tables metadata writes are critical-path.",
+          "$ref": "#/definitions/DeadLetterQueueS3Configuration",
+          "markdownDescription": "The dead-letter queue (DLQ) configuration for records that cannot be delivered to the S3 Tables destination. Required for S3 Tables: there is no safe fallback because S3 Tables metadata writes are critical-path.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "DataFreshnessInSeconds": {
+          "default": 300,
+          "description": "The maximum time in seconds the channel buffers records before delivery if the minimum target file size is not reached.",
+          "type": "integer",
+          "markdownDescription": "The maximum time in seconds the channel buffers records before delivery if the minimum target file size is not reached.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "DeadLetterQueueS3Configuration",
+        "S3TablesConfigurationList"
+      ],
+      "markdownDescription": "Configuration for delivery to S3 Tables destinations. Exactly one of S3DestinationConfiguration and S3TablesDestinationConfiguration must be specified on the channel.\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
+    },
+    "PartitionSpec": {
+      "description": "Partitioning specification for the destination Iceberg table. Follows the S3 Tables / Iceberg PartitionSpec format.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "PartitionFields": {
+          "minItems": 1,
+          "maxItems": 10,
+          "description": "List of partition fields that define how records are partitioned when written to the destination table.",
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PartitionField"
+          },
+          "markdownDescription": "List of partition fields that define how records are partitioned when written to the destination table.\n\n---\n\nRequired: Yes  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "PartitionFields"
+      ],
+      "markdownDescription": "Partitioning specification for the destination Iceberg table. Follows the S3 Tables / Iceberg PartitionSpec format.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "PartitionField": {
+      "description": "A single partition field consisting of a transform applied to a source column.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "SourceName": {
+          "minLength": 1,
+          "description": "The name of the source column on which the transform is applied.",
+          "type": "string",
+          "maxLength": 255,
+          "markdownDescription": "The name of the source column on which the transform is applied.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[a-zA-Z0-9._]+$  \nUpdate requires: No interruption\n"
+        },
+        "Transform": {
+          "description": "The partitioning transform applied to the SourceName column.",
+          "type": "string",
+          "enum": [
+            "TIME_HOUR"
+          ],
+          "markdownDescription": "The partitioning transform applied to the SourceName column.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: TIME_HOUR  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Transform",
+        "SourceName"
+      ],
+      "markdownDescription": "A single partition field consisting of a transform applied to a source column.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CloudWatchLogsConfiguration": {
+      "description": "CloudWatch Logs configuration for the channel. When Enabled is true and LogGroupName is omitted, the service uses a default group derived from the channel name and id; LogStreamName defaults to the literal string 'DestinationDelivery'.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "LogStreamName": {
+          "default": "DestinationDelivery",
+          "minLength": 1,
+          "description": "The CloudWatch log stream name. Defaults to the literal string 'DestinationDelivery' when omitted.",
+          "type": "string",
+          "maxLength": 512,
+          "markdownDescription": "The CloudWatch log stream name. Defaults to the literal string 'DestinationDelivery' when omitted.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^[^:*]+$  \nUpdate requires: No interruption\n"
+        },
+        "Enabled": {
+          "description": "Whether CloudWatch Logs delivery is enabled.",
+          "type": "boolean",
+          "markdownDescription": "Whether CloudWatch Logs delivery is enabled.\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "LogGroupName": {
+          "minLength": 1,
+          "description": "The CloudWatch log group name. When Enabled is true and LogGroupName is omitted, the service uses the default '/aws/kinesis/<channelName>/<channelId>'.",
+          "type": "string",
+          "maxLength": 512,
+          "markdownDescription": "The CloudWatch log group name. When Enabled is true and LogGroupName is omitted, the service uses the default '/aws/kinesis/<channelName>/<channelId>'.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^[\\.\\-_/#A-Za-z0-9]+$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Enabled"
+      ],
+      "markdownDescription": "CloudWatch Logs configuration for the channel. When Enabled is true and LogGroupName is omitted, the service uses a default group derived from the channel name and id; LogStreamName defaults to the literal string 'DestinationDelivery'.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "S3DestinationConfiguration": {
+      "description": "Configuration for delivery to a vanilla S3 bucket destination. Exactly one of S3DestinationConfiguration and S3TablesDestinationConfiguration must be specified on the channel.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "DeadLetterQueueS3Configuration": {
+          "description": "Optional dead-letter queue (DLQ) configuration for records that cannot be delivered to the destination. When omitted, the service auto-fills using the storage BucketARN with an error prefix.",
+          "$ref": "#/definitions/DeadLetterQueueS3Configuration",
+          "markdownDescription": "Optional dead-letter queue (DLQ) configuration for records that cannot be delivered to the destination. When omitted, the service auto-fills using the storage BucketARN with an error prefix.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "DataFreshnessInSeconds": {
+          "default": 300,
+          "description": "The maximum time in seconds the channel buffers records before delivery if the minimum target file size is not reached.",
+          "type": "integer",
+          "markdownDescription": "The maximum time in seconds the channel buffers records before delivery if the minimum target file size is not reached.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "StorageConfiguration": {
+          "description": "S3 storage configuration including the destination bucket, output key template, storage class, and compression type.",
+          "$ref": "#/definitions/S3StorageConfiguration",
+          "markdownDescription": "S3 storage configuration including the destination bucket, output key template, storage class, and compression type.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "StorageConfiguration"
+      ],
+      "markdownDescription": "Configuration for delivery to a vanilla S3 bucket destination. Exactly one of S3DestinationConfiguration and S3TablesDestinationConfiguration must be specified on the channel.\n\n---\n\nRequired: No  \nUpdate requires: Replacement\n"
+    },
+    "DeadLetterQueueS3Configuration": {
+      "description": "Configuration of the S3 bucket used to capture records that cannot be delivered to the primary destination.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ErrorOutputPrefix": {
+          "minLength": 1,
+          "description": "Optional S3 key prefix under which error records are organized. When omitted, the service uses the default 'kinesis-channel/errors/<channelName>/<channelId>/'.",
+          "type": "string",
+          "maxLength": 512,
+          "markdownDescription": "Optional S3 key prefix under which error records are organized. When omitted, the service uses the default 'kinesis-channel/errors/<channelName>/<channelId>/'.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^[0-9A-Za-z!\\-_'.*()\\/]+$  \nUpdate requires: No interruption\n"
+        },
+        "BucketARN": {
+          "minLength": 1,
+          "description": "The ARN of the S3 bucket for storing failed records.",
+          "type": "string",
+          "maxLength": 2048,
+          "markdownDescription": "The ARN of the S3 bucket for storing failed records.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws[-a-z0-9]*:s3:::[a-z0-9._-]{3,63}$  \nUpdate requires: No interruption\n"
+        },
+        "ExpectedBucketOwner": {
+          "minLength": 12,
+          "description": "The AWS account ID of the expected owner of the dead-letter queue S3 bucket. Used to verify bucket ownership before delivery.",
+          "type": "string",
+          "maxLength": 12,
+          "markdownDescription": "The AWS account ID of the expected owner of the dead-letter queue S3 bucket. Used to verify bucket ownership before delivery.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 12  \nMaximum Length: 12  \nPattern: ^\\d{12}$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "BucketARN",
+        "ExpectedBucketOwner"
+      ],
+      "markdownDescription": "Configuration of the S3 bucket used to capture records that cannot be delivered to the primary destination.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LoggingConfiguration": {
+      "description": "Configuration for delivering channel operational logs.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "CloudWatchLogs": {
+          "description": "CloudWatch Logs configuration block. When provided, controls whether and where the channel writes operational logs.",
+          "$ref": "#/definitions/CloudWatchLogsConfiguration",
+          "markdownDescription": "CloudWatch Logs configuration block. When provided, controls whether and where the channel writes operational logs.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "CloudWatchLogs"
+      ],
+      "markdownDescription": "Configuration for delivering channel operational logs.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "StreamConfiguration": {
+      "description": "The configuration of a Kinesis stream that the channel reads from.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "RecordConfiguration": {
+          "description": "The configuration that describes how records on the source stream are encoded.",
+          "$ref": "#/definitions/RecordConfiguration",
+          "markdownDescription": "The configuration that describes how records on the source stream are encoded.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "StreamARN": {
+          "minLength": 1,
+          "description": "The Amazon resource name (ARN) of the Kinesis data stream that the channel reads from.",
+          "type": "string",
+          "maxLength": 2048,
+          "markdownDescription": "The Amazon resource name (ARN) of the Kinesis data stream that the channel reads from.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws.*:kinesis:.*:\\d{12}:stream/\\S+  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "StreamARN",
+        "RecordConfiguration"
+      ],
+      "markdownDescription": "The configuration of a Kinesis stream that the channel reads from.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "RecordConfiguration": {
+      "description": "The configuration that describes how records on the source stream are encoded.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "GSRSchemaARN": {
+          "minLength": 1,
+          "description": "The ARN of the AWS Glue Schema Registry (GSR) schema. Required for the S3 Tables destination, where it is used to create the S3 Table and to validate that the record format matches the table schema. Also used when RecordFormatType is GSR_JSON to interpret records read from the source stream. Vanilla S3 delivery writes records as S3 objects and does not need a schema. The schema must be in the same account and region as the channel.",
+          "type": "string",
+          "maxLength": 512,
+          "markdownDescription": "The ARN of the AWS Glue Schema Registry (GSR) schema. Required for the S3 Tables destination, where it is used to create the S3 Table and to validate that the record format matches the table schema. Also used when RecordFormatType is GSR_JSON to interpret records read from the source stream. Vanilla S3 delivery writes records as S3 objects and does not need a schema. The schema must be in the same account and region as the channel.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^arn:aws[-a-z0-9]*:glue:[-a-z0-9]+:\\d{12}:schema/[-a-zA-Z0-9_$#.]+/[-a-zA-Z0-9_$#.]+$  \nUpdate requires: No interruption\n"
+        },
+        "RecordFormatType": {
+          "description": "The format used to interpret records read from the source stream.",
+          "type": "string",
+          "enum": [
+            "GSR_JSON",
+            "JSON",
+            "STRING",
+            "BYTE_ARRAY"
+          ],
+          "markdownDescription": "The format used to interpret records read from the source stream.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: GSR_JSON | JSON | STRING | BYTE_ARRAY  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "RecordFormatType"
+      ],
+      "markdownDescription": "The configuration that describes how records on the source stream are encoded.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "description": "An arbitrary set of tags (key-value pairs) to associate with the Kinesis channel.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "minLength": 0,
+          "description": "The value for the tag. You can specify a value that is 0 to 255 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "type": "string",
+          "maxLength": 255,
+          "markdownDescription": "The value for the tag. You can specify a value that is 0 to 255 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+        },
+        "Key": {
+          "minLength": 1,
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "type": "string",
+          "maxLength": 128,
+          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "An arbitrary set of tags (key-value pairs) to associate with the Kinesis channel.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "S3StorageConfiguration": {
+      "description": "S3 storage configuration that describes the destination bucket and how delivered objects are stored.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "BucketARN": {
+          "minLength": 1,
+          "description": "The ARN of the S3 bucket for record delivery. Different channels can deliver to the same bucket. Buckets can be cross-account but must be in the same region as the channel.",
+          "type": "string",
+          "maxLength": 2048,
+          "markdownDescription": "The ARN of the S3 bucket for record delivery. Different channels can deliver to the same bucket. Buckets can be cross-account but must be in the same region as the channel.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws[-a-z0-9]*:s3:::[a-z0-9._-]{3,63}$  \nUpdate requires: No interruption\n"
+        },
+        "StorageClass": {
+          "default": "STANDARD",
+          "description": "The S3 storage class for delivered objects.",
+          "type": "string",
+          "enum": [
+            "STANDARD",
+            "INTELLIGENT_TIERING",
+            "GLACIER_IR"
+          ],
+          "markdownDescription": "The S3 storage class for delivered objects.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: STANDARD | INTELLIGENT_TIERING | GLACIER_IR  \nUpdate requires: No interruption\n"
+        },
+        "OutputKeyTemplate": {
+          "minLength": 1,
+          "description": "Optional template for the S3 object key path. Supports placeholders in the form !{name}: !{channel-name}, !{channel-id}, !{stream-name}, !{yyyy}, !{yy}, !{MM}, !{dd}, !{HH}, !{mm}, and !{extension} (a literal file extension can be supplied as !{extension:.json.gz}). When omitted, the service uses the default 'kinesis-channel/!{channel-name}/!{channel-id}/!{yyyy}/!{MM}/!{dd}/!{HH}/!{channel-name}-!{channel-id}-!{yyyy}-!{MM}-!{dd}-!{HH}-!{mm}!{extension}'.",
+          "type": "string",
+          "maxLength": 1024,
+          "markdownDescription": "Optional template for the S3 object key path. Supports placeholders in the form !{name}: !{channel-name}, !{channel-id}, !{stream-name}, !{yyyy}, !{yy}, !{MM}, !{dd}, !{HH}, !{mm}, and !{extension} (a literal file extension can be supplied as !{extension:.json.gz}). When omitted, the service uses the default 'kinesis-channel/!{channel-name}/!{channel-id}/!{yyyy}/!{MM}/!{dd}/!{HH}/!{channel-name}-!{channel-id}-!{yyyy}-!{MM}-!{dd}-!{HH}-!{mm}!{extension}'.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nPattern: ^[0-9A-Za-z!\\-_'.*()\\/=:{}]+$  \nUpdate requires: No interruption\n"
+        },
+        "CompressionType": {
+          "description": "The compression algorithm applied to delivered objects.",
+          "type": "string",
+          "enum": [
+            "NONE",
+            "GZIP",
+            "ZSTD"
+          ],
+          "markdownDescription": "The compression algorithm applied to delivered objects.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: NONE | GZIP | ZSTD  \nUpdate requires: No interruption\n"
+        },
+        "ExpectedBucketOwner": {
+          "minLength": 12,
+          "description": "The AWS account ID of the expected owner of the destination S3 bucket. Used to verify bucket ownership before delivery.",
+          "type": "string",
+          "maxLength": 12,
+          "markdownDescription": "The AWS account ID of the expected owner of the destination S3 bucket. Used to verify bucket ownership before delivery.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 12  \nMaximum Length: 12  \nPattern: ^\\d{12}$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "BucketARN",
+        "ExpectedBucketOwner",
+        "CompressionType"
+      ],
+      "markdownDescription": "S3 storage configuration that describes the destination bucket and how delivered objects are stored.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "ChannelARN": {
+      "minLength": 1,
+      "description": "The ARN of the channel.",
+      "type": "string",
+      "maxLength": 2048,
+      "markdownDescription": "The ARN of the channel.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws.*:kinesis:.*:\\d{12}:channel/\\S+  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ChannelCreationTimestamp": {
+      "description": "Timestamp of when the channel was created.",
+      "type": "string",
+      "markdownDescription": "Timestamp of when the channel was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ChannelName": {
+      "minLength": 1,
+      "description": "The name of the channel. The name's uniqueness is scoped per AWS account and region.",
+      "type": "string",
+      "maxLength": 128,
+      "markdownDescription": "The name of the channel. The name's uniqueness is scoped per AWS account and region.\n\n---\n\nRequired: Conditional  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9_.-]+$  \nUpdate requires: Replacement\n"
+    },
+    "EncryptionConfiguration": {
+      "description": "Server-side encryption configuration for data at rest.",
+      "$ref": "#/definitions/EncryptionConfiguration",
+      "markdownDescription": "Server-side encryption configuration for data at rest.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
+    },
+    "S3DestinationConfiguration": {
+      "description": "Configuration for delivery to a vanilla S3 bucket destination. Exactly one of S3DestinationConfiguration and S3TablesDestinationConfiguration must be specified.",
+      "$ref": "#/definitions/S3DestinationConfiguration",
+      "markdownDescription": "Configuration for delivery to a vanilla S3 bucket destination. Exactly one of S3DestinationConfiguration and S3TablesDestinationConfiguration must be specified.\n\n---\n\nRequired: Conditional  \nType:   \nUpdate requires: Replacement\n"
+    },
+    "LoggingConfiguration": {
+      "default": {
+        "CloudWatchLogs": {
+          "Enabled": false
+        }
+      },
+      "description": "Configuration for delivering channel operational logs. Defaults to CloudWatch Logs disabled.",
+      "$ref": "#/definitions/LoggingConfiguration",
+      "markdownDescription": "Configuration for delivering channel operational logs. Defaults to CloudWatch Logs disabled.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
+    "StreamConfigurationList": {
+      "minItems": 1,
+      "maxItems": 10000,
+      "description": "List of stream configurations associated with the channel. v1 supports a single element; the list shape allows future extensibility to fan in from multiple streams.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/StreamConfiguration"
+      },
+      "markdownDescription": "List of stream configurations associated with the channel. v1 supports a single element; the list shape allows future extensibility to fan in from multiple streams.\n\n---\n\nRequired: Conditional  \nType: Array  \nUpdate requires: Replacement\n"
+    },
+    "ServiceExecutionRoleARN": {
+      "minLength": 1,
+      "description": "The ARN of the IAM role that the channel assumes to read from the source stream, deliver records to the destination, and (when enabled) write CloudWatch Logs.",
+      "type": "string",
+      "maxLength": 512,
+      "markdownDescription": "The ARN of the IAM role that the channel assumes to read from the source stream, deliver records to the destination, and (when enabled) write CloudWatch Logs.\n\n---\n\nRequired: Conditional  \nType: String  \nMinimum Length: 1  \nMaximum Length: 512  \nPattern: ^arn:aws[-a-z0-9]*:iam::\\d{12}:role/[a-zA-Z_0-9+=,.@\\-_/]+$  \nUpdate requires: Replacement\n"
+    },
+    "S3TablesDestinationConfiguration": {
+      "description": "Configuration for delivery to S3 Tables destinations. Exactly one of S3DestinationConfiguration and S3TablesDestinationConfiguration must be specified.",
+      "$ref": "#/definitions/S3TablesDestinationConfiguration",
+      "markdownDescription": "Configuration for delivery to S3 Tables destinations. Exactly one of S3DestinationConfiguration and S3TablesDestinationConfiguration must be specified.\n\n---\n\nRequired: Conditional  \nType:   \nUpdate requires: Replacement\n"
+    },
+    "ChannelStatus": {
+      "description": "The status of the channel.",
+      "type": "string",
+      "enum": [
+        "CREATING",
+        "ACTIVE",
+        "UPDATING",
+        "DELETING",
+        "FAILED"
+      ],
+      "markdownDescription": "The status of the channel.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | ACTIVE | UPDATING | DELETING | FAILED  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ChannelId": {
+      "minLength": 1,
+      "description": "The service-generated unique identifier for the channel.",
+      "type": "string",
+      "maxLength": 64,
+      "markdownDescription": "The service-generated unique identifier for the channel.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Tags": {
+      "maxItems": 50,
+      "uniqueItems": false,
+      "description": "An arbitrary set of tags (key-value pairs) to associate with the Kinesis channel.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "An arbitrary set of tags (key-value pairs) to associate with the Kinesis channel.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "attributes": {
+    "ChannelARN": {
+      "minLength": 1,
+      "description": "The ARN of the channel.",
+      "type": "string",
+      "maxLength": 2048,
+      "markdownDescription": "The ARN of the channel.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws.*:kinesis:.*:\\d{12}:channel/\\S+  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ChannelCreationTimestamp": {
+      "description": "Timestamp of when the channel was created.",
+      "type": "string",
+      "markdownDescription": "Timestamp of when the channel was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ChannelStatus": {
+      "description": "The status of the channel.",
+      "type": "string",
+      "enum": [
+        "CREATING",
+        "ACTIVE",
+        "UPDATING",
+        "DELETING",
+        "FAILED"
+      ],
+      "markdownDescription": "The status of the channel.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | ACTIVE | UPDATING | DELETING | FAILED  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ChannelId": {
+      "minLength": 1,
+      "description": "The service-generated unique identifier for the channel.",
+      "type": "string",
+      "maxLength": 64,
+      "markdownDescription": "The service-generated unique identifier for the channel.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

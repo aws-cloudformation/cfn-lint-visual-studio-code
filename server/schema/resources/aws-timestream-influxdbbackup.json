@@ -1,0 +1,621 @@
+{
+  "typeName": "AWS::Timestream::InfluxDBBackup",
+  "description": "Resource type definition for AWS::Timestream::InfluxDBBackup. An on-demand backup of an Amazon Timestream for InfluxDB DB instance or DB cluster.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-timestream-influxdb.git",
+  "definitions": {
+    "ClusterConfiguration": {
+      "type": "object",
+      "description": "The cluster configuration of the resource at the time of backup.",
+      "properties": {
+        "IngestQueryInstances": {
+          "type": "integer",
+          "description": "The number of ingest and query instances in the cluster.",
+          "markdownDescription": "The number of ingest and query instances in the cluster.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "QueryOnlyInstances": {
+          "type": "integer",
+          "description": "The number of query-only instances in the cluster.",
+          "markdownDescription": "The number of query-only instances in the cluster.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "DedicatedCompactor": {
+          "type": "boolean",
+          "description": "Indicates if the compactor instance is a standalone instance or not.",
+          "markdownDescription": "Indicates if the compactor instance is a standalone instance or not.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "The cluster configuration of the resource at the time of backup.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "LogDeliveryConfiguration": {
+      "type": "object",
+      "description": "The log delivery configuration of the resource at the time of backup.",
+      "properties": {
+        "S3Configuration": {
+          "$ref": "#/definitions/S3Configuration"
+        }
+      },
+      "required": [
+        "S3Configuration"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The log delivery configuration of the resource at the time of backup.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "S3Configuration": {
+      "type": "object",
+      "description": "Configuration for S3 bucket log delivery.",
+      "properties": {
+        "BucketName": {
+          "type": "string",
+          "description": "The name of the S3 bucket to deliver logs to.",
+          "minLength": 3,
+          "maxLength": 63,
+          "markdownDescription": "The name of the S3 bucket to deliver logs to.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 3  \nMaximum Length: 63  \nPattern: ^[0-9a-z]+[0-9a-z\\.\\-]*[0-9a-z]+$  \nUpdate requires: No interruption\n"
+        },
+        "Enabled": {
+          "type": "boolean",
+          "description": "Indicates whether log delivery to the S3 bucket is enabled.",
+          "markdownDescription": "Indicates whether log delivery to the S3 bucket is enabled.\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "BucketName",
+        "Enabled"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Configuration for S3 bucket log delivery.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "MaintenanceSchedule": {
+      "type": "object",
+      "description": "The maintenance schedule of the resource at the time of backup.",
+      "properties": {
+        "Timezone": {
+          "type": "string",
+          "description": "The IANA timezone identifier for the maintenance window.",
+          "minLength": 1,
+          "maxLength": 64,
+          "markdownDescription": "The IANA timezone identifier for the maintenance window.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^(UTC|[A-Za-z_]+/[A-Za-z0-9_]+(/[A-Za-z0-9_]+)?)$  \nUpdate requires: No interruption\n"
+        },
+        "PreferredMaintenanceWindow": {
+          "type": "string",
+          "description": "The preferred maintenance window in the format ddd:HH:MM-ddd:HH:MM.",
+          "minLength": 0,
+          "maxLength": 19,
+          "markdownDescription": "The preferred maintenance window in the format ddd:HH:MM-ddd:HH:MM.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 19  \nPattern: ^$|^(Mon|Tue|Wed|Thu|Fri|Sat|Sun):([01]\\d|2[0-3]):[0-5]\\d-(Mon|Tue|Wed|Thu|Fri|Sat|Sun):([01]\\d|2[0-3]):[0-5]\\d$  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Timezone",
+        "PreferredMaintenanceWindow"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The maintenance schedule of the resource at the time of backup.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "type": "object",
+      "description": "A key-value pair to associate with the resource.",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The key name of the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag.",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The value for the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A key-value pair to associate with the resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "Arn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the backup.",
+      "minLength": 1,
+      "maxLength": 1011,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the backup.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1011  \nPattern: ^arn:aws[a-z\\-]*:timestream\\-influxdb:[a-z0-9\\-]+:[0-9]{12}:(db\\-instance|db\\-cluster|db\\-parameter\\-group|db\\-backup)/[a-zA-Z0-9]{3,64}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Id": {
+      "type": "string",
+      "description": "Service-generated unique identifier of the backup.",
+      "minLength": 3,
+      "maxLength": 64,
+      "markdownDescription": "Service-generated unique identifier of the backup.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 64  \nPattern: ^[a-zA-Z0-9]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Name": {
+      "type": "string",
+      "description": "The name of the backup. Must be unique within the account and region.",
+      "minLength": 3,
+      "maxLength": 40,
+      "markdownDescription": "The name of the backup. Must be unique within the account and region.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 3  \nMaximum Length: 40  \nPattern: ^[a-zA-Z][a-zA-Z0-9]*(-[a-zA-Z0-9]+)*$  \nUpdate requires: Replacement\n"
+    },
+    "DbResourceId": {
+      "type": "string",
+      "description": "The id of the DB instance or DB cluster to back up.",
+      "minLength": 3,
+      "maxLength": 64,
+      "markdownDescription": "The id of the DB instance or DB cluster to back up.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 3  \nMaximum Length: 64  \nPattern: ^[a-zA-Z0-9]+$  \nUpdate requires: Replacement\n"
+    },
+    "RetentionDays": {
+      "type": "integer",
+      "description": "The number of days to retain the backup. Valid values are 1 to 3650.",
+      "minimum": 1,
+      "maximum": 3650,
+      "markdownDescription": "The number of days to retain the backup. Valid values are 1 to 3650.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: Replacement\n"
+    },
+    "Status": {
+      "type": "string",
+      "description": "The current status of the backup.",
+      "enum": [
+        "IN_PROGRESS",
+        "COMPLETED",
+        "FAILED",
+        "DELETING",
+        "DELETED"
+      ],
+      "markdownDescription": "The current status of the backup.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: IN_PROGRESS | COMPLETED | FAILED | DELETING | DELETED  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Type": {
+      "type": "string",
+      "description": "The type of backup. Backups created through this resource type are always ON_DEMAND.",
+      "enum": [
+        "HOURLY",
+        "DAILY",
+        "WEEKLY",
+        "MONTHLY",
+        "CUSTOM_SCHEDULE",
+        "ON_DEMAND",
+        "CONTINUOUS"
+      ],
+      "markdownDescription": "The type of backup. Backups created through this resource type are always ON_DEMAND.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: HOURLY | DAILY | WEEKLY | MONTHLY | CUSTOM_SCHEDULE | ON_DEMAND | CONTINUOUS  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreatedAt": {
+      "type": "string",
+      "description": "The time when the backup was created.",
+      "format": "date-time",
+      "markdownDescription": "The time when the backup was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ExpiresAfter": {
+      "type": "string",
+      "description": "The date after which the backup will be automatically deleted, as a calendar date in YYYY-MM-DD format.",
+      "markdownDescription": "The date after which the backup will be automatically deleted, as a calendar date in YYYY-MM-DD format.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^\\d{4}-\\d{2}-\\d{2}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "EngineType": {
+      "type": "string",
+      "description": "The engine type of the resource that the backup was created from.",
+      "enum": [
+        "INFLUXDB_V2",
+        "INFLUXDB_V3_CORE",
+        "INFLUXDB_V3_ENTERPRISE"
+      ],
+      "markdownDescription": "The engine type of the resource that the backup was created from.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: INFLUXDB_V2 | INFLUXDB_V3_CORE | INFLUXDB_V3_ENTERPRISE  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "DeploymentType": {
+      "type": "string",
+      "description": "The deployment type of the resource that the backup was created from.",
+      "enum": [
+        "SINGLE_AZ",
+        "WITH_MULTIAZ_STANDBY",
+        "MULTI_NODE_READ_REPLICAS"
+      ],
+      "markdownDescription": "The deployment type of the resource that the backup was created from.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SINGLE_AZ | WITH_MULTIAZ_STANDBY | MULTI_NODE_READ_REPLICAS  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "KmsKeyId": {
+      "type": "string",
+      "description": "The Amazon Web Services KMS key ARN used for encryption of the resource at the time of backup.",
+      "minLength": 1,
+      "maxLength": 2048,
+      "markdownDescription": "The Amazon Web Services KMS key ARN used for encryption of the resource at the time of backup.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^[a-zA-Z0-9:/_\\-]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ClusterConfiguration": {
+      "$ref": "#/definitions/ClusterConfiguration"
+    },
+    "DbParameterGroupId": {
+      "type": "string",
+      "description": "The identifier of the DB parameter group associated with the backup.",
+      "minLength": 3,
+      "maxLength": 64,
+      "markdownDescription": "The identifier of the DB parameter group associated with the backup.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 64  \nPattern: ^[a-zA-Z0-9]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "DbInstanceType": {
+      "type": "string",
+      "description": "The DB instance type of the resource at the time of backup.",
+      "enum": [
+        "db.influx.medium",
+        "db.influx.large",
+        "db.influx.xlarge",
+        "db.influx.2xlarge",
+        "db.influx.4xlarge",
+        "db.influx.8xlarge",
+        "db.influx.12xlarge",
+        "db.influx.16xlarge",
+        "db.influx.24xlarge"
+      ],
+      "markdownDescription": "The DB instance type of the resource at the time of backup.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: db.influx.medium | db.influx.large | db.influx.xlarge | db.influx.2xlarge | db.influx.4xlarge | db.influx.8xlarge | db.influx.12xlarge | db.influx.16xlarge | db.influx.24xlarge  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "LogDeliveryConfiguration": {
+      "$ref": "#/definitions/LogDeliveryConfiguration"
+    },
+    "FailoverMode": {
+      "type": "string",
+      "description": "The failover mode of the resource at the time of backup.",
+      "enum": [
+        "AUTOMATIC",
+        "NO_FAILOVER"
+      ],
+      "markdownDescription": "The failover mode of the resource at the time of backup.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AUTOMATIC | NO_FAILOVER  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "DbStorageType": {
+      "type": "string",
+      "description": "The storage type of the resource at the time of backup.",
+      "enum": [
+        "InfluxIOIncludedT1",
+        "InfluxIOIncludedT2",
+        "InfluxIOIncludedT3"
+      ],
+      "markdownDescription": "The storage type of the resource at the time of backup.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: InfluxIOIncludedT1 | InfluxIOIncludedT2 | InfluxIOIncludedT3  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "AllocatedStorage": {
+      "type": "integer",
+      "description": "The allocated storage of the resource at the time of backup, in GiB.",
+      "minimum": 20,
+      "maximum": 15360,
+      "markdownDescription": "The allocated storage of the resource at the time of backup, in GiB.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "VpcSubnetIds": {
+      "type": "array",
+      "description": "The VPC subnet IDs associated with the resource at the time of backup.",
+      "items": {
+        "type": "string",
+        "maxLength": 64,
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 64  \nPattern: ^subnet-[a-z0-9]+$  \nUpdate requires: No interruption\n"
+      },
+      "minItems": 1,
+      "maxItems": 6,
+      "insertionOrder": false,
+      "markdownDescription": "The VPC subnet IDs associated with the resource at the time of backup.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "VpcSecurityGroupIds": {
+      "type": "array",
+      "description": "The VPC security group IDs associated with the resource at the time of backup.",
+      "items": {
+        "type": "string",
+        "maxLength": 64,
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 64  \nPattern: ^sg-[a-z0-9]+$  \nUpdate requires: No interruption\n"
+      },
+      "minItems": 1,
+      "maxItems": 5,
+      "insertionOrder": false,
+      "markdownDescription": "The VPC security group IDs associated with the resource at the time of backup.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "PubliclyAccessible": {
+      "type": "boolean",
+      "description": "Indicates whether the resource was publicly accessible at the time of backup.",
+      "markdownDescription": "Indicates whether the resource was publicly accessible at the time of backup.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Port": {
+      "type": "integer",
+      "description": "The port number of the resource at the time of backup.",
+      "markdownDescription": "The port number of the resource at the time of backup.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "NetworkType": {
+      "type": "string",
+      "description": "The network type of the resource at the time of backup.",
+      "enum": [
+        "IPV4",
+        "DUAL"
+      ],
+      "markdownDescription": "The network type of the resource at the time of backup.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: IPV4 | DUAL  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "InfluxAuthParametersSecretArn": {
+      "type": "string",
+      "description": "The ARN of the Secrets Manager secret containing the InfluxDB auth parameters.",
+      "markdownDescription": "The ARN of the Secrets Manager secret containing the InfluxDB auth parameters.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "MaintenanceSchedule": {
+      "$ref": "#/definitions/MaintenanceSchedule"
+    },
+    "Tags": {
+      "type": "array",
+      "description": "A list of key-value pairs to associate with the backup.",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "maxItems": 200,
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "markdownDescription": "A list of key-value pairs to associate with the backup.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "Name",
+    "DbResourceId"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/Id",
+    "/properties/Status",
+    "/properties/Type",
+    "/properties/CreatedAt",
+    "/properties/ExpiresAfter",
+    "/properties/EngineType",
+    "/properties/DeploymentType",
+    "/properties/KmsKeyId",
+    "/properties/ClusterConfiguration",
+    "/properties/DbParameterGroupId",
+    "/properties/DbInstanceType",
+    "/properties/LogDeliveryConfiguration",
+    "/properties/FailoverMode",
+    "/properties/DbStorageType",
+    "/properties/AllocatedStorage",
+    "/properties/VpcSubnetIds",
+    "/properties/VpcSecurityGroupIds",
+    "/properties/PubliclyAccessible",
+    "/properties/Port",
+    "/properties/NetworkType",
+    "/properties/InfluxAuthParametersSecretArn",
+    "/properties/MaintenanceSchedule"
+  ],
+  "createOnlyProperties": [
+    "/properties/Name",
+    "/properties/DbResourceId",
+    "/properties/RetentionDays"
+  ],
+  "writeOnlyProperties": [
+    "/properties/RetentionDays"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/Id"
+    ]
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "timestream-influxdb:TagResource",
+      "timestream-influxdb:UntagResource",
+      "timestream-influxdb:ListTagsForResource"
+    ]
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "timestream-influxdb:CreateDbBackup",
+        "timestream-influxdb:GetDbBackup",
+        "timestream-influxdb:TagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "timestream-influxdb:GetDbBackup",
+        "timestream-influxdb:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "timestream-influxdb:GetDbBackup",
+        "timestream-influxdb:ListTagsForResource",
+        "timestream-influxdb:TagResource",
+        "timestream-influxdb:UntagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "timestream-influxdb:DeleteDbBackup",
+        "timestream-influxdb:GetDbBackup",
+        "timestream-influxdb:ListTagsForResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "timestream-influxdb:ListDbBackups"
+      ]
+    }
+  },
+  "attributes": {
+    "Arn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the backup.",
+      "minLength": 1,
+      "maxLength": 1011,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the backup.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1011  \nPattern: ^arn:aws[a-z\\-]*:timestream\\-influxdb:[a-z0-9\\-]+:[0-9]{12}:(db\\-instance|db\\-cluster|db\\-parameter\\-group|db\\-backup)/[a-zA-Z0-9]{3,64}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Id": {
+      "type": "string",
+      "description": "Service-generated unique identifier of the backup.",
+      "minLength": 3,
+      "maxLength": 64,
+      "markdownDescription": "Service-generated unique identifier of the backup.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 64  \nPattern: ^[a-zA-Z0-9]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Status": {
+      "type": "string",
+      "description": "The current status of the backup.",
+      "enum": [
+        "IN_PROGRESS",
+        "COMPLETED",
+        "FAILED",
+        "DELETING",
+        "DELETED"
+      ],
+      "markdownDescription": "The current status of the backup.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: IN_PROGRESS | COMPLETED | FAILED | DELETING | DELETED  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Type": {
+      "type": "string",
+      "description": "The type of backup. Backups created through this resource type are always ON_DEMAND.",
+      "enum": [
+        "HOURLY",
+        "DAILY",
+        "WEEKLY",
+        "MONTHLY",
+        "CUSTOM_SCHEDULE",
+        "ON_DEMAND",
+        "CONTINUOUS"
+      ],
+      "markdownDescription": "The type of backup. Backups created through this resource type are always ON_DEMAND.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: HOURLY | DAILY | WEEKLY | MONTHLY | CUSTOM_SCHEDULE | ON_DEMAND | CONTINUOUS  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreatedAt": {
+      "type": "string",
+      "description": "The time when the backup was created.",
+      "format": "date-time",
+      "markdownDescription": "The time when the backup was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ExpiresAfter": {
+      "type": "string",
+      "description": "The date after which the backup will be automatically deleted, as a calendar date in YYYY-MM-DD format.",
+      "markdownDescription": "The date after which the backup will be automatically deleted, as a calendar date in YYYY-MM-DD format.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^\\d{4}-\\d{2}-\\d{2}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "EngineType": {
+      "type": "string",
+      "description": "The engine type of the resource that the backup was created from.",
+      "enum": [
+        "INFLUXDB_V2",
+        "INFLUXDB_V3_CORE",
+        "INFLUXDB_V3_ENTERPRISE"
+      ],
+      "markdownDescription": "The engine type of the resource that the backup was created from.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: INFLUXDB_V2 | INFLUXDB_V3_CORE | INFLUXDB_V3_ENTERPRISE  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "DeploymentType": {
+      "type": "string",
+      "description": "The deployment type of the resource that the backup was created from.",
+      "enum": [
+        "SINGLE_AZ",
+        "WITH_MULTIAZ_STANDBY",
+        "MULTI_NODE_READ_REPLICAS"
+      ],
+      "markdownDescription": "The deployment type of the resource that the backup was created from.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SINGLE_AZ | WITH_MULTIAZ_STANDBY | MULTI_NODE_READ_REPLICAS  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "KmsKeyId": {
+      "type": "string",
+      "description": "The Amazon Web Services KMS key ARN used for encryption of the resource at the time of backup.",
+      "minLength": 1,
+      "maxLength": 2048,
+      "markdownDescription": "The Amazon Web Services KMS key ARN used for encryption of the resource at the time of backup.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^[a-zA-Z0-9:/_\\-]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ClusterConfiguration": {
+      "$ref": "#/definitions/ClusterConfiguration"
+    },
+    "DbParameterGroupId": {
+      "type": "string",
+      "description": "The identifier of the DB parameter group associated with the backup.",
+      "minLength": 3,
+      "maxLength": 64,
+      "markdownDescription": "The identifier of the DB parameter group associated with the backup.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 3  \nMaximum Length: 64  \nPattern: ^[a-zA-Z0-9]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "DbInstanceType": {
+      "type": "string",
+      "description": "The DB instance type of the resource at the time of backup.",
+      "enum": [
+        "db.influx.medium",
+        "db.influx.large",
+        "db.influx.xlarge",
+        "db.influx.2xlarge",
+        "db.influx.4xlarge",
+        "db.influx.8xlarge",
+        "db.influx.12xlarge",
+        "db.influx.16xlarge",
+        "db.influx.24xlarge"
+      ],
+      "markdownDescription": "The DB instance type of the resource at the time of backup.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: db.influx.medium | db.influx.large | db.influx.xlarge | db.influx.2xlarge | db.influx.4xlarge | db.influx.8xlarge | db.influx.12xlarge | db.influx.16xlarge | db.influx.24xlarge  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "LogDeliveryConfiguration": {
+      "$ref": "#/definitions/LogDeliveryConfiguration"
+    },
+    "FailoverMode": {
+      "type": "string",
+      "description": "The failover mode of the resource at the time of backup.",
+      "enum": [
+        "AUTOMATIC",
+        "NO_FAILOVER"
+      ],
+      "markdownDescription": "The failover mode of the resource at the time of backup.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: AUTOMATIC | NO_FAILOVER  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "DbStorageType": {
+      "type": "string",
+      "description": "The storage type of the resource at the time of backup.",
+      "enum": [
+        "InfluxIOIncludedT1",
+        "InfluxIOIncludedT2",
+        "InfluxIOIncludedT3"
+      ],
+      "markdownDescription": "The storage type of the resource at the time of backup.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: InfluxIOIncludedT1 | InfluxIOIncludedT2 | InfluxIOIncludedT3  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "AllocatedStorage": {
+      "type": "integer",
+      "description": "The allocated storage of the resource at the time of backup, in GiB.",
+      "minimum": 20,
+      "maximum": 15360,
+      "markdownDescription": "The allocated storage of the resource at the time of backup, in GiB.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "VpcSubnetIds": {
+      "type": "array",
+      "description": "The VPC subnet IDs associated with the resource at the time of backup.",
+      "items": {
+        "type": "string",
+        "maxLength": 64,
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 64  \nPattern: ^subnet-[a-z0-9]+$  \nUpdate requires: No interruption\n"
+      },
+      "minItems": 1,
+      "maxItems": 6,
+      "insertionOrder": false,
+      "markdownDescription": "The VPC subnet IDs associated with the resource at the time of backup.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "VpcSecurityGroupIds": {
+      "type": "array",
+      "description": "The VPC security group IDs associated with the resource at the time of backup.",
+      "items": {
+        "type": "string",
+        "maxLength": 64,
+        "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 64  \nPattern: ^sg-[a-z0-9]+$  \nUpdate requires: No interruption\n"
+      },
+      "minItems": 1,
+      "maxItems": 5,
+      "insertionOrder": false,
+      "markdownDescription": "The VPC security group IDs associated with the resource at the time of backup.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "PubliclyAccessible": {
+      "type": "boolean",
+      "description": "Indicates whether the resource was publicly accessible at the time of backup.",
+      "markdownDescription": "Indicates whether the resource was publicly accessible at the time of backup.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Port": {
+      "type": "integer",
+      "description": "The port number of the resource at the time of backup.",
+      "markdownDescription": "The port number of the resource at the time of backup.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "NetworkType": {
+      "type": "string",
+      "description": "The network type of the resource at the time of backup.",
+      "enum": [
+        "IPV4",
+        "DUAL"
+      ],
+      "markdownDescription": "The network type of the resource at the time of backup.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: IPV4 | DUAL  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "InfluxAuthParametersSecretArn": {
+      "type": "string",
+      "description": "The ARN of the Secrets Manager secret containing the InfluxDB auth parameters.",
+      "markdownDescription": "The ARN of the Secrets Manager secret containing the InfluxDB auth parameters.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "MaintenanceSchedule": {
+      "$ref": "#/definitions/MaintenanceSchedule"
+    }
+  }
+}

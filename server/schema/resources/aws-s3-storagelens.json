@@ -1,5 +1,4 @@
 {
-  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-s3-storagelens",
   "tagging": {
     "permissions": [
       "s3:PutStorageLensConfigurationTagging",
@@ -12,6 +11,22 @@
     "tagProperty": "/properties/Tags",
     "cloudFormationSystemTags": false
   },
+  "typeName": "AWS::S3::StorageLens",
+  "readOnlyProperties": [
+    "/properties/StorageLensConfiguration/StorageLensArn"
+  ],
+  "description": "The AWS::S3::StorageLens resource is an Amazon S3 resource type that you can use to create Storage Lens configurations.",
+  "createOnlyProperties": [
+    "/properties/StorageLensConfiguration/Id"
+  ],
+  "$comment": "This schema must be kept in sync with its regional contract-test template: aws-s3-storagelens/templates/{region.region_name}_schema.json.erb. Any property change here must be mirrored there (and vice versa).",
+  "primaryIdentifier": [
+    "/properties/StorageLensConfiguration/Id"
+  ],
+  "required": [
+    "StorageLensConfiguration"
+  ],
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-s3-storagelens",
   "handlers": {
     "read": {
       "permissions": [
@@ -61,18 +76,7 @@
       ]
     }
   },
-  "typeName": "AWS::S3::StorageLens",
-  "readOnlyProperties": [
-    "/properties/StorageLensConfiguration/StorageLensArn"
-  ],
-  "description": "The AWS::S3::StorageLens resource is an Amazon S3 resource type that you can use to create Storage Lens configurations.",
-  "createOnlyProperties": [
-    "/properties/StorageLensConfiguration/Id"
-  ],
   "additionalProperties": false,
-  "primaryIdentifier": [
-    "/properties/StorageLensConfiguration/Id"
-  ],
   "definitions": {
     "PrefixLevel": {
       "description": "Prefix-level metrics configurations.",
@@ -98,6 +102,9 @@
         },
         "Exclude": {
           "$ref": "#/definitions/BucketsAndRegions"
+        },
+        "IntAccessTiers": {
+          "$ref": "#/definitions/IntAccessTiers"
         },
         "IsEnabled": {
           "description": "Specifies whether the Amazon S3 Storage Lens configuration is enabled or disabled.",
@@ -128,6 +135,9 @@
         },
         "ExpandedPrefixesDataExport": {
           "$ref": "#/definitions/StorageLensExpandedPrefixesDataExport"
+        },
+        "CostAndUsageReportsPublish": {
+          "$ref": "#/definitions/CostAndUsageReportsPublish"
         }
       },
       "required": [
@@ -182,6 +192,17 @@
       "description": "Configures the server-side encryption for Amazon S3 Storage Lens report files with either S3-managed keys (SSE-S3) or KMS-managed keys (SSE-KMS).",
       "type": "object",
       "markdownDescription": "Configures the server-side encryption for Amazon S3 Storage Lens report files with either S3-managed keys (SSE-S3) or KMS-managed keys (SSE-KMS).\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "CostAndUsageReportsPublish": {
+      "description": "Settings for publishing Amazon S3 Storage Lens metrics to AWS Cost and Usage Reports.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "PrefixLevel": {
+          "$ref": "#/definitions/CostAndUsageReportsPrefixLevel"
+        }
+      },
+      "markdownDescription": "Settings for publishing Amazon S3 Storage Lens metrics to AWS Cost and Usage Reports.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "DetailedStatusCodesMetrics": {
       "description": "Enables detailed status codes metrics.",
@@ -436,6 +457,19 @@
       ],
       "markdownDescription": "S3 Tables destination settings for the Amazon S3 Storage Lens metrics export.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "IntAccessTiers": {
+      "description": "Metric breakdown per Intelligent-Tiering access tiers.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "IsEnabled": {
+          "description": "Specifies whether metric breakdown per Intelligent-Tiering access tiers is enabled or disabled.",
+          "type": "boolean",
+          "markdownDescription": "Specifies whether metric breakdown per Intelligent-Tiering access tiers is enabled or disabled.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Metric breakdown per Intelligent-Tiering access tiers.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "ActivityMetrics": {
       "description": "Enables activity metrics.",
       "additionalProperties": false,
@@ -504,6 +538,28 @@
       ],
       "markdownDescription": "AWS KMS server-side encryption.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "CostAndUsageReportsSelectionCriteria": {
+      "description": "Selection criteria for the data that Amazon S3 Storage Lens publishes to AWS Cost and Usage Reports.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "MaxDepth": {
+          "description": "The maximum prefix depth to publish to AWS Cost and Usage Reports. You must specify MinDepth and MaxDepth together, or neither. If you specify neither, MaxDepth defaults to 3.",
+          "maximum": 15,
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "The maximum prefix depth to publish to AWS Cost and Usage Reports. You must specify MinDepth and MaxDepth together, or neither. If you specify neither, MaxDepth defaults to 3.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "MinDepth": {
+          "description": "The minimum prefix depth to publish to AWS Cost and Usage Reports. You must specify MinDepth and MaxDepth together, or neither. If you specify neither, MinDepth defaults to 1.",
+          "maximum": 15,
+          "type": "integer",
+          "minimum": 1,
+          "markdownDescription": "The minimum prefix depth to publish to AWS Cost and Usage Reports. You must specify MinDepth and MaxDepth together, or neither. If you specify neither, MinDepth defaults to 1.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Selection criteria for the data that Amazon S3 Storage Lens publishes to AWS Cost and Usage Reports.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "AdvancedPerformanceMetrics": {
       "description": "Advanced Performance Metrics.",
       "additionalProperties": false,
@@ -523,6 +579,25 @@
       "type": "string",
       "maxLength": 64,
       "markdownDescription": "The ID that identifies the Amazon S3 Storage Lens configuration.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[a-zA-Z0-9\\-_.]+$  \nUpdate requires: No interruption\n"
+    },
+    "CostAndUsageReportsPrefixLevel": {
+      "description": "Prefix-level settings for publishing Amazon S3 Storage Lens metrics to AWS Cost and Usage Reports.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "IsEnabled": {
+          "description": "Specifies whether publishing prefix-level metrics to AWS Cost and Usage Reports is enabled or disabled.",
+          "type": "boolean",
+          "markdownDescription": "Specifies whether publishing prefix-level metrics to AWS Cost and Usage Reports is enabled or disabled.\n\n---\n\nRequired: Yes  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "SelectionCriteria": {
+          "$ref": "#/definitions/CostAndUsageReportsSelectionCriteria"
+        }
+      },
+      "required": [
+        "IsEnabled"
+      ],
+      "markdownDescription": "Prefix-level settings for publishing Amazon S3 Storage Lens metrics to AWS Cost and Usage Reports.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
     "Tag": {
       "additionalProperties": false,
@@ -596,8 +671,5 @@
       "markdownDescription": "A set of tags (key-value pairs) for this Amazon S3 Storage Lens configuration.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
-  "required": [
-    "StorageLensConfiguration"
-  ],
   "attributes": {}
 }

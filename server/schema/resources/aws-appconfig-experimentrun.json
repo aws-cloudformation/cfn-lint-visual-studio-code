@@ -1,0 +1,257 @@
+{
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-appconfig.git",
+  "tagging": {
+    "permissions": [
+      "appconfig:TagResource",
+      "appconfig:UntagResource",
+      "appconfig:ListTagsForResource"
+    ],
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "tagProperty": "/properties/Tags",
+    "cloudFormationSystemTags": true
+  },
+  "handlers": {
+    "read": {
+      "permissions": [
+        "appconfig:GetExperimentRun",
+        "appconfig:ListTagsForResource"
+      ]
+    },
+    "create": {
+      "permissions": [
+        "appconfig:StartExperimentRun",
+        "appconfig:GetExperimentRun",
+        "appconfig:StartDeployment",
+        "appconfig:TagResource",
+        "appconfig:ListTagsForResource",
+        "kms:GenerateDataKey"
+      ],
+      "timeoutInMinutes": 60
+    },
+    "update": {
+      "permissions": [
+        "appconfig:UpdateExperimentRun",
+        "appconfig:GetExperimentRun",
+        "appconfig:StartDeployment",
+        "appconfig:TagResource",
+        "appconfig:UntagResource",
+        "appconfig:ListTagsForResource",
+        "kms:GenerateDataKey"
+      ],
+      "timeoutInMinutes": 60
+    },
+    "list": {
+      "permissions": [
+        "appconfig:ListExperimentRuns"
+      ],
+      "handlerSchema": {
+        "properties": {
+          "ExperimentDefinitionId": {
+            "$ref": "resource-schema.json#/properties/ExperimentDefinitionId"
+          },
+          "ApplicationId": {
+            "$ref": "resource-schema.json#/properties/ApplicationId"
+          }
+        },
+        "required": [
+          "ApplicationId",
+          "ExperimentDefinitionId"
+        ]
+      }
+    },
+    "delete": {
+      "permissions": [
+        "appconfig:StopExperimentRun",
+        "appconfig:GetExperimentRun",
+        "appconfig:StartDeployment",
+        "kms:GenerateDataKey"
+      ]
+    }
+  },
+  "typeName": "AWS::AppConfig::ExperimentRun",
+  "readOnlyProperties": [
+    "/properties/ApplicationId",
+    "/properties/ExperimentDefinitionId",
+    "/properties/Run",
+    "/properties/Status",
+    "/properties/StartedAt",
+    "/properties/UpdatedAt"
+  ],
+  "description": "Resource Type definition for AWS::AppConfig::ExperimentRun",
+  "createOnlyProperties": [
+    "/properties/ApplicationIdentifier",
+    "/properties/ExperimentDefinitionIdentifier"
+  ],
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/ApplicationId",
+    "/properties/ExperimentDefinitionId",
+    "/properties/Run"
+  ],
+  "definitions": {
+    "TreatmentOverrides": {
+      "description": "Treatment overrides for specific entities.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Inline": {
+          "patternProperties": {
+            "^.+$": {
+              "type": "string",
+              "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+            }
+          },
+          "description": "Map of entity ID to treatment key (t1, t2, ..., or c for control).",
+          "additionalProperties": false,
+          "type": "object",
+          "markdownDescription": "Map of entity ID to treatment key (t1, t2, ..., or c for control).\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "Treatment overrides for specific entities.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "minLength": 0,
+          "description": "The tag value.",
+          "type": "string",
+          "maxLength": 256,
+          "markdownDescription": "The tag value.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        },
+        "Key": {
+          "minLength": 1,
+          "description": "The tag key.",
+          "type": "string",
+          "maxLength": 128,
+          "markdownDescription": "The tag key.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "ExperimentDefinitionId": {
+      "description": "The resolved experiment definition ID.",
+      "type": "string",
+      "markdownDescription": "The resolved experiment definition ID.\n\n---\n\nRequired: No  \nType: String  \nPattern: [a-z0-9]{4,7}  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Status": {
+      "description": "Current status of the run.",
+      "type": "string",
+      "enum": [
+        "RUNNING",
+        "DONE"
+      ],
+      "markdownDescription": "Current status of the run.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: RUNNING | DONE  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Description": {
+      "description": "Description of the experiment run.",
+      "type": "string",
+      "maxLength": 1024,
+      "markdownDescription": "Description of the experiment run.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+    },
+    "TreatmentOverrides": {
+      "$ref": "#/definitions/TreatmentOverrides"
+    },
+    "Run": {
+      "description": "The run number (auto-assigned by the service).",
+      "type": "string",
+      "markdownDescription": "The run number (auto-assigned by the service).\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "StartedAt": {
+      "description": "ISO-8601 timestamp when the run started.",
+      "type": "string",
+      "markdownDescription": "ISO-8601 timestamp when the run started.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ApplicationIdentifier": {
+      "minLength": 1,
+      "description": "The application name or ID used to create the experiment run.",
+      "type": "string",
+      "maxLength": 2048,
+      "markdownDescription": "The application name or ID used to create the experiment run.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: Replacement\n"
+    },
+    "ApplicationId": {
+      "description": "The resolved application ID.",
+      "type": "string",
+      "markdownDescription": "The resolved application ID.\n\n---\n\nRequired: No  \nType: String  \nPattern: [a-z0-9]{4,7}  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ExperimentDefinitionIdentifier": {
+      "minLength": 1,
+      "description": "The experiment definition name or ID used to create the experiment run.",
+      "type": "string",
+      "maxLength": 2048,
+      "markdownDescription": "The experiment definition name or ID used to create the experiment run.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: Replacement\n"
+    },
+    "UpdatedAt": {
+      "description": "ISO-8601 timestamp when the run was last updated.",
+      "type": "string",
+      "markdownDescription": "ISO-8601 timestamp when the run was last updated.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ExposurePercentage": {
+      "description": "Percentage of traffic exposed to the experiment (0-100).",
+      "maximum": 100,
+      "type": "number",
+      "minimum": 0,
+      "markdownDescription": "Percentage of traffic exposed to the experiment (0-100).\n\n---\n\nRequired: Yes  \nType: Number  \nUpdate requires: No interruption\n"
+    },
+    "Tags": {
+      "uniqueItems": true,
+      "description": "Tags to associate with the experiment run.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "Tags to associate with the experiment run.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "required": [
+    "ApplicationIdentifier",
+    "ExperimentDefinitionIdentifier",
+    "ExposurePercentage"
+  ],
+  "attributes": {
+    "ExperimentDefinitionId": {
+      "description": "The resolved experiment definition ID.",
+      "type": "string",
+      "markdownDescription": "The resolved experiment definition ID.\n\n---\n\nRequired: No  \nType: String  \nPattern: [a-z0-9]{4,7}  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Status": {
+      "description": "Current status of the run.",
+      "type": "string",
+      "enum": [
+        "RUNNING",
+        "DONE"
+      ],
+      "markdownDescription": "Current status of the run.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: RUNNING | DONE  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Run": {
+      "description": "The run number (auto-assigned by the service).",
+      "type": "string",
+      "markdownDescription": "The run number (auto-assigned by the service).\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "StartedAt": {
+      "description": "ISO-8601 timestamp when the run started.",
+      "type": "string",
+      "markdownDescription": "ISO-8601 timestamp when the run started.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ApplicationId": {
+      "description": "The resolved application ID.",
+      "type": "string",
+      "markdownDescription": "The resolved application ID.\n\n---\n\nRequired: No  \nType: String  \nPattern: [a-z0-9]{4,7}  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "UpdatedAt": {
+      "description": "ISO-8601 timestamp when the run was last updated.",
+      "type": "string",
+      "markdownDescription": "ISO-8601 timestamp when the run was last updated.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

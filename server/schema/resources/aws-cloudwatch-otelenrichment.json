@@ -11,6 +11,38 @@
         "STOPPED"
       ],
       "markdownDescription": "Current status of OTel enrichment (RUNNING or STOPPED).\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: RUNNING | STOPPED  \nUpdate requires: No interruption\n"
+    },
+    "OTelEnrichmentMetricSelector": {
+      "description": "Selects metrics within one namespace. The same shape serves both the include and the exclude direction. Namespaces are compared byte-for-byte and case-sensitively; no wildcards, prefixes or normalization.",
+      "type": "object",
+      "properties": {
+        "Namespace": {
+          "description": "The CloudWatch namespace this selector applies to.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "markdownDescription": "The CloudWatch namespace this selector applies to.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nPattern: ^[^:].*$  \nUpdate requires: No interruption\n"
+        },
+        "MetricNames": {
+          "description": "Absent or empty means every metric in this namespace, in whichever direction this selector appears. Present means only these metric names.",
+          "type": "array",
+          "insertionOrder": false,
+          "uniqueItems": true,
+          "maxItems": 100,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\n"
+          },
+          "markdownDescription": "Absent or empty means every metric in this namespace, in whichever direction this selector appears. Present means only these metric names.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Namespace"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Selects metrics within one namespace. The same shape serves both the include and the exclude direction. Namespaces are compared byte-for-byte and case-sensitively; no wildcards, prefixes or normalization.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     }
   },
   "tagging": {
@@ -24,6 +56,28 @@
     },
     "Status": {
       "$ref": "#/definitions/Status"
+    },
+    "IncludeFilters": {
+      "description": "Scopes enrichment to a subset of the account's telemetry. Absent or empty means all namespaces are in scope. Present means only these are. The service enforces a combined cap of 100 selectors across IncludeFilters and ExcludeFilters, and rejects more than one selector for the same namespace within a direction.",
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "maxItems": 100,
+      "items": {
+        "$ref": "#/definitions/OTelEnrichmentMetricSelector"
+      },
+      "markdownDescription": "Scopes enrichment to a subset of the account's telemetry. Absent or empty means all namespaces are in scope. Present means only these are. The service enforces a combined cap of 100 selectors across IncludeFilters and ExcludeFilters, and rejects more than one selector for the same namespace within a direction.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "ExcludeFilters": {
+      "description": "Removes metrics from the include set. Absent or empty means nothing is removed. Evaluated after IncludeFilters, so ExcludeFilters always wins.",
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "maxItems": 100,
+      "items": {
+        "$ref": "#/definitions/OTelEnrichmentMetricSelector"
+      },
+      "markdownDescription": "Removes metrics from the include set. Absent or empty means nothing is removed. Evaluated after IncludeFilters, so ExcludeFilters always wins.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
     }
   },
   "additionalProperties": false,
@@ -49,7 +103,7 @@
     },
     "update": {
       "permissions": [
-        "cloudwatch:StartOTelEnrichment",
+        "cloudwatch:UpdateOTelEnrichment",
         "cloudwatch:GetOTelEnrichment"
       ]
     },
