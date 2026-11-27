@@ -42,6 +42,7 @@
         "route53:ListQueryLoggingConfigs",
         "route53:UpdateHostedZoneComment",
         "route53:UpdateHostedZoneFeatures",
+        "route53:UpdateHostedZoneTier",
         "route53:ChangeTagsForResource",
         "route53:AssociateVPCWithHostedZone",
         "route53:DisassociateVPCFromHostedZone",
@@ -72,29 +73,74 @@
   "typeName": "AWS::Route53::HostedZone",
   "readOnlyProperties": [
     "/properties/Id",
-    "/properties/NameServers"
+    "/properties/NameServers",
+    "/properties/HostedZoneFeatures/ChangeHistory"
   ],
   "description": "Creates a new public or private hosted zone. You create records in a public hosted zone to define how you want to route traffic on the internet for a domain, such as example.com, and its subdomains (apex.example.com, acme.example.com). You create records in a private hosted zone to define how you want to route traffic for a domain and its subdomains within one or more Amazon Virtual Private Clouds (Amazon VPCs). \n  You can't convert a public hosted zone to a private hosted zone or vice versa. Instead, you must create a new hosted zone with the same name and create new resource record sets.\n  For more information about charges for hosted zones, see [Amazon Route 53 Pricing](https://docs.aws.amazon.com/route53/pricing/).\n Note the following:\n  +  You can't create a hosted zone for a top-level domain (TLD) such as .com.\n  +  If your domain is registered with a registrar other than Route 53, you must update the name servers with your registrar to make Route 53 the DNS service for the domain. For more information, see [Migrating DNS Service for an Existing Domain to Amazon Route 53](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/MigratingDNS.html) in the *Amazon Route 53 Developer Guide*. \n  \n When you submit a ``CreateHostedZone`` request, the initial status of the hosted zone is ``PENDING``. For public hosted zones, this means that the NS and SOA records are not yet available on all Route 53 DNS servers. When the NS and SOA records are available, the status of the zone changes to ``INSYNC``.\n The ``CreateHostedZone`` request requires the caller to have an ``ec2:DescribeVpcs`` permission.\n  When creating private hosted zones, the Amazon VPC must belong to the same partition where the hosted zone is created. A partition is a group of AWS-Regions. Each AWS-account is scoped to one partition.\n The following are the supported partitions:\n  +  ``aws`` - AWS-Regions\n  +  ``aws-cn`` - China Regions\n  +  ``aws-us-gov`` - govcloud-us-region\n  \n For more information, see [Access Management](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html) in the *General Reference*.",
   "createOnlyProperties": [
-    "/properties/Name"
+    "/properties/Name",
+    "/properties/DelegationSetId"
   ],
   "additionalProperties": false,
   "primaryIdentifier": [
     "/properties/Id"
   ],
   "definitions": {
+    "ChangeHistory": {
+      "description": "",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Status": {
+          "description": "Whether change history is enabled for the hosted zone.",
+          "type": "string",
+          "enum": [
+            "ENABLED",
+            "DISABLED"
+          ],
+          "markdownDescription": "Whether change history is enabled for the hosted zone.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption\n"
+        },
+        "RetentionStartsAt": {
+          "format": "date-time",
+          "description": "The earliest time the hosted zone's change history can be read from, as an ISO 8601 timestamp. Present only when Status is ENABLED.",
+          "type": "string",
+          "markdownDescription": "The earliest time the hosted zone's change history can be read from, as an ISO 8601 timestamp. Present only when Status is ENABLED.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "HostedZoneFeatures": {
       "description": "Represents the features configuration for a hosted zone, including the status of various features and any associated failure reasons.",
       "additionalProperties": false,
       "type": "object",
       "properties": {
+        "ChangeHistory": {
+          "description": "",
+          "$ref": "#/definitions/ChangeHistory",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
         "EnableAcceleratedRecovery": {
           "description": "",
           "type": "boolean",
           "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "EnablePublicDNSFallback": {
+          "description": "",
+          "type": "boolean",
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "ChangeGuardrails": {
+          "uniqueItems": true,
+          "description": "",
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ChangeGuardrail"
+          },
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
         }
       },
-      "markdownDescription": "Represents the features configuration for a hosted zone, including the status of various features and any associated failure reasons.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+      "markdownDescription": "Represents the features configuration for a hosted zone, including the status of various features and any associated failure reasons.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "HostedZoneTag": {
       "description": "A complex type that contains information about a tag that you want to add or edit for the specified health check or hosted zone.",
@@ -142,6 +188,38 @@
       ],
       "markdownDescription": "*Private hosted zones only:* A complex type that contains information about an Amazon VPC. Route 53 Resolver uses the records in the private hosted zone to route traffic in that VPC. \n  For public hosted zones, omit ``VPCs``, ``VPCId``, and ``VPCRegion``.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
     },
+    "ChangeGuardrail": {
+      "description": "",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Status": {
+          "description": "The status of the Change Guardrail. ENABLED makes Route 53 block the corresponding destructive change; DISABLED turns the guardrail off.",
+          "type": "string",
+          "enum": [
+            "ENABLED",
+            "DISABLED"
+          ],
+          "markdownDescription": "The status of the Change Guardrail. ENABLED makes Route 53 block the corresponding destructive change; DISABLED turns the guardrail off.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: ENABLED | DISABLED  \nUpdate requires: No interruption\n"
+        },
+        "Name": {
+          "description": "The name of the Change Guardrail.",
+          "type": "string",
+          "enum": [
+            "NS_OCCLUSION_CHECK",
+            "ALIAS_TARGET_CHECK",
+            "ACTIVE_RECORD_CHECK",
+            "ACTIVE_DELEGATION_CHECK"
+          ],
+          "markdownDescription": "The name of the Change Guardrail.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: NS_OCCLUSION_CHECK | ALIAS_TARGET_CHECK | ACTIVE_RECORD_CHECK | ACTIVE_DELEGATION_CHECK  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Name",
+        "Status"
+      ],
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "HostedZoneConfig": {
       "description": "A complex type that contains an optional comment about your hosted zone. If you don't want to specify a comment, omit both the ``HostedZoneConfig`` and ``Comment`` elements.",
       "additionalProperties": false,
@@ -152,6 +230,15 @@
           "type": "string",
           "maxLength": 256,
           "markdownDescription": "Any comments that you want to include about the hosted zone.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        },
+        "HostedZoneTier": {
+          "description": "",
+          "type": "string",
+          "enum": [
+            "STANDARD",
+            "ADVANCED"
+          ],
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: STANDARD | ADVANCED  \nUpdate requires: No interruption\n"
         }
       },
       "markdownDescription": "A complex type that contains an optional comment about your hosted zone. If you don't want to specify a comment, omit both the ``HostedZoneConfig`` and ``Comment`` elements.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
@@ -174,6 +261,11 @@
     }
   },
   "properties": {
+    "DelegationSetId": {
+      "description": "",
+      "type": "string",
+      "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+    },
     "HostedZoneTags": {
       "uniqueItems": true,
       "description": "Adds, edits, or deletes tags for a health check or a hosted zone.\n For information about using tags for cost allocation, see [Using Cost Allocation Tags](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html) in the *User Guide*.",
@@ -197,7 +289,7 @@
     "HostedZoneFeatures": {
       "description": "The features configuration for the hosted zone, including accelerated recovery settings and status information.",
       "$ref": "#/definitions/HostedZoneFeatures",
-      "markdownDescription": "The features configuration for the hosted zone, including accelerated recovery settings and status information.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+      "markdownDescription": "The features configuration for the hosted zone, including accelerated recovery settings and status information.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
     },
     "HostedZoneConfig": {
       "description": "A complex type that contains an optional comment.\n If you don't want to specify a comment, omit the ``HostedZoneConfig`` and ``Comment`` elements.",

@@ -1,0 +1,226 @@
+{
+  "typeName": "AWS::PI::PerfReports",
+  "description": "Creates and manages a Performance Insights performance analysis report for a specified DB instance.",
+  "definitions": {
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag.",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The key name of the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag.",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The value for the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "Arn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the performance analysis report.",
+      "minLength": 1,
+      "maxLength": 1011,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the performance analysis report.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1011  \nPattern: ^arn:.*:pi:.*$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ServiceType": {
+      "type": "string",
+      "description": "The AWS service for which Performance Insights returns metrics. Valid values are RDS and DOCDB.",
+      "enum": [
+        "RDS",
+        "DOCDB"
+      ],
+      "markdownDescription": "The AWS service for which Performance Insights returns metrics. Valid values are RDS and DOCDB.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: RDS | DOCDB  \nUpdate requires: Replacement\n"
+    },
+    "Identifier": {
+      "type": "string",
+      "description": "An immutable, AWS Region-unique identifier for a data source. Performance Insights gathers metrics from this data source. To use an Amazon RDS instance as a data source, specify its DbiResourceId value.",
+      "minLength": 0,
+      "maxLength": 256,
+      "markdownDescription": "An immutable, AWS Region-unique identifier for a data source. Performance Insights gathers metrics from this data source. To use an Amazon RDS instance as a data source, specify its DbiResourceId value.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: ^[a-zA-Z0-9-]+$  \nUpdate requires: Replacement\n"
+    },
+    "AnalysisReportId": {
+      "type": "string",
+      "description": "A unique identifier for the analysis report.",
+      "minLength": 1,
+      "maxLength": 100,
+      "markdownDescription": "A unique identifier for the analysis report.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: ^report-[0-9a-f]{17}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "StartTime": {
+      "type": "string",
+      "description": "The start time defined for the analysis report in ISO 8601 format.",
+      "format": "date-time",
+      "markdownDescription": "The start time defined for the analysis report in ISO 8601 format.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "EndTime": {
+      "type": "string",
+      "description": "The end time defined for the analysis report in ISO 8601 format.",
+      "format": "date-time",
+      "markdownDescription": "The end time defined for the analysis report in ISO 8601 format.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
+    },
+    "CreateTime": {
+      "type": "string",
+      "description": "The time the analysis report was created in ISO 8601 format.",
+      "format": "date-time",
+      "markdownDescription": "The time the analysis report was created in ISO 8601 format.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Status": {
+      "type": "string",
+      "description": "The status of the analysis report.",
+      "enum": [
+        "RUNNING",
+        "SUCCEEDED",
+        "FAILED"
+      ],
+      "markdownDescription": "The status of the analysis report.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: RUNNING | SUCCEEDED | FAILED  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Tags": {
+      "type": "array",
+      "description": "An array of key-value pairs to apply to this resource.",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "maxItems": 200,
+      "markdownDescription": "An array of key-value pairs to apply to this resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: Replacement\n"
+    }
+  },
+  "required": [
+    "ServiceType",
+    "Identifier",
+    "StartTime",
+    "EndTime"
+  ],
+  "additionalProperties": false,
+  "createOnlyProperties": [
+    "/properties/ServiceType",
+    "/properties/Identifier",
+    "/properties/StartTime",
+    "/properties/EndTime",
+    "/properties/Tags"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/AnalysisReportId",
+    "/properties/CreateTime",
+    "/properties/Status"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/ServiceType",
+      "/properties/Identifier",
+      "/properties/AnalysisReportId"
+    ]
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "pi:ListTagsForResource"
+    ]
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "pi:CreatePerformanceAnalysisReport",
+        "pi:GetPerformanceAnalysisReport",
+        "pi:ListTagsForResource",
+        "pi:TagResource",
+        "pi:GetResourceMetadata",
+        "rds:DescribeDBInstances"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "pi:GetPerformanceAnalysisReport",
+        "pi:ListTagsForResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "pi:DeletePerformanceAnalysisReport",
+        "pi:GetPerformanceAnalysisReport",
+        "pi:ListTagsForResource"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "ServiceType": {
+            "type": "string",
+            "enum": [
+              "RDS",
+              "DOCDB"
+            ],
+            "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: RDS | DOCDB  \nUpdate requires: No interruption\n"
+          },
+          "Identifier": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 256,
+            "markdownDescription": "\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nPattern: ^[a-zA-Z0-9-]+$  \nUpdate requires: No interruption\n"
+          }
+        },
+        "required": [
+          "ServiceType",
+          "Identifier"
+        ]
+      },
+      "permissions": [
+        "pi:ListPerformanceAnalysisReports"
+      ]
+    }
+  },
+  "attributes": {
+    "Arn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the performance analysis report.",
+      "minLength": 1,
+      "maxLength": 1011,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the performance analysis report.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1011  \nPattern: ^arn:.*:pi:.*$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "AnalysisReportId": {
+      "type": "string",
+      "description": "A unique identifier for the analysis report.",
+      "minLength": 1,
+      "maxLength": 100,
+      "markdownDescription": "A unique identifier for the analysis report.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: ^report-[0-9a-f]{17}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreateTime": {
+      "type": "string",
+      "description": "The time the analysis report was created in ISO 8601 format.",
+      "format": "date-time",
+      "markdownDescription": "The time the analysis report was created in ISO 8601 format.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Status": {
+      "type": "string",
+      "description": "The status of the analysis report.",
+      "enum": [
+        "RUNNING",
+        "SUCCEEDED",
+        "FAILED"
+      ],
+      "markdownDescription": "The status of the analysis report.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: RUNNING | SUCCEEDED | FAILED  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

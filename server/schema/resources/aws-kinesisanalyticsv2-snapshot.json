@@ -1,0 +1,474 @@
+{
+  "typeName": "AWS::KinesisAnalyticsV2::Snapshot",
+  "description": "Resource Type definition for AWS::KinesisAnalyticsV2::Snapshot, a point-in-time snapshot of a Managed Service for Apache Flink (Kinesis Analytics V2) application's state. Snapshots are account-scoped and immutable: every input property except Tags is create-only, so changing any of them forces replacement, while changing Tags updates the snapshot in place. Specify exactly one source: ApplicationName to snapshot a running application (CreateSnapshot), or ImportSourceConfiguration to import a snapshot from Amazon S3 (ImportSnapshot). CloudFormation deletes the snapshot via DeleteSnapshot; to retain a snapshot beyond the stack, set DeletionPolicy: Retain on the resource.",
+  "definitions": {
+    "SnapshotEncryptionConfigurationDescription": {
+      "description": "A KMS encryption configuration for snapshot data: the key type, and the key when it is a customer managed key.",
+      "type": "object",
+      "properties": {
+        "KeyId": {
+          "description": "The ARN of the customer managed KMS key. Required when KeyType is CUSTOMER_MANAGED_KEY; must be omitted for AWS_OWNED_KEY.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "markdownDescription": "The ARN of the customer managed KMS key. Required when KeyType is CUSTOMER_MANAGED_KEY; must be omitted for AWS_OWNED_KEY.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nUpdate requires: No interruption\n"
+        },
+        "KeyType": {
+          "description": "The type of KMS key: AWS_OWNED_KEY or CUSTOMER_MANAGED_KEY.",
+          "type": "string",
+          "enum": [
+            "AWS_OWNED_KEY",
+            "CUSTOMER_MANAGED_KEY"
+          ],
+          "markdownDescription": "The type of KMS key: AWS_OWNED_KEY or CUSTOMER_MANAGED_KEY.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: AWS_OWNED_KEY | CUSTOMER_MANAGED_KEY  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "KeyType"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A KMS encryption configuration for snapshot data: the key type, and the key when it is a customer managed key.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "S3PrefixLocation": {
+      "description": "An Amazon S3 prefix location.",
+      "type": "object",
+      "properties": {
+        "BucketARN": {
+          "description": "The ARN of the S3 bucket.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "markdownDescription": "The ARN of the S3 bucket.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:  \nUpdate requires: No interruption\n"
+        },
+        "KeyPrefix": {
+          "description": "The S3 key prefix.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "markdownDescription": "The S3 key prefix.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 200  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "BucketARN",
+        "KeyPrefix"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "An Amazon S3 prefix location.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ImportSourceConfiguration": {
+      "description": "The Amazon S3 location to import a snapshot from, and the role the service assumes to read it.",
+      "type": "object",
+      "properties": {
+        "SourceType": {
+          "description": "The type of storage the snapshot is imported from.",
+          "type": "string",
+          "enum": [
+            "S3"
+          ],
+          "markdownDescription": "The type of storage the snapshot is imported from.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: S3  \nUpdate requires: No interruption\n"
+        },
+        "ImportRoleArn": {
+          "description": "The ARN of the IAM role that the service assumes to read the snapshot files from Amazon S3 (and to decrypt them, if they are encrypted with a customer managed key).",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "markdownDescription": "The ARN of the IAM role that the service assumes to read the snapshot files from Amazon S3 (and to decrypt them, if they are encrypted with a customer managed key).\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:  \nUpdate requires: No interruption\n"
+        },
+        "SourceEncryptionConfiguration": {
+          "description": "The encryption of the snapshot files in Amazon S3.",
+          "$ref": "#/definitions/SnapshotEncryptionConfigurationDescription",
+          "markdownDescription": "The encryption of the snapshot files in Amazon S3.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+        },
+        "SourceS3PrefixLocation": {
+          "description": "The Amazon S3 bucket and key prefix that hold the snapshot files, for example the prefix an ExportSnapshot operation wrote them to.",
+          "$ref": "#/definitions/S3PrefixLocation",
+          "markdownDescription": "The Amazon S3 bucket and key prefix that hold the snapshot files, for example the prefix an ExportSnapshot operation wrote them to.\n\n---\n\nRequired: Yes  \nType:   \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "SourceType",
+        "ImportRoleArn",
+        "SourceS3PrefixLocation"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The Amazon S3 location to import a snapshot from, and the role the service assumes to read it.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SourceApplicationDescription": {
+      "description": "Details about the application the snapshot was taken from.",
+      "type": "object",
+      "properties": {
+        "ApplicationName": {
+          "description": "The name of the source application.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The name of the source application.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "ApplicationCreationTimestamp": {
+          "description": "The time at which the source application was created.",
+          "type": "string",
+          "format": "date-time",
+          "markdownDescription": "The time at which the source application was created.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: No interruption\n"
+        },
+        "ApplicationVersionId": {
+          "description": "The version of the source application captured in the snapshot.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 999999999,
+          "markdownDescription": "The version of the source application captured in the snapshot.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "ApplicationName",
+        "ApplicationCreationTimestamp",
+        "ApplicationVersionId"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "Details about the application the snapshot was taken from.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SnapshotSourceDescription": {
+      "description": "Details about the source (application and/or S3 location) the snapshot was taken from. Populated by DescribeSnapshot.",
+      "type": "object",
+      "properties": {
+        "S3PrefixLocation": {
+          "$ref": "#/definitions/S3PrefixLocation"
+        },
+        "SourceApplicationDescription": {
+          "$ref": "#/definitions/SourceApplicationDescription"
+        }
+      },
+      "additionalProperties": false,
+      "markdownDescription": "Details about the source (application and/or S3 location) the snapshot was taken from. Populated by DescribeSnapshot.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a snapshot.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "description": "The key of the tag.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The key of the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "description": "The value of the tag.",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The value of the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "A key-value pair to associate with a snapshot.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "SnapshotArn": {
+      "description": "The Amazon Resource Name (ARN) of the snapshot. Account-scoped: arn:<partition>:kinesisanalytics:<region>:<account>:snapshot/<SnapshotName>. Assigned by the service at create time and used as the resource's primary identifier.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the snapshot. Account-scoped: arn:<partition>:kinesisanalytics:<region>:<account>:snapshot/<SnapshotName>. Assigned by the service at create time and used as the resource's primary identifier.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws[a-z-]*:kinesisanalytics:[a-z0-9-]+:[0-9]{12}:snapshot/[a-zA-Z0-9_.-]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "ApplicationName": {
+      "description": "The name of the Managed Service for Apache Flink application to snapshot. Used only at create time to select the source application; immutable after create. Specify either ApplicationName or ImportSourceConfiguration, not both.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "markdownDescription": "The name of the Managed Service for Apache Flink application to snapshot. Used only at create time to select the source application; immutable after create. Specify either ApplicationName or ImportSourceConfiguration, not both.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nPattern: ^[a-zA-Z0-9_.-]+$  \nUpdate requires: Replacement\n"
+    },
+    "ImportSourceConfiguration": {
+      "description": "The Amazon S3 location and role to import the snapshot from, with ImportSnapshot. Used only at create time; immutable after create. Specify either ApplicationName or ImportSourceConfiguration, not both.",
+      "$ref": "#/definitions/ImportSourceConfiguration",
+      "markdownDescription": "The Amazon S3 location and role to import the snapshot from, with ImportSnapshot. Used only at create time; immutable after create. Specify either ApplicationName or ImportSourceConfiguration, not both.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
+    },
+    "SnapshotName": {
+      "description": "The customer-chosen name of the snapshot, unique within the account. Immutable after create.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "markdownDescription": "The customer-chosen name of the snapshot, unique within the account. Immutable after create.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 100  \nPattern: ^[a-zA-Z0-9_.-]+$  \nUpdate requires: Replacement\n"
+    },
+    "SnapshotDescription": {
+      "description": "Optional customer-supplied description of the snapshot. Immutable after create.",
+      "type": "string",
+      "minLength": 0,
+      "maxLength": 1024,
+      "markdownDescription": "Optional customer-supplied description of the snapshot. Immutable after create.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nPattern: ^[^\\u0000-\\u001F\\u007F]*$  \nUpdate requires: Replacement\n"
+    },
+    "SnapshotStatus": {
+      "description": "The lifecycle status of the snapshot as reported by the service (CREATING, READY, DELETING, FAILED). Populated by DescribeSnapshot.",
+      "type": "string",
+      "enum": [
+        "CREATING",
+        "READY",
+        "DELETING",
+        "FAILED"
+      ],
+      "markdownDescription": "The lifecycle status of the snapshot as reported by the service (CREATING, READY, DELETING, FAILED). Populated by DescribeSnapshot.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | READY | DELETING | FAILED  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SnapshotCreationTimestamp": {
+      "description": "The time at which the service created the snapshot, in ISO-8601 format. Populated by DescribeSnapshot.",
+      "type": "string",
+      "format": "date-time",
+      "markdownDescription": "The time at which the service created the snapshot, in ISO-8601 format. Populated by DescribeSnapshot.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "RuntimeEnvironment": {
+      "description": "The runtime environment of the source application when the snapshot was taken with ApplicationName (CreateSnapshot), for example FLINK-1_20. Populated by DescribeSnapshot. Not returned for snapshots created with ImportSourceConfiguration (ImportSnapshot), which carry no runtime version.",
+      "type": "string",
+      "enum": [
+        "SQL-1_0",
+        "FLINK-1_6",
+        "FLINK-1_8",
+        "ZEPPELIN-FLINK-1_0",
+        "FLINK-1_11",
+        "FLINK-1_13",
+        "ZEPPELIN-FLINK-2_0",
+        "FLINK-1_15",
+        "ZEPPELIN-FLINK-3_0",
+        "FLINK-1_18",
+        "FLINK-1_19",
+        "FLINK-1_20",
+        "FLINK-2_1",
+        "FLINK-2_2",
+        "FLINK-2_3",
+        "FLINK-2_4"
+      ],
+      "markdownDescription": "The runtime environment of the source application when the snapshot was taken with ApplicationName (CreateSnapshot), for example FLINK-1_20. Populated by DescribeSnapshot. Not returned for snapshots created with ImportSourceConfiguration (ImportSnapshot), which carry no runtime version.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SQL-1_0 | FLINK-1_6 | FLINK-1_8 | ZEPPELIN-FLINK-1_0 | FLINK-1_11 | FLINK-1_13 | ZEPPELIN-FLINK-2_0 | FLINK-1_15 | ZEPPELIN-FLINK-3_0 | FLINK-1_18 | FLINK-1_19 | FLINK-1_20 | FLINK-2_1 | FLINK-2_2 | FLINK-2_3 | FLINK-2_4  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SnapshotSizeInBytes": {
+      "description": "The size of the snapshot in bytes. Populated by DescribeSnapshot once the snapshot reaches READY.",
+      "type": "integer",
+      "minimum": 0,
+      "markdownDescription": "The size of the snapshot in bytes. Populated by DescribeSnapshot once the snapshot reaches READY.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SnapshotEncryptionConfigurationDescription": {
+      "description": "The encryption of the snapshot. Can be set only with ImportSourceConfiguration (sent as the ImportSnapshot DestinationEncryptionConfiguration; the AWS owned key when omitted). A snapshot taken from ApplicationName uses the application's encryption: DescribeSnapshot returns it for such snapshots, but it must not be set with ApplicationName. Immutable after create.",
+      "$ref": "#/definitions/SnapshotEncryptionConfigurationDescription",
+      "markdownDescription": "The encryption of the snapshot. Can be set only with ImportSourceConfiguration (sent as the ImportSnapshot DestinationEncryptionConfiguration; the AWS owned key when omitted). A snapshot taken from ApplicationName uses the application's encryption: DescribeSnapshot returns it for such snapshots, but it must not be set with ApplicationName. Immutable after create.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: Replacement\n"
+    },
+    "SnapshotSourceDescription": {
+      "description": "The source of the snapshot: the application it was taken from, or the Amazon S3 location it was imported from. Populated by DescribeSnapshot.",
+      "$ref": "#/definitions/SnapshotSourceDescription",
+      "markdownDescription": "The source of the snapshot: the application it was taken from, or the Amazon S3 location it was imported from. Populated by DescribeSnapshot.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SnapshotInitiator": {
+      "description": "Indicates whether the snapshot was initiated by the customer or by the service. Populated by DescribeSnapshot.",
+      "type": "string",
+      "enum": [
+        "USER",
+        "SYSTEM"
+      ],
+      "markdownDescription": "Indicates whether the snapshot was initiated by the customer or by the service. Populated by DescribeSnapshot.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: USER | SYSTEM  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SnapshotInitiatorOperation": {
+      "description": "The operation that initiated the snapshot. Populated by DescribeSnapshot.",
+      "type": "string",
+      "enum": [
+        "CreateSnapshot",
+        "ImportSnapshot",
+        "SystemCreateSnapshot"
+      ],
+      "markdownDescription": "The operation that initiated the snapshot. Populated by DescribeSnapshot.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CreateSnapshot | ImportSnapshot | SystemCreateSnapshot  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SnapshotFormat": {
+      "description": "The format of the snapshot (CANONICAL). Sent to ImportSnapshot with ImportSourceConfiguration; with ApplicationName it may only be CANONICAL, the format CreateSnapshot produces. Returned by DescribeSnapshot. Immutable after create.",
+      "type": "string",
+      "enum": [
+        "CANONICAL"
+      ],
+      "markdownDescription": "The format of the snapshot (CANONICAL). Sent to ImportSnapshot with ImportSourceConfiguration; with ApplicationName it may only be CANONICAL, the format CreateSnapshot produces. Returned by DescribeSnapshot. Immutable after create.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CANONICAL  \nUpdate requires: Replacement\n"
+    },
+    "Tags": {
+      "description": "Tags to apply to the snapshot. Applied at create time (with CreateSnapshot, or with TagResource right after ImportSnapshot) and updated in place with TagResource and UntagResource. Tag keys must not start with aws:.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "maxItems": 50,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "markdownDescription": "Tags to apply to the snapshot. Applied at create time (with CreateSnapshot, or with TagResource right after ImportSnapshot) and updated in place with TagResource and UntagResource. Tag keys must not start with aws:.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "SnapshotName"
+  ],
+  "primaryIdentifier": [
+    "/properties/SnapshotArn"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/SnapshotName"
+    ],
+    [
+      "/properties/SnapshotName",
+      "/properties/SnapshotCreationTimestamp"
+    ]
+  ],
+  "createOnlyProperties": [
+    "/properties/ApplicationName",
+    "/properties/ImportSourceConfiguration",
+    "/properties/SnapshotName",
+    "/properties/SnapshotDescription",
+    "/properties/SnapshotEncryptionConfigurationDescription",
+    "/properties/SnapshotFormat"
+  ],
+  "writeOnlyProperties": [
+    "/properties/ApplicationName",
+    "/properties/ImportSourceConfiguration"
+  ],
+  "readOnlyProperties": [
+    "/properties/SnapshotArn",
+    "/properties/SnapshotStatus",
+    "/properties/SnapshotCreationTimestamp",
+    "/properties/RuntimeEnvironment",
+    "/properties/SnapshotSizeInBytes",
+    "/properties/SnapshotSourceDescription",
+    "/properties/SnapshotSourceDescription/S3PrefixLocation/BucketARN",
+    "/properties/SnapshotSourceDescription/S3PrefixLocation/KeyPrefix",
+    "/properties/SnapshotSourceDescription/SourceApplicationDescription/ApplicationName",
+    "/properties/SnapshotSourceDescription/SourceApplicationDescription/ApplicationCreationTimestamp",
+    "/properties/SnapshotSourceDescription/SourceApplicationDescription/ApplicationVersionId",
+    "/properties/SnapshotInitiator",
+    "/properties/SnapshotInitiatorOperation"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "kinesisanalytics:TagResource",
+      "kinesisanalytics:UntagResource",
+      "kinesisanalytics:ListTagsForResource"
+    ]
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "kinesisanalytics:CreateSnapshot",
+        "kinesisanalytics:ImportSnapshot",
+        "kinesisanalytics:DescribeSnapshot",
+        "kinesisanalytics:TagResource",
+        "kinesisanalytics:ListTagsForResource",
+        "kms:DescribeKey",
+        "kms:Decrypt",
+        "kms:GenerateDataKey",
+        "iam:PassRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "kinesisanalytics:DescribeSnapshot",
+        "kinesisanalytics:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "kinesisanalytics:DescribeSnapshot",
+        "kinesisanalytics:TagResource",
+        "kinesisanalytics:UntagResource",
+        "kinesisanalytics:ListTagsForResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "kinesisanalytics:DescribeSnapshot",
+        "kinesisanalytics:DeleteSnapshot",
+        "kinesisanalytics:ListTagsForResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "kinesisanalytics:ListSnapshots"
+      ]
+    }
+  },
+  "attributes": {
+    "SnapshotArn": {
+      "description": "The Amazon Resource Name (ARN) of the snapshot. Account-scoped: arn:<partition>:kinesisanalytics:<region>:<account>:snapshot/<SnapshotName>. Assigned by the service at create time and used as the resource's primary identifier.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048,
+      "markdownDescription": "The Amazon Resource Name (ARN) of the snapshot. Account-scoped: arn:<partition>:kinesisanalytics:<region>:<account>:snapshot/<SnapshotName>. Assigned by the service at create time and used as the resource's primary identifier.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 2048  \nPattern: ^arn:aws[a-z-]*:kinesisanalytics:[a-z0-9-]+:[0-9]{12}:snapshot/[a-zA-Z0-9_.-]+$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SnapshotStatus": {
+      "description": "The lifecycle status of the snapshot as reported by the service (CREATING, READY, DELETING, FAILED). Populated by DescribeSnapshot.",
+      "type": "string",
+      "enum": [
+        "CREATING",
+        "READY",
+        "DELETING",
+        "FAILED"
+      ],
+      "markdownDescription": "The lifecycle status of the snapshot as reported by the service (CREATING, READY, DELETING, FAILED). Populated by DescribeSnapshot.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CREATING | READY | DELETING | FAILED  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SnapshotCreationTimestamp": {
+      "description": "The time at which the service created the snapshot, in ISO-8601 format. Populated by DescribeSnapshot.",
+      "type": "string",
+      "format": "date-time",
+      "markdownDescription": "The time at which the service created the snapshot, in ISO-8601 format. Populated by DescribeSnapshot.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "RuntimeEnvironment": {
+      "description": "The runtime environment of the source application when the snapshot was taken with ApplicationName (CreateSnapshot), for example FLINK-1_20. Populated by DescribeSnapshot. Not returned for snapshots created with ImportSourceConfiguration (ImportSnapshot), which carry no runtime version.",
+      "type": "string",
+      "enum": [
+        "SQL-1_0",
+        "FLINK-1_6",
+        "FLINK-1_8",
+        "ZEPPELIN-FLINK-1_0",
+        "FLINK-1_11",
+        "FLINK-1_13",
+        "ZEPPELIN-FLINK-2_0",
+        "FLINK-1_15",
+        "ZEPPELIN-FLINK-3_0",
+        "FLINK-1_18",
+        "FLINK-1_19",
+        "FLINK-1_20",
+        "FLINK-2_1",
+        "FLINK-2_2",
+        "FLINK-2_3",
+        "FLINK-2_4"
+      ],
+      "markdownDescription": "The runtime environment of the source application when the snapshot was taken with ApplicationName (CreateSnapshot), for example FLINK-1_20. Populated by DescribeSnapshot. Not returned for snapshots created with ImportSourceConfiguration (ImportSnapshot), which carry no runtime version.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: SQL-1_0 | FLINK-1_6 | FLINK-1_8 | ZEPPELIN-FLINK-1_0 | FLINK-1_11 | FLINK-1_13 | ZEPPELIN-FLINK-2_0 | FLINK-1_15 | ZEPPELIN-FLINK-3_0 | FLINK-1_18 | FLINK-1_19 | FLINK-1_20 | FLINK-2_1 | FLINK-2_2 | FLINK-2_3 | FLINK-2_4  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SnapshotSizeInBytes": {
+      "description": "The size of the snapshot in bytes. Populated by DescribeSnapshot once the snapshot reaches READY.",
+      "type": "integer",
+      "minimum": 0,
+      "markdownDescription": "The size of the snapshot in bytes. Populated by DescribeSnapshot once the snapshot reaches READY.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SnapshotSourceDescription": {
+      "description": "The source of the snapshot: the application it was taken from, or the Amazon S3 location it was imported from. Populated by DescribeSnapshot.",
+      "$ref": "#/definitions/SnapshotSourceDescription",
+      "markdownDescription": "The source of the snapshot: the application it was taken from, or the Amazon S3 location it was imported from. Populated by DescribeSnapshot.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SnapshotInitiator": {
+      "description": "Indicates whether the snapshot was initiated by the customer or by the service. Populated by DescribeSnapshot.",
+      "type": "string",
+      "enum": [
+        "USER",
+        "SYSTEM"
+      ],
+      "markdownDescription": "Indicates whether the snapshot was initiated by the customer or by the service. Populated by DescribeSnapshot.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: USER | SYSTEM  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "SnapshotInitiatorOperation": {
+      "description": "The operation that initiated the snapshot. Populated by DescribeSnapshot.",
+      "type": "string",
+      "enum": [
+        "CreateSnapshot",
+        "ImportSnapshot",
+        "SystemCreateSnapshot"
+      ],
+      "markdownDescription": "The operation that initiated the snapshot. Populated by DescribeSnapshot.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CreateSnapshot | ImportSnapshot | SystemCreateSnapshot  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

@@ -1,0 +1,193 @@
+{
+  "typeName": "AWS::DevOpsAgent::Trigger",
+  "description": "Resource Type definition for AWS::DevOpsAgent::Trigger. A trigger defines an automated action that fires on a schedule within an Agent Space.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "definitions": {
+    "Schedule": {
+      "description": "Schedule configuration for a time-based trigger.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Expression": {
+          "description": "A cron or rate expression that defines when the trigger fires.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "markdownDescription": "A cron or rate expression that defines when the trigger fires.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Expression"
+      ],
+      "markdownDescription": "Schedule configuration for a time-based trigger.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Condition": {
+      "description": "The condition that causes the trigger to fire.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Schedule": {
+          "$ref": "#/definitions/Schedule"
+        }
+      },
+      "required": [
+        "Schedule"
+      ],
+      "markdownDescription": "The condition that causes the trigger to fire.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "properties": {
+    "AgentSpaceId": {
+      "description": "The unique identifier of the parent Agent Space.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "markdownDescription": "The unique identifier of the parent Agent Space.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: Replacement\n"
+    },
+    "TriggerId": {
+      "description": "The unique identifier of the trigger (assigned by the service on Create).",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "markdownDescription": "The unique identifier of the trigger (assigned by the service on Create).\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Type": {
+      "description": "The type of trigger.",
+      "type": "string",
+      "enum": [
+        "TIME_BASED"
+      ],
+      "markdownDescription": "The type of trigger.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: TIME_BASED  \nUpdate requires: Replacement\n"
+    },
+    "Condition": {
+      "$ref": "#/definitions/Condition"
+    },
+    "Action": {
+      "description": "The action to perform when the trigger fires. A JSON object containing actionType and task.",
+      "type": "object",
+      "markdownDescription": "The action to perform when the trigger fires. A JSON object containing actionType and task.\n\n---\n\nRequired: Yes  \nUpdate requires: Replacement\n"
+    },
+    "Status": {
+      "description": "The status of the trigger. Active triggers fire on schedule; Inactive triggers are paused.",
+      "type": "string",
+      "enum": [
+        "Active",
+        "Inactive"
+      ],
+      "default": "Active",
+      "markdownDescription": "The status of the trigger. Active triggers fire on schedule; Inactive triggers are paused.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: Active | Inactive  \nUpdate requires: No interruption\n"
+    },
+    "CreatedAt": {
+      "description": "The timestamp when the trigger was created.",
+      "type": "string",
+      "format": "date-time",
+      "markdownDescription": "The timestamp when the trigger was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "UpdatedAt": {
+      "description": "The timestamp when the trigger was last updated.",
+      "type": "string",
+      "format": "date-time",
+      "markdownDescription": "The timestamp when the trigger was last updated.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Arn": {
+      "description": "The Amazon Resource Name (ARN) of the trigger. Nested under the parent Agent Space: arn:<partition>:aidevops:<region>:<account-id>:agentspace/<agentspace-id>/trigger/<trigger-id>.",
+      "type": "string",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the trigger. Nested under the parent Agent Space: arn:<partition>:aidevops:<region>:<account-id>:agentspace/<agentspace-id>/trigger/<trigger-id>.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "AgentSpaceId",
+    "Type",
+    "Condition",
+    "Action"
+  ],
+  "readOnlyProperties": [
+    "/properties/TriggerId",
+    "/properties/CreatedAt",
+    "/properties/UpdatedAt",
+    "/properties/Arn"
+  ],
+  "createOnlyProperties": [
+    "/properties/AgentSpaceId",
+    "/properties/Type",
+    "/properties/Condition",
+    "/properties/Action"
+  ],
+  "primaryIdentifier": [
+    "/properties/AgentSpaceId",
+    "/properties/TriggerId"
+  ],
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "aidevops:CreateTrigger",
+        "aidevops:GetTrigger"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "aidevops:GetTrigger"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "aidevops:UpdateTrigger",
+        "aidevops:GetTrigger"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "aidevops:DeleteTrigger",
+        "aidevops:GetTrigger"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "aidevops:ListTriggers"
+      ],
+      "handlerSchema": {
+        "properties": {
+          "AgentSpaceId": {
+            "$ref": "resource-schema.json#/properties/AgentSpaceId"
+          }
+        },
+        "required": [
+          "AgentSpaceId"
+        ]
+      }
+    }
+  },
+  "attributes": {
+    "TriggerId": {
+      "description": "The unique identifier of the trigger (assigned by the service on Create).",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "markdownDescription": "The unique identifier of the trigger (assigned by the service on Create).\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 1  \nMaximum Length: 255  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreatedAt": {
+      "description": "The timestamp when the trigger was created.",
+      "type": "string",
+      "format": "date-time",
+      "markdownDescription": "The timestamp when the trigger was created.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "UpdatedAt": {
+      "description": "The timestamp when the trigger was last updated.",
+      "type": "string",
+      "format": "date-time",
+      "markdownDescription": "The timestamp when the trigger was last updated.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Arn": {
+      "description": "The Amazon Resource Name (ARN) of the trigger. Nested under the parent Agent Space: arn:<partition>:aidevops:<region>:<account-id>:agentspace/<agentspace-id>/trigger/<trigger-id>.",
+      "type": "string",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the trigger. Nested under the parent Agent Space: arn:<partition>:aidevops:<region>:<account-id>:agentspace/<agentspace-id>/trigger/<trigger-id>.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

@@ -12,15 +12,14 @@
   },
   "typeName": "AWS::EC2::VPCPeeringConnection",
   "readOnlyProperties": [
-    "/properties/Id"
+    "/properties/Id",
+    "/properties/MultipathResilienceStatus"
   ],
   "description": "Resource Type definition for AWS::EC2::VPCPeeringConnection",
   "createOnlyProperties": [
     "/properties/PeerRegion",
     "/properties/PeerOwnerId",
     "/properties/PeerVpcId",
-    "/properties/PeerRoleArn",
-    "/properties/AssumeRoleRegion",
     "/properties/VpcId"
   ],
   "primaryIdentifier": [
@@ -34,7 +33,8 @@
   "handlers": {
     "read": {
       "permissions": [
-        "ec2:DescribeVpcPeeringConnections"
+        "ec2:DescribeVpcPeeringConnections",
+        "sts:AssumeRole"
       ]
     },
     "create": {
@@ -43,14 +43,17 @@
         "ec2:DescribeVpcPeeringConnections",
         "ec2:AcceptVpcPeeringConnection",
         "ec2:CreateTags",
-        "sts:AssumeRole"
+        "sts:AssumeRole",
+        "ec2:ModifyVpcPeeringConnectionOptions"
       ]
     },
     "update": {
       "permissions": [
         "ec2:CreateTags",
         "ec2:DeleteTags",
-        "ec2:DescribeVpcPeeringConnections"
+        "ec2:DescribeVpcPeeringConnections",
+        "ec2:ModifyVpcPeeringConnectionOptions",
+        "sts:AssumeRole"
       ]
     },
     "list": {
@@ -71,6 +74,31 @@
   ],
   "additionalProperties": false,
   "definitions": {
+    "VpcPeeringConnectionOptions": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "AllowDnsResolutionFromRemoteVpc": {
+          "description": "If true, enables a local VPC to resolve public DNS hostnames to private IP addresses when queried from instances in the peer VPC.",
+          "type": "boolean",
+          "markdownDescription": "If true, enables a local VPC to resolve public DNS hostnames to private IP addresses when queried from instances in the peer VPC.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        },
+        "MultipathResilienceMode": {
+          "description": "The mode of multipath resilience on the peering connection. Applies when AllowMultipathResilience is true.",
+          "type": "string",
+          "enum": [
+            "always-on"
+          ],
+          "markdownDescription": "The mode of multipath resilience on the peering connection. Applies when AllowMultipathResilience is true.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: always-on  \nUpdate requires: No interruption\n"
+        },
+        "AllowMultipathResilience": {
+          "description": "If true, allows multipath resilience on this side of the peering connection. Multipath resilience is enabled only when both the requester and accepter sides allow it; MultipathResilienceStatus reports the result.",
+          "type": "boolean",
+          "markdownDescription": "If true, allows multipath resilience on this side of the peering connection. Multipath resilience is enabled only when both the requester and accepter sides allow it; MultipathResilienceStatus reports the result.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+        }
+      },
+      "markdownDescription": "\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
     "Tag": {
       "description": "A key-value pair to associate with a resource.",
       "additionalProperties": false,
@@ -95,10 +123,15 @@
     }
   },
   "properties": {
+    "PeerVpcPeeringConnectionOptions": {
+      "description": "The VPC peering connection options corresponding to the accepter side of the connection.",
+      "$ref": "#/definitions/VpcPeeringConnectionOptions",
+      "markdownDescription": "The VPC peering connection options corresponding to the accepter side of the connection.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
     "PeerRoleArn": {
-      "description": "The Amazon Resource Name (ARN) of the VPC peer role for the peering connection in another AWS account.",
+      "description": "The Amazon Resource Name (ARN) of the VPC peer role for the peering connection in another AWS account. You can update this property. To manage PeerVpcPeeringConnectionOptions on a peering connection with another AWS account, the role must allow ec2:DescribeVpcPeeringConnections and ec2:ModifyVpcPeeringConnectionOptions.",
       "type": "string",
-      "markdownDescription": "The Amazon Resource Name (ARN) of the VPC peer role for the peering connection in another AWS account.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+      "markdownDescription": "The Amazon Resource Name (ARN) of the VPC peer role for the peering connection in another AWS account. You can update this property. To manage PeerVpcPeeringConnectionOptions on a peering connection with another AWS account, the role must allow ec2:DescribeVpcPeeringConnections and ec2:ModifyVpcPeeringConnectionOptions.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
     },
     "VpcId": {
       "description": "The ID of the VPC.",
@@ -110,10 +143,15 @@
       "type": "string",
       "markdownDescription": "The ID of the VPC with which you are creating the VPC peering connection. You must specify this parameter in the request.\n\n---\n\nRequired: Yes  \nType: String  \nUpdate requires: Replacement\n"
     },
+    "VpcPeeringConnectionOptions": {
+      "description": "The VPC peering connection options corresponding to the requester side of the connection.",
+      "$ref": "#/definitions/VpcPeeringConnectionOptions",
+      "markdownDescription": "The VPC peering connection options corresponding to the requester side of the connection.\n\n---\n\nRequired: No  \nType:   \nUpdate requires: No interruption\n"
+    },
     "AssumeRoleRegion": {
-      "description": "The Region code to use when calling Security Token Service (STS) to assume the PeerRoleArn, if provided.",
+      "description": "The Region code to use when calling Security Token Service (STS) to assume the PeerRoleArn, if provided. You can update this property.",
       "type": "string",
-      "markdownDescription": "The Region code to use when calling Security Token Service (STS) to assume the PeerRoleArn, if provided.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: Replacement\n"
+      "markdownDescription": "The Region code to use when calling Security Token Service (STS) to assume the PeerRoleArn, if provided. You can update this property.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\n"
     },
     "Id": {
       "type": "string",
@@ -137,12 +175,32 @@
         "$ref": "#/definitions/Tag"
       },
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "MultipathResilienceStatus": {
+      "description": "The multipath resilience status of the VPC peering connection: enabled when both the requester and accepter sides allow multipath resilience, pending when only one side allows it, and disabled when neither side allows it.",
+      "type": "string",
+      "enum": [
+        "pending",
+        "enabled",
+        "disabled"
+      ],
+      "markdownDescription": "The multipath resilience status of the VPC peering connection: enabled when both the requester and accepter sides allow multipath resilience, pending when only one side allows it, and disabled when neither side allows it.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: pending | enabled | disabled  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   },
   "attributes": {
     "Id": {
       "type": "string",
       "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "MultipathResilienceStatus": {
+      "description": "The multipath resilience status of the VPC peering connection: enabled when both the requester and accepter sides allow multipath resilience, pending when only one side allows it, and disabled when neither side allows it.",
+      "type": "string",
+      "enum": [
+        "pending",
+        "enabled",
+        "disabled"
+      ],
+      "markdownDescription": "The multipath resilience status of the VPC peering connection: enabled when both the requester and accepter sides allow multipath resilience, pending when only one side allows it, and disabled when neither side allows it.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: pending | enabled | disabled  \nUpdate requires: No interruption\nRead only property: Yes"
     }
   }
 }

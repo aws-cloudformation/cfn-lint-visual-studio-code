@@ -1,0 +1,669 @@
+{
+  "typeName": "AWS::CloudWatch::Alert",
+  "description": "Resource Type definition for AWS::CloudWatch::Alert. An alert runs a SQL or PromQL query in a CloudWatch Omni space on a fixed interval, or reads the burn rate or error budget of a service level objective (SLO), compares the result against warning and critical thresholds, and sends notifications to Amazon SNS topics or integrations, or requests an investigation, when its state changes.",
+  "properties": {
+    "SpaceId": {
+      "type": "string",
+      "description": "The ID of the space to create the alert in. Changing this value replaces the alert.",
+      "markdownDescription": "The ID of the space to create the alert in. Changing this value replaces the alert.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$  \nUpdate requires: Replacement\n"
+    },
+    "ProfileId": {
+      "type": "string",
+      "description": "The ID of the access profile the alert uses to run its query and send notifications.",
+      "minLength": 1,
+      "maxLength": 64,
+      "markdownDescription": "The ID of the access profile the alert uses to run its query and send notifications.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 64  \nPattern: ^[a-zA-Z0-9_-]+$  \nUpdate requires: No interruption\n"
+    },
+    "Name": {
+      "type": "string",
+      "description": "The display name of the alert. Names don't need to be unique within a space; the alert is identified by AlertId.",
+      "minLength": 1,
+      "maxLength": 256,
+      "markdownDescription": "The display name of the alert. Names don't need to be unique within a space; the alert is identified by AlertId.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nPattern: ^[a-zA-Z0-9_.@~()-]+$  \nUpdate requires: No interruption\n"
+    },
+    "Description": {
+      "type": "string",
+      "description": "A description of the alert.",
+      "maxLength": 1024,
+      "markdownDescription": "A description of the alert.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+    },
+    "Rule": {
+      "$ref": "#/definitions/Rule"
+    },
+    "NotificationsEnabled": {
+      "type": "boolean",
+      "description": "Whether the alert sends notifications. When false, the alert is still evaluated and records its state, but sends nothing. Defaults to true.",
+      "markdownDescription": "Whether the alert sends notifications. When false, the alert is still evaluated and records its state, but sends nothing. Defaults to true.\n\n---\n\nRequired: No  \nType: Boolean  \nUpdate requires: No interruption\n"
+    },
+    "NotificationRules": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/NotificationRule"
+      },
+      "description": "The notification rules that determine when and where notifications are sent.",
+      "minItems": 0,
+      "maxItems": 5,
+      "markdownDescription": "The notification rules that determine when and where notifications are sent.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "AccountId": {
+      "type": "string",
+      "description": "The AWS account ID that owns the alert.",
+      "minLength": 12,
+      "maxLength": 12,
+      "markdownDescription": "The AWS account ID that owns the alert.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 12  \nMaximum Length: 12  \nPattern: ^[0-9]{12}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The time the alert was created, in ISO 8601 format (UTC).",
+      "markdownDescription": "The time the alert was created, in ISO 8601 format (UTC).\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "UpdatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The time the alert was last updated, in ISO 8601 format (UTC).",
+      "markdownDescription": "The time the alert was last updated, in ISO 8601 format (UTC).\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "AlertId": {
+      "type": "string",
+      "description": "The ID of the alert, assigned by CloudWatch when the alert is created. It doesn't change when the alert is updated, and it is the resource ID in the alert's ARN.",
+      "minLength": 32,
+      "maxLength": 32,
+      "markdownDescription": "The ID of the alert, assigned by CloudWatch when the alert is created. It doesn't change when the alert is updated, and it is the resource ID in the alert's ARN.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 32  \nMaximum Length: 32  \nPattern: ^[0-9a-f]{32}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Arn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the alert.",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the alert.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:[^:]+:cloudwatch:[^:]*:[0-9]{12}:alert/[0-9a-f]{32}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Tags": {
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "description": "An array of key-value pairs to apply to this resource.",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "maxItems": 50,
+      "markdownDescription": "An array of key-value pairs to apply to this resource.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    }
+  },
+  "definitions": {
+    "Query": {
+      "type": "object",
+      "properties": {
+        "Language": {
+          "type": "string",
+          "description": "The query language. Valid values: SQL, PROMQL.",
+          "enum": [
+            "SQL",
+            "PROMQL"
+          ],
+          "markdownDescription": "The query language. Valid values: SQL, PROMQL.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: SQL | PROMQL  \nUpdate requires: No interruption\n"
+        },
+        "Expression": {
+          "type": "string",
+          "description": "The query expression. For PromQL, the series value is returned in a field named value.",
+          "minLength": 1,
+          "maxLength": 10000,
+          "markdownDescription": "The query expression. For PromQL, the series value is returned in a field named value.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 10000  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Language",
+        "Expression"
+      ],
+      "additionalProperties": false,
+      "description": "The query the alert runs, and the language it is written in.",
+      "markdownDescription": "The query the alert runs, and the language it is written in.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Condition": {
+      "type": "object",
+      "properties": {
+        "ThresholdMode": {
+          "type": "string",
+          "description": "How the threshold is applied. COUNT_OF_RESULTS compares the number of rows the query returns. FIELD_VALUE compares the value of ThresholdField in each result row; each row is tracked separately.",
+          "enum": [
+            "COUNT_OF_RESULTS",
+            "FIELD_VALUE"
+          ],
+          "markdownDescription": "How the threshold is applied. COUNT_OF_RESULTS compares the number of rows the query returns. FIELD_VALUE compares the value of ThresholdField in each result row; each row is tracked separately.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: COUNT_OF_RESULTS | FIELD_VALUE  \nUpdate requires: No interruption\n"
+        },
+        "ThresholdField": {
+          "type": "string",
+          "description": "The result field to compare against the threshold. Required when ThresholdMode is FIELD_VALUE.",
+          "maxLength": 256,
+          "markdownDescription": "The result field to compare against the threshold. Required when ThresholdMode is FIELD_VALUE.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        },
+        "Comparator": {
+          "type": "string",
+          "description": "The comparison operator. Valid values: GT, GTE, LT, LTE (greater than, greater than or equal to, less than, less than or equal to).",
+          "enum": [
+            "GT",
+            "LT",
+            "GTE",
+            "LTE"
+          ],
+          "markdownDescription": "The comparison operator. Valid values: GT, GTE, LT, LTE (greater than, greater than or equal to, less than, less than or equal to).\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: GT | LT | GTE | LTE  \nUpdate requires: No interruption\n"
+        },
+        "WarningThreshold": {
+          "type": "number",
+          "description": "The value at which the alert enters the WARNING state.",
+          "markdownDescription": "The value at which the alert enters the WARNING state.\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "CriticalThreshold": {
+          "type": "number",
+          "description": "The value at which the alert enters the CRITICAL state.",
+          "markdownDescription": "The value at which the alert enters the CRITICAL state.\n\n---\n\nRequired: No  \nType: Number  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "description": "The thresholds that set the alert's state. Specify at least one of WarningThreshold and CriticalThreshold.",
+      "markdownDescription": "The thresholds that set the alert's state. Specify at least one of WarningThreshold and CriticalThreshold.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Evaluation": {
+      "type": "object",
+      "properties": {
+        "IntervalSeconds": {
+          "type": "integer",
+          "description": "The time between evaluations, in seconds. Valid values: 30, 60, 120, 300, 600, 900, 1800, 3600.",
+          "markdownDescription": "The time between evaluations, in seconds. Valid values: 30, 60, 120, 300, 600, 900, 1800, 3600.\n\n---\n\nRequired: Yes  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "PendingDurationSeconds": {
+          "type": "integer",
+          "description": "How long a threshold breach must last before the alert changes state, in seconds. Must be a multiple of IntervalSeconds. 0 changes state immediately.",
+          "markdownDescription": "How long a threshold breach must last before the alert changes state, in seconds. Must be a multiple of IntervalSeconds. 0 changes state immediately.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "RecoveryDurationSeconds": {
+          "type": "integer",
+          "description": "How long the result must stay within its thresholds before the alert returns to OK, in seconds. Must be a multiple of IntervalSeconds. 0 returns to OK immediately.",
+          "markdownDescription": "How long the result must stay within its thresholds before the alert returns to OK, in seconds. Must be a multiple of IntervalSeconds. 0 returns to OK immediately.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "IntervalSeconds"
+      ],
+      "additionalProperties": false,
+      "description": "How often the alert is evaluated, and how long a change must last before the state changes.",
+      "markdownDescription": "How often the alert is evaluated, and how long a change must last before the state changes.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "NoData": {
+      "type": "object",
+      "properties": {
+        "TreatAs": {
+          "type": "string",
+          "description": "The state to report when an evaluation returns no data. Valid values: OK, WARNING, CRITICAL, NODATA.",
+          "enum": [
+            "OK",
+            "WARNING",
+            "CRITICAL",
+            "NODATA"
+          ],
+          "markdownDescription": "The state to report when an evaluation returns no data. Valid values: OK, WARNING, CRITICAL, NODATA.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: OK | WARNING | CRITICAL | NODATA  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "TreatAs"
+      ],
+      "additionalProperties": false,
+      "description": "How the alert behaves when an evaluation returns no data. If omitted, the alert reports NODATA.",
+      "markdownDescription": "How the alert behaves when an evaluation returns no data. If omitted, the alert reports NODATA.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "TelemetryRule": {
+      "type": "object",
+      "properties": {
+        "Query": {
+          "$ref": "#/definitions/Query"
+        },
+        "Condition": {
+          "$ref": "#/definitions/Condition"
+        },
+        "Evaluation": {
+          "$ref": "#/definitions/Evaluation"
+        },
+        "NoData": {
+          "$ref": "#/definitions/NoData"
+        }
+      },
+      "additionalProperties": false,
+      "description": "A rule that queries telemetry, evaluates the result against a condition, and sets how missing data is handled.",
+      "required": [
+        "Query",
+        "Condition",
+        "Evaluation"
+      ],
+      "markdownDescription": "A rule that queries telemetry, evaluates the result against a condition, and sets how missing data is handled.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Rule": {
+      "type": "object",
+      "description": "The rule that defines how the alert is evaluated. Specify exactly one of TelemetryRule and SloRule. An alert cannot change from one to the other: an update that does so fails. To change the kind, give the alert a new logical ID, so that CloudFormation creates a new alert and deletes the old one.",
+      "properties": {
+        "TelemetryRule": {
+          "$ref": "#/definitions/TelemetryRule"
+        },
+        "SloRule": {
+          "$ref": "#/definitions/SloRule"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "TelemetryRule"
+          ]
+        },
+        {
+          "required": [
+            "SloRule"
+          ]
+        }
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "The rule that defines how the alert is evaluated. Specify exactly one of TelemetryRule and SloRule. An alert cannot change from one to the other: an update that does so fails. To change the kind, give the alert a new logical ID, so that CloudFormation creates a new alert and deletes the old one.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Trigger": {
+      "type": "object",
+      "properties": {
+        "StateValues": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "OK",
+              "WARNING",
+              "CRITICAL",
+              "NODATA"
+            ],
+            "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: OK | WARNING | CRITICAL | NODATA  \nUpdate requires: No interruption\n"
+          },
+          "description": "The alert states that trigger this rule. A notification is sent when the alert enters any listed state. If omitted or empty, every state triggers the rule.",
+          "maxItems": 4,
+          "markdownDescription": "The alert states that trigger this rule. A notification is sent when the alert enters any listed state. If omitted or empty, every state triggers the rule.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "description": "The alert states that trigger the notification rule.",
+      "markdownDescription": "The alert states that trigger the notification rule.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Metadata": {
+      "type": "object",
+      "patternProperties": {
+        ".+": {
+          "type": "string",
+          "maxLength": 1024,
+          "markdownDescription": "\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 1024  \nUpdate requires: No interruption\n"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Settings specific to the target, as key-value pairs (up to 20). The keys depend on the integration type. Not used for sns and investigation targets.",
+      "maxProperties": 20,
+      "markdownDescription": "Settings specific to the target, as key-value pairs (up to 20). The keys depend on the integration type. Not used for sns and investigation targets.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Target": {
+      "type": "object",
+      "properties": {
+        "Type": {
+          "type": "string",
+          "description": "The target type. Valid values: sns, slack, pagerduty, investigation.",
+          "enum": [
+            "sns",
+            "slack",
+            "pagerduty",
+            "investigation"
+          ],
+          "markdownDescription": "The target type. Valid values: sns, slack, pagerduty, investigation.\n\n---\n\nRequired: Yes  \nType: String  \nAllowed Values: sns | slack | pagerduty | investigation  \nUpdate requires: No interruption\n"
+        },
+        "Arn": {
+          "type": "string",
+          "description": "The ARN of the target. For sns, the ARN of the Amazon SNS topic. For slack and pagerduty, the ARN of a CloudWatch Omni integration. For investigation, the ARN of an external agent integration in the same account and Region; the rule's StateValues must list one or more of WARNING, CRITICAL and NODATA.",
+          "minLength": 1,
+          "maxLength": 1024,
+          "markdownDescription": "The ARN of the target. For sns, the ARN of the Amazon SNS topic. For slack and pagerduty, the ARN of a CloudWatch Omni integration. For investigation, the ARN of an external agent integration in the same account and Region; the rule's StateValues must list one or more of WARNING, CRITICAL and NODATA.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 1024  \nPattern: ^arn:.+$  \nUpdate requires: No interruption\n"
+        },
+        "Metadata": {
+          "$ref": "#/definitions/Metadata"
+        }
+      },
+      "required": [
+        "Type",
+        "Arn"
+      ],
+      "additionalProperties": false,
+      "description": "Where the notification is sent.",
+      "markdownDescription": "Where the notification is sent.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "NotificationRule": {
+      "type": "object",
+      "properties": {
+        "Trigger": {
+          "$ref": "#/definitions/Trigger"
+        },
+        "Target": {
+          "$ref": "#/definitions/Target"
+        }
+      },
+      "required": [
+        "Trigger",
+        "Target"
+      ],
+      "additionalProperties": false,
+      "description": "A notification rule: which alert states trigger it, and where the notification is sent.",
+      "markdownDescription": "A notification rule: which alert states trigger it, and where the notification is sent.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "A key-value pair to associate with a resource.",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "description": "The key name of the tag.",
+          "markdownDescription": "The key name of the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 256,
+          "description": "The value for the tag.",
+          "markdownDescription": "The value for the tag.\n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SloEvaluation": {
+      "type": "object",
+      "properties": {
+        "IntervalSeconds": {
+          "type": "integer",
+          "enum": [
+            60,
+            120,
+            300,
+            600,
+            900,
+            1800,
+            3600
+          ],
+          "description": "The time between evaluations, in seconds. Valid values: 60, 120, 300, 600, 900, 1800, 3600.",
+          "markdownDescription": "The time between evaluations, in seconds. Valid values: 60, 120, 300, 600, 900, 1800, 3600.\n\n---\n\nRequired: Yes  \nType: Integer  \nAllowed Values: 60 | 120 | 300 | 600 | 900 | 1800 | 3600  \nUpdate requires: No interruption\n"
+        },
+        "PendingDurationSeconds": {
+          "type": "integer",
+          "description": "How long a threshold breach must last before the alert changes state, in seconds. Must be a multiple of IntervalSeconds. 0 changes state immediately.",
+          "markdownDescription": "How long a threshold breach must last before the alert changes state, in seconds. Must be a multiple of IntervalSeconds. 0 changes state immediately.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "RecoveryDurationSeconds": {
+          "type": "integer",
+          "description": "How long the result must stay within its thresholds before the alert returns to OK, in seconds. Must be a multiple of IntervalSeconds. 0 returns to OK immediately.",
+          "markdownDescription": "How long the result must stay within its thresholds before the alert returns to OK, in seconds. Must be a multiple of IntervalSeconds. 0 returns to OK immediately.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "IntervalSeconds"
+      ],
+      "additionalProperties": false,
+      "description": "How often the alert is evaluated, and how long a change must last before the state changes.",
+      "markdownDescription": "How often the alert is evaluated, and how long a change must last before the state changes.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SloBurnRateCondition": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "A burn-rate condition. With one window, the burn rate over WindowMinutes is compared with the thresholds. With ShortWindowMinutes as well, the lower of the two burn rates is compared, so the alert changes state only when both windows breach. Specify at least one of WarningThreshold and CriticalThreshold. Each is breached at or above its value.",
+      "properties": {
+        "WindowMinutes": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 10080,
+          "multipleOf": 5,
+          "description": "The burn-rate window, in minutes. A multiple of 5, from 5 through 10080 (7 days). WindowMinutes x 60 must be at least Evaluation IntervalSeconds.",
+          "markdownDescription": "The burn-rate window, in minutes. A multiple of 5, from 5 through 10080 (7 days). WindowMinutes x 60 must be at least Evaluation IntervalSeconds.\n\n---\n\nRequired: Conditional  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "ShortWindowMinutes": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 10080,
+          "multipleOf": 5,
+          "description": "The short window of a pair, in minutes. A multiple of 5, from 5 through 10080, and shorter than WindowMinutes. Omit for a single window. Recommended pairs: 60/5, 360/30, 1440/60 and 4320/360.",
+          "markdownDescription": "The short window of a pair, in minutes. A multiple of 5, from 5 through 10080, and shorter than WindowMinutes. Omit for a single window. Recommended pairs: 60/5, 360/30, 1440/60 and 4320/360.\n\n---\n\nRequired: No  \nType: Integer  \nUpdate requires: No interruption\n"
+        },
+        "WarningThreshold": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "The alert is WARNING when the burn rate reaches this multiple of the sustainable rate. Greater than 0.",
+          "markdownDescription": "The alert is WARNING when the burn rate reaches this multiple of the sustainable rate. Greater than 0.\n\n---\n\nRequired: Conditional  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "CriticalThreshold": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "The alert is CRITICAL when the burn rate reaches this multiple of the sustainable rate. Greater than 0, and greater than WarningThreshold when both are set.",
+          "markdownDescription": "The alert is CRITICAL when the burn rate reaches this multiple of the sustainable rate. Greater than 0, and greater than WarningThreshold when both are set.\n\n---\n\nRequired: Conditional  \nType: Number  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "WindowMinutes"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "WarningThreshold"
+          ]
+        },
+        {
+          "required": [
+            "CriticalThreshold"
+          ]
+        }
+      ],
+      "markdownDescription": "A burn-rate condition. With one window, the burn rate over WindowMinutes is compared with the thresholds. With ShortWindowMinutes as well, the lower of the two burn rates is compared, so the alert changes state only when both windows breach. Specify at least one of WarningThreshold and CriticalThreshold. Each is breached at or above its value.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SloErrorBudgetCondition": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "An error-budget condition on the share of the error budget used over the SLO's window, from 0 to 1. Specify at least one of WarningThreshold and CriticalThreshold. Each is breached at or above its value. A CriticalThreshold of 1 is breached when the SLO misses its target.",
+      "properties": {
+        "WarningThreshold": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "description": "The alert is WARNING when the used share reaches this value. Greater than 0, at most 1.",
+          "markdownDescription": "The alert is WARNING when the used share reaches this value. Greater than 0, at most 1.\n\n---\n\nRequired: Conditional  \nType: Number  \nUpdate requires: No interruption\n"
+        },
+        "CriticalThreshold": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "description": "The alert is CRITICAL when the used share reaches this value. Greater than 0, at most 1, and greater than WarningThreshold when both are set.",
+          "markdownDescription": "The alert is CRITICAL when the used share reaches this value. Greater than 0, at most 1, and greater than WarningThreshold when both are set.\n\n---\n\nRequired: Conditional  \nType: Number  \nUpdate requires: No interruption\n"
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "WarningThreshold"
+          ]
+        },
+        {
+          "required": [
+            "CriticalThreshold"
+          ]
+        }
+      ],
+      "markdownDescription": "An error-budget condition on the share of the error budget used over the SLO's window, from 0 to 1. Specify at least one of WarningThreshold and CriticalThreshold. Each is breached at or above its value. A CriticalThreshold of 1 is breached when the SLO misses its target.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SloAlertCondition": {
+      "type": "object",
+      "description": "What changes the alert's state. Specify exactly one of BurnRate and ErrorBudget.",
+      "properties": {
+        "BurnRate": {
+          "$ref": "#/definitions/SloBurnRateCondition"
+        },
+        "ErrorBudget": {
+          "$ref": "#/definitions/SloErrorBudgetCondition"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "BurnRate"
+          ]
+        },
+        {
+          "required": [
+            "ErrorBudget"
+          ]
+        }
+      ],
+      "additionalProperties": false,
+      "markdownDescription": "What changes the alert's state. Specify exactly one of BurnRate and ErrorBudget.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "SloRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "A rule on the burn rate or the error budget of a service level objective (SLO) in the same space as the alert.",
+      "properties": {
+        "SloId": {
+          "type": "string",
+          "minLength": 32,
+          "maxLength": 32,
+          "description": "The ID of the SLO. It must be in the same space as the alert.",
+          "markdownDescription": "The ID of the SLO. It must be in the same space as the alert.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 32  \nMaximum Length: 32  \nPattern: ^[0-9a-f]{32}$  \nUpdate requires: No interruption\n"
+        },
+        "Condition": {
+          "$ref": "#/definitions/SloAlertCondition"
+        },
+        "Evaluation": {
+          "$ref": "#/definitions/SloEvaluation"
+        },
+        "NoData": {
+          "$ref": "#/definitions/NoData"
+        }
+      },
+      "required": [
+        "SloId",
+        "Condition",
+        "Evaluation"
+      ],
+      "markdownDescription": "A rule on the burn rate or the error budget of a service level objective (SLO) in the same space as the alert.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    }
+  },
+  "primaryIdentifier": [
+    "/properties/SpaceId",
+    "/properties/AlertId"
+  ],
+  "required": [
+    "SpaceId",
+    "ProfileId",
+    "Name",
+    "Rule"
+  ],
+  "readOnlyProperties": [
+    "/properties/AccountId",
+    "/properties/CreatedAt",
+    "/properties/UpdatedAt",
+    "/properties/AlertId",
+    "/properties/Arn"
+  ],
+  "createOnlyProperties": [
+    "/properties/SpaceId"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "cloudwatch:ListTagsForResource",
+      "cloudwatch:TagResource",
+      "cloudwatch:UntagResource"
+    ]
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "cloudwatch:AssumeAccessProfile",
+        "cloudwatch:CreateAlert",
+        "cloudwatch:InvokeIntegration",
+        "cloudwatch:TagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "cloudwatch:GetAlert",
+        "cloudwatch:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "cloudwatch:AssumeAccessProfile",
+        "cloudwatch:InvokeIntegration",
+        "cloudwatch:TagResource",
+        "cloudwatch:UntagResource",
+        "cloudwatch:UpdateAlert"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "cloudwatch:DeleteAlert",
+        "cloudwatch:GetAlert",
+        "cloudwatch:ListTagsForResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "cloudwatch:ListAlerts"
+      ],
+      "handlerSchema": {
+        "properties": {
+          "SpaceId": {
+            "type": "string",
+            "description": "The ID of the space the alert belongs to.",
+            "markdownDescription": "The ID of the space the alert belongs to.\n\n---\n\nRequired: Yes  \nType: String  \nPattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$  \nUpdate requires: No interruption\n"
+          }
+        },
+        "required": [
+          "SpaceId"
+        ]
+      }
+    }
+  },
+  "additionalProperties": false,
+  "attributes": {
+    "AccountId": {
+      "type": "string",
+      "description": "The AWS account ID that owns the alert.",
+      "minLength": 12,
+      "maxLength": 12,
+      "markdownDescription": "The AWS account ID that owns the alert.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 12  \nMaximum Length: 12  \nPattern: ^[0-9]{12}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "CreatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The time the alert was created, in ISO 8601 format (UTC).",
+      "markdownDescription": "The time the alert was created, in ISO 8601 format (UTC).\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "UpdatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The time the alert was last updated, in ISO 8601 format (UTC).",
+      "markdownDescription": "The time the alert was last updated, in ISO 8601 format (UTC).\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "AlertId": {
+      "type": "string",
+      "description": "The ID of the alert, assigned by CloudWatch when the alert is created. It doesn't change when the alert is updated, and it is the resource ID in the alert's ARN.",
+      "minLength": 32,
+      "maxLength": 32,
+      "markdownDescription": "The ID of the alert, assigned by CloudWatch when the alert is created. It doesn't change when the alert is updated, and it is the resource ID in the alert's ARN.\n\n---\n\nRequired: No  \nType: String  \nMinimum Length: 32  \nMaximum Length: 32  \nPattern: ^[0-9a-f]{32}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Arn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the alert.",
+      "markdownDescription": "The Amazon Resource Name (ARN) of the alert.\n\n---\n\nRequired: No  \nType: String  \nPattern: ^arn:[^:]+:cloudwatch:[^:]*:[0-9]{12}:alert/[0-9a-f]{32}$  \nUpdate requires: No interruption\nRead only property: Yes"
+    }
+  }
+}

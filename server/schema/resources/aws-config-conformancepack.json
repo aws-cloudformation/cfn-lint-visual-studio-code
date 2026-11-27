@@ -35,14 +35,97 @@
         "ParameterValue"
       ],
       "markdownDescription": "Input parameters in the form of key-value pairs for the conformance pack.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 127 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The key name of the tag. You can specify a value that is 1 to 127 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. \n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 1 to 255 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The value for the tag. You can specify a value that is 1 to 255 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. \n\n---\n\nRequired: Yes  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ],
+      "markdownDescription": "A key-value pair to associate with a resource.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Source": {
+      "description": "The source of a managed conformance pack. Specifying Source creates a managed conformance pack, whose Config rules are managed by AWS. You can only specify one of Source or the template body or template S3Uri fields.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "SourceIdentifier": {
+          "description": "The identifier specifying which managed conformance pack is being deployed.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "markdownDescription": "The identifier specifying which managed conformance pack is being deployed.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "SourceIdentifier"
+      ],
+      "markdownDescription": "The source of a managed conformance pack. Specifying Source creates a managed conformance pack, whose Config rules are managed by AWS. You can only specify one of Source or the template body or template S3Uri fields.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "Scope": {
+      "description": "The global tag scope of the managed conformance pack. If specified, only resources with this tag key and value pair are in scope of the conformance pack.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "TagKey": {
+          "description": "The tag key of the tag scope. Only resources with this tag key are in scope of the conformance pack.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "markdownDescription": "The tag key of the tag scope. Only resources with this tag key are in scope of the conformance pack.\n\n---\n\nRequired: Yes  \nType: String  \nMinimum Length: 1  \nMaximum Length: 128  \nUpdate requires: No interruption\n"
+        },
+        "TagValue": {
+          "description": "The tag value of the tag scope. If omitted, resources are in scope based on the presence of the tag key alone, regardless of its value.",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 256,
+          "markdownDescription": "The tag value of the tag scope. If omitted, resources are in scope based on the presence of the tag key alone, regardless of its value.\n\n---\n\nRequired: No  \nType: String  \nMaximum Length: 256  \nUpdate requires: No interruption\n"
+        }
+      },
+      "required": [
+        "TagKey"
+      ],
+      "markdownDescription": "The global tag scope of the managed conformance pack. If specified, only resources with this tag key and value pair are in scope of the conformance pack.\n\n---\n\nRequired: No  \nUpdate requires: No interruption\n"
+    },
+    "ConformancePackType": {
+      "description": "The type of the conformance pack. CUSTOM for a conformance pack whose Config rules are managed by the customer; MANAGED for a managed conformance pack whose Config rules are managed by AWS.",
+      "type": "string",
+      "enum": [
+        "CUSTOM",
+        "MANAGED"
+      ],
+      "markdownDescription": "The type of the conformance pack. CUSTOM for a conformance pack whose Config rules are managed by the customer; MANAGED for a managed conformance pack whose Config rules are managed by AWS.\n\n---\n\nRequired: No  \nType: String  \nAllowed Values: CUSTOM | MANAGED  \nUpdate requires: No interruption\n"
     }
   },
   "tagging": {
-    "taggable": false,
-    "tagOnCreate": false,
-    "tagUpdatable": false,
-    "cloudFormationSystemTags": false,
-    "tagProperty": "/properties/Tags"
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags",
+    "permissions": [
+      "config:TagResource",
+      "config:UntagResource",
+      "config:ListTagsForResource"
+    ]
   },
   "properties": {
     "ConformancePackName": {
@@ -109,11 +192,39 @@
       "minItems": 0,
       "maxItems": 60,
       "markdownDescription": "A list of ConformancePackInputParameter objects.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "ConformancePackArn": {
+      "description": "Amazon Resource Name (ARN) of the conformance pack.",
+      "type": "string",
+      "markdownDescription": "Amazon Resource Name (ARN) of the conformance pack.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Tags": {
+      "description": "The tags for the conformance pack.",
+      "type": "array",
+      "maxItems": 50,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "markdownDescription": "The tags for the conformance pack.\n\n---\n\nRequired: No  \nType: Array  \nUpdate requires: No interruption\n"
+    },
+    "Source": {
+      "$ref": "#/definitions/Source"
+    },
+    "Scope": {
+      "$ref": "#/definitions/Scope"
+    },
+    "Type": {
+      "$ref": "#/definitions/ConformancePackType"
     }
   },
   "additionalProperties": false,
   "required": [
     "ConformancePackName"
+  ],
+  "readOnlyProperties": [
+    "/properties/ConformancePackArn",
+    "/properties/Type"
   ],
   "writeOnlyProperties": [
     "/properties/TemplateBody",
@@ -121,7 +232,8 @@
     "/properties/TemplateSSMDocumentDetails"
   ],
   "createOnlyProperties": [
-    "/properties/ConformancePackName"
+    "/properties/ConformancePackName",
+    "/properties/Source"
   ],
   "primaryIdentifier": [
     "/properties/ConformancePackName"
@@ -132,6 +244,8 @@
         "config:PutConformancePack",
         "config:DescribeConformancePackStatus",
         "config:DescribeConformancePacks",
+        "config:TagResource",
+        "config:ListTagsForResource",
         "s3:GetObject",
         "s3:GetBucketAcl",
         "iam:CreateServiceLinkedRole",
@@ -140,13 +254,18 @@
     },
     "read": {
       "permissions": [
-        "config:DescribeConformancePacks"
+        "config:DescribeConformancePacks",
+        "config:ListTagsForResource"
       ]
     },
     "update": {
       "permissions": [
         "config:PutConformancePack",
         "config:DescribeConformancePackStatus",
+        "config:DescribeConformancePacks",
+        "config:TagResource",
+        "config:UntagResource",
+        "config:ListTagsForResource",
         "s3:GetObject",
         "s3:GetBucketAcl",
         "iam:CreateServiceLinkedRole",
@@ -156,7 +275,8 @@
     "delete": {
       "permissions": [
         "config:DeleteConformancePack",
-        "config:DescribeConformancePackStatus"
+        "config:DescribeConformancePackStatus",
+        "config:UntagResource"
       ]
     },
     "list": {
@@ -165,5 +285,14 @@
       ]
     }
   },
-  "attributes": {}
+  "attributes": {
+    "ConformancePackArn": {
+      "description": "Amazon Resource Name (ARN) of the conformance pack.",
+      "type": "string",
+      "markdownDescription": "Amazon Resource Name (ARN) of the conformance pack.\n\n---\n\nRequired: No  \nType: String  \nUpdate requires: No interruption\nRead only property: Yes"
+    },
+    "Type": {
+      "$ref": "#/definitions/ConformancePackType"
+    }
+  }
 }
